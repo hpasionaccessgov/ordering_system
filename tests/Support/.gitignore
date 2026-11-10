@@ -1,2 +1,5 @@
 _generated
 *Tester.php
+.env
+.env.*
+!.env.example
