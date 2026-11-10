@@ -8,10 +8,11 @@
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
 
-$this->title = 'Login to your account';
+$this->title = 'Login to Ordering System';
 $this->params['breadcrumbs'][] = $this->title;
-$this->params['meta_description'] = 'Log in to access your Yii2 application account.';
+$this->params['meta_description'] = 'Log in to access your application account.';
 $this->params['meta_keywords'] = 'yii, yii2, login, sign in, authentication';
+$this->params['meta_robots'] = 'noindex, nofollow';
 $htmlIcon = <<<HTML
 {label}<div class="input-group"><span class="input-group-text" aria-hidden="true">%s</span>{input}</div>{error}{hint}
 HTML;
@@ -36,10 +37,10 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                     </div>
                     <div>
                         <h2 class="fw-bold mb-3 login-brand-title">
-                            Welcome<br>Back
+                            Welcome<br>to Ordering System
                         </h2>
                         <p class="opacity-75 mb-0 login-brand-text">
-                            Log in to access your Yii2 application and manage your account.
+                            Log in to access the application
                         </p>
                     </div>
                 </div>
@@ -61,7 +62,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                             ) ?>
                         </div>
                         <h1 class="h3 fw-bold mb-1"><?= Html::encode($this->title) ?></h1>
-                        <p class="text-body-secondary small">Enter your credentials to continue</p>
+                        <p class="text-body-secondary small">Enter your credentials to access</p>
                     </div>
 
                     <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
@@ -106,8 +107,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                     <?php ActiveForm::end(); ?>
 
                     <div class="text-body-secondary text-center mt-3 small">
-                        You may login with <strong>admin/admin</strong> or <strong>demo/demo</strong>.<br>
-                        To modify the username/password, check <code>app\models\User::$users</code>.
+                        Don't have account yet? <?= Html::a('Register Here', ['site/register']) ?>
                     </div>
 
                 </div>
