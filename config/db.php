@@ -13,7 +13,6 @@ $env = static function (string $name): string
     }
 
     return $value;
-
 };
 
     return [
