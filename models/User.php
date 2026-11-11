@@ -16,7 +16,6 @@ class User extends ActiveRecord implements IdentityInterface
     public const STATUS_INACTIVE = 0;
     public const STATUS_ACTIVE = 10;
     public const STATUS_DISABLED = 20;
-    public const STATUS_PENDING = 30;
 
     public static function tableName(): string
     {
@@ -47,7 +46,6 @@ class User extends ActiveRecord implements IdentityInterface
                 self::STATUS_INACTIVE,
                 self::STATUS_ACTIVE,
                 self::STATUS_DISABLED,
-                self::STATUS_PENDING,
             ]],
         ];
     }

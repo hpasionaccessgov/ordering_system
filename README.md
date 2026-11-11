@@ -47,5 +47,4 @@ OR Install Laragon for all in one universal pack (https://laragon.org/download/)
    ```
    OR use the laragon GUI to start the server.
 7. Start the laragon apache and MySQL services, then open the link: http://localhost/ordering_system/web/
-8. Register a sample account
-9. in the runtime\mail there would be a generated .eml there, open it with a email type such as outlook app because file transport is enabled for testing local random emails
+8. Register a new account. Registration activates the account and signs you in immediately; email activation is not used.

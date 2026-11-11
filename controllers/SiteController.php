@@ -67,7 +67,6 @@ class SiteController extends Controller
                 'class' => VerbFilter::class,
                 'actions' => [
                     'logout' => ['post'],
-                    'activate' => ['get', 'post'],
                     'profile' => ['get', 'post'],
                     'change-password' => ['get', 'post'],
                     'deactivate' => ['get', 'post'],
@@ -119,108 +118,42 @@ class SiteController extends Controller
             $user->full_name = $model->fullName;
             $user->setPassword($model->password);
             $user->generateAuthKey();
-
-            $token = Yii::$app->security->generateRandomString(64);
-            $user->activation_token_hash = hash('sha256', $token);
-            $user->activation_token_expires_at = time() + 86400;
-            $user->status = User::STATUS_PENDING;
+            $user->status = User::STATUS_ACTIVE;
 
             if ($user->save()) {
-                $activationUrl = Yii::$app->urlManager->createAbsoluteUrl([
-                    'site/activate',
-                    'id' => $user->id,
-                    'token' => $token,
-                ]);
-
-                $sent = $this->mailer->compose()
-                    ->setTo($user->email)
-                    ->setFrom([
-                        Yii::$app->params['senderEmail'] => Yii::$app->params['senderName'],
-                    ])
-                    ->setSubject('Activate your Ordering System account')
-                    ->setTextBody(
-                        "Activate your account using this link:\n\n{$activationUrl}\n\n"
-                            . "This link will expire in 24 hours.",
-                    )
-                    ->send();
-
-                if (!$sent) {
-                    Yii::error("Activation email could not be sent for user ID {$user->id}.");
-                    Yii::$app->session->setFlash('error', 'Your account was created, but the activation email could not be sent. Please contact support.');
-                } else {
+                if (Yii::$app->user->login($user)) {
                     Yii::$app->session->setFlash(
                         'success',
-                        'Registration received. Check your email for an activation link.',
+                        'Your account was created and you are now logged in.',
                     );
+
+                    return $this->redirect(['site/profile']);
                 }
 
-                return $this->redirect(['site/login']);
-            }
-
-            $model->addError('email', 'We could not create youyr account. Check your details and try again.');
-        }
-
-        return $this->render('registration', ['model' => $model]);
-    }
-
-    public function actionActivate(int $id, string $token): Response|string
-    {
-        $user = User::findOne([
-            'id' => $id,
-            'status' => User::STATUS_PENDING,
-        ]);
-
-        $validToken = $user !== null && $user->activation_token_hash !== null && $user->activation_token_expires_at !== null && $user->activation_token_expires_at >= time() && hash_equals(
-            $user->activation_token_hash,
-            hash('sha256', $token),
-        );
-
-        if (!$validToken) {
-            Yii::$app->session->setFlash(
-                'error',
-                'This activation link is invalid, expired, or already used.',
-            );
-            return $this->redirect(['site/login']);
-        }
-
-        if ($this->request->isPost) {
-            $user->status = User::STATUS_ACTIVE;
-            $user->activation_token_hash = null;
-            $user->activation_token_expires_at = null;
-
-            if ($user->save(false, [
-                'status',
-                'activation_token_hash',
-                'activation_token_expires_at',
-            ])) {
-                Yii::$app->session->setFlash(
-                    'success',
-                    'Your account is activated. You can now login.',
+                Yii::error(
+                    "Registration succeeded but login failed for user ID {$user->id}.",
+                    __METHOD__,
                 );
+                Yii::$app->session->setFlash(
+                    'error',
+                    'Your account was created, but automatic login failed. Please log in.',
+                );
+
                 return $this->redirect(['site/login']);
             }
-
-            $errors = $user->getFirstErrors();
-
-            Yii::$app->session->setFlash(
-                'error',
-                $errors
-                    ? implode(' ', array_values($errors))
-                    : 'The account could not be saved. Check the application log.',
-            );
 
             Yii::error([
                 'message' => 'Registration user save failed.',
                 'errors' => $user->getErrors(),
             ], __METHOD__);
 
-            return $this->redirect(['site/login']);
+            $model->addError(
+                'username',
+                'We could not create your account. Check the submitted details and try again.',
+            );
         }
 
-        return $this->render('activate', [
-            'id' => $id,
-            'token' => $token
-        ]);
+        return $this->render('registration', ['model' => $model]);
     }
 
     /**
