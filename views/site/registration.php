@@ -70,7 +70,10 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                             'options' => ['autocomplete' => 'off'],
                             'fieldConfig' => ['labelOptions' => $labelOptions],
                         ],
-                    ) ?>
+                    )
+                    ?>
+
+                    <?= $form->errorSummary($model) ?>
 
                     <?= $form->field($model, 'username', ['template' => sprintf($htmlIcon, '&#128100;')])->textInput(['autofocus' => true, 'placeholder' => 'Enter your username']) ?>
                     <?= $form->field($model, 'email', ['template' => sprintf($htmlIcon, '&#9993;')])->textInput(['placeholder' => 'Enter your email address']) ?>
@@ -94,6 +97,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                             <?= Html::a('Log in', ['site/login'], ['class' => 'fw-semibold']) ?>
                         </p>
                     </div>
+                    <?php ActiveForm::end(); ?>
                 </div>
             </div>
         </div>

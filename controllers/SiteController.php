@@ -51,9 +51,9 @@ class SiteController extends Controller
                 'class' => VerbFilter::class,
                 'actions' => [
                     'logout' => ['post'],
-                'activate' => ['get', 'post']
+                    'activate' => ['get', 'post']
+                ],
             ],
-        ],
         ];
     }
 
@@ -144,7 +144,7 @@ class SiteController extends Controller
         return $this->render('registration', ['model' => $model]);
     }
 
-    public function actionActivies(int $id, string $token): Response|string
+    public function actionActivate(int $id, string $token): Response|string
     {
         $user = User::findOne([
             'id' => $id,
@@ -161,7 +161,7 @@ class SiteController extends Controller
                 'error',
                 'This activation link is invalid, expired, or already used.',
             );
-            return $this->redirect(['sites/login']);
+            return $this->redirect(['site/login']);
         }
 
         if ($this->request->isPost) {
@@ -178,14 +178,22 @@ class SiteController extends Controller
                     'success',
                     'Your account is activated. You can now login.',
                 );
-                return $this->redirect(['sites/login']);
+                return $this->redirect(['site/login']);
             }
 
-            Yii::error("Could not activate user ID{$user->id}.");
+            $errors = $user->getFirstErrors();
+
             Yii::$app->session->setFlash(
                 'error',
-                'We could not activate your account. Please try again.'
+                $errors
+                    ? implode(' ', array_values($errors))
+                    : 'The account could not be saved. Check the application log.',
             );
+
+            Yii::error([
+                'message' => 'Registration user save failed.',
+                'errors' => $user->getErrors(),
+            ], __METHOD__);
 
             return $this->redirect(['site/login']);
         }
