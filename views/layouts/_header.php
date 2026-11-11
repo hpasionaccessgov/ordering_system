@@ -27,14 +27,25 @@ $items = [
         'visible' => Yii::$app->user->isGuest,
     ],
     [
-        'label' => 'Logout (' . Html::encode(Yii::$app->user->identity?->username ?? '') . ')',
-        'url' => ['/site/logout'],
-        'linkOptions' => [
-            'data-method' => 'post',
-            'class' => 'nav-link logout',
-        ],
+        'label' => 'Profile',
+        'url' => ['/site/profile'],
         'visible' => !Yii::$app->user->isGuest,
     ],
+    // [
+    //     'label' => 'Change Password',
+    //     'url' => ['/site/change-password'],
+    //     'visible' => !Yii::$app->user->isGuest,
+    // ],
+
+    // [
+    //     'label' => 'Logout (' . Html::encode(Yii::$app->user->identity?->username ?? '') . ')',
+    //     'url' => ['/site/logout'],
+    //     'linkOptions' => [
+    //         'data-method' => 'post',
+    //         'class' => 'nav-link logout',
+    //     ],
+    //     'visible' => !Yii::$app->user->isGuest,
+    // ],
 ];
 
 ?>

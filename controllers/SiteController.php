@@ -17,9 +17,24 @@ use yii\mail\MailerInterface;
 use yii\web\Controller;
 use yii\web\ErrorAction;
 use yii\web\Response;
+use app\models\ChangePasswordForm;
+use app\models\ProfileForm;
+use yii\web\ForbiddenHttpException;
 
 class SiteController extends Controller
 {
+
+    private function getCurrentUser(): User
+    {
+        $user = Yii::$app->user->identity;
+
+        if (!$user instanceof User) {
+            throw new ForbiddenHttpException();
+        }
+
+        return $user;
+    }
+
     public function __construct(
         $id,
         $module,
@@ -38,10 +53,10 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['logout'],
+                'only' => ['logout', 'profile', 'change-password', 'deactivate'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['logout', 'profile', 'change-password', 'deactivate'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -51,7 +66,10 @@ class SiteController extends Controller
                 'class' => VerbFilter::class,
                 'actions' => [
                     'logout' => ['post'],
-                    'activate' => ['get', 'post']
+                    'activate' => ['get', 'post'],
+                    'profile' => ['get', 'post'],
+                    'change-password' => ['get', 'post'],
+                    'deactivate' => ['get', 'post'],
                 ],
             ],
         ];
@@ -224,6 +242,94 @@ class SiteController extends Controller
         $model->password = '';
 
         return $this->render('login', ['model' => $model]);
+    }
+
+    /** 
+     * Profile action
+     * 
+     * @return Response|string
+     */
+    public function actionProfile(): Response|string
+    {
+        $user = $this->getCurrentUser();
+        $model = new ProfileForm(['fullName' => $user->full_name]);
+
+        if ($model->load($this->request->post()) && $model->validate()) {
+            $user->full_name = $model->fullName;
+
+            if ($user->save(false, ['full_name', 'updated_at'])) {
+                Yii::$app->session->setFlash('success', 'Your profile was update.');
+                return $this->refresh();
+            }
+
+            Yii::error("Could not update profile for user ID {$user->id}.", __METHOD__);
+            Yii::$app->session->setFlash('error', 'Your profile could not be updated.');
+        }
+
+        return $this->render('user_profile', [
+            'user' => $user,
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * Change password action
+     * 
+     * @return Response|string
+     */
+    public function actionChangePassword(): Response|string
+    {
+        $user = $this->getCurrentUser();
+        $model = new ChangePasswordForm($user);
+
+        if ($model->load($this->request->post()) && $model->validate()) {
+            $user->setPassword($model->newPassword);
+            $user->generateAuthKey();
+
+            if ($user->save(false, ['password_hash', 'auth_key', 'updated_at'])) {
+                Yii::$app->user->logout();
+                Yii::$app->session->setFlash(
+                    'success',
+                    'Your password was changed. Please login again.'
+                );
+                return $this->redirect(['site/login']);
+            }
+
+            Yii::error("Could not change password for user ID {$user->id}.", __METHOD__);
+            Yii::$app->session->setFlash('error', 'Your password could not be changed.');
+        }
+
+        return $this->render('change_password', ['model' => $model]);
+    }
+
+    /** 
+     * Deaction aciton
+     * 
+     * @return Response|string
+     */
+    public function actionDeactivate(): Response|string
+    {
+        $user = $this->getCurrentUser();
+        $model = new ChangePasswordForm($user);
+
+        if ($model->load($this->request->post()) && $model->validate()) {
+            $user->status = User::STATUS_DISABLED;
+
+            if ($user->save(false, ['status', 'updated_at'])) {
+                Yii::$app->user->logout();
+                Yii::$app->session->setFlash(
+                    'success',
+                    'Your account has been deactivated.',
+                );
+
+                return $this->redirect(['site/login']);
+            }
+
+            Yii::error("Could not deactivate account for user ID {$user->id}.", __METHOD__);
+            Yii::$app->session->setFlash('error', 'Your account could not be deactivated.');
+        }
+
+        return $this->render('deactivate', ['model' => $model]);
     }
 
     /**
