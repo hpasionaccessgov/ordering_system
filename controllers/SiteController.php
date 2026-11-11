@@ -20,6 +20,7 @@ use yii\web\Response;
 use app\models\ChangePasswordForm;
 use app\models\ProfileForm;
 use yii\web\ForbiddenHttpException;
+use app\models\DeactivateForm;
 
 class SiteController extends Controller
 {
@@ -310,7 +311,7 @@ class SiteController extends Controller
     public function actionDeactivate(): Response|string
     {
         $user = $this->getCurrentUser();
-        $model = new ChangePasswordForm($user);
+        $model = new DeactivateForm($user);
 
         if ($model->load($this->request->post()) && $model->validate()) {
             $user->status = User::STATUS_DISABLED;

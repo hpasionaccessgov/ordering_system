@@ -1,7 +1,7 @@
 <?php
 
 use yii\bootstrap5\ActiveForm;
-use yii\bootstrap5\HTML;
+use yii\helpers\Html;
 
 /** @var app\models\ChangePasswordForm $model */
 
@@ -12,6 +12,8 @@ $this->title = 'Deactivate account';
 <p> Deactivate your account will sign you out and prevent future logins.</p>
 
 <?php $form = ActiveForm::begin(['method' => 'post']); ?>
+
+<?= $form->errorSummary($model) ?>
 
 <?= $form->field($model, 'currentPassword')->passwordInput()->label('Confirm your current password') ?>
 
