@@ -11,7 +11,7 @@
 A Yii2 basic application for ordering system. This application is built using Yii2 framework and provides a simple ordering system for products.
 
 ## Requirements
-- PHP 8.3.36 or higher
+- PHP 8.2 or higher
 - Composer
 - MySQL 8.0.30
 - Git
@@ -31,7 +31,12 @@ OR Install Laragon for all in one universal pack (https://laragon.org/download/)
     ```bash
     mysql -u root -p -e "CREATE DATABASE ordering_system;"
     ```
-    OR use the laragon GUI database manager to create the database.
+    OR use the laragon GUI database manager to create the database using this CREATE query:
+    ```bash
+    CREATE DATABASE ordering_system
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_0900_ai_ci;
+    ```
 5. Run the migrations to set up the database schema:
    ```bash
    php yii migrate
@@ -42,3 +47,4 @@ OR Install Laragon for all in one universal pack (https://laragon.org/download/)
    ```
    OR use the laragon GUI to start the server.
 7. Start the laragon apache and MySQL services, then open the link: http://localhost/ordering_system/web/
+8. Register a new account. Registration activates the account and signs you in immediately; email activation is not used.
