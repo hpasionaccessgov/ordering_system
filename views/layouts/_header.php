@@ -17,7 +17,7 @@ $items = [
     //     'label' => 'About',
     //     'url' => ['/site/about'],
     // ],
-    // [
+    // [ 
     //     'label' => 'Contact',
     //     'url' => ['/site/contact'],
     // ],
@@ -52,9 +52,13 @@ $items = [
 <header id="header">
     <?php NavBar::begin(
         [
-            'brandLabel' => Yii::$app->name,
+            'brandLabel' => Html::img(
+                Yii::getAlias('@web/images/Cafebara_logo.png'),
+                ['alt' => '', 'class' => 'cafebara-brand-logo'],
+            ) . Html::tag('span', 'Cafébara'),
             'brandUrl' => Yii::$app->homeUrl,
-            'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
+            'brandOptions' => ['class' => 'navbar-brand d-flex align-items-center gap-2'],
+            'options' => ['class' => 'navbar-expand-md cafebara-public-navbar fixed-top']
         ],
     ) ?>
     <?= Nav::widget(

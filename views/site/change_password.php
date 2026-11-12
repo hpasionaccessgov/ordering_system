@@ -2,21 +2,30 @@
 
 use app\models\ChangePasswordForm;
 use yii\bootstrap5\ActiveForm;
-use yii\bootstrap5\Html;
+use yii\helpers\Html;
 
-/** @var app\models\ChangePasswordForm $model */
+/** @var ChangePasswordForm $model */
 
 $this->title = 'Change password';
 ?>
 
-<h1> <?= Html::encode($this->title) ?></h1>
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-7">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title mb-0">Change password</h2>
+            </div>
+            <div class="card-body">
+                <?php $form = ActiveForm::begin(); ?>
 
-<?php $form = ActiveForm::begin(); ?>
+                <?= $form->field($model, 'currentPassword')->passwordInput() ?>
+                <?= $form->field($model, 'newPassword')->passwordInput() ?>
+                <?= $form->field($model, 'confirmPassword')->passwordInput() ?>
 
-<?= $form->field($model, 'currentPassword')->passwordInput() ?>
-<?= $form->field($model, 'newPassword')->passwordInput() ?>
-<?= $form->field($model, 'confirmPassword')->passwordInput() ?>
+                <?= Html::submitButton('Update password', ['class' => 'btn btn-primary']) ?>
 
-<?= Html::submitButton('Change password', ['class' => 'btn btn-primary']) ?>
-
-<?php ActiveForm::end(); ?>
+                <?php ActiveForm::end(); ?>
+            </div>
+        </div>
+    </div>
+</div>

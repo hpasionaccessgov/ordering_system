@@ -15,7 +15,7 @@ A Yii2 basic application for ordering system. This application is built using Yi
 - Composer
 - MySQL 8.0.30
 - Git
-OR Install Laragon for all in one universal pack (https://laragon.org/download/)
+OR Install Laragon v6 for all in one universal pack (https://laragon.org/download/)
 
 ## Local setup
 1. Clone the repository:

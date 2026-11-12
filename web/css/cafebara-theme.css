@@ -1,0 +1,173 @@
+/* Cafébara theme color for some of the components*/
+
+:root,
+[data-bs-theme="light"] {
+    --cafebara-brown: #89431c;
+    --cafebara-cream: #f8e6cb;
+    --cafebara-dark: #301206;
+    --cafebara-brown-rgb: 137, 67, 28;
+
+    --bs-primary: var(--cafebara-brown);
+    --bs-primary-rgb: var(--cafebara-brown-rgb);
+    --bs-primary-text-emphasis: var(--cafebara-dark);
+    --bs-primary-bg-subtle: var(--cafebara-cream);
+    --bs-primary-border-subtle: #d7b897;
+    --bs-link-color: var(--cafebara-brown);
+    --bs-link-hover-color: var(--cafebara-dark);
+    --bs-focus-ring-color: rgba(var(--cafebara-brown-rgb), .25);
+}
+
+.btn-primary {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--cafebara-brown);
+    --bs-btn-border-color: var(--cafebara-brown);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--cafebara-dark);
+    --bs-btn-hover-border-color: var(--cafebara-dark);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--cafebara-dark);
+    --bs-btn-active-border-color: var(--cafebara-dark);
+    --bs-btn-disabled-bg: var(--cafebara-brown);
+    --bs-btn-disabled-border-color: var(--cafebara-brown);
+    --bs-btn-focus-shadow-rgb: var(--cafebara-brown-rgb);
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--cafebara-brown);
+    --bs-btn-border-color: var(--cafebara-brown);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--cafebara-brown);
+    --bs-btn-hover-border-color: var(--cafebara-brown);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--cafebara-dark);
+    --bs-btn-active-border-color: var(--cafebara-dark);
+    --bs-btn-focus-shadow-rgb: var(--cafebara-brown-rgb);
+}
+
+.bg-primary {
+    background-color: var(--cafebara-brown) !important;
+}
+
+.text-primary,
+.link-primary {
+    color: var(--cafebara-brown) !important;
+}
+
+.border-primary {
+    border-color: var(--cafebara-brown) !important;
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    border-color: #bd8a68;
+    box-shadow: 0 0 0 .25rem rgba(var(--cafebara-brown-rgb), .2);
+}
+
+.form-check-input:checked {
+    background-color: var(--cafebara-brown);
+    border-color: var(--cafebara-brown);
+}
+
+.cafebara-brand-logo {
+    display: block;
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+}
+
+.cafebara-brand-name {
+    color: var(--cafebara-dark);
+    font-weight: 700;
+}
+
+.cafebara-public-navbar,
+.cafebara-auth-header {
+    background-color: var(--cafebara-cream);
+    border-bottom: 1px solid #e8d2b4;
+}
+
+.cafebara-public-navbar .navbar-brand,
+.cafebara-public-navbar .nav-link {
+    color: var(--cafebara-dark) !important;
+}
+
+.cafebara-public-navbar .nav-link:hover,
+.cafebara-public-navbar .nav-link:focus {
+    color: var(--cafebara-brown) !important;
+}
+
+.cafebara-auth-header .navbar {
+    min-height: 68px;
+}
+
+.cafebara-admin-brand {
+    margin-right: 1rem;
+}
+
+.app-header {
+    background-color: var(--cafebara-cream) !important;
+    border-bottom: 1px solid #e8d2b4;
+}
+
+.app-header .navbar-brand,
+.app-header .nav-link {
+    color: var(--cafebara-dark);
+}
+
+.app-header .nav-link:hover,
+.app-header .nav-link:focus {
+    color: var(--cafebara-brown);
+}
+
+.app-sidebar[data-bs-theme="dark"] {
+    background-color: var(--cafebara-dark) !important;
+}
+
+.app-sidebar[data-bs-theme="dark"] .sidebar-brand {
+    background-color: var(--cafebara-dark);
+}
+
+.app-sidebar[data-bs-theme="dark"] .nav-link {
+    color: var(--cafebara-cream);
+}
+
+.app-sidebar[data-bs-theme="dark"] .nav-link:hover:not(.active) {
+    background-color: rgba(248, 230, 203, .12);
+    color: #fff;
+}
+
+.app-sidebar[data-bs-theme="dark"] .nav-link.active {
+    background-color: var(--cafebara-brown);
+    color: #fff;
+}
+
+.app-content-header h1 {
+    color: var(--cafebara-dark);
+}
+
+.app-footer {
+    border-top: 1px solid #e8d2b4;
+}
+
+.auth-main {
+    flex-grow: 1;
+}
+
+@media (max-width: 575.98px) {
+    .cafebara-brand-logo {
+        width: 38px;
+        height: 38px;
+    }
+
+    .cafebara-auth-header .btn {
+        --bs-btn-padding-y: .375rem;
+        --bs-btn-padding-x: .6rem;
+        font-size: .875rem;
+    }
+}
+
+[data-bs-theme="dark"] {
+    --bs-link-color: #e9b88c;
+    --bs-link-hover-color: var(--cafebara-cream);
+}

@@ -12,11 +12,11 @@ use yii\helpers\Html;
 $this->render('_head');
 ?>
 <?php $this->beginPage() ?>
-<!DOCTYPE html>
-<html lang="<?= Yii::$app->language ?>" class="h-100" data-bs-theme="light">
+<!doctype html>
+<html lang="<?= Html::encode(Yii::$app->language) ?>" class="h-100" data-bs-theme="light">
 <head>
+    <title><?= Html::encode($this->title ?: Yii::$app->name) ?></title>
     <?php $this->head() ?>
-    <title><?= Html::encode($this->title) ?></title>
 </head>
 <body class="d-flex flex-column h-100">
 <?php $this->beginBody() ?>
@@ -28,6 +28,7 @@ $this->render('_head');
         <?php if (!empty($this->params['breadcrumbs'])): ?>
             <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
         <?php endif ?>
+
         <?= Alert::widget() ?>
         <?= $content ?>
     </div>

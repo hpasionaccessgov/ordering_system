@@ -54,10 +54,10 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['logout', 'profile', 'change-password', 'deactivate'],
+                'only' => ['logout', 'profile', 'change-password', 'deactivate', 'dashboard'],
                 'rules' => [
                     [
-                        'actions' => ['logout', 'profile', 'change-password', 'deactivate'],
+                        'actions' => ['logout', 'profile', 'change-password', 'deactivate', 'dashboard'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -109,6 +109,8 @@ class SiteController extends Controller
      */
     public function actionRegister(): Response|string
     {
+        $this->layout = 'auth';
+
         $model = new RegisterForm();
 
         if ($model->load($this->request->post()) && $model->validate()) {
@@ -163,6 +165,8 @@ class SiteController extends Controller
      */
     public function actionLogin(): Response|string
     {
+        $this->layout = 'auth';
+
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
@@ -179,12 +183,24 @@ class SiteController extends Controller
     }
 
     /** 
+     * Dashboard action
+     * @return Response|string
+     */
+    public function actionDashboard(): string
+    {
+        $this->layout = 'admin';
+
+        return $this->render('dashboard');
+    }
+
+    /** 
      * Profile action
      * 
      * @return Response|string
      */
     public function actionProfile(): Response|string
     {
+        $this->layout = 'admin';
         $user = $this->getCurrentUser();
         $model = new ProfileForm(['fullName' => $user->full_name]);
 
@@ -213,6 +229,7 @@ class SiteController extends Controller
      */
     public function actionChangePassword(): Response|string
     {
+        $this->layout = 'admin';
         $user = $this->getCurrentUser();
         $model = new ChangePasswordForm($user);
 
@@ -243,6 +260,7 @@ class SiteController extends Controller
      */
     public function actionDeactivate(): Response|string
     {
+        $this->layout = 'admin';
         $user = $this->getCurrentUser();
         $model = new DeactivateForm($user);
 
