@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace app\assets;
 
 use yii\bootstrap5\BootstrapAsset;
+use yii\bootstrap5\BootstrapPluginAsset;
 use yii\web\AssetBundle;
 use yii\web\View;
 use yii\web\YiiAsset;
@@ -35,7 +36,11 @@ class AppAsset extends AssetBundle
         'position' => View::POS_HEAD,
     ];
     public $depends = [
+        ColorModeAsset::class,
         YiiAsset::class,
         BootstrapAsset::class,
+        BootstrapPluginAsset::class,
+        CafebaraThemeAsset::class,
+        BootstrapIconsAsset::class,
     ];
 }

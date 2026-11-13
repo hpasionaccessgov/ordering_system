@@ -5,7 +5,7 @@
 use yii\helpers\Html;
 
 $this->title = 'About';
-$this->params['breadcrumbs'][] = $this->title;
+// $this->params['breadcrumbs'][] = $this->title;
 $this->params['meta_description'] = 'Learn more about this Yii2-powered application.';
 $this->params['meta_keywords'] = 'yii, yii2, about, php, framework';
 ?>

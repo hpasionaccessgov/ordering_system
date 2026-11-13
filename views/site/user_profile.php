@@ -1,37 +1,56 @@
 <?php
 
-use yii\bootstrap5\ActiveForm;
-use yii\bootstrap5\Html;
+use app\models\ProfileForm;
+use app\models\User;
+use app\widgets\AdminActiveForm;
+use app\widgets\AdminButton;
+use yii\helpers\Html;
 
-/** @var app\models\User $user */
-/** @var app\models\ProfileForm $model */
+/** @var User $user */
+/** @var ProfileForm $model */
 
 $this->title = 'My Profile';
 ?>
 
-<h1><?= Html::encode($this->title) ?></h1>
+<div class="row justify-content-center">
+    <div class="col-12 col-xl-8">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title mb-0">Profile details</h2>
+            </div>
 
-<p>Username: <?= Html::encode($user->username) ?></p>
-<p>Email: <?= Html::encode($user->email) ?></p>
+            <div class="card-body">
+                <dl class="row mb-4">
+                    <dt class="col-sm-3">Username</dt>
+                    <dd class="col-sm-9"><?= Html::encode($user->username) ?></dd>
 
-<?php $form = ActiveForm::begin(); ?>
+                    <dt class="col-sm-3">Email</dt>
+                    <dd class="col-sm-9"><?= Html::encode($user->email) ?></dd>
+                </dl>
 
-<?= $form->field($model, 'fullName')->textInput(['maxlength' => true]) ?>
+                <?php $form = AdminActiveForm::begin(); ?>
 
-<?= Html::submitButton('Save profile', ['class' => 'btn btn-primary']) ?>
+                <?= $form->field($model, 'fullName')->textInput(['maxlength' => true]) ?>
 
-<?php ActiveForm::end(); ?>
+                <?= AdminButton::submit('Save profile') ?>
 
-<p class="mt-3">
-    <?= Html::a('Change password', ['site/change-password']) ?>
-</p>
-<p>
-    <?= Html::a('Deactivate account', ['site/deactivate'], ['class' => 'text-danger']) ?>
-</p>
+                <?php AdminActiveForm::end(); ?>
+            </div>
+        </div>
 
-<p class="mt-3">
-    <?= Html::a('Logout', ['/site/logout'], [
-        'data-method' => 'post',
-        'class' => 'text-warning logout',
-    ]) ?>
-</p>
+        <div class="card mt-4">
+            <div class="card-header">
+                <h2 class="card-title mb-0">Account actions</h2>
+            </div>
+
+            <div class="card-body d-flex flex-wrap gap-2">
+                <?= AdminButton::link('Change password', ['/site/change-password'], 'outline-primary') ?>
+
+                <?= AdminButton::link('Deactivate account', ['/site/deactivate'], 'outline-danger') ?>
+
+                <?= Html::beginForm(['/site/logout'], 'post', ['class' => 'd-inline']) ?>
+                <?= AdminButton::submit('Logout', 'outline-warning') ?>
+                <?= Html::endForm() ?>
+            </div>
+        </div>
+    </div>

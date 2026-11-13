@@ -1,0 +1,647 @@
+/* Cafébara theme color for some of the components*/
+
+:root,
+[data-bs-theme="light"] {
+    --cafebara-brown: #89431c;
+    --cafebara-cream: #f8e6cb;
+    --cafebara-dark: #301206;
+    --cafebara-brown-rgb: 137, 67, 28;
+
+    --bs-primary: var(--cafebara-brown);
+    --bs-primary-rgb: var(--cafebara-brown-rgb);
+    --bs-primary-text-emphasis: var(--cafebara-dark);
+    --bs-primary-bg-subtle: var(--cafebara-cream);
+    --bs-primary-border-subtle: #d7b897;
+    --bs-link-color: var(--cafebara-brown);
+    --bs-link-hover-color: var(--cafebara-dark);
+    --bs-focus-ring-color: rgba(var(--cafebara-brown-rgb), .25);
+}
+
+.btn-primary {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--cafebara-brown);
+    --bs-btn-border-color: var(--cafebara-brown);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--cafebara-dark);
+    --bs-btn-hover-border-color: var(--cafebara-dark);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--cafebara-dark);
+    --bs-btn-active-border-color: var(--cafebara-dark);
+    --bs-btn-disabled-bg: var(--cafebara-brown);
+    --bs-btn-disabled-border-color: var(--cafebara-brown);
+    --bs-btn-focus-shadow-rgb: var(--cafebara-brown-rgb);
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--cafebara-brown);
+    --bs-btn-border-color: var(--cafebara-brown);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--cafebara-brown);
+    --bs-btn-hover-border-color: var(--cafebara-brown);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--cafebara-dark);
+    --bs-btn-active-border-color: var(--cafebara-dark);
+    --bs-btn-focus-shadow-rgb: var(--cafebara-brown-rgb);
+}
+
+.bg-primary {
+    background-color: var(--cafebara-brown) !important;
+}
+
+.text-primary,
+.link-primary {
+    color: var(--cafebara-brown) !important;
+}
+
+.border-primary {
+    border-color: var(--cafebara-brown) !important;
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    border-color: #bd8a68;
+    box-shadow: 0 0 0 .25rem rgba(var(--cafebara-brown-rgb), .2);
+}
+
+.form-check-input:checked {
+    background-color: var(--cafebara-brown);
+    border-color: var(--cafebara-brown);
+}
+
+.cafebara-brand-logo {
+    display: block;
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+}
+
+.cafebara-brand-name {
+    color: var(--cafebara-dark);
+    font-weight: 700;
+}
+
+.cafebara-auth-header {
+    background-color: var(--cafebara-cream);
+    border-bottom: 1px solid #e8d2b4;
+}
+
+.cafebara-site-header {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    background-color: rgba(248, 230, 203, .97);
+    border-bottom: 1px solid #e8d2b4;
+    box-shadow: 0 4px 20px rgba(48, 18, 6, .08);
+    backdrop-filter: blur(12px);
+}
+
+.cafebara-site-header .navbar {
+    padding: .55rem 0;
+}
+
+.cafebara-brand-lockup {
+    text-decoration: none;
+}
+
+.cafebara-brand-copy {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+}
+
+.cafebara-brand-name {
+    font-size: 1.1rem;
+}
+
+.cafebara-brand-caption {
+    margin-top: .3rem;
+    color: #805139;
+    font-size: .58rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+}
+
+.cafebara-main-nav {
+    align-items: center;
+}
+
+.cafebara-main-nav .nav-link {
+    border-radius: 999px;
+    color: var(--cafebara-dark);
+    font-weight: 600;
+    padding: .6rem .9rem;
+    transition: background-color .15s ease-in-out, color .15s ease-in-out;
+}
+
+.cafebara-main-nav .nav-link:hover,
+.cafebara-main-nav .nav-link:focus,
+.cafebara-main-nav .nav-link.active {
+    background-color: rgba(137, 67, 28, .1);
+    color: var(--cafebara-brown);
+}
+
+.cafebara-site-header .navbar-toggler {
+    border-color: rgba(48, 18, 6, .2);
+    padding: .45rem .6rem;
+}
+
+.cafebara-menu-icon,
+.cafebara-menu-icon::before,
+.cafebara-menu-icon::after {
+    display: block;
+    width: 1.25rem;
+    height: 2px;
+    border-radius: 2px;
+    background-color: var(--cafebara-dark);
+}
+
+.cafebara-menu-icon {
+    position: relative;
+}
+
+.cafebara-menu-icon::before,
+.cafebara-menu-icon::after {
+    position: absolute;
+    left: 0;
+    content: "";
+}
+
+.cafebara-menu-icon::before {
+    top: -.4rem;
+}
+
+.cafebara-menu-icon::after {
+    top: .4rem;
+}
+
+.cafebara-theme-toggle {
+    width: 42px;
+    height: 42px;
+    border: 1px solid #d6b998;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, .6);
+    color: var(--cafebara-dark);
+    font-size: 1.15rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+}
+
+.cafebara-theme-toggle:hover,
+.cafebara-theme-toggle:focus {
+    border-color: var(--cafebara-brown);
+    background-color: #fff;
+    color: var(--cafebara-brown);
+}
+
+.cafebara-sign-out {
+    color: #62402f;
+    text-decoration: none;
+}
+
+.cafebara-sign-out:hover,
+.cafebara-sign-out:focus {
+    color: var(--cafebara-dark);
+    text-decoration: underline;
+}
+
+.btn-cafebara-light {
+    --bs-btn-color: var(--cafebara-dark);
+    --bs-btn-bg: var(--cafebara-cream);
+    --bs-btn-border-color: var(--cafebara-cream);
+    --bs-btn-hover-color: var(--cafebara-dark);
+    --bs-btn-hover-bg: #fff4e4;
+    --bs-btn-hover-border-color: #fff4e4;
+    --bs-btn-active-color: var(--cafebara-dark);
+    --bs-btn-active-bg: #efd6b5;
+    --bs-btn-active-border-color: #efd6b5;
+}
+
+.btn-cafebara-outline-light {
+    --bs-btn-color: #fff;
+    --bs-btn-border-color: rgba(255, 255, 255, .75);
+    --bs-btn-hover-color: var(--cafebara-dark);
+    --bs-btn-hover-bg: #fff;
+    --bs-btn-hover-border-color: #fff;
+    --bs-btn-active-color: var(--cafebara-dark);
+    --bs-btn-active-bg: var(--cafebara-cream);
+    --bs-btn-active-border-color: var(--cafebara-cream);
+}
+
+.cafebara-hero {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(125deg, var(--cafebara-dark) 0%, var(--cafebara-brown) 72%, #a96231 100%);
+    box-shadow: 0 1.25rem 3rem rgba(48, 18, 6, .18);
+    color: #fff;
+}
+
+.cafebara-hero::before,
+.cafebara-hero::after {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(248, 230, 203, .08);
+    content: "";
+    pointer-events: none;
+}
+
+.cafebara-hero::before {
+    top: -9rem;
+    right: 12%;
+    width: 22rem;
+    height: 22rem;
+}
+
+.cafebara-hero::after {
+    right: -7rem;
+    bottom: -12rem;
+    width: 26rem;
+    height: 26rem;
+}
+
+.cafebara-hero>.row {
+    position: relative;
+    z-index: 1;
+}
+
+.cafebara-hero-kicker,
+.cafebara-section-kicker,
+.cafebara-dashboard-kicker {
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+}
+
+.cafebara-hero-kicker {
+    color: var(--cafebara-cream);
+}
+
+.cafebara-kicker-dot {
+    display: inline-block;
+    width: .55rem;
+    height: .55rem;
+    margin-right: .4rem;
+    border-radius: 50%;
+    background-color: #f3bd83;
+    vertical-align: .05rem;
+}
+
+.cafebara-hero h1 {
+    color: #fff;
+    line-height: 1.08;
+}
+
+.cafebara-hero h1 span {
+    color: var(--cafebara-cream);
+}
+
+.cafebara-hero-copy {
+    max-width: 40rem;
+    color: rgba(255, 255, 255, .82);
+}
+
+.cafebara-hero-art {
+    position: relative;
+    display: flex;
+    min-height: 290px;
+    align-items: center;
+    justify-content: center;
+}
+
+.cafebara-hero-logo {
+    width: min(100%, 340px);
+    filter: drop-shadow(0 1rem 1.5rem rgba(0, 0, 0, .28));
+}
+
+.cafebara-hero-note {
+    position: absolute;
+    right: 0;
+    bottom: .25rem;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    max-width: 275px;
+    padding: .75rem 1rem;
+    border: 1px solid rgba(48, 18, 6, .08);
+    border-radius: 1rem;
+    background-color: var(--cafebara-cream);
+    box-shadow: 0 .75rem 1.75rem rgba(0, 0, 0, .18);
+    color: var(--cafebara-dark);
+}
+
+.cafebara-hero-note-icon,
+.cafebara-feature-icon,
+.cafebara-dashboard-icon,
+.cafebara-empty-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    border-radius: 1rem;
+    background-color: var(--cafebara-cream);
+    color: var(--cafebara-brown);
+}
+
+.cafebara-hero-note-icon {
+    width: 42px;
+    height: 42px;
+    background-color: rgba(137, 67, 28, .12);
+    font-size: 1.2rem;
+}
+
+.cafebara-hero-note strong,
+.cafebara-hero-note small {
+    display: block;
+}
+
+.cafebara-hero-note small {
+    margin-top: .15rem;
+    color: #74523d;
+}
+
+.cafebara-section-kicker {
+    color: var(--cafebara-brown);
+}
+
+.cafebara-feature-card,
+.cafebara-dashboard-card,
+.cafebara-dashboard-activity {
+    overflow: hidden;
+    border: 1px solid rgba(48, 18, 6, .08);
+    border-radius: 1rem;
+    box-shadow: 0 .5rem 1.5rem rgba(48, 18, 6, .05);
+}
+
+.cafebara-feature-card {
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.cafebara-feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 .9rem 2rem rgba(48, 18, 6, .1);
+}
+
+.cafebara-feature-icon,
+.cafebara-dashboard-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
+}
+
+.cafebara-dashboard-hero {
+    background: linear-gradient(125deg, var(--cafebara-dark), var(--cafebara-brown));
+    box-shadow: 0 1rem 2rem rgba(48, 18, 6, .14);
+    color: #fff;
+}
+
+.cafebara-dashboard-kicker {
+    color: var(--cafebara-cream);
+}
+
+.cafebara-dashboard-hero .lead {
+    max-width: 42rem;
+    color: rgba(255, 255, 255, .8);
+}
+
+.cafebara-dashboard-logo {
+    width: min(100%, 180px);
+    filter: drop-shadow(0 .75rem 1rem rgba(0, 0, 0, .24));
+}
+
+.cafebara-dashboard-icon {
+    border-radius: .9rem;
+}
+
+.cafebara-admin-form .form-label {
+    color: var(--cafebara-dark);
+    font-weight: 600;
+}
+
+.cafebara-admin-form .form-control:focus,
+.cafebara-admin-form .form-select:focus {
+    border-color: #bd8a68;
+    box-shadow: 0 0 0 .25rem rgba(var(--cafebara-brown-rgb), .2);
+}
+
+.cafebara-admin-grid table {
+    min-width: 36rem;
+}
+
+.cafebara-admin-grid .table thead th {
+    background-color: var(--cafebara-cream);
+    color: var(--cafebara-dark);
+    white-space: nowrap;
+}
+
+.cafebara-empty-state {
+    max-width: 34rem;
+    margin: 0 auto;
+}
+
+.cafebara-empty-icon {
+    width: 54px;
+    height: 54px;
+    font-size: 1.35rem;
+}
+
+.cafebara-site-header .cafebara-nav-actions {
+    flex-shrink: 0;
+}
+
+.cafebara-auth-header .navbar {
+    min-height: 68px;
+}
+
+.cafebara-admin-brand {
+    margin-right: 1rem;
+}
+
+.app-header {
+    background-color: var(--cafebara-cream) !important;
+    border-bottom: 1px solid #e8d2b4;
+}
+
+.app-header .navbar-brand,
+.app-header .nav-link {
+    color: var(--cafebara-dark);
+}
+
+.app-header .nav-link:hover,
+.app-header .nav-link:focus {
+    color: var(--cafebara-brown);
+}
+
+.app-sidebar[data-bs-theme="dark"] {
+    background-color: var(--cafebara-dark) !important;
+}
+
+.app-sidebar[data-bs-theme="dark"] .sidebar-brand {
+    background-color: var(--cafebara-dark);
+}
+
+.app-sidebar[data-bs-theme="dark"] .nav-link {
+    color: var(--cafebara-cream);
+}
+
+.app-sidebar[data-bs-theme="dark"] .nav-link:hover:not(.active) {
+    background-color: rgba(248, 230, 203, .12);
+    color: #fff;
+}
+
+.app-sidebar[data-bs-theme="dark"] .nav-link.active {
+    background-color: var(--cafebara-brown);
+    color: #fff;
+}
+
+.app-content-header h1 {
+    color: var(--cafebara-dark);
+}
+
+.app-footer {
+    border-top: 1px solid #e8d2b4;
+}
+
+.auth-main {
+    flex-grow: 1;
+}
+
+@media (max-width: 575.98px) {
+    .cafebara-brand-logo {
+        width: 38px;
+        height: 38px;
+    }
+
+    .cafebara-auth-header .btn {
+        --bs-btn-padding-y: .375rem;
+        --bs-btn-padding-x: .6rem;
+        font-size: .875rem;
+    }
+
+    .cafebara-hero-art {
+        min-height: 230px;
+        margin-top: .5rem;
+    }
+
+    .cafebara-hero-logo {
+        width: min(75%, 260px);
+    }
+
+    .cafebara-hero-note {
+        right: 0;
+        bottom: 0;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .cafebara-site-header .navbar-collapse {
+        padding: 1rem 0 .5rem;
+    }
+
+    .cafebara-main-nav {
+        align-items: stretch;
+        padding-bottom: .75rem;
+    }
+
+    .cafebara-site-header .cafebara-nav-actions {
+        flex-wrap: wrap;
+        padding-top: .75rem;
+        border-top: 1px solid rgba(48, 18, 6, .12);
+    }
+}
+
+[data-bs-theme="dark"] {
+    --bs-link-color: #e9b88c;
+    --bs-link-hover-color: var(--cafebara-cream);
+}
+
+[data-bs-theme="dark"] .cafebara-site-header {
+    background-color: rgba(48, 18, 6, .97);
+    border-bottom-color: rgba(248, 230, 203, .14);
+}
+
+[data-bs-theme="dark"] .cafebara-site-header .navbar-brand,
+[data-bs-theme="dark"] .cafebara-site-header .cafebara-brand-name,
+[data-bs-theme="dark"] .cafebara-site-header .nav-link {
+    color: var(--cafebara-cream) !important;
+}
+
+[data-bs-theme="dark"] .cafebara-brand-caption {
+    color: #d7b897;
+}
+
+[data-bs-theme="dark"] .cafebara-main-nav .nav-link:hover,
+[data-bs-theme="dark"] .cafebara-main-nav .nav-link:focus,
+[data-bs-theme="dark"] .cafebara-main-nav .nav-link.active {
+    background-color: rgba(248, 230, 203, .12);
+    color: #fff !important;
+}
+
+[data-bs-theme="dark"] .cafebara-site-header .navbar-toggler {
+    border-color: rgba(248, 230, 203, .35);
+}
+
+[data-bs-theme="dark"] .cafebara-menu-icon,
+[data-bs-theme="dark"] .cafebara-menu-icon::before,
+[data-bs-theme="dark"] .cafebara-menu-icon::after {
+    background-color: var(--cafebara-cream);
+}
+
+[data-bs-theme="dark"] .cafebara-site-header .btn-outline-primary {
+    --bs-btn-color: var(--cafebara-cream);
+    --bs-btn-border-color: #d7b897;
+    --bs-btn-hover-color: var(--cafebara-dark);
+    --bs-btn-hover-bg: var(--cafebara-cream);
+    --bs-btn-hover-border-color: var(--cafebara-cream);
+    --bs-btn-active-color: var(--cafebara-dark);
+    --bs-btn-active-bg: #efd6b5;
+    --bs-btn-active-border-color: #efd6b5;
+}
+
+[data-bs-theme="dark"] .cafebara-sign-out {
+    color: var(--cafebara-cream);
+}
+
+[data-theme-icon] .cafebara-theme-toggle {
+    display: block;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+[data-bs-theme="dark"] .cafebara-auth-header {
+    background-color: var(--cafebara-dark);
+    border-bottom-color: rgba(248, 230, 203, .14);
+}
+
+[data-bs-theme="dark"] .cafebara-auth-header .navbar-brand,
+[data-bs-theme="dark"] .cafebara-auth-header .cafebara-brand-name {
+    color: var(--cafebara-cream);
+}
+
+[data-bs-theme="dark"] .app-header {
+    background-color: var(--bs-body-bg) !important;
+    border-bottom-color: var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .app-header .navbar-brand,
+[data-bs-theme="dark"] .app-header .nav-link {
+    color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .cafebara-auth-header .btn-outline-primary {
+    --bs-btn-color: var(--cafebara-cream);
+    --bs-btn-border-color: #d7b897;
+    --bs-btn-hover-color: var(--cafebara-dark);
+    --bs-btn-hover-bg: var(--cafebara-cream);
+    --bs-btn-hover-border-color: var(--cafebara-cream);
+}
+
+[data-bs-theme="dark"] .cafebara-theme-toggle {
+    border-color: rgba(248, 230, 203, .35);
+    background-color: rgba(248, 230, 203, .1);
+    color: var(--cafebara-cream);
+}

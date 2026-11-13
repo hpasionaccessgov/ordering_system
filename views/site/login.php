@@ -8,7 +8,7 @@
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
 
-$this->title = 'Login to Ordering System';
+$this->title = 'Sign in to Cafébara';
 $this->params['breadcrumbs'][] = $this->title;
 $this->params['meta_description'] = 'Log in to access your application account.';
 $this->params['meta_keywords'] = 'yii, yii2, login, sign in, authentication';
@@ -27,17 +27,16 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                 <div class="d-flex flex-column justify-content-between p-4 p-lg-5 w-100">
                     <div>
                         <?= Html::img(
-                            Yii::getAlias('@web/images/yii3_full_white_for_dark.svg'),
+                            Yii::getAlias('@web/images/Cafebara_logo.png'),
                             [
-                                'alt' => 'Yii Framework',
-                                'class' => 'mb-4',
-                                'height' => 40,
+                                'alt' => 'Cafébara',
+                                'class' => 'login-brand-logo mb-4',
                             ],
                         ) ?>
                     </div>
                     <div>
                         <h2 class="fw-bold mb-3 login-brand-title">
-                            Welcome<br>to Ordering System
+                            Welcome<br>to Cafébara
                         </h2>
                         <p class="opacity-75 mb-0 login-brand-text">
                             Log in to access the application
@@ -53,11 +52,10 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                         <!-- Mobile-only logo -->
                         <div class="d-md-none mb-3">
                             <?= Html::img(
-                                Yii::getAlias('@web/images/yii3_full_black_for_light.svg'),
+                                Yii::getAlias('@web/images/Cafebara_logo.png'),
                                 [
-                                    'alt' => 'Yii Framework',
+                                    'alt' => 'Cafébara',
                                     'class' => 'login-mobile-logo',
-                                    'height' => 36,
                                 ],
                             ) ?>
                         </div>

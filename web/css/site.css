@@ -1,5 +1,5 @@
 main > .container {
-    padding: 70px 15px 20px;
+    padding: 2rem 15px 3rem;
     display: flex;
     flex-direction: column;
     min-height: 100%;
@@ -48,12 +48,6 @@ a.desc:after {
     border-left: 3px solid var(--bs-danger-border-subtle);
     padding: 10px 20px;
     margin: 0 0 15px 0;
-}
-
-/* align navbar brand baseline with nav links */
-.navbar > .container,
-.navbar > .container-fluid {
-    align-items: baseline;
 }
 
 /* align the logout "link" (button in form) of the navbar */
@@ -170,7 +164,7 @@ a.desc:after {
 }
 
 .login-brand-panel {
-    background: linear-gradient(135deg, #40B3D8 0%, #3a9cbd 40%, #83C933 100%);
+    background: linear-gradient(135deg, var(--cafebara-dark) 0%, var(--cafebara-brown) 62%, #b66a35 100%);
     position: relative;
     min-height: 480px;
 }
@@ -180,13 +174,20 @@ a.desc:after {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(circle at 20% 80%, rgba(241, 138, 42, .25) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(131, 201, 51, .2) 0%, transparent 40%);
+        radial-gradient(circle at 20% 80%, rgba(248, 230, 203, .2) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(182, 106, 53, .2) 0%, transparent 40%);
     pointer-events: none;
 }
 
+.login-brand-logo,
+.login-mobile-logo {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+}
+
 .login-btn {
-    background: linear-gradient(135deg, #40B3D8, #3a9cbd);
+    background: linear-gradient(135deg, var(--cafebara-brown), var(--cafebara-dark));
     border: none;
     font-weight: 600;
     letter-spacing: .02em;
@@ -206,10 +207,6 @@ a.desc:after {
 [data-bs-theme="dark"] .login-split-card {
     background-color: var(--bs-body-bg);
     box-shadow: 0 0 0 1px var(--bs-border-color), 0 4px 24px rgba(0, 0, 0, .4);
-}
-
-[data-bs-theme="dark"] .login-mobile-logo {
-    filter: invert(1);
 }
 
 /* contact form textarea height */
@@ -272,7 +269,7 @@ a.desc:after {
 
 /* hero banner */
 .hero-banner {
-    background: linear-gradient(135deg, #83C933 0%, #3a9cbd 40%, #40B3D8 100%);
+    background: linear-gradient(135deg, var(--cafebara-dark) 0%, var(--cafebara-brown) 55%, #b66a35 100%);
     position: relative;
 }
 
@@ -294,9 +291,9 @@ a.desc:after {
     inset: 0;
     border-radius: inherit;
     background:
-        radial-gradient(circle at 15% 85%, rgba(241, 138, 42, .3) 0%, transparent 45%),
-        radial-gradient(circle at 85% 15%, rgba(131, 201, 51, .25) 0%, transparent 40%),
-        radial-gradient(ellipse at 50% 50%, rgba(64, 179, 216, .15) 0%, transparent 60%);
+        radial-gradient(circle at 15% 85%, rgba(248, 230, 203, .24) 0%, transparent 45%),
+        radial-gradient(circle at 85% 15%, rgba(182, 106, 53, .2) 0%, transparent 40%),
+        radial-gradient(ellipse at 50% 50%, rgba(248, 230, 203, .12) 0%, transparent 60%);
     pointer-events: none;
 }
 
