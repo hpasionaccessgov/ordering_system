@@ -2,12 +2,15 @@
 
 /** @var yii\web\View $this */
 
+use app\models\User;
 use yii\helpers\Html;
 use app\widgets\AdminButton;
 
 $this->title = 'Dashboard';
-$user = Yii::$app->user->identity;
-$displayName = $user?->full_name ?: ($user?->username ?? 'there');
+$identity = Yii::$app->user->identity;
+$displayName = $identity instanceof User
+    ? ($identity->full_name ?: $identity->username)
+    : 'there';
 ?>
 <div class="cafebara-dashboard">
     <section class="cafebara-dashboard-hero rounded-4 p-4 p-lg-5 mb-4">

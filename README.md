@@ -24,7 +24,7 @@ OR Install Laragon v6 for all in one universal pack (https://laragon.org/downloa
     ```
 2. Install local dependencies:
    ```bash
-   composer install
+   composer install && npm install
    ```
 3. Create a `.env` file in the root directory of the project and configure your database connection settings, You can use the provided `.env.example` file as a template
 4. Create the database:
@@ -37,8 +37,9 @@ OR Install Laragon v6 for all in one universal pack (https://laragon.org/downloa
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_0900_ai_ci;
     ```
-5. Run the migrations to set up the database schema:
+5. Create Yii's RBAC tables, then run the application migrations:
    ```bash
+   php yii migrate --migrationPath=@yii/rbac/migrations
    php yii migrate
    ```
 6. Start the development server:
@@ -47,4 +48,11 @@ OR Install Laragon v6 for all in one universal pack (https://laragon.org/downloa
    ```
    OR use the laragon GUI to start the server.
 7. Start the laragon apache and MySQL services, then open the link: http://localhost/ordering_system/web/
-8. Register a new account. Registration activates the account and signs you in immediately; email activation is not used.
+8. Register a new account. Registration activates the account and signs you in immediately; new accounts receive the Customer role.
+9. Promote your first account to Admin from the project directory:
+   ```bash
+   php yii rbac/make-admin your-email@example.com
+   ```
+10. Sign in again or refresh the application. Admins can assign Admin, Staff, and Customer roles from the **User roles** link in the dashboard sidebar.
+
+The Admin, Staff, and Customer dashboards are protected by Yii RBAC. Product and order workflows are not implemented yet; their dashboard cards are placeholders until those modules and their ownership checks are added.

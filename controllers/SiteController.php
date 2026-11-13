@@ -37,8 +37,8 @@ class SiteController extends Controller
     }
 
     public function __construct(
-        $id,
-        $module,
+        mixed $id,
+        mixed $module,
         private readonly MailerInterface $mailer,
         private readonly Security $security,
         $config = [],
@@ -122,14 +122,39 @@ class SiteController extends Controller
             $user->generateAuthKey();
             $user->status = User::STATUS_ACTIVE;
 
-            if ($user->save()) {
+            $customerRole = Yii::$app->authManager->getRole('customer');
+            if ($customerRole === null) {
+                throw new \yii\base\InvalidConfigException(
+                    'The customer RBAC role is missing. Run the RBAC migrations.'
+                );
+            }
+
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $registrationSaved = $user->save();
+
+                if ($registrationSaved) {
+                    Yii::$app->authManager->assign($customerRole, $user->getId());
+                    $transaction->commit();
+                } else {
+                    $transaction->rollBack();
+                }
+            } catch (\Throwable $exception) {
+                if ($transaction->isActive) {
+                    $transaction->rollBack();
+                }
+
+                throw $exception;
+            }
+
+            if ($registrationSaved) {
                 if (Yii::$app->user->login($user)) {
                     Yii::$app->session->setFlash(
                         'success',
                         'Your account was created and you are now logged in.',
                     );
 
-                    return $this->redirect(['site/profile']);
+                    return $this->redirect(['site/dashboard']);
                 }
 
                 Yii::error(
@@ -168,13 +193,13 @@ class SiteController extends Controller
         $this->layout = 'auth';
 
         if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
+            return $this->redirect(['site/dashboard']);
         }
 
         $model = new LoginForm($this->security);
 
         if ($model->load($this->request->post()) && $model->login()) {
-            return $this->goBack();
+            return $this->redirect(['site/dashboard']);
         }
 
         $model->password = '';
@@ -186,11 +211,23 @@ class SiteController extends Controller
      * Dashboard action
      * @return Response|string
      */
-    public function actionDashboard(): string
+    public function actionDashboard(): Response|string
     {
         $this->layout = 'admin';
 
-        return $this->render('dashboard');
+        if (Yii::$app->user->can('admin.access')) {
+            return $this->redirect(['/admin/dashboard']);
+        }
+
+        if (Yii::$app->user->can('staff.access')) {
+            return $this->redirect(['/staff/dashboard']);
+        }
+
+        if (Yii::$app->user->can('customer.access')) {
+            return $this->redirect(['/customer/dashboard']);
+        }
+
+        throw new ForbiddenHttpException('No application role is assigned to this account.');
     }
 
     /** 
