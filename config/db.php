@@ -4,8 +4,7 @@ use Dotenv\Dotenv;
 
 Dotenv::createImmutable(dirname(__DIR__))->safeLoad();
 
-$env = static function (string $name): string 
-{
+$env = static function (string $name): string {
     $value = $_ENV[$name] ?? $_SERVER[$name] ?? null;
 
     if (!is_string($value)) {
@@ -15,7 +14,7 @@ $env = static function (string $name): string
     return $value;
 };
 
-    return [
+return [
     'class' => \yii\db\Connection::class,
     'dsn' => $env('DB_DSN'),
     'username' => $env('DB_USERNAME'),
@@ -27,5 +26,3 @@ $env = static function (string $name): string
     //'schemaCacheDuration' => 60,
     //'schemaCache' => 'cache',
 ];
-
-

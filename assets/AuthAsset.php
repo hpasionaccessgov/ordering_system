@@ -16,6 +16,7 @@ class AuthAsset extends AssetBundle
     ];
 
     public $depends = [
+        ColorModeAsset::class,
         AdminLteAsset::class,
         CafebaraThemeAsset::class,
     ];

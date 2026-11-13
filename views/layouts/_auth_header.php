@@ -24,6 +24,7 @@ $otherAuthLabel = $actionId === 'login' ? 'Create account' : 'Sign in';
             ) ?>
 
             <div class="d-flex align-items-center gap-2 ms-auto">
+                <?= $this->render('_theme_toggle') ?>
                 <?= Html::a('Home', ['/site/index'], ['class' => 'btn btn-outline-primary']) ?>
                 <?= Html::a($otherAuthLabel, $otherAuthRoute, ['class' => 'btn btn-primary']) ?>
             </div>

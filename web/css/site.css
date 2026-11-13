@@ -1,5 +1,5 @@
 main > .container {
-    padding: 70px 15px 20px;
+    padding: 2rem 15px 3rem;
     display: flex;
     flex-direction: column;
     min-height: 100%;
@@ -48,12 +48,6 @@ a.desc:after {
     border-left: 3px solid var(--bs-danger-border-subtle);
     padding: 10px 20px;
     margin: 0 0 15px 0;
-}
-
-/* align navbar brand baseline with nav links */
-.navbar > .container,
-.navbar > .container-fluid {
-    align-items: baseline;
 }
 
 /* align the logout "link" (button in form) of the navbar */

@@ -39,6 +39,9 @@ $user = Yii::$app->user->identity;
                     <?= Html::a('Login', ['/site/login'], ['class' => 'nav-link']) ?>
                 </li>
             <?php else: ?>
+                <li class="nav-item d-flex align-items-center me-2">
+                    <?= $this->render('_theme_toggle') ?>
+                </li>
                 <li class="nav-item dropdown">
                     <a
                         class="nav-link dropdown-toggle"

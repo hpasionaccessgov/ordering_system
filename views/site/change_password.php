@@ -1,8 +1,8 @@
 <?php
 
 use app\models\ChangePasswordForm;
-use yii\bootstrap5\ActiveForm;
-use yii\helpers\Html;
+use app\widgets\AdminActiveForm;
+use app\widgets\AdminButton;
 
 /** @var ChangePasswordForm $model */
 
@@ -16,15 +16,15 @@ $this->title = 'Change password';
                 <h2 class="card-title mb-0">Change password</h2>
             </div>
             <div class="card-body">
-                <?php $form = ActiveForm::begin(); ?>
+                <?php $form = AdminActiveForm::begin(); ?>
 
                 <?= $form->field($model, 'currentPassword')->passwordInput() ?>
                 <?= $form->field($model, 'newPassword')->passwordInput() ?>
                 <?= $form->field($model, 'confirmPassword')->passwordInput() ?>
 
-                <?= Html::submitButton('Update password', ['class' => 'btn btn-primary']) ?>
+                <?= AdminButton::submit('Update password') ?>
 
-                <?php ActiveForm::end(); ?>
+                <?php AdminActiveForm::end(); ?>
             </div>
         </div>
     </div>

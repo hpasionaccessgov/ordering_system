@@ -20,6 +20,7 @@ class AdminLteAsset extends AssetBundle
     ];
 
     public $depends = [
+        ColorModeAsset::class,
         YiiAsset::class,
         BootstrapJsAsset::class,
         BootstrapIconsAsset::class,
