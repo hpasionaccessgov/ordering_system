@@ -23,7 +23,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
     <div class="site-contact-success-content mx-auto">
         <h1 class="display-6 fw-semibold mb-3">Message sent</h1>
 
-        <?php if (YII_DEBUG && Yii::$app->mailer->useFileTransport): ?>
+        <?php if (YII_DEBUG && Yii::$app->mailer instanceof \yii\mail\BaseMailer && Yii::$app->mailer->useFileTransport): ?>
             <p class="text-body-tertiary small mb-4">
                 Development mode: email saved under
                 <code><?= Yii::getAlias(Yii::$app->mailer->fileTransportPath) ?></code>

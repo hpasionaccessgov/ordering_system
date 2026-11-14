@@ -23,7 +23,7 @@ class m261110_044202_create_users_table extends Migration
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
         ], 'ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci');
-        
+
         $this->createIndex(
             'uq-users-username',
             '{{%users}}',
@@ -45,4 +45,19 @@ class m261110_044202_create_users_table extends Migration
     {
         $this->dropTable('{{%users}}');
     }
+
+    /*
+    // Use up()/down() to run migration code without a transaction.
+    public function up()
+    {
+
+    }
+
+    public function down()
+    {
+        echo "m261110_060129_add_email_activation cannot be reverted.\n";
+
+        return false;
+    }
+    */
 }

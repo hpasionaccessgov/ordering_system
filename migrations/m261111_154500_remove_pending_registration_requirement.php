@@ -29,4 +29,20 @@ class m261111_154500_remove_pending_registration_requirement extends Migration
 
         return false;
     }
+
+    
+    /*
+    // Use up()/down() to run migration code without a transaction.
+    public function up()
+    {
+
+    }
+
+    public function down()
+    {
+        echo "m261110_060129_add_email_activation cannot be reverted.\n";
+
+        return false;
+    }
+    */
 }
