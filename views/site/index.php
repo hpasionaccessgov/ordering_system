@@ -49,7 +49,7 @@ $this->title = 'Cafébara | Cafe ordering';
                                 <p class="cafebara-section-kicker mb-2">From the counter</p>
                                 <h2 class="h2 fw-bold mb-0">Featured drinks and bites</h2>
                             </div>
-                            <?= Html::a('Browse menu', ['/product/index'], ['class' => 'btn btn-outline-primary']) ?>
+                            <?= Html::a('Browse menu', ['/product/index'], ['class' => 'btn btn-cafebara-outline-light']) ?>
                         </div>
                         <div class="row g-4">
                             <?php foreach ($featuredProducts as $product): ?>

@@ -14,8 +14,8 @@ $displayName = $identity instanceof User
     : 'there';
 ?>
 
-<section class="cafebara-dashboard-hero mb-4">
-    <div>
+<section class="card dashboard-welcome-card border-0 mb-4">
+    <div class="card-body">
         <p class="text-uppercase small fw-semibold mb-2">Your Cafébara account</p>
         <h1 class="h3 mb-2">Welcome, <?= Html::encode($displayName) ?></h1>
         <p class="mb-0">Discover the menu and keep track of your cafe orders.</p>

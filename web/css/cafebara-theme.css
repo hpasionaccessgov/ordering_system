@@ -706,10 +706,25 @@ body {
     font-size: 1.25rem;
 }
 
-.cafebara-dashboard-hero {
-    background: linear-gradient(125deg, var(--cafebara-dark), var(--cafebara-brown));
-    box-shadow: 0 1rem 2rem rgba(48, 18, 6, .14);
+.dashboard-welcome-card {
+    overflow: hidden;
+    background: var(--cafebara-brown);
+    box-shadow: 0 .75rem 1.5rem rgba(48, 18, 6, .14);
     color: #fff;
+}
+
+.dashboard-welcome-card .card-body {
+    padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.dashboard-welcome-card h1 {
+    color: #fff;
+    letter-spacing: -.025em;
+}
+
+.dashboard-welcome-card p {
+    max-width: 46rem;
+    color: rgba(255, 255, 255, .86);
 }
 
 .cafebara-dashboard-kicker {
