@@ -9,6 +9,11 @@ use Yii;
 
 class UserSeeder
 {
+    /**
+     * Add local test accounts without modifying existing user records.
+     *
+     * @return int number of users inserted
+     */
     public function run(): int
     {
         $records = [

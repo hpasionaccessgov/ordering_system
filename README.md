@@ -13,7 +13,7 @@ A Yii2 basic application for ordering system. This application is built using Yi
 ## Requirements
 - PHP 8.2 or higher
 - Composer
-- MySQL 8.0.30
+- MariaDB 10.4+ or MySQL 8.0+
 - Git
 OR Install Laragon v6 for all in one universal pack (https://laragon.org/download/)
 
@@ -53,6 +53,8 @@ OR Install Laragon v6 for all in one universal pack (https://laragon.org/downloa
    ```bash
    php yii rbac/make-admin your-email@example.com
    ```
-10. Sign in again or refresh the application. Admins can assign Admin, Staff, and Customer roles from the **User roles** link in the dashboard sidebar.
-
-The Admin, Staff, and Customer dashboards are protected by Yii RBAC. Product and order workflows are not implemented yet; their dashboard cards are placeholders until those modules and their ownership checks are added.
+10. Sign in again or refresh the application. Admins can assign Admin, Staff, and Customer roles from the **Roles** link in the dashboard sidebar.
+11. You can also run the test data seeder:
+   ```bash
+   php yii seed/test-data
+   ```
