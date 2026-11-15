@@ -37,7 +37,7 @@ $this->registerMetaTag([
     <main class="app-main">
         <div class="app-content-header">
             <div class="container-fluid">
-                <h1 class="mb-0 fs-3"><?= Html::encode($this->title) ?></h1>
+                <span class="visually-hidden"><?= Html::encode($this->title) ?></span>
             </div>
         </div>
 

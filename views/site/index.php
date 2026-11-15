@@ -3,6 +3,9 @@
 /** @var yii\web\View $this */
 
 use yii\helpers\Html;
+use app\models\Product;
+
+/** @var Product[] $featuredProducts */
 
 $this->title = 'Cafébara | Cafe ordering';
 ?>
@@ -38,6 +41,38 @@ $this->title = 'Cafébara | Cafe ordering';
                         ]) ?>
                     <?php endif ?>
                 </div>
+
+                <?php if ($featuredProducts !== []): ?>
+                    <section class="cafebara-catalog-preview mt-5">
+                        <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+                            <div>
+                                <p class="cafebara-section-kicker mb-2">From the counter</p>
+                                <h2 class="h2 fw-bold mb-0">Featured drinks and bites</h2>
+                            </div>
+                            <?= Html::a('Browse menu', ['/product/index'], ['class' => 'btn btn-outline-primary']) ?>
+                        </div>
+                        <div class="row g-4">
+                            <?php foreach ($featuredProducts as $product): ?>
+                                <div class="col-12 col-sm-6 col-lg-4">
+                                    <article class="card product-card h-100">
+                                        <?php if ($product->getImageUrl() !== null): ?>
+                                            <?= Html::img($product->getImageUrl(), [
+                                                'class' => 'product-card-image',
+                                                'alt' => $product->name,
+                                            ]) ?>
+                                        <?php endif; ?>
+                                        <div class="card-body">
+                                            <span class="product-category"><?= Html::encode($product->category) ?></span>
+                                            <h3 class="h5 mt-2"><?= Html::encode($product->name) ?></h3>
+                                            <p class="text-body-secondary"><?= Html::encode($product->description) ?></p>
+                                            <strong><?= Yii::$app->formatter->asCurrency($product->price) ?></strong>
+                                        </div>
+                                    </article>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </section>
+                <?php endif; ?>
             </div>
 
             <div class="col-lg-5">

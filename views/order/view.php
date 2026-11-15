@@ -16,7 +16,8 @@ $statusLabels = [
 ];
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="order-page">
+<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
     <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
 
     <?= Html::a(
@@ -26,14 +27,16 @@ $statusLabels = [
     ) ?>
 </div>
 
-<p>
-    Status:
-    <span class="badge text-bg-secondary">
+<section class="order-detail-card p-3 p-md-4">
+<p class="mb-4">
+    <span class="text-body-secondary me-2">Status</span>
+    <span class="badge order-status">
         <?= Html::encode($statusLabels[$model->status] ?? $model->status) ?>
     </span>
 </p>
 
-<table class="table">
+<div class="table-responsive">
+<table class="table align-middle">
     <thead>
         <tr>
             <th>Product</th>
@@ -57,6 +60,7 @@ $statusLabels = [
         <?php endforeach; ?>
     </tbody>
 </table>
+</div>
 
 <p class="text-end fw-bold">
     Total:
@@ -89,3 +93,5 @@ $statusLabels = [
 
     <?= Html::endForm() ?>
 <?php endif; ?>
+</section>
+</div>

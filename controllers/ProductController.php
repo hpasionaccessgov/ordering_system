@@ -13,6 +13,7 @@ use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
+use yii\web\UploadedFile;
 
 class ProductController extends Controller
 {
@@ -26,6 +27,11 @@ class ProductController extends Controller
                         'actions' => ['index', 'view'],
                         'allow' => true,
                         'roles' => ['product.view'],
+                    ],
+                    [
+                        'actions' => ['image'],
+                        'allow' => true,
+                        'roles' => ['?', 'product.view'],
                     ],
                     [
                         'actions' => ['create'],
@@ -56,13 +62,34 @@ class ProductController extends Controller
     public function actionIndex(): string
     {
         $this->layout = 'admin';
+        $query = Product::find()->where(['status' => Product::STATUS_ACTIVE]);
+        $search = trim((string) $this->request->get('q', ''));
+        $category = trim((string) $this->request->get('category', ''));
+        $minPrice = $this->request->get('min_price');
+        $maxPrice = $this->request->get('max_price');
+
+        if ($search !== '') {
+            $query->andWhere(['or',
+                ['like', 'name', $search],
+                ['like', 'description', $search],
+                ['like', 'category', $search],
+            ]);
+        }
+        if ($category !== '') {
+            $query->andWhere(['category' => $category]);
+        }
+        if (is_numeric($minPrice)) {
+            $query->andWhere(['>=', 'price', (float) $minPrice]);
+        }
+        if (is_numeric($maxPrice)) {
+            $query->andWhere(['<=', 'price', (float) $maxPrice]);
+        }
 
         return $this->render('index', [
             'dataProvider' => new ActiveDataProvider([
-                'query' => Product::find()
-                    ->where(['status' => Product::STATUS_ACTIVE])
-                    ->orderBy(['name' => SORT_ASC]),
+                'query' => $query->orderBy(['name' => SORT_ASC]),
             ]),
+            'categories' => Product::find()->select('category')->distinct()->orderBy('category')->column(),
         ]);
     }
 
@@ -75,16 +102,43 @@ class ProductController extends Controller
         ]);
     }
 
+    public function actionImage(int $id): Response
+    {
+        $model = Product::find()
+            ->select(['image_data', 'image_mime', 'image_name'])
+            ->where(['id' => $id, 'status' => Product::STATUS_ACTIVE])
+            ->one();
+
+        if ($model === null || $model->image_data === null) {
+            throw new NotFoundHttpException('Product image not found.');
+        }
+
+        Yii::$app->response->format = Response::FORMAT_RAW;
+        Yii::$app->response->headers->set(
+            'Content-Type',
+            $model->image_mime ?: 'application/octet-stream',
+        );
+        Yii::$app->response->headers->set('Content-Disposition', 'inline');
+        Yii::$app->response->headers->set('Cache-Control', 'public, max-age=86400');
+        Yii::$app->response->data = $model->image_data;
+
+        return Yii::$app->response;
+    }
+
     public function actionCreate(): Response|string
     {
         $this->layout = 'admin';
         $model = new Product();
         $model->status = Product::STATUS_ACTIVE;
 
-        if ($model->load($this->request->post()) && $model->save()) {
-            Yii::$app->session->setFlash('success', 'Product created.');
+        if ($this->request->isPost && $model->load($this->postAttributes())) {
+            $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
 
-            return $this->redirect(['view', 'id' => $model->id]);
+            if ($this->saveProduct($model)) {
+                Yii::$app->session->setFlash('success', 'Product created.');
+
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('create', [
@@ -97,10 +151,14 @@ class ProductController extends Controller
         $this->layout = 'admin';
         $model = $this->findProduct($id);
 
-        if ($model->load($this->request->post()) && $model->save()) {
-            Yii::$app->session->setFlash('success', 'Product updated.');
+        if ($this->request->isPost && $model->load($this->postAttributes())) {
+            $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
 
-            return $this->redirect(['view', 'id' => $model->id]);
+            if ($this->saveProduct($model)) {
+                Yii::$app->session->setFlash('success', 'Product updated.');
+
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('update', [
@@ -131,5 +189,50 @@ class ProductController extends Controller
         }
 
         return $model;
+    }
+
+    private function saveProduct(Product $model): bool
+    {
+        if (!$model->validate()) {
+            return false;
+        }
+
+        if ($model->imageFile !== null) {
+            $imageData = file_get_contents($model->imageFile->tempName);
+            if ($imageData === false) {
+                throw new BadRequestHttpException('Product image could not be read.');
+            }
+
+            $mime = (new \finfo(FILEINFO_MIME_TYPE))->file($model->imageFile->tempName);
+            if (!is_string($mime)) {
+                throw new BadRequestHttpException('Product image type could not be detected.');
+            }
+
+            $model->image_data = $imageData;
+            $model->image_mime = $mime;
+            $model->image_name = $model->imageFile->name;
+            $model->image_path = null;
+        }
+
+        if (!$model->save(false)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Exclude file input from mass assignment; UploadedFile handles it separately.
+     *
+     * @return array<string, mixed>
+     */
+    private function postAttributes(): array
+    {
+        $post = $this->request->post();
+        if (isset($post['Product']) && is_array($post['Product'])) {
+            unset($post['Product']['imageFile']);
+        }
+
+        return $post;
     }
 }

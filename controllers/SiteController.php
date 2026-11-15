@@ -12,6 +12,7 @@ use app\models\User;
 use app\models\ChangePasswordForm;
 use app\models\ProfileForm;
 use app\models\DeactivateForm;
+use app\models\Product;
 use yii\web\Controller;
 use yii\web\ErrorAction;
 use yii\web\Response;
@@ -99,7 +100,16 @@ class SiteController extends Controller
      */
     public function actionIndex(): string
     {
-        return $this->render('index');
+        return $this->render('index', [
+            'featuredProducts' => Product::find()
+                ->where([
+                    'status' => Product::STATUS_ACTIVE,
+                    'is_featured' => true,
+                ])
+                ->orderBy(['name' => SORT_ASC])
+                ->limit(6)
+                ->all(),
+        ]);
     }
 
     /**

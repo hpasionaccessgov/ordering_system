@@ -35,12 +35,18 @@ class AdminUserController extends Controller
                 'class' => VerbFilter::class,
                 'actions' => [
                     'assign-role' => ['post'],
+                    'update-status' => ['post'],
                 ],
             ],
         ];
     }
 
     public function actionIndex(): string
+    {
+        return $this->actionList();
+    }
+
+    public function actionList(): string
     {
         $this->layout = 'admin';
 
@@ -49,6 +55,40 @@ class AdminUserController extends Controller
                 'query' => User::find()->orderBy(['id' => SORT_ASC]),
                 'pagination' => ['pageSize' => 20],
             ]),
+        ]);
+    }
+
+    public function actionUpdateStatus(int $id): Response
+    {
+        $user = User::findOne($id);
+        $status = $this->request->post('status');
+
+        if ($user === null) {
+            throw new NotFoundHttpException('The requested user was not found.');
+        }
+        if ((string) $user->id === (string) Yii::$app->user->id) {
+            throw new ForbiddenHttpException('You cannot block your own account.');
+        }
+        if (!in_array((int) $status, [User::STATUS_ACTIVE, User::STATUS_DISABLED], true)) {
+            throw new BadRequestHttpException('Select a valid account status.');
+        }
+
+        $user->status = (int) $status;
+        if (!$user->save(false, ['status', 'updated_at'])) {
+            throw new BadRequestHttpException('User status could not be updated.');
+        }
+
+        Yii::$app->session->setFlash('success', "Account status for {$user->username} was updated.");
+
+        return $this->redirect(['list']);
+    }
+
+    public function actionRoles(): string
+    {
+        $this->layout = 'admin';
+
+        return $this->render('roles', [
+            'users' => User::find()->orderBy(['id' => SORT_ASC])->all(),
         ]);
     }
 

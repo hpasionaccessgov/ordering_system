@@ -31,12 +31,21 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
                         ['class' => 'nav-link' . ($currentRoute === $dashboardRouteName ? ' active' : '')],
                     ) ?>
                 </li>
+                <?php if (Yii::$app->user->can('user.view')): ?>
+                    <li class="nav-item">
+                        <?= Html::a(
+                            '<i class="nav-icon bi bi-person-lines-fill"></i><p>User list</p>',
+                            ['/admin-user/list'],
+                            ['class' => 'nav-link' . ($currentRoute === 'admin-user/list' ? ' active' : '')],
+                        ) ?>
+                    </li>
+                <?php endif; ?>
                 <?php if (Yii::$app->user->can('user.assignRole')): ?>
                     <li class="nav-item">
                         <?= Html::a(
-                            '<i class="nav-icon bi bi-people"></i><p>User roles</p>',
-                            ['/admin-user/index'],
-                            ['class' => 'nav-link' . (strpos($currentRoute, 'admin-user/') === 0 ? ' active' : '')],
+                            '<i class="nav-icon bi bi-shield-lock"></i><p>Roles</p>',
+                            ['/admin-role/index'],
+                            ['class' => 'nav-link' . ($currentRoute === 'admin-role/index' ? ' active' : '')],
                         ) ?>
                     </li>
                 <?php endif; ?>
@@ -46,7 +55,7 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
                         <?= Html::a(
                             '<i class="nav-icon bi bi-cup-hot"></i><p>Products</p>',
                             ['/product/index'],
-                            ['class' => 'nav-link'],
+                            ['class' => 'nav-link' . (str_starts_with($currentRoute, 'product/') ? ' active' : '')],
                         ) ?>
                     </li>
                 <?php endif; ?>
@@ -56,7 +65,7 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
                         <?= Html::a(
                             '<i class="nav-icon bi bi-receipt"></i><p>Orders</p>',
                             ['/order/index'],
-                            ['class' => 'nav-link'],
+                            ['class' => 'nav-link' . (str_starts_with($currentRoute, 'order/') ? ' active' : '')],
                         ) ?>
                     </li>
                 <?php endif; ?>

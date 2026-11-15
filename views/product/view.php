@@ -20,6 +20,13 @@ $this->title = $model->name;
 
 <p><?= nl2br(Html::encode($model->description ?? '')) ?></p>
 
+<?php if ($model->getImageUrl() !== null): ?>
+    <?= Html::img($model->getImageUrl(), [
+        'class' => 'product-detail-image mb-4',
+        'alt' => $model->name,
+    ]) ?>
+<?php endif; ?>
+
 <p class="fw-bold">
     <?= Yii::$app->formatter->asCurrency($model->price) ?>
 </p>

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\models\Order;
+use app\models\Product;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 
@@ -28,6 +30,12 @@ class StaffController extends Controller
     {
         $this->layout = 'admin';
 
-        return $this->render('dashboard');
+        return $this->render('dashboard', [
+            'activeProductCount' => (int) Product::find()->where(['status' => Product::STATUS_ACTIVE])->count(),
+            'pendingOrderCount' => (int) Order::find()->where(['status' => Order::STATUS_PENDING])->count(),
+            'processingOrderCount' => (int) Order::find()->where([
+                'status' => Order::STATUS_PROCESSING,
+            ])->count(),
+        ]);
     }
 }

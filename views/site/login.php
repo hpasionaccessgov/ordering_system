@@ -71,10 +71,10 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                             'template' => sprintf($htmlIcon, '&#128100;'),
                             'inputOptions' => [
                                 'class' => 'form-control',
-                                'placeholder' => 'username',
+                                'placeholder' => 'Username or email',
                                 'autofocus' => true,
                             ],
-                        ])->textInput()->label('Your Username', $labelOptions) ?>
+                        ])->textInput()->label('Username or email', $labelOptions) ?>
                     </div>
 
                     <div class="mb-3">

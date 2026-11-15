@@ -5,12 +5,22 @@ use yii\widgets\ActiveForm;
 
 /** @var app\models\Product $model */
 
-$form = ActiveForm::begin();
+$form = ActiveForm::begin([
+    'options' => ['enctype' => 'multipart/form-data'],
+]);
 ?>
 
 <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
 <?= $form->field($model, 'description')->textarea(['rows' => 5]) ?>
+
+<?= $form->field($model, 'category')->textInput(['maxlength' => true]) ?>
+
+<?= $form->field($model, 'imageFile')->fileInput([
+    'accept' => 'image/png,image/jpeg,image/webp',
+])->hint('Stored securely in the database. Maximum size: 3 MB.') ?>
+
+<?= $form->field($model, 'is_featured')->checkbox() ?>
 
 <?= $form->field($model, 'price')->input('number', [
     'step' => '0.01',

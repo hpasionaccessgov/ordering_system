@@ -9,7 +9,8 @@ use yii\helpers\Html;
 $this->title = 'Orders';
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="order-page">
+<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
     <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
 
     <?php if (Yii::$app->user->can('order.create')): ?>
@@ -21,8 +22,12 @@ $this->title = 'Orders';
     <?php endif; ?>
 </div>
 
+<div class="order-table-card">
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
+    'tableOptions' => ['class' => 'table table-hover align-middle'],
+    'summaryOptions' => ['class' => 'px-3 pt-3 mb-0 text-body-secondary small'],
+    'options' => ['class' => 'table-responsive'],
     'columns' => [
         'id',
         'status',
@@ -44,3 +49,5 @@ $this->title = 'Orders';
         ],
     ],
 ]) ?>
+</div>
+</div>
