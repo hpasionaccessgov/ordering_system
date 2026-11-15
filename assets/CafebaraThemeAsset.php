@@ -14,4 +14,8 @@ class CafebaraThemeAsset extends AssetBundle
     public $css = [
         'css/cafebara-theme.css',
     ];
+
+    public $js = [
+        'js/password-toggle.js',
+    ];
 }

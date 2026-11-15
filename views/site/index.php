@@ -101,11 +101,11 @@ $this->title = 'Cafébara | Cafe ordering';
                 <p class="cafebara-section-kicker mb-2">WELCOME TO CAFÉBARA!</p>
                 <h2 class="h2 fw-bold mb-0">Your cafe, all in one place.</h2>
             </div>
-            <div class="col-lg-5">
+            <!-- <div class="col-lg-5">
                 <p class="text-body-secondary mb-0">
                     Start with your account today. Cafébara's ordering workspace is designed to grow with the cafe.
                 </p>
-            </div>
+            </div> -->
         </div>
 
         <div class="row g-3">
@@ -131,7 +131,7 @@ $this->title = 'Cafébara | Cafe ordering';
                         </span>
                         <h3 class="h5 fw-bold mt-4">Cafe workspace</h3>
                         <p class="text-body-secondary mb-0">
-                            A clear dashboard is ready for the cafe's ordering tools and activity.
+                            A dashboard ready for the cafe's ordering tools and activity.
                         </p>
                     </div>
                 </article>
@@ -143,9 +143,9 @@ $this->title = 'Cafébara | Cafe ordering';
                         <span class="cafebara-feature-icon" aria-hidden="true">
                             <i class="bi bi-phone"></i>
                         </span>
-                        <h3 class="h5 fw-bold mt-4">Made for every screen</h3>
+                        <h3 class="h5 fw-bold mt-4">Made for each screen</h3>
                         <p class="text-body-secondary mb-0">
-                            Use Cafébara comfortably on a phone, tablet, or desktop.
+                            Access Cafébara on any device.
                         </p>
                     </div>
                 </article>

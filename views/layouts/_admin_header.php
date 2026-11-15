@@ -9,10 +9,7 @@ $user = Yii::$app->user->identity;
 <nav class="app-header navbar navbar-expand bg-body">
     <div class="container-fluid">
         <?= Html::a(
-            Html::img(Yii::getAlias('@web/images/Cafebara_logo.png'), [
-                'alt' => '',
-                'class' => 'cafebara-brand-logo',
-            ]) . Html::tag('span', 'Cafébara', ['class' => 'cafebara-brand-name d-none d-sm-inline']),
+            Html::tag('span', 'Cafébara', ['class' => 'cafebara-brand-name d-none d-sm-inline']),
             ['/site/index'],
             [
                 'class' => 'navbar-brand cafebara-admin-brand d-flex align-items-center gap-2',

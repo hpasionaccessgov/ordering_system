@@ -15,9 +15,12 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
 <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
     <div class="sidebar-brand">
         <?= Html::a(
-            '<span class="brand-text fw-light">' . Html::encode(Yii::$app->name) . '</span>',
+            Html::img(Yii::getAlias('@web/images/Cafebara_logo.png'), [
+                'alt' => 'Cafébara',
+                'class' => 'cafebara-sidebar-logo',
+            ]) . '<span class="brand-text">' . Html::encode(Yii::$app->name) . '</span>',
             $dashboardRoute,
-            ['class' => 'brand-link'],
+            ['class' => 'brand-link d-flex align-items-center gap-2'],
         ) ?>
     </div>
 
