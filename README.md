@@ -35,7 +35,7 @@ OR Install Laragon v6 for all in one universal pack (https://laragon.org/downloa
     ```bash
     CREATE DATABASE ordering_system
     CHARACTER SET utf8mb4
-    COLLATE utf8mb4_0900_ai_ci;
+    COLLATE utf8mb4_unicode_ci;
     ```
 5. Create Yii's RBAC tables, then run the application migrations:
    ```bash

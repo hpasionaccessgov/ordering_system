@@ -9,18 +9,18 @@ use app\models\ContactForm;
 use app\models\LoginForm;
 use app\models\RegisterForm;
 use app\models\User;
+use app\models\ChangePasswordForm;
+use app\models\ProfileForm;
+use app\models\DeactivateForm;
+use yii\web\Controller;
+use yii\web\ErrorAction;
+use yii\web\Response;
+use yii\web\ForbiddenHttpException;
 use yii\captcha\CaptchaAction;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\base\Security;
 use yii\mail\MailerInterface;
-use yii\web\Controller;
-use yii\web\ErrorAction;
-use yii\web\Response;
-use app\models\ChangePasswordForm;
-use app\models\ProfileForm;
-use yii\web\ForbiddenHttpException;
-use app\models\DeactivateForm;
 
 class SiteController extends Controller
 {

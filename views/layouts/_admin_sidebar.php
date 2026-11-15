@@ -40,6 +40,27 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
                         ) ?>
                     </li>
                 <?php endif; ?>
+
+                <?php if (Yii::$app->user->can('product.view')): ?>
+                    <li class="nav-item">
+                        <?= Html::a(
+                            '<i class="nav-icon bi bi-cup-hot"></i><p>Products</p>',
+                            ['/product/index'],
+                            ['class' => 'nav-link'],
+                        ) ?>
+                    </li>
+                <?php endif; ?>
+
+                <?php if (Yii::$app->user->can('order.view')): ?>
+                    <li class="nav-item">
+                        <?= Html::a(
+                            '<i class="nav-icon bi bi-receipt"></i><p>Orders</p>',
+                            ['/order/index'],
+                            ['class' => 'nav-link'],
+                        ) ?>
+                    </li>
+                <?php endif; ?>
+
                 <li class="nav-item">
                     <?= Html::a(
                         '<i class="nav-icon bi bi-person"></i><p>Profile</p>',

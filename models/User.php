@@ -8,7 +8,6 @@ use Override;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
-use yii\base\BaseObject;
 use yii\web\IdentityInterface;
 
 class User extends ActiveRecord implements IdentityInterface
