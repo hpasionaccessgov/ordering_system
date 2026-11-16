@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace app\widgets;
 
 use Yii;
-use yii\bootstrap5\Alert as BootstrapAlert;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 /**
  * Alert widget renders a message from session flash. All flash messages are displayed
@@ -22,6 +23,17 @@ use yii\bootstrap5\Alert as BootstrapAlert;
  * ```php
  * Yii::$app->session->setFlash('error', ['Error 1', 'Error 2']);
  * ```
+ *
+ * Unlike {@see \yii\bootstrap5\Alert}, this widget renders the alert markup itself
+ * instead of delegating to the Bootstrap widget. The Bootstrap widget would register
+ * `yii\bootstrap5\BootstrapPluginAsset` (the vendor `twbs/bootstrap` bundle) every time
+ * a flash message is present. On AdminLTE pages that vendor bundle is a second copy of
+ * Bootstrap on top of the node_modules bundle loaded by `AdminLteAsset`, which breaks
+ * the admin layout: the late `bootstrap.css` overrides the theme and the duplicated
+ * `bootstrap.bundle.js` double-binds the `data-bs-toggle` handlers, so the header
+ * dropdown opens and immediately closes. Bootstrap is already provided by the layout,
+ * so the plugin registration is unnecessary; the close button keeps working through
+ * Bootstrap's data API.
  *
  * @author Kartik Visweswaran <kartikv2@gmail.com>
  * @author Alexander Makarov <sam@rmcreative.ru>
@@ -41,11 +53,13 @@ class Alert extends \yii\bootstrap5\Widget
         'info'    => 'alert-info',
         'warning' => 'alert-warning'
     ];
+
     /**
      * @var array the options for rendering the close button tag.
-     * Array will be passed to [[\yii\bootstrap\Alert::closeButton]].
+     * Set to `false` to disable the close button.
      */
     public array $closeButton = [];
+
     /**
      * {@inheritdoc}
      */
@@ -57,26 +71,60 @@ class Alert extends \yii\bootstrap5\Widget
             return;
         }
 
-        $appendClass = isset($this->options['class']) ? ' ' . $this->options['class'] : '';
-
         foreach (array_keys($this->alertTypes) as $type) {
             $flash = $session->getFlash($type);
 
             foreach ((array) $flash as $i => $message) {
-                echo BootstrapAlert::widget(
-                    [
-                        'body' => $message,
-                        'closeButton' => $this->closeButton,
-                        'options' => [
-                            ...$this->options,
-                            'id' => $this->getId() . '-' . $type . '-' . $i,
-                            'class' => $this->alertTypes[$type] . $appendClass
-                        ],
-                    ],
-                );
+                echo $this->renderAlert($type, (string) $i, (string) $message);
             }
 
             $session->removeFlash($type);
         }
+    }
+
+    /**
+     * Renders a single alert.
+     *
+     * @param string $type the flash type (a key of [[alertTypes]]).
+     * @param string $index the position of the message within its flash type.
+     * @param string $message the alert message.
+     */
+    private function renderAlert(string $type, string $index, string $message): string
+    {
+        $options = $this->options;
+        $options['id'] = $this->getId() . '-' . $type . '-' . $index;
+        $options['role'] = $options['role'] ?? 'alert';
+
+        Html::addCssClass($options, 'alert');
+        Html::addCssClass($options, $this->alertTypes[$type]);
+
+        $closeButton = '';
+        if ($this->closeButton !== false) {
+            Html::addCssClass($options, 'alert-dismissible');
+            $closeButton = "\n" . $this->renderCloseButton();
+        }
+
+        return Html::tag('div', $message . $closeButton, $options) . "\n";
+    }
+
+    /**
+     * Renders the alert close button.
+     */
+    private function renderCloseButton(): string
+    {
+        $closeButton = array_merge([
+            'class' => 'btn-close',
+            'data' => ['bs-dismiss' => 'alert'],
+            'aria' => ['label' => Yii::t('yii/bootstrap5', 'Close')],
+        ], $this->closeButton);
+
+        $tag = ArrayHelper::remove($closeButton, 'tag', 'button');
+        $label = ArrayHelper::remove($closeButton, 'label', '');
+
+        if ($tag === 'button' && !isset($closeButton['type'])) {
+            $closeButton['type'] = 'button';
+        }
+
+        return Html::tag($tag, $label, $closeButton);
     }
 }
