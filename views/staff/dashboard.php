@@ -20,7 +20,7 @@ $displayName = $identity instanceof User
     <div class="card-body row align-items-center g-4">
         <div class="col">
             <span class="dashboard-welcome-role mb-3">
-                <i class="bi bi-cup-hot" aria-hidden="true"></i> Staff workspace
+                <i class="bi bi-cup-hot" aria-hidden="true"></i> Staff
             </span>
             <h1 class="h3 mt-2 mb-2">Welcome, <?= Html::encode($displayName) ?></h1>
             <p class="mb-3">Keep the menu current and move customer orders through service.</p>
@@ -67,7 +67,7 @@ $displayName = $identity instanceof User
     </div>
 </div>
 
-<div class="row g-4">
+<!-- <div class="row g-4">
     <div class="col-12 col-xl-6">
         <section class="card dashboard-action-card h-100">
             <div class="card-body">
@@ -88,4 +88,4 @@ $displayName = $identity instanceof User
             </div>
         </section>
     </div>
-</div>
+</div> -->

@@ -18,9 +18,9 @@ $displayName = $identity instanceof User
     <div class="card-body row align-items-center g-4">
         <div class="col">
             <span class="dashboard-welcome-role mb-3">
-                <i class="bi bi-person-heart" aria-hidden="true"></i> Customer workspace
+                <i class="bi bi-person-heart" aria-hidden="true"></i> Customer
             </span>
-            <h1 class="h3 mt-2 mb-2">Welcome, <?= Html::encode($displayName) ?></h1>
+            <h1 class="h3 mt-2 mb-2">Welcome, <?= Html::encode($displayName) ?>!</h1>
             <p class="mb-3">Find a favorite, place an order, and follow its progress.</p>
             <div class="d-flex flex-wrap gap-2">
                 <?= Html::a('Browse menu', ['/product/index'], ['class' => 'btn btn-cafebara-light']) ?>
@@ -58,26 +58,13 @@ $displayName = $identity instanceof User
     <div class="row g-3">
         <?php foreach ($featuredProducts as $product) : ?>
             <div class="col-12 col-sm-6 col-xl-3">
-                <article class="card product-card h-100">
-                    <?php if ($product->getImageUrl() !== null) : ?>
-                        <?= Html::img($product->getImageUrl(), [
-                            'class' => 'product-card-image',
-                            'alt' => $product->name,
-                        ]) ?>
-                    <?php endif; ?>
-                    <div class="card-body">
-                        <p class="product-category mb-2"><?= Html::encode($product->category) ?></p>
-                        <h3 class="h6"><?= Html::encode($product->name) ?></h3>
-                        <p class="text-body-secondary small"><?= Html::encode($product->description) ?></p>
-                        <strong><?= Yii::$app->formatter->asCurrency($product->price) ?></strong>
-                    </div>
-                </article>
+                <?= $this->render('../shared/_product_card', ['product' => $product]) ?>
             </div>
         <?php endforeach; ?>
     </div>
 </section>
 
-<div class="row g-4">
+<!-- <div class="row g-4">
     <div class="col-12 col-xl-6">
         <section class="card dashboard-action-card h-100">
             <div class="card-body">
@@ -98,4 +85,4 @@ $displayName = $identity instanceof User
             </div>
         </section>
     </div>
-</div>
+</div> -->

@@ -1,23 +1,17 @@
 <?php
 
+use app\models\RoleForm;
 use app\services\RbacPermissionPolicy;
-use app\widgets\AdminGridView;
-use app\models\User;
+use app\widgets\AdminActiveForm;
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */
-/** @var yii\data\ActiveDataProvider $usersDataProvider */
+/** @var RoleForm $roleForm */
 
 $this->title = 'Roles';
 $auth = Yii::$app->authManager;
 $permissions = $auth->getPermissions();
 $roles = $auth->getRoles();
-$roleOptions = ['' => 'Select role'];
-foreach ($roles as $role) {
-    $roleOptions[$role->name] = $role->description !== ''
-        ? $role->description . ' (' . $role->name . ')'
-        : ucfirst($role->name);
-}
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -30,64 +24,40 @@ foreach ($roles as $role) {
 <section class="card admin-panel mb-4">
     <div class="card-body">
         <h2 class="h5">Create role</h2>
-        <?= Html::beginForm(['/admin-role/create'], 'post', ['class' => 'row g-2']) ?>
+        <?php $form = AdminActiveForm::begin([
+            'action' => ['/admin-role/create'],
+            'method' => 'post',
+            'options' => ['class' => 'row g-2'],
+        ]); ?>
+
+        <div class="col-12">
+            <?= $form->errorSummary(
+                $roleForm,
+                ['class' => 'alert alert-danger'],
+            ) ?>
+        </div>
         <div class="col-12 col-md-4">
-            <?= Html::input('text', 'name', '', [
-                'class' => 'form-control',
+            <?= $form->field($roleForm, 'name', ['options' => ['class' => 'mb-0']])->textInput([
                 'placeholder' => 'e.g. cashier',
-                'required' => true,
+                'maxlength' => 50,
+                'pattern' => '[a-z][a-z0-9._-]{2,49}',
+                'title' => 'Start with a lowercase letter; use 3-50 lowercase letters, numbers, dots, dashes, '
+                    . 'or underscores.',
+                'autocapitalize' => 'none',
+                'spellcheck' => 'false',
             ]) ?>
         </div>
         <div class="col-12 col-md-5">
-            <?= Html::input('text', 'description', '', [
-                'class' => 'form-control',
+            <?= $form->field($roleForm, 'description', ['options' => ['class' => 'mb-0']])->textInput([
                 'placeholder' => 'Role description',
+                'maxlength' => 255,
             ]) ?>
         </div>
-        <div class="col-12 col-md-3">
+        <div class="col-12 col-md-3 d-flex align-items-end">
             <?= Html::submitButton('Create role', ['class' => 'btn btn-primary w-100']) ?>
         </div>
-        <?= Html::endForm() ?>
-    </div>
-</section>
 
-<section class="card admin-panel mb-4">
-    <div class="card-body">
-        <h2 class="h5">Assign roles to users</h2>
-        <p class="text-body-secondary">Each account receives one application role.</p>
-        <?= AdminGridView::widget([
-            'dataProvider' => $usersDataProvider,
-            'columns' => [
-                'username',
-                'email:email',
-                [
-                    'label' => 'Role',
-                    'format' => 'raw',
-                    'value' => static function (User $user) use ($roleOptions): string {
-                        $auth = Yii::$app->authManager;
-                        $assigned = $auth->getRolesByUser($user->id);
-                        $selected = count($assigned) === 1 ? array_key_first($assigned) : '';
-
-                        if ((string) $user->id === (string) Yii::$app->user->id) {
-                            return '<span class="text-body-secondary">Current account</span>';
-                        }
-
-                        return Html::beginForm(
-                            ['/admin-user/assign-role', 'id' => $user->id],
-                            'post',
-                            ['class' => 'd-flex flex-wrap gap-2 role-assignment-form']
-                        )
-                            . Html::dropDownList('role', $selected, $roleOptions, [
-                                'class' => 'form-select form-select-sm',
-                                'required' => true,
-                                'aria-label' => 'Role for ' . $user->username,
-                            ])
-                            . Html::submitButton('Save', ['class' => 'btn btn-sm btn-primary'])
-                            . Html::endForm();
-                    },
-                ],
-            ],
-        ]) ?>
+        <?php AdminActiveForm::end(); ?>
     </div>
 </section>
 
@@ -141,6 +111,7 @@ foreach ($roles as $role) {
                                         'label' => Html::encode($permission->name),
                                         'title' => $permission->name,
                                         'disabled' => $isAdminRole || !$canAssignPermission,
+                                        'uncheck' => null,
                                     ],
                                 ) ?>
                             </div>

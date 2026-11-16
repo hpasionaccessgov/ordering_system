@@ -56,7 +56,7 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
                 <?php if (Yii::$app->user->can('product.view')): ?>
                     <li class="nav-item">
                         <?= Html::a(
-                            '<i class="nav-icon bi bi-cup-hot"></i><p>Products</p>',
+                            '<i class="nav-icon bi bi-cup-hot"></i><p>Menu</p>',
                             ['/product/index'],
                             ['class' => 'nav-link' . (str_starts_with($currentRoute, 'product/') ? ' active' : '')],
                         ) ?>

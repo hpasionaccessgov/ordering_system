@@ -158,6 +158,72 @@
     background: var(--cafebara-cream);
 }
 
+.product-card-placeholder,
+.order-product-placeholder {
+    display: grid;
+    min-height: 190px;
+    place-items: center;
+    background: var(--bs-secondary-bg);
+    color: var(--cafebara-brown);
+    font-size: 2.5rem;
+}
+
+.product-catalog-card {
+    border-color: var(--bs-border-color);
+    background: var(--bs-tertiary-bg);
+}
+
+.product-card-price {
+    color: var(--cafebara-brown);
+    font-size: 1.15rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.product-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+
+.order-builder-summary {
+    position: sticky;
+    top: 1rem;
+    z-index: 4;
+    box-shadow: 0 .5rem 1.5rem rgba(48, 18, 6, .08);
+}
+
+.order-builder-total {
+    color: var(--cafebara-brown);
+    font-size: 1.35rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.order-product-card {
+    overflow: hidden;
+    border-color: var(--bs-border-color);
+    background: var(--bs-tertiary-bg);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.order-product-card:focus-within,
+.order-product-card:hover {
+    box-shadow: 0 .5rem 1.25rem rgba(48, 18, 6, .12);
+    transform: translateY(-2px);
+}
+
+.order-product-image {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    background: var(--cafebara-cream);
+}
+
+.order-quantity-input {
+    width: 7rem;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
 .product-table-image {
     width: 52px;
     height: 52px;

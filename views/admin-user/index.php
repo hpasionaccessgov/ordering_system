@@ -2,22 +2,34 @@
 
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
+/** @var yii\rbac\Role[] $roles */
 
 use app\models\User;
 use app\widgets\AdminGridView;
 use yii\helpers\Html;
 
 $this->title = 'User list';
+$roleOptions = ['' => 'Select role'];
+foreach ($roles as $role) {
+    $roleOptions[$role->name] = $role->description !== ''
+        ? $role->description . ' (' . $role->name . ')'
+        : ucfirst($role->name);
+}
 ?>
 
-<div class="card">
-    <div class="card-header">
-        <h1 class="h5 mb-0">User list</h1>
+<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Administration</p>
+        <h1 class="h3 mb-0">User list</h1>
     </div>
-    <div class="card-body border-bottom">
-        <p class="text-body-secondary mb-0">
-            Review accounts and update their personal details or access.
-        </p>
+    <?php if (Yii::$app->user->can('admin.access')) : ?>
+        <?= Html::a('Create account', ['/admin-user/create'], ['class' => 'btn btn-primary']) ?>
+    <?php endif; ?>
+</div>
+
+<section class="card admin-panel">
+    <div class="card-header">
+        <p class="text-body-secondary mb-0">Review account details, roles, and access.</p>
     </div>
     <?= AdminGridView::widget([
         'dataProvider' => $dataProvider,
@@ -26,6 +38,32 @@ $this->title = 'User list';
             'username',
             'full_name',
             'email:email',
+            [
+                'label' => 'Role',
+                'format' => 'raw',
+                'value' => static function (User $user) use ($roleOptions): string {
+                    $auth = Yii::$app->authManager;
+                    $assigned = $auth->getRolesByUser($user->id);
+                    $selected = count($assigned) === 1 ? array_key_first($assigned) : '';
+
+                    if ((string) $user->id === (string) Yii::$app->user->id) {
+                        return '<span class="text-body-secondary">Current account</span>';
+                    }
+
+                    return Html::beginForm(
+                        ['/admin-user/assign-role', 'id' => $user->id],
+                        'post',
+                        ['class' => 'd-flex flex-wrap gap-2 role-assignment-form'],
+                    )
+                        . Html::dropDownList('role', $selected, $roleOptions, [
+                            'class' => 'form-select form-select-sm',
+                            'required' => true,
+                            'aria-label' => 'Role for ' . $user->username,
+                        ])
+                        . Html::submitButton('Save', ['class' => 'btn btn-sm btn-primary'])
+                        . Html::endForm();
+                },
+            ],
             [
                 'label' => 'Actions',
                 'format' => 'raw',
@@ -42,4 +80,4 @@ $this->title = 'User list';
             ],
         ],
     ]) ?>
-</div>
+</section>

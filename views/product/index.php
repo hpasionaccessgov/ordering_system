@@ -1,7 +1,6 @@
 <?php
 
-use app\models\Product;
-use app\widgets\AdminGridView;
+use yii\bootstrap5\LinkPager;
 use yii\helpers\Html;
 
 /** @var yii\data\ActiveDataProvider $dataProvider */
@@ -9,7 +8,7 @@ use yii\helpers\Html;
 /** @var bool $canManageProducts */
 /** @var string $status */
 
-$this->title = 'Products';
+$this->title = 'Menu';
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -26,14 +25,14 @@ $this->title = 'Products';
 
 <?= Html::beginForm(['/product/index'], 'get', ['class' => 'catalog-filter mb-4']) ?>
 <div class="row g-2">
-    <div class="col-12 col-md-<?= $canManageProducts ? '3' : '4' ?>">
+    <div class="col-12 col-md-3">
         <?= Html::input('search', 'q', Yii::$app->request->get('q'), [
             'class' => 'form-control',
             'placeholder' => 'Search products',
             'aria-label' => 'Search products',
         ]) ?>
     </div>
-    <div class="col-12 col-md-<?= $canManageProducts ? '2' : '3' ?>">
+    <div class="col-12 col-md-2">
         <?= Html::dropDownList('category', Yii::$app->request->get('category'), [
             '' => 'All categories',
         ] + array_combine($categories, $categories), ['class' => 'form-select']) ?>
@@ -47,7 +46,7 @@ $this->title = 'Products';
             ], ['class' => 'form-select', 'aria-label' => 'Product status']) ?>
         </div>
     <?php endif; ?>
-    <div class="col-6 col-md-2">
+    <div class="col-6 col-md-1">
         <?= Html::input('number', 'min_price', Yii::$app->request->get('min_price'), [
             'class' => 'form-control',
             'min' => 0,
@@ -55,7 +54,7 @@ $this->title = 'Products';
             'placeholder' => 'Min ₱',
         ]) ?>
     </div>
-    <div class="col-6 col-md-2">
+    <div class="col-6 col-md-1">
         <?= Html::input('number', 'max_price', Yii::$app->request->get('max_price'), [
             'class' => 'form-control',
             'min' => 0,
@@ -63,98 +62,33 @@ $this->title = 'Products';
             'placeholder' => 'Max ₱',
         ]) ?>
     </div>
+        <div class="col-12 col-md-2">
+            <?= Html::dropDownList('sort', Yii::$app->request->get('sort', 'name'), [
+                'name' => 'Name: A to Z',
+                '-name' => 'Name: Z to A',
+                'price' => 'Price: low to high',
+                '-price' => 'Price: high to low',
+            ], ['class' => 'form-select', 'aria-label' => 'Sort products']) ?>
+        </div>
     <div class="col-12 col-md-1">
         <?= Html::submitButton('Filter', ['class' => 'btn btn-primary w-100']) ?>
     </div>
 </div>
 <?= Html::endForm() ?>
 
-<?= AdminGridView::widget([
-    'dataProvider' => $dataProvider,
-    'columns' => [
-        [
-            'label' => 'Image',
-            'format' => 'raw',
-            'value' => static function (Product $model): string {
-                if ($model->getImageUrl() === null) {
-                    return '<span class="text-body-secondary">No image</span>';
-                }
-
-                return Html::img($model->getImageUrl(), [
-                    'class' => 'product-table-image',
-                    'alt' => $model->name,
-                ]);
-            },
-        ],
-        'name',
-        'description',
-        'price:currency',
-        [
-            'attribute' => 'status',
-            'value' => static fn (Product $model): string => $model->isActive()
-                ? 'Active'
-                : 'Archived',
-        ],
-        [
-            'class' => 'yii\grid\ActionColumn',
-            'header' => 'Actions',
-            'template' => '{view} {update} {archive} {restore}',
-            'buttons' => [
-                'view' => static fn ($url, Product $model): string => Html::a(
-                    'View',
-                    ['/product/view', 'id' => $model->id],
-                    ['class' => 'btn btn-sm btn-outline-secondary'],
-                ),
-                'update' => static function ($url, Product $model): string {
-                    if (!Yii::$app->user->can('product.update')) {
-                        return '';
-                    }
-
-                    return Html::a(
-                        'Edit',
-                        ['/product/update', 'id' => $model->id],
-                        ['class' => 'btn btn-sm btn-outline-primary'],
-                    );
-                },
-                'archive' => static function ($url, Product $model): string {
-                    if (
-                        !Yii::$app->user->can('product.archive')
-                        || !$model->isActive()
-                    ) {
-                        return '';
-                    }
-
-                    return Html::beginForm(
-                        ['/product/archive', 'id' => $model->id],
-                        'post',
-                        ['class' => 'd-inline'],
-                    )
-                        . Html::submitButton('Archive', [
-                            'class' => 'btn btn-sm btn-outline-danger',
-                            'data-confirm' => 'Archive this product?',
-                        ])
-                        . Html::endForm();
-                },
-                'restore' => static function ($url, Product $model): string {
-                    if (
-                        !Yii::$app->user->can('product.update')
-                        || $model->isActive()
-                    ) {
-                        return '';
-                    }
-
-                    return Html::beginForm(
-                        ['/product/restore', 'id' => $model->id],
-                        'post',
-                        ['class' => 'd-inline'],
-                    )
-                        . Html::submitButton('Restore', [
-                            'class' => 'btn btn-sm btn-outline-success',
-                            'data-confirm' => 'Restore this product to the active catalog?',
-                        ])
-                        . Html::endForm();
-                },
-            ],
-        ],
-    ],
-]) ?>
+    <div class="row g-3">
+        <?php foreach ($dataProvider->getModels() as $product) : ?>
+            <div class="col-12 col-sm-6 col-xl-4">
+                <?= $this->render('../shared/_product_card', ['product' => $product]) ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <?php if ($dataProvider->getCount() === 0) : ?>
+        <div class="card admin-panel">
+            <div class="card-body text-center py-5">
+                <h2 class="h5">No products match your filters</h2>
+                <p class="text-body-secondary mb-0">Try a different search or category.</p>
+            </div>
+        </div>
+    <?php endif; ?>
+    <?= LinkPager::widget(['pagination' => $dataProvider->pagination]) ?>

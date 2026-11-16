@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\models\AdminUserCreateForm;
 use app\models\User;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -24,11 +25,12 @@ class AdminUserController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     [
-                        'actions' => ['update'],
+                        'actions' => ['create', 'update'],
                         'allow' => true,
                         'roles' => ['admin.access'],
                     ],
                     [
+                        'actions' => ['index', 'list', 'assign-role'],
                         'allow' => true,
                         'roles' => ['user.assignRole'],
                     ],
@@ -37,6 +39,7 @@ class AdminUserController extends Controller
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
+                    'create' => ['GET', 'POST'],
                     'assign-role' => ['post'],
                     'update' => ['GET', 'POST'],
                 ],
@@ -58,6 +61,58 @@ class AdminUserController extends Controller
                 'query' => User::find()->orderBy(['id' => SORT_ASC]),
                 'pagination' => ['pageSize' => 20],
             ]),
+            'roles' => Yii::$app->authManager->getRoles(),
+        ]);
+    }
+
+    public function actionCreate(): Response|string
+    {
+        $this->layout = 'admin';
+        $model = new AdminUserCreateForm();
+        $auth = Yii::$app->authManager;
+        $roles = $auth->getRoles();
+
+        if ($model->load($this->request->post()) && $model->validate()) {
+            $role = $auth->getRole($model->roleName);
+            if ($role === null) {
+                $model->addError(
+                    'roleName',
+                    'The selected role no longer exists. Reload the page and choose another role.',
+                );
+            } else {
+                $user = new User();
+                $user->username = $model->username;
+                $user->email = mb_strtolower($model->email);
+                $user->full_name = $model->fullName;
+                $user->setPassword($model->password);
+                $user->generateAuthKey();
+                $user->status = User::STATUS_ACTIVE;
+
+                $transaction = Yii::$app->db->beginTransaction();
+                try {
+                    if (!$user->save(false)) {
+                        throw new \RuntimeException('The user account could not be saved.');
+                    }
+
+                    $auth->assign($role, $user->id);
+                    $transaction->commit();
+                } catch (\Throwable $exception) {
+                    if ($transaction->isActive) {
+                        $transaction->rollBack();
+                    }
+
+                    throw $exception;
+                }
+
+                Yii::$app->session->setFlash('success', "Account for {$user->username} was created.");
+
+                return $this->redirect(['list']);
+            }
+        }
+
+        return $this->render('create', [
+            'model' => $model,
+            'roles' => $roles,
         ]);
     }
 
@@ -143,6 +198,6 @@ class AdminUserController extends Controller
 
         Yii::$app->session->setFlash('success', "The role for {$user->username} was updated.");
 
-        return $this->redirect(['/admin-role/index']);
+        return $this->redirect(['list']);
     }
 }

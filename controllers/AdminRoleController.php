@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
-use app\models\User;
+use app\models\RoleForm;
 use app\services\RbacPermissionPolicy;
 use Yii;
-use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
@@ -42,25 +41,31 @@ class AdminRoleController extends Controller
     {
         $this->layout = 'admin';
 
-        return $this->render('../admin-user/roles', [
-            'roles' => Yii::$app->authManager->getRoles(),
-            'permissions' => Yii::$app->authManager->getPermissions(),
-            'usersDataProvider' => new ActiveDataProvider([
-                'query' => User::find(),
-                'pagination' => ['pageSize' => 15],
-                'sort' => ['defaultOrder' => ['id' => SORT_ASC]],
-            ]),
-        ]);
+        return $this->renderRoles(new RoleForm());
     }
 
     public function actionCreate(): Response
     {
-        $name = trim((string) $this->request->post('name'));
-        $description = trim((string) $this->request->post('description'));
+        $model = new RoleForm();
+        if ($model->load($this->request->post()) && $model->validate()) {
+            $auth = Yii::$app->authManager;
+            $role = $auth->createRole($model->name);
+            $role->description = $model->description;
+            if (!$auth->add($role)) {
+                $model->addError('name', 'The role could not be created. Please try again.');
+                $this->layout = 'admin';
 
-        $this->saveRole($name, $description, false);
+                return $this->renderRoles($model);
+            }
 
-        return $this->redirect(['index']);
+            Yii::$app->session->setFlash('success', "Role '{$role->name}' was created.");
+
+            return $this->redirect(['index']);
+        }
+
+        $this->layout = 'admin';
+
+        return $this->renderRoles($model);
     }
 
     public function actionUpdate(string $name): Response
@@ -119,6 +124,11 @@ class AdminRoleController extends Controller
             throw new BadRequestHttpException('Role or permissions are invalid.');
         }
 
+        $permissionNames = array_values(array_filter(
+            $permissionNames,
+            static fn ($permissionName): bool => $permissionName !== '0',
+        ));
+
         foreach ($permissionNames as $permissionName) {
             if (!is_string($permissionName)) {
                 throw new BadRequestHttpException('Permission names must be strings.');
@@ -133,29 +143,37 @@ class AdminRoleController extends Controller
             }
         }
 
-        $auth->removeChildren($role);
-        foreach ($permissionNames as $permissionName) {
-            $permission = $auth->getPermission($permissionName);
-            $auth->addChild($role, $permission);
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $auth->removeChildren($role);
+            foreach ($permissionNames as $permissionName) {
+                $permission = $auth->getPermission($permissionName);
+                if (!$auth->addChild($role, $permission)) {
+                    throw new \RuntimeException("Could not assign permission '{$permissionName}'.");
+                }
+            }
+            $transaction->commit();
+        } catch (\Throwable $exception) {
+            if ($transaction->isActive) {
+                $transaction->rollBack();
+            }
+
+            throw $exception;
         }
+
+        Yii::$app->session->setFlash('success', "Permissions for '{$name}' were updated.");
 
         return $this->redirect(['index']);
     }
 
-    private function saveRole(string $name, string $description, bool $update): void
+    private function renderRoles(RoleForm $roleForm): string
     {
         $auth = Yii::$app->authManager;
-        if ($name === '' || !preg_match('/^[a-z][a-z0-9._-]{2,49}$/', $name)) {
-            throw new BadRequestHttpException(
-                'Role name must use lowercase letters, numbers, dots, dashes, or underscores.'
-            );
-        }
-        if (!$update && $auth->getRole($name) !== null) {
-            throw new BadRequestHttpException('Role name already exists.');
-        }
 
-        $role = $auth->createRole($name);
-        $role->description = $description;
-        $auth->add($role);
+        return $this->render('../admin-user/roles', [
+            'roles' => $auth->getRoles(),
+            'permissions' => $auth->getPermissions(),
+            'roleForm' => $roleForm,
+        ]);
     }
 }

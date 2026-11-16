@@ -70,7 +70,7 @@ $displayName = $identity instanceof User
     </div>
 </div>
 
-<div class="row g-4">
+<!-- <div class="row g-4">
     <div class="col-12 col-xl-6">
         <section class="card dashboard-action-card h-100">
             <div class="card-body">
@@ -86,11 +86,11 @@ $displayName = $identity instanceof User
         <section class="card dashboard-action-card h-100">
             <div class="card-body">
                 <span class="cafebara-dashboard-icon mb-3"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
-                <h2 class="h5">Products and orders</h2>
+                <h2 class="h5">Menu and orders</h2>
                 <p class="text-body-secondary">Review the catalog and order activity.</p>
-                <?= Html::a('Products', ['/product/index'], ['class' => 'btn btn-primary']) ?>
+                <?= Html::a('Menu', ['/product/index'], ['class' => 'btn btn-primary']) ?>
                 <?= Html::a('Orders', ['/order/index'], ['class' => 'btn btn-outline-primary']) ?>
             </div>
         </section>
     </div>
-</div>
+</div> -->

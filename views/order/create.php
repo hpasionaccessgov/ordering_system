@@ -8,57 +8,17 @@ use yii\helpers\Html;
 $this->title = 'Create order';
 ?>
 
-<h1 class="h3 mb-4"><?= Html::encode($this->title) ?></h1>
+<section class="order-builder-page">
+    <div class="mb-4">
+        <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Cafébara menu</p>
+        <h1 class="h3 mb-1"><?= Html::encode($this->title) ?></h1>
+        <p class="text-body-secondary mb-0">Choose quantities and review your order total before placing it.</p>
+    </div>
 
-<?= Html::beginForm(['/order/create'], 'post') ?>
-
-<div class="row g-3">
-    <?php foreach ($products as $product): ?>
-        <div class="col-12 col-md-6">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h2 class="h5"><?= Html::encode($product->name) ?></h2>
-
-                    <p class="text-body-secondary">
-                        <?= Html::encode($product->description ?? '') ?>
-                    </p>
-
-                    <p class="fw-semibold">
-                        <?= Yii::$app->formatter->asCurrency($product->price) ?>
-                    </p>
-
-                    <?= Html::hiddenInput(
-                        "items[{$product->id}][product_id]",
-                        (string) $product->id,
-                    ) ?>
-
-                    <?= Html::label(
-                        'Quantity',
-                        "quantity-{$product->id}",
-                        ['class' => 'form-label'],
-                    ) ?>
-
-                    <?= Html::input(
-                        'number',
-                        "items[{$product->id}][quantity]",
-                        0,
-                        [
-                            'id' => "quantity-{$product->id}",
-                            'class' => 'form-control',
-                            'min' => 0,
-                        ],
-                    ) ?>
-                </div>
-            </div>
-        </div>
-    <?php endforeach; ?>
-</div>
-
-<div class="mt-4">
-    <?= Html::submitButton(
-        'Place order',
-        ['class' => 'btn btn-primary'],
-    ) ?>
-</div>
-
-<?= Html::endForm() ?>
+    <?= $this->render('_product_selection', [
+        'products' => $products,
+        'quantities' => [],
+        'formAction' => ['/order/create'],
+        'submitLabel' => 'Place order',
+    ]) ?>
+</section>

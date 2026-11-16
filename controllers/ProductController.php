@@ -25,6 +25,11 @@ class ProductController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     [
+                        'actions' => ['view'],
+                        'allow' => true,
+                        'roles' => ['?'],
+                    ],
+                    [
                         'actions' => ['index', 'view'],
                         'allow' => true,
                         'roles' => ['product.view'],

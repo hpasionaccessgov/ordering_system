@@ -24,50 +24,41 @@ $this->title = 'Cafébara | Cafe ordering';
                 </h1>
 
                 <p class="lead cafebara-hero-copy mb-4">
-                    Welcome to Cafébara, your place to manage an account and follow the cafe tools as they grow.
+                    Welcome to Cafébara! follow the cafe tools as they grow.
                 </p>
 
                 <div class="d-flex flex-wrap gap-2">
-                    <?php if (Yii::$app->user->isGuest): ?>
+                    <?php if (Yii::$app->user->isGuest) : ?>
                         <?= Html::a('Create your account', ['/site/register'], [
                             'class' => 'btn btn-cafebara-light btn-lg',
                         ]) ?>
                         <?= Html::a('Sign in', ['/site/login'], [
                             'class' => 'btn btn-cafebara-outline-light btn-lg',
                         ]) ?>
-                    <?php else: ?>
+                    <?php else : ?>
                         <?= Html::a('Open your dashboard', ['/site/dashboard'], [
                             'class' => 'btn btn-cafebara-light btn-lg',
                         ]) ?>
                     <?php endif ?>
                 </div>
 
-                <?php if ($featuredProducts !== []): ?>
+                <?php if ($featuredProducts !== []) : ?>
                     <section class="cafebara-catalog-preview mt-5">
                         <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
                             <div>
                                 <p class="cafebara-section-kicker mb-2">From the counter</p>
                                 <h2 class="h2 fw-bold mb-0">Featured drinks and bites</h2>
                             </div>
-                            <?= Html::a('Browse menu', ['/product/index'], ['class' => 'btn btn-cafebara-outline-light']) ?>
+                            <?= Html::a(
+                                'Browse menu',
+                                ['/product/index'],
+                                ['class' => 'btn btn-cafebara-outline-light'],
+                            ) ?>
                         </div>
                         <div class="row g-4">
-                            <?php foreach ($featuredProducts as $product): ?>
+                            <?php foreach ($featuredProducts as $product) : ?>
                                 <div class="col-12 col-sm-6 col-lg-4">
-                                    <article class="card product-card h-100">
-                                        <?php if ($product->getImageUrl() !== null): ?>
-                                            <?= Html::img($product->getImageUrl(), [
-                                                'class' => 'product-card-image',
-                                                'alt' => $product->name,
-                                            ]) ?>
-                                        <?php endif; ?>
-                                        <div class="card-body">
-                                            <span class="product-category"><?= Html::encode($product->category) ?></span>
-                                            <h3 class="h5 mt-2"><?= Html::encode($product->name) ?></h3>
-                                            <p class="text-body-secondary"><?= Html::encode($product->description) ?></p>
-                                            <strong><?= Yii::$app->formatter->asCurrency($product->price) ?></strong>
-                                        </div>
-                                    </article>
+                                    <?= $this->render('../shared/_product_card', ['product' => $product]) ?>
                                 </div>
                             <?php endforeach; ?>
                         </div>
