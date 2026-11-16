@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\models\Product;
+use app\services\ProductCatalogPolicy;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -44,6 +45,11 @@ class ProductController extends Controller
                         'roles' => ['product.update'],
                     ],
                     [
+                        'actions' => ['restore'],
+                        'allow' => true,
+                        'roles' => ['product.update'],
+                    ],
+                    [
                         'actions' => ['archive'],
                         'allow' => true,
                         'roles' => ['product.archive'],
@@ -54,6 +60,7 @@ class ProductController extends Controller
                 'class' => VerbFilter::class,
                 'actions' => [
                     'archive' => ['post'],
+                    'restore' => ['post'],
                 ],
             ],
         ];
@@ -62,7 +69,19 @@ class ProductController extends Controller
     public function actionIndex(): string
     {
         $this->layout = 'admin';
-        $query = Product::find()->where(['status' => Product::STATUS_ACTIVE]);
+        $canManageProducts = Yii::$app->user->can('product.update');
+        $requestedStatus = $this->request->get('status', 'all');
+        $status = ProductCatalogPolicy::normalizeStatus(
+            $canManageProducts,
+            is_string($requestedStatus) ? $requestedStatus : 'all',
+        );
+
+        $query = ProductCatalogPolicy::applyStatusFilter(Product::find(), $status);
+        $categoryQuery = ProductCatalogPolicy::applyStatusFilter(
+            Product::find()->select('category')->distinct(),
+            $status,
+        );
+
         $search = trim((string) $this->request->get('q', ''));
         $category = trim((string) $this->request->get('category', ''));
         $minPrice = $this->request->get('min_price');
@@ -89,7 +108,9 @@ class ProductController extends Controller
             'dataProvider' => new ActiveDataProvider([
                 'query' => $query->orderBy(['name' => SORT_ASC]),
             ]),
-            'categories' => Product::find()->select('category')->distinct()->orderBy('category')->column(),
+            'categories' => $categoryQuery->orderBy('category')->column(),
+            'canManageProducts' => $canManageProducts,
+            'status' => $status,
         ]);
     }
 
@@ -105,11 +126,15 @@ class ProductController extends Controller
     public function actionImage(int $id): Response
     {
         $model = Product::find()
-            ->select(['image_data', 'image_mime', 'image_name'])
-            ->where(['id' => $id, 'status' => Product::STATUS_ACTIVE])
+            ->select(['image_data', 'image_mime', 'image_name', 'status'])
+            ->where(['id' => $id])
             ->one();
 
-        if ($model === null || $model->image_data === null) {
+        if (
+            $model === null
+            || ($model->status !== Product::STATUS_ACTIVE && !Yii::$app->user->can('product.update'))
+            || $model->image_data === null
+        ) {
             throw new NotFoundHttpException('Product image not found.');
         }
 
@@ -180,9 +205,31 @@ class ProductController extends Controller
         return $this->redirect(['index']);
     }
 
+    public function actionRestore(int $id): Response
+    {
+        $model = $this->findProduct($id);
+        if ($model->status !== Product::STATUS_ARCHIVED) {
+            throw new BadRequestHttpException('Only archived products can be restored.');
+        }
+
+        $model->status = Product::STATUS_ACTIVE;
+        if (!$model->save(false, ['status', 'updated_at'])) {
+            throw new BadRequestHttpException('Product could not be restored.');
+        }
+
+        Yii::$app->session->setFlash('success', 'Product restored.');
+
+        return $this->redirect(['index', 'status' => 'active']);
+    }
+
     private function findProduct(int $id): Product
     {
-        $model = Product::findOne($id);
+        $query = Product::find()->where(['id' => $id]);
+        if (!Yii::$app->user->can('product.update')) {
+            $query->andWhere(['status' => Product::STATUS_ACTIVE]);
+        }
+
+        $model = $query->one();
 
         if ($model === null) {
             throw new NotFoundHttpException('Product not found.');

@@ -1,5 +1,6 @@
 <?php
 
+use app\services\RbacPermissionPolicy;
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */
@@ -7,6 +8,8 @@ use yii\helpers\Html;
 
 $this->title = 'Roles';
 $auth = Yii::$app->authManager;
+$permissions = $auth->getPermissions();
+$roles = $auth->getRoles();
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -21,10 +24,17 @@ $auth = Yii::$app->authManager;
         <h2 class="h5">Create role</h2>
         <?= Html::beginForm(['/admin-role/create'], 'post', ['class' => 'row g-2']) ?>
         <div class="col-12 col-md-4">
-            <?= Html::input('text', 'name', '', ['class' => 'form-control', 'placeholder' => 'e.g. cashier', 'required' => true]) ?>
+            <?= Html::input('text', 'name', '', [
+                'class' => 'form-control',
+                'placeholder' => 'e.g. cashier',
+                'required' => true,
+            ]) ?>
         </div>
         <div class="col-12 col-md-5">
-            <?= Html::input('text', 'description', '', ['class' => 'form-control', 'placeholder' => 'Role description']) ?>
+            <?= Html::input('text', 'description', '', [
+                'class' => 'form-control',
+                'placeholder' => 'Role description',
+            ]) ?>
         </div>
         <div class="col-12 col-md-3">
             <?= Html::submitButton('Create role', ['class' => 'btn btn-primary w-100']) ?>
@@ -40,34 +50,42 @@ $auth = Yii::$app->authManager;
         <div class="table-responsive">
             <table class="table align-middle">
                 <thead>
-                    <tr><th>User</th><th>Email</th><th>Role</th></tr>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                    </tr>
                 </thead>
                 <tbody>
-                <?php foreach ($users as $user): ?>
-                    <?php
-                    $assigned = $auth->getRolesByUser($user->id);
-                    $selected = count($assigned) === 1 ? array_key_first($assigned) : '';
-                    ?>
-                    <tr>
-                        <td><?= Html::encode($user->username) ?></td>
-                        <td><?= Html::encode($user->email) ?></td>
-                        <td>
-                            <?php if ((string) $user->id === (string) Yii::$app->user->id): ?>
-                                <span class="text-body-secondary">Current account</span>
-                            <?php else: ?>
-                                <?= Html::beginForm(['/admin-user/assign-role', 'id' => $user->id], 'post', ['class' => 'd-flex gap-2']) ?>
-                                <?= Html::dropDownList('role', $selected, [
-                                    '' => 'Select role',
-                                    'admin' => 'Admin',
-                                    'staff' => 'Staff',
-                                    'customer' => 'Customer',
-                                ], ['class' => 'form-select form-select-sm', 'required' => true]) ?>
-                                <?= Html::submitButton('Save', ['class' => 'btn btn-sm btn-primary']) ?>
-                                <?= Html::endForm() ?>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
+                    <?php foreach ($users as $user) : ?>
+                        <?php
+                        $assigned = $auth->getRolesByUser($user->id);
+                        $selected = count($assigned) === 1 ? array_key_first($assigned) : '';
+                        ?>
+                        <tr>
+                            <td><?= Html::encode($user->username) ?></td>
+                            <td><?= Html::encode($user->email) ?></td>
+                            <td>
+                                <?php if ((string) $user->id === (string) Yii::$app->user->id) : ?>
+                                    <span class="text-body-secondary">Current account</span>
+                                <?php else : ?>
+                                    <?= Html::beginForm(
+                                        ['/admin-user/assign-role', 'id' => $user->id],
+                                        'post',
+                                        ['class' => 'd-flex gap-2']
+                                    ) ?>
+                                    <?= Html::dropDownList('role', $selected, [
+                                        '' => 'Select role',
+                                        'admin' => 'Admin',
+                                        'staff' => 'Staff',
+                                        'customer' => 'Customer',
+                                    ], ['class' => 'form-select form-select-sm', 'required' => true]) ?>
+                                    <?= Html::submitButton('Save', ['class' => 'btn btn-sm btn-primary']) ?>
+                                    <?= Html::endForm() ?>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
@@ -75,7 +93,7 @@ $auth = Yii::$app->authManager;
 </section>
 
 <div class="row g-4">
-    <?php foreach ($roles as $role): ?>
+    <?php foreach ($roles as $role) : ?>
         <div class="col-12 col-lg-6">
             <section class="card admin-panel h-100">
                 <div class="card-body">
@@ -84,15 +102,20 @@ $auth = Yii::$app->authManager;
                             <h2 class="h5 mb-1"><?= Html::encode($role->name) ?></h2>
                             <p class="text-body-secondary"><?= Html::encode($role->description) ?></p>
                         </div>
-                        <?php if (!in_array($role->name, ['admin', 'staff', 'customer'], true)): ?>
+                        <?php if (!in_array($role->name, ['admin', 'staff', 'customer'], true)) : ?>
                             <?= Html::beginForm(['/admin-role/delete', 'name' => $role->name], 'post') ?>
-                            <?= Html::submitButton('Delete', ['class' => 'btn btn-sm btn-outline-danger', 'data-confirm' => 'Delete this role?']) ?>
+                            <?= Html::submitButton('Delete', [
+                                'class' => 'btn btn-sm btn-outline-danger',
+                                'data-confirm' => 'Delete this role?',
+                            ]) ?>
                             <?= Html::endForm() ?>
                         <?php endif; ?>
                     </div>
-                    <p class="small text-body-secondary mb-2">Assigned users: <?= count($auth->getUserIdsByRole($role->name)) ?></p>
+                    <p class="small text-body-secondary mb-2">
+                        Assigned users: <?= count($auth->getUserIdsByRole($role->name)) ?>
+                    </p>
                     <div class="d-flex flex-wrap gap-2">
-                        <?php foreach ($auth->getChildren($role->name) as $child): ?>
+                        <?php foreach ($auth->getChildren($role->name) as $child) : ?>
                             <span class="badge text-bg-secondary"><?= Html::encode($child->name) ?></span>
                         <?php endforeach; ?>
                     </div>
@@ -101,14 +124,26 @@ $auth = Yii::$app->authManager;
                     <?= Html::beginForm(['/admin-role/update-permissions', 'name' => $role->name], 'post') ?>
                     <div class="row g-2">
                         <?php $children = array_keys($auth->getChildren($role->name)); ?>
-                        <?php foreach ($permissions as $permission): ?>
+                        <?php foreach ($permissions as $permission) : ?>
                             <div class="col-12 col-md-6">
+                                <?php
+                                $canAssignPermission = RbacPermissionPolicy::isAllowed(
+                                    $role->name,
+                                    $permission->name,
+                                );
+                                $isChecked = $role->name === 'admin'
+                                    || (
+                                        $canAssignPermission
+                                        && in_array($permission->name, $children, true)
+                                    );
+                                ?>
                                 <?= Html::checkbox(
                                     'permissions[]',
-                                    in_array($permission->name, $children, true),
+                                    $isChecked,
                                     [
                                         'value' => $permission->name,
                                         'label' => Html::encode($permission->name),
+                                        'disabled' => !$canAssignPermission || $role->name === 'admin',
                                     ],
                                 ) ?>
                             </div>
@@ -117,7 +152,11 @@ $auth = Yii::$app->authManager;
                     <?= Html::submitButton('Save permissions', ['class' => 'btn btn-sm btn-outline-primary mt-3']) ?>
                     <?= Html::endForm() ?>
                     <hr>
-                    <?= Html::beginForm(['/admin-role/update', 'name' => $role->name], 'post', ['class' => 'row g-2']) ?>
+                    <?= Html::beginForm(
+                        ['/admin-role/update', 'name' => $role->name],
+                        'post',
+                        ['class' => 'row g-2']
+                    ) ?>
                     <?= Html::hiddenInput('new_name', $role->name) ?>
                     <div class="col-12">
                         <?= Html::input('text', 'description', $role->description, [

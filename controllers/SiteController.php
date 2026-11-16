@@ -25,7 +25,6 @@ use yii\mail\MailerInterface;
 
 class SiteController extends Controller
 {
-
     private function getCurrentUser(): User
     {
         $user = Yii::$app->user->identity;
@@ -217,7 +216,7 @@ class SiteController extends Controller
         return $this->render('login', ['model' => $model]);
     }
 
-    /** 
+    /**
      * Dashboard action
      * @return Response|string
      */
@@ -240,9 +239,9 @@ class SiteController extends Controller
         throw new ForbiddenHttpException('No application role is assigned to this account.');
     }
 
-    /** 
+    /**
      * Profile action
-     * 
+     *
      * @return Response|string
      */
     public function actionProfile(): Response|string
@@ -255,8 +254,9 @@ class SiteController extends Controller
             $user->full_name = $model->fullName;
 
             if ($user->save(false, ['full_name', 'updated_at'])) {
-                Yii::$app->session->setFlash('success', 'Your profile was update.');
-                return $this->refresh();
+                Yii::$app->session->setFlash('success', 'Your profile was updated.');
+
+                return $this->redirect(['profile']);
             }
 
             Yii::error("Could not update profile for user ID {$user->id}.", __METHOD__);
@@ -271,7 +271,7 @@ class SiteController extends Controller
 
     /**
      * Change password action
-     * 
+     *
      * @return Response|string
      */
     public function actionChangePassword(): Response|string
@@ -300,9 +300,9 @@ class SiteController extends Controller
         return $this->render('change_password', ['model' => $model]);
     }
 
-    /** 
+    /**
      * Deaction aciton
-     * 
+     *
      * @return Response|string
      */
     public function actionDeactivate(): Response|string

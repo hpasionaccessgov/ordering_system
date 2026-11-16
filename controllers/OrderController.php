@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\models\Order;
+use app\services\OrderAccessPolicy;
 use app\services\OrderService;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -72,11 +73,11 @@ class OrderController extends Controller
     {
         $this->layout = 'admin';
 
-        $query = Order::find()->orderBy(['created_at' => SORT_DESC]);
-
-        if (!Yii::$app->user->can('order.process')) {
-            $query->andWhere(['user_id' => Yii::$app->user->id]);
-        }
+        $query = OrderAccessPolicy::scopeToOwner(
+            Order::find(),
+            Yii::$app->user->id,
+            $this->canViewAllOrders(),
+        )->orderBy(['created_at' => SORT_DESC]);
 
         return $this->render('index', [
             'dataProvider' => new ActiveDataProvider([
@@ -194,19 +195,14 @@ class OrderController extends Controller
     public function actionProcess(int $id): Response
     {
         $order = $this->findAccessibleOrder($id);
-
-        $allowedStatuses = [
-            Order::STATUS_CONFIRMED => Order::STATUS_PROCESSING,
-            Order::STATUS_PROCESSING => Order::STATUS_COMPLETED,
-        ];
-
-        if (!isset($allowedStatuses[$order->status])) {
+        $nextStatus = $order->nextStatus();
+        if ($nextStatus === null) {
             throw new ForbiddenHttpException(
                 'This order cannot be processed from its current status.',
             );
         }
 
-        $order->status = $allowedStatuses[$order->status];
+        $order->status = $nextStatus;
 
         if (!$order->save(false, ['status', 'updated_at'])) {
             throw new ForbiddenHttpException('Order status could not be updated.');
@@ -219,18 +215,26 @@ class OrderController extends Controller
 
     private function findAccessibleOrder(int $id): Order
     {
-        $query = Order::find()->where(['id' => $id]);
+        $query = OrderAccessPolicy::scopeToOwner(
+            Order::find()->where(['id' => $id]),
+            Yii::$app->user->id,
+            $this->canViewAllOrders(),
+        );
 
-        if (!Yii::$app->user->can('order.process')) {
-            $query->andWhere(['user_id' => Yii::$app->user->id]);
-        }
-
-        $order = $query->with(['items.product'])->one();
+        $order = $query->with(['items.product', 'user'])->one();
 
         if ($order === null) {
             throw new NotFoundHttpException('Order not found.');
         }
 
         return $order;
+    }
+
+    private function canViewAllOrders(): bool
+    {
+        return OrderAccessPolicy::canViewAllOrders(
+            Yii::$app->user->can('admin.access'),
+            Yii::$app->user->can('staff.access'),
+        );
     }
 }

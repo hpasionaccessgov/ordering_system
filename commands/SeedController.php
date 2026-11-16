@@ -11,12 +11,23 @@ use yii\console\ExitCode;
 
 class SeedController extends Controller
 {
+    public function actionProducts(): int
+    {
+        $products = (new ProductSeeder())->run();
+
+        $this->stdout("Product catalog refreshed. Seeded products processed: {$products}.\n");
+
+        return ExitCode::OK;
+    }
+
     public function actionTestData(): int
     {
         $users = (new UserSeeder())->run();
         $products = (new ProductSeeder())->run();
 
-        $this->stdout("Seed complete. Users added: {$users}; products added: {$products}.\n");
+        $this->stdout(
+            "Seed complete. Users added: {$users}; products created or refreshed: {$products}.\n"
+        );
 
         return ExitCode::OK;
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\models\User;
+use app\services\RbacPermissionPolicy;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -107,19 +108,29 @@ class AdminRoleController extends Controller
         if ($role === null || !is_array($permissionNames)) {
             throw new BadRequestHttpException('Role or permissions are invalid.');
         }
-        if ($name === 'admin' && !in_array('admin.access', $permissionNames, true)) {
-            $permissionNames[] = 'admin.access';
+
+        if ($name === 'admin') {
+            $permissionNames = array_keys($auth->getPermissions());
+        }
+
+        foreach ($permissionNames as $permissionName) {
+            if (!is_string($permissionName)) {
+                throw new BadRequestHttpException('Permission names must be strings.');
+            }
+            if ($auth->getPermission($permissionName) === null) {
+                throw new BadRequestHttpException("Permission '{$permissionName}' does not exist.");
+            }
+            if (!RbacPermissionPolicy::isAllowed($name, $permissionName)) {
+                throw new BadRequestHttpException(
+                    "The permission '{$permissionName}' cannot be assigned to the '{$name}' role.",
+                );
+            }
         }
 
         $auth->removeChildren($role);
         foreach ($permissionNames as $permissionName) {
-            if (!is_string($permissionName)) {
-                continue;
-            }
             $permission = $auth->getPermission($permissionName);
-            if ($permission !== null) {
-                $auth->addChild($role, $permission);
-            }
+            $auth->addChild($role, $permission);
         }
 
         return $this->redirect(['index']);
@@ -129,7 +140,9 @@ class AdminRoleController extends Controller
     {
         $auth = Yii::$app->authManager;
         if ($name === '' || !preg_match('/^[a-z][a-z0-9._-]{2,49}$/', $name)) {
-            throw new BadRequestHttpException('Role name must use lowercase letters, numbers, dots, dashes, or underscores.');
+            throw new BadRequestHttpException(
+                'Role name must use lowercase letters, numbers, dots, dashes, or underscores.'
+            );
         }
         if (!$update && $auth->getRole($name) !== null) {
             throw new BadRequestHttpException('Role name already exists.');

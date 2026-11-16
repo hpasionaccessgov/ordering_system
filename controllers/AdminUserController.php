@@ -137,6 +137,6 @@ class AdminUserController extends Controller
 
         Yii::$app->session->setFlash('success', "The role for {$user->username} was updated.");
 
-        return $this->redirect(['index']);
+        return $this->redirect(['/admin-role/index']);
     }
 }

@@ -14,25 +14,59 @@ $statusLabels = [
     Order::STATUS_COMPLETED => 'Completed',
     Order::STATUS_CANCELLED => 'Cancelled',
 ];
+$staffActionLabels = [
+    Order::STATUS_PENDING => 'Confirm order',
+    Order::STATUS_CONFIRMED => 'Start preparing',
+    Order::STATUS_PROCESSING => 'Mark completed',
+];
+$nextStatus = $model->nextStatus();
 ?>
 
 <div class="order-page">
-<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+<div class="d-flex justify-content-between align-items-center gap-3 mb-4 order-no-print">
     <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
 
-    <?= Html::a(
-        'Back to orders',
-        ['/order/index'],
-        ['class' => 'btn btn-outline-secondary'],
-    ) ?>
+    <div class="d-flex gap-2">
+        <?= Html::button('Print order receipt', [
+            'class' => 'btn btn-outline-primary',
+            'type' => 'button',
+            'onclick' => 'window.print()',
+        ]) ?>
+        <?= Html::a(
+            'Back to orders',
+            ['/order/index'],
+            ['class' => 'btn btn-outline-secondary'],
+        ) ?>
+    </div>
 </div>
 
-<section class="order-detail-card p-3 p-md-4">
+<section class="order-detail-card order-receipt p-3 p-md-4" id="order-receipt">
+<div class="order-receipt-heading d-flex justify-content-between align-items-start gap-3 mb-4">
+    <div>
+        <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Cafébara</p>
+        <h1 class="h3 mb-1">Order receipt</h1>
+        <p class="text-body-secondary mb-0">Order #<?= Html::encode((string) $model->id) ?></p>
+    </div>
+    <div class="text-end">
+        <p class="mb-1">
+            <span class="text-body-secondary me-2">Status</span>
+            <span class="badge order-status">
+                <?= Html::encode($statusLabels[$model->status] ?? $model->status) ?>
+            </span>
+        </p>
+        <p class="small text-body-secondary mb-0">
+            <?= Yii::$app->formatter->asDatetime($model->created_at) ?>
+        </p>
+    </div>
+</div>
+
+<div class="order-receipt-customer mb-4">
+    <span class="text-body-secondary">Customer</span>
+    <strong><?= Html::encode($model->user->full_name ?: $model->user->username) ?></strong>
+</div>
+
 <p class="mb-4">
-    <span class="text-body-secondary me-2">Status</span>
-    <span class="badge order-status">
-        <?= Html::encode($statusLabels[$model->status] ?? $model->status) ?>
-    </span>
+    Order details
 </p>
 
 <div class="table-responsive">
@@ -46,7 +80,7 @@ $statusLabels = [
         </tr>
     </thead>
     <tbody>
-        <?php foreach ($model->items as $item): ?>
+        <?php foreach ($model->items as $item) : ?>
             <tr>
                 <td><?= Html::encode($item->product->name) ?></td>
                 <td><?= Html::encode((string) $item->quantity) ?></td>
@@ -62,24 +96,18 @@ $statusLabels = [
 </table>
 </div>
 
-<p class="text-end fw-bold">
-    Total:
-    <?= Yii::$app->formatter->asCurrency($model->total_amount) ?>
+<div class="order-receipt-total d-flex justify-content-between">
+    <span>Total</span>
+    <strong><?= Yii::$app->formatter->asCurrency($model->total_amount) ?></strong>
+</div>
+<p class="small text-body-secondary mt-3 mb-0">
+    This receipt confirms the order and fulfillment status; payment is not recorded by this system.
 </p>
 
+<div class="order-no-print mt-4 d-flex flex-wrap gap-2">
 <?= $this->render('_cancel', ['model' => $model]) ?>
 
-<?php if (
-    Yii::$app->user->can('order.process')
-    && in_array(
-        $model->status,
-        [
-            Order::STATUS_CONFIRMED,
-            Order::STATUS_PROCESSING,
-        ],
-        true,
-    )
-): ?>
+<?php if (Yii::$app->user->can('order.process') && $nextStatus !== null) : ?>
     <?= Html::beginForm(
         ['/order/process', 'id' => $model->id],
         'post',
@@ -87,11 +115,12 @@ $statusLabels = [
     ) ?>
 
     <?= Html::submitButton(
-        'Update order status',
+        $staffActionLabels[$model->status] ?? 'Advance order',
         ['class' => 'btn btn-primary'],
     ) ?>
 
     <?= Html::endForm() ?>
 <?php endif; ?>
+</div>
 </section>
 </div>

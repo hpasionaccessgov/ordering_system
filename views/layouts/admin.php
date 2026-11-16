@@ -31,8 +31,8 @@ $this->registerMetaTag([
 <?php $this->beginBody() ?>
 
 <div class="app-wrapper">
-    <?= $this->render('_admin_header') ?>
-    <?= $this->render('_admin_sidebar') ?>
+    <?= $this->render('_header') ?>
+    <?= $this->render('_sidebar') ?>
 
     <main class="app-main">
         <div class="app-content-header">

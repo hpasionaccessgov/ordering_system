@@ -18,6 +18,12 @@ class Order extends ActiveRecord
     public const STATUS_COMPLETED = 'completed';
     public const STATUS_CANCELLED = 'cancelled';
 
+    private const NEXT_STATUSES = [
+        self::STATUS_PENDING => self::STATUS_CONFIRMED,
+        self::STATUS_CONFIRMED => self::STATUS_PROCESSING,
+        self::STATUS_PROCESSING => self::STATUS_COMPLETED,
+    ];
+
     public static function tableName(): string
     {
         return '{{%orders}}';
@@ -63,6 +69,16 @@ class Order extends ActiveRecord
     public function isEditableByCustomer(): bool
     {
         return $this->status === self::STATUS_PENDING;
+    }
+
+    public function nextStatus(): ?string
+    {
+        return self::nextStatusFor((string) $this->status);
+    }
+
+    public static function nextStatusFor(string $status): ?string
+    {
+        return self::NEXT_STATUSES[$status] ?? null;
     }
 
     public function canBeCancelledByCustomer(): bool

@@ -2,82 +2,72 @@
 
 declare(strict_types=1);
 
-/** @var yii\web\View $this */
-
 use yii\helpers\Html;
-use app\widgets\AdminButton;
 
-$currentRoute = Yii::$app->controller->route;
-$navigationItems = [
-    ['label' => 'Home', 'route' => 'site/index', 'url' => ['/site/index']],
-    ['label' => 'About', 'route' => 'site/about', 'url' => ['/site/about']],
-    ['label' => 'Contact', 'route' => 'site/contact', 'url' => ['/site/contact']],
-];
 $user = Yii::$app->user->identity;
-$brand = Html::img(Yii::getAlias('@web/images/Cafebara_logo.png'), [
-    'alt' => '',
-    'class' => 'cafebara-brand-logo',
-]) . Html::tag(
-    'span',
-    Html::tag('span', 'Cafébara', ['class' => 'cafebara-brand-name'])
-        . Html::tag('span', 'CAFE & ORDERING', ['class' => 'cafebara-brand-caption']),
-    ['class' => 'cafebara-brand-copy'],
-);
 ?>
-<header id="header" class="cafebara-site-header">
-    <nav class="navbar navbar-expand-lg" aria-label="Main navigation">
-        <div class="container">
-            <?= Html::a($brand, ['/site/index'], [
-                'class' => 'navbar-brand cafebara-brand-lockup d-flex align-items-center gap-2',
+<nav class="app-header navbar navbar-expand bg-body">
+    <div class="container-fluid">
+        <?= Html::a(
+            Html::tag('span', 'Cafébara', ['class' => 'cafebara-brand-name d-none d-sm-inline']),
+            ['/site/index'],
+            [
+                'class' => 'navbar-brand cafebara-admin-brand d-flex align-items-center gap-2',
                 'aria-label' => 'Cafébara home',
-            ]) ?>
+            ],
+        ) ?>
 
-            <?= Html::button('<span class="cafebara-menu-icon" aria-hidden="true"></span>', [
-                'class' => 'navbar-toggler',
-                'type' => 'button',
-                'data-bs-toggle' => 'collapse',
-                'data-bs-target' => '#cafebara-public-nav',
-                'aria-controls' => 'cafebara-public-nav',
-                'aria-expanded' => 'false',
-                'aria-label' => 'Toggle navigation',
-            ]) ?>
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a
+                    class="nav-link"
+                    data-lte-toggle="sidebar"
+                    href="#"
+                    role="button"
+                    aria-label="Toggle sidebar">
+                    <i class="bi bi-list"></i>
+                </a>
+            </li>
+        </ul>
 
-            <div class="collapse navbar-collapse" id="cafebara-public-nav">
-                <ul class="navbar-nav mx-auto cafebara-main-nav">
-                    <?php foreach ($navigationItems as $item): ?>
-                        <?php $active = $item['route'] === $currentRoute; ?>
-                        <li class="nav-item">
-                            <?= Html::a($item['label'], $item['url'], [
-                                'class' => 'nav-link' . ($active ? ' active' : ''),
-                                'aria-current' => $active ? 'page' : null,
+        <ul class="navbar-nav ms-auto">
+            <?php if (Yii::$app->user->isGuest): ?>
+                <li class="nav-item">
+                    <?= Html::a('Login', ['/site/login'], ['class' => 'nav-link']) ?>
+                </li>
+            <?php else: ?>
+                <li class="nav-item d-flex align-items-center me-2">
+                    <?= $this->render('_theme_toggle') ?>
+                </li>
+                <li class="nav-item dropdown">
+                    <a
+                        class="nav-link dropdown-toggle"
+                        href="#"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <?= Html::encode($user?->username ?? 'Account') ?>
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <?= Html::a('Profile', ['/site/profile'], ['class' => 'dropdown-item']) ?>
+                        </li>
+                        <li>
+                            <?= Html::a('Change password', ['/site/change-password'], [
+                                'class' => 'dropdown-item',
                             ]) ?>
                         </li>
-                    <?php endforeach ?>
-                </ul>
-
-                <div class="cafebara-nav-actions d-flex align-items-center gap-2">
-                    <?= $this->render('_theme_toggle') ?>
-
-                    <?php if (Yii::$app->user->isGuest): ?>
-                        <?= Html::a('Sign in', ['/site/login'], [
-                            'class' => 'btn btn-outline-primary',
-                        ]) ?>
-                        <?= Html::a('Get started', ['/site/register'], [
-                            'class' => 'btn btn-primary',
-                        ]) ?>
-                    <?php else: ?>
-                        <?= Html::a('Dashboard', ['/site/dashboard'], [
-                            'class' => 'btn btn-primary',
-                        ]) ?>
-                        <?= Html::a('Profile', ['/site/profile'], [
-                            'class' => 'btn btn-outline-primary',
-                        ]) ?>
-                        <?= Html::beginForm(['/site/logout'], 'post', ['class' => 'm-0']) ?>
-                        <?= AdminButton::submit('Sign out', 'link', ['class' => 'cafebara-sign-out']) ?>
-                        <?= Html::endForm() ?>
-                    <?php endif ?>
-                </div>
-            </div>
-        </div>
-    </nav>
-</header>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <?= Html::beginForm(['/site/logout'], 'post', ['class' => 'm-0']) ?>
+                            <?= Html::submitButton('Logout', ['class' => 'dropdown-item']) ?>
+                            <?= Html::endForm() ?>
+                        </li>
+                    </ul>
+                </li>
+            <?php endif ?>
+        </ul>
+    </div>
+</nav>

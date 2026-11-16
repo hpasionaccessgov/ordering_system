@@ -21,7 +21,7 @@ $this->render('_head');
 <body class="d-flex flex-column h-100">
 <?php $this->beginBody() ?>
 
-<?= $this->render('_header') ?>
+<?= $this->render('_public_header') ?>
 
 <main id="main" class="flex-grow-1" role="main">
     <div class="container">

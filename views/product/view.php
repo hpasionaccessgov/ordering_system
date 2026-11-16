@@ -33,7 +33,7 @@ $this->title = $model->name;
 
 <?php if (Yii::$app->user->can('product.update')): ?>
     <?= Html::a(
-        'Update',
+        'Edit',
         ['/product/update', 'id' => $model->id],
         ['class' => 'btn btn-primary'],
     ) ?>

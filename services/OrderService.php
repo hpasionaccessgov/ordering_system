@@ -22,14 +22,8 @@ class OrderService
      */
     public function create(int $userId, array $requestedItems): Order
     {
-        if ($requestedItems === []) {
-            throw new BadRequestHttpException('An order must contain at least one product.');
-        }
-
-        $productIds = array_map(
-            static fn(array $item): int => (int) ($item['product_id'] ?? 0),
-            $requestedItems,
-        );
+        $requestedItems = OrderItemSelection::selectedItems($requestedItems);
+        $productIds = array_column($requestedItems, 'product_id');
 
         $products = Product::find()
             ->where([
@@ -55,10 +49,10 @@ class OrderService
             $total = 0.0;
 
             foreach ($requestedItems as $requestedItem) {
-                $productId = (int) ($requestedItem['product_id'] ?? 0);
-                $quantity = (int) ($requestedItem['quantity'] ?? 0);
+                $productId = $requestedItem['product_id'];
+                $quantity = $requestedItem['quantity'];
 
-                if ($quantity < 1 || !isset($products[$productId])) {
+                if (!isset($products[$productId])) {
                     throw new BadRequestHttpException(
                         'One or more selected products are invalid.',
                     );
@@ -110,10 +104,8 @@ class OrderService
             );
         }
 
-        $productIds = array_map(
-            static fn(array $item): int => (int) ($item['product_id'] ?? 0),
-            $requestedItems,
-        );
+        $requestedItems = OrderItemSelection::selectedItems($requestedItems);
+        $productIds = array_column($requestedItems, 'product_id');
 
         $products = Product::find()
             ->where([
@@ -131,10 +123,10 @@ class OrderService
             $total = 0.0;
 
             foreach ($requestedItems as $requestedItem) {
-                $productId = (int) ($requestedItem['product_id'] ?? 0);
-                $quantity = (int) ($requestedItem['quantity'] ?? 0);
+                $productId = $requestedItem['product_id'];
+                $quantity = $requestedItem['quantity'];
 
-                if ($quantity < 1 || !isset($products[$productId])) {
+                if (!isset($products[$productId])) {
                     throw new BadRequestHttpException(
                         'One or more selected products are invalid.',
                     );
@@ -159,7 +151,9 @@ class OrderService
             }
 
             $order->total_amount = number_format($total, 2, '.', '');
-            $order->save(false, ['total_amount', 'updated_at']);
+            if (!$order->save(false, ['total_amount', 'updated_at'])) {
+                throw new BadRequestHttpException('Order total could not be saved.');
+            }
 
             $transaction->commit();
 
