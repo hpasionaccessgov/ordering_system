@@ -63,26 +63,3 @@ $displayName = $identity instanceof User
         <?php endforeach; ?>
     </div>
 </section>
-
-<!-- <div class="row g-4">
-    <div class="col-12 col-xl-6">
-        <section class="card dashboard-action-card h-100">
-            <div class="card-body">
-                <span class="cafebara-dashboard-icon mb-3"><i class="bi bi-cup-hot" aria-hidden="true"></i></span>
-                <h2 class="h5">Browse the menu</h2>
-                <p class="text-body-secondary">Browse current drinks and pastries, then start an order.</p>
-                <?= Html::a('Browse menu', ['/product/index'], ['class' => 'btn btn-primary']) ?>
-            </div>
-        </section>
-    </div>
-    <div class="col-12 col-xl-6">
-        <section class="card dashboard-action-card h-100">
-            <div class="card-body">
-                <span class="cafebara-dashboard-icon mb-3"><i class="bi bi-receipt" aria-hidden="true"></i></span>
-                <h2 class="h5">Your orders</h2>
-                <p class="text-body-secondary">See only your own orders and update pending orders.</p>
-                <?= Html::a('View orders', ['/order/index'], ['class' => 'btn btn-primary']) ?>
-            </div>
-        </section>
-    </div>
-</div> -->

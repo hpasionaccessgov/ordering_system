@@ -6,26 +6,30 @@ namespace app\services;
 
 final class RbacPermissionPolicy
 {
-    private const BUILT_IN_ROLE_PERMISSIONS = [
+    private const FORBIDDEN_PERMISSIONS = [
         'staff' => [
+            'admin.access',
+            'customer.access',
+            'user.view',
+            'user.create',
+            'user.update',
+            'user.delete',
+            'user.assignRole',
+        ],
+        'customer' => [
+            'admin.access',
             'staff.access',
-            'product.view',
+            'user.view',
+            'user.create',
+            'user.update',
+            'user.delete',
+            'user.assignRole',
             'product.create',
             'product.update',
             'product.archive',
-            'order.view',
-            'order.update',
-            'order.cancel',
+            'product.delete',
             'order.process',
             'order.receipt.print',
-        ],
-        'customer' => [
-            'customer.access',
-            'product.view',
-            'order.view',
-            'order.create',
-            'order.update',
-            'order.cancel',
         ],
     ];
 
@@ -35,18 +39,18 @@ final class RbacPermissionPolicy
             return true;
         }
 
-        if ($roleName === 'customer' && $permissionName === 'order.receipt.print') {
+        if ($permissionName === 'admin.access') {
             return false;
         }
 
-        if (isset(self::BUILT_IN_ROLE_PERMISSIONS[$roleName])) {
-            return in_array(
+        if (isset(self::FORBIDDEN_PERMISSIONS[$roleName])) {
+            return !in_array(
                 $permissionName,
-                self::BUILT_IN_ROLE_PERMISSIONS[$roleName],
+                self::FORBIDDEN_PERMISSIONS[$roleName],
                 true,
             );
         }
 
-        return $permissionName !== 'admin.access';
+        return true;
     }
 }

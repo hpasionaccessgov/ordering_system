@@ -22,7 +22,7 @@ foreach ($roles as $role) {
         <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Administration</p>
         <h1 class="h3 mb-0">User list</h1>
     </div>
-    <?php if (Yii::$app->user->can('admin.access')) : ?>
+    <?php if (Yii::$app->user->can('user.create')) : ?>
         <?= Html::a('Create account', ['/admin-user/create'], ['class' => 'btn btn-primary']) ?>
     <?php endif; ?>
 </div>
@@ -46,6 +46,10 @@ foreach ($roles as $role) {
                     $assigned = $auth->getRolesByUser($user->id);
                     $selected = count($assigned) === 1 ? array_key_first($assigned) : '';
 
+                    if (!Yii::$app->user->can('user.assignRole')) {
+                        return Html::encode(implode(', ', array_keys($assigned)) ?: 'No role assigned');
+                    }
+
                     if ((string) $user->id === (string) Yii::$app->user->id) {
                         return '<span class="text-body-secondary">Current account</span>';
                     }
@@ -68,14 +72,31 @@ foreach ($roles as $role) {
                 'label' => 'Actions',
                 'format' => 'raw',
                 'value' => static function (User $user): string {
-                    if (!Yii::$app->user->can('admin.access')) {
-                        return '';
+                    $actions = [];
+                    if (Yii::$app->user->can('user.update')) {
+                        $actions[] = Html::a('Edit', ['/admin-user/update', 'id' => $user->id], [
+                            'class' => 'btn btn-sm btn-outline-primary',
+                            'aria-label' => 'Edit personal data for ' . $user->username,
+                        ]);
                     }
 
-                    return Html::a('Edit', ['/admin-user/update', 'id' => $user->id], [
-                        'class' => 'btn btn-outline-primary',
-                        'aria-label' => 'Edit personal data for ' . $user->username,
-                    ]);
+                    if (
+                        Yii::$app->user->can('user.delete')
+                        && (string) $user->id !== (string) Yii::$app->user->id
+                    ) {
+                        $actions[] = Html::beginForm(
+                            ['/admin-user/delete', 'id' => $user->id],
+                            'post',
+                            ['class' => 'd-inline'],
+                        )
+                            . Html::submitButton('Delete', [
+                                'class' => 'btn btn-sm btn-outline-danger',
+                                'data-confirm-modal' => 'Permanently delete this account? Accounts with order history cannot be deleted.',
+                            ])
+                            . Html::endForm();
+                    }
+
+                    return implode(' ', $actions);
                 },
             ],
         ],

@@ -24,7 +24,7 @@ $canCancel = Yii::$app->user->can('order.cancel')
         'Cancel order',
         [
             'class' => 'btn btn-outline-danger',
-            'data-confirm' => 'Cancel this order?',
+            'data-confirm-modal' => 'Cancel this order?',
         ],
     ) ?>
 

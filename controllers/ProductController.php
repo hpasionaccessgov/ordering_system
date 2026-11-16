@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\models\Product;
+use app\models\OrderItem;
 use app\services\ProductCatalogPolicy;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -32,7 +33,13 @@ class ProductController extends Controller
                     [
                         'actions' => ['index', 'view'],
                         'allow' => true,
-                        'roles' => ['product.view'],
+                        'roles' => [
+                            'product.view',
+                            'product.create',
+                            'product.update',
+                            'product.archive',
+                            'product.delete',
+                        ],
                     ],
                     [
                         'actions' => ['image'],
@@ -59,6 +66,11 @@ class ProductController extends Controller
                         'allow' => true,
                         'roles' => ['product.archive'],
                     ],
+                    [
+                        'actions' => ['delete'],
+                        'allow' => true,
+                        'roles' => ['product.delete'],
+                    ],
                 ],
             ],
             'verbs' => [
@@ -66,6 +78,7 @@ class ProductController extends Controller
                 'actions' => [
                     'archive' => ['post'],
                     'restore' => ['post'],
+                    'delete' => ['post'],
                 ],
             ],
         ];
@@ -227,6 +240,53 @@ class ProductController extends Controller
         Yii::$app->session->setFlash('success', 'Product restored.');
 
         return $this->redirect(['index', 'status' => 'active']);
+    }
+
+    public function actionDelete(int $id): Response
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+
+        try {
+            $lockedId = Yii::$app->db->createCommand(
+                'SELECT id FROM {{%products}} WHERE id = :id FOR UPDATE',
+                [':id' => $id],
+            )->queryScalar();
+
+            if ($lockedId === false) {
+                throw new NotFoundHttpException('Product not found.');
+            }
+
+            $model = Product::findOne($lockedId);
+            if ($model === null) {
+                throw new NotFoundHttpException('Product not found.');
+            }
+
+            if (OrderItem::find()->where(['product_id' => $model->id])->exists()) {
+                $transaction->rollBack();
+                Yii::$app->session->setFlash(
+                    'error',
+                    'This product is part of order history and cannot be permanently deleted. Archive it instead.',
+                );
+
+                return $this->redirect(['index']);
+            }
+
+            if ($model->delete() === false) {
+                throw new BadRequestHttpException('Product could not be permanently deleted.');
+            }
+
+            $transaction->commit();
+        } catch (\Throwable $exception) {
+            if ($transaction->isActive) {
+                $transaction->rollBack();
+            }
+
+            throw $exception;
+        }
+
+        Yii::$app->session->setFlash('success', 'Product permanently deleted.');
+
+        return $this->redirect(['index']);
     }
 
     private function findProduct(int $id): Product

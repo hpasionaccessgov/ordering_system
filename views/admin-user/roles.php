@@ -12,6 +12,27 @@ $this->title = 'Roles';
 $auth = Yii::$app->authManager;
 $permissions = $auth->getPermissions();
 $roles = $auth->getRoles();
+$permissionModuleLabels = [
+    'admin' => 'Administration',
+    'user' => 'Users',
+    'product' => 'Products',
+    'order' => 'Orders',
+    'staff' => 'Staff',
+    'customer' => 'Customers',
+];
+$permissionGroups = [];
+foreach ($permissions as $permission) {
+    $module = strstr($permission->name, '.', true) ?: 'other';
+    $permissionGroups[$module][] = $permission;
+}
+$moduleOrder = array_keys($permissionModuleLabels);
+uksort($permissionGroups, static function (string $left, string $right) use ($moduleOrder): int {
+    $leftPosition = array_search($left, $moduleOrder, true);
+    $rightPosition = array_search($right, $moduleOrder, true);
+
+    return ($leftPosition === false ? PHP_INT_MAX : $leftPosition)
+        <=> ($rightPosition === false ? PHP_INT_MAX : $rightPosition);
+});
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -40,7 +61,7 @@ $roles = $auth->getRoles();
             <?= $form->field($roleForm, 'name', ['options' => ['class' => 'mb-0']])->textInput([
                 'placeholder' => 'e.g. cashier',
                 'maxlength' => 50,
-                'pattern' => '[a-z][a-z0-9._-]{2,49}',
+                'pattern' => '[a-z](?:[a-z0-9._]|-){2,49}',
                 'title' => 'Start with a lowercase letter; use 3-50 lowercase letters, numbers, dots, dashes, '
                     . 'or underscores.',
                 'autocapitalize' => 'none',
@@ -75,7 +96,7 @@ $roles = $auth->getRoles();
                             <?= Html::beginForm(['/admin-role/delete', 'name' => $role->name], 'post') ?>
                             <?= Html::submitButton('Delete', [
                                 'class' => 'btn btn-sm btn-outline-danger',
-                                'data-confirm' => 'Delete this role?',
+                                'data-confirm-modal' => 'Delete this role?',
                             ]) ?>
                             <?= Html::endForm() ?>
                         <?php endif; ?>
@@ -91,32 +112,39 @@ $roles = $auth->getRoles();
                     <hr>
                     <h3 class="small text-uppercase text-body-secondary">Permissions</h3>
                     <?= Html::beginForm(['/admin-role/update-permissions', 'name' => $role->name], 'post') ?>
-                    <div class="row g-2">
-                        <?php $isAdminRole = $role->name === 'admin'; ?>
-                        <?php $children = array_keys($auth->getChildren($role->name)); ?>
-                        <?php foreach ($permissions as $permission) : ?>
-                            <div class="col-12 col-md-6">
-                                <?php
-                                $canAssignPermission = RbacPermissionPolicy::isAllowed(
-                                    $role->name,
-                                    $permission->name,
-                                );
-                                $isChecked = $isAdminRole || in_array($permission->name, $children, true);
-                                ?>
-                                <?= Html::checkbox(
-                                    'permissions[]',
-                                    $isChecked,
-                                    [
-                                        'value' => $permission->name,
-                                        'label' => Html::encode($permission->name),
-                                        'title' => $permission->name,
-                                        'disabled' => $isAdminRole || !$canAssignPermission,
-                                        'uncheck' => null,
-                                    ],
-                                ) ?>
+                    <?php $isAdminRole = $role->name === 'admin'; ?>
+                    <?php $children = array_keys($auth->getChildren($role->name)); ?>
+                    <?php foreach ($permissionGroups as $module => $modulePermissions) : ?>
+                        <section class="permission-module-group mb-3">
+                            <h4 class="h6 text-body-secondary mb-2">
+                                <?= Html::encode($permissionModuleLabels[$module] ?? ucfirst($module)) ?>
+                            </h4>
+                            <div class="row g-2">
+                                <?php foreach ($modulePermissions as $permission) : ?>
+                                    <div class="col-12 col-md-6">
+                                        <?php
+                                        $canAssignPermission = RbacPermissionPolicy::isAllowed(
+                                            $role->name,
+                                            $permission->name,
+                                        );
+                                        $isChecked = $isAdminRole || in_array($permission->name, $children, true);
+                                        ?>
+                                        <?= Html::checkbox(
+                                            'permissions[]',
+                                            $isChecked,
+                                            [
+                                                'value' => $permission->name,
+                                                'label' => Html::encode($permission->name),
+                                                'title' => $permission->name,
+                                                'disabled' => $isAdminRole || !$canAssignPermission,
+                                                'uncheck' => null,
+                                            ],
+                                        ) ?>
+                                    </div>
+                                <?php endforeach; ?>
                             </div>
-                        <?php endforeach; ?>
-                    </div>
+                        </section>
+                    <?php endforeach; ?>
                     <?php if ($isAdminRole) : ?>
                         <p class="small text-body-secondary mt-3 mb-0">
                             Administrator permissions are fixed and always enabled.

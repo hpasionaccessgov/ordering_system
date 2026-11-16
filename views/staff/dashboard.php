@@ -41,12 +41,12 @@ $displayName = $identity instanceof User
 
 <div class="row g-3 mb-4">
     <?php foreach (
-    [
-        ['Active products', $activeProductCount, 'bi-cup-hot'],
-        ['Pending orders', $pendingOrderCount, 'bi-hourglass-split'],
-        ['Processing orders', $processingOrderCount, 'bi-arrow-repeat'],
-    ] as [$label, $value, $icon]
-) : ?>
+        [
+            ['Active products', $activeProductCount, 'bi-cup-hot'],
+            ['Pending orders', $pendingOrderCount, 'bi-hourglass-split'],
+            ['Processing orders', $processingOrderCount, 'bi-arrow-repeat'],
+        ] as [$label, $value, $icon]
+    ) : ?>
         <div class="col-12 col-md-4">
             <section class="small-box cafebara-stat-card h-100">
                 <div class="inner">
@@ -66,26 +66,3 @@ $displayName = $identity instanceof User
         ]) ?>
     </div>
 </div>
-
-<!-- <div class="row g-4">
-    <div class="col-12 col-xl-6">
-        <section class="card dashboard-action-card h-100">
-            <div class="card-body">
-                <span class="cafebara-dashboard-icon mb-3"><i class="bi bi-cup-hot" aria-hidden="true"></i></span>
-                <h2 class="h5">Product management</h2>
-                <p class="text-body-secondary">Maintain active products, pricing, categories, and featured items.</p>
-                <?= Html::a('Manage products', ['/product/index'], ['class' => 'btn btn-primary']) ?>
-            </div>
-        </section>
-    </div>
-    <div class="col-12 col-xl-6">
-        <section class="card dashboard-action-card h-100">
-            <div class="card-body">
-                <span class="cafebara-dashboard-icon mb-3"><i class="bi bi-receipt" aria-hidden="true"></i></span>
-                <h2 class="h5">Order processing</h2>
-                <p class="text-body-secondary">Review customer orders and move them through the service workflow.</p>
-                <?= Html::a('Process orders', ['/order/index'], ['class' => 'btn btn-primary']) ?>
-            </div>
-        </section>
-    </div>
-</div> -->

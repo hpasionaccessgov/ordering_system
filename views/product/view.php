@@ -7,6 +7,7 @@ use yii\helpers\Html;
 
 $this->title = $model->name;
 $canManageProducts = Yii::$app->user->can('product.update');
+$canDeleteProducts = Yii::$app->user->can('product.delete');
 $canOrder = Yii::$app->user->can('order.create') && $model->isActive();
 ?>
 
@@ -90,7 +91,20 @@ $canOrder = Yii::$app->user->can('order.create') && $model->isActive();
                             ) ?>
                             <?= Html::submitButton('Archive product', [
                                 'class' => 'btn btn-outline-danger',
-                                'data-confirm' => 'Archive this product?',
+                                'data-confirm-modal' => 'Archive this product?',
+                            ]) ?>
+                            <?= Html::endForm() ?>
+                        <?php endif; ?>
+
+                        <?php if ($canDeleteProducts) : ?>
+                            <?= Html::beginForm(
+                                ['/product/delete', 'id' => $model->id],
+                                'post',
+                                ['class' => 'd-inline'],
+                            ) ?>
+                            <?= Html::submitButton('Delete permanently', [
+                                'class' => 'btn btn-outline-danger',
+                                'data-confirm-modal' => 'Permanently delete this product? This cannot be undone.',
                             ]) ?>
                             <?= Html::endForm() ?>
                         <?php endif; ?>

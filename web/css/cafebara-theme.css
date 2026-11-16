@@ -50,6 +50,11 @@
     --bs-secondary-color: var(--cafebara-muted);
 }
 
+body.confirm-modal-open .modal-backdrop {
+    background-color: transparent;
+    opacity: 0 !important;
+}
+
 .cafebara-about-hero,
 .cafebara-contact-hero {
     overflow: hidden;

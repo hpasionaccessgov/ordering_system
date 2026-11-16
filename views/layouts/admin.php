@@ -8,6 +8,7 @@ declare(strict_types=1);
 use app\assets\AdminLteAsset;
 use app\assets\CafebaraThemeAsset;
 use app\widgets\Alert;
+use app\widgets\ConfirmModal;
 use yii\helpers\Html;
 
 AdminLteAsset::register($this);
@@ -53,6 +54,8 @@ $this->registerMetaTag([
         <strong>&copy; <?= date('Y') ?> <?= Html::encode(Yii::$app->name) ?></strong>
     </footer>
 </div>
+
+<?= ConfirmModal::widget() ?>
 
 <?php $this->endBody() ?>
 </body>

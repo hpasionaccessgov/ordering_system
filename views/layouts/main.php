@@ -6,6 +6,7 @@ declare(strict_types=1);
 /** @var string $content */
 
 use app\widgets\Alert;
+use app\widgets\ConfirmModal;
 use yii\bootstrap5\Breadcrumbs;
 use yii\helpers\Html;
 
@@ -35,6 +36,8 @@ $this->render('_head');
 </main>
 
 <?= $this->render('_footer') ?>
+
+<?= ConfirmModal::widget() ?>
 
 <?php $this->endBody() ?>
 </body>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\models\AdminUserCreateForm;
+use app\models\Order;
 use app\models\User;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -25,14 +26,35 @@ class AdminUserController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     [
-                        'actions' => ['create', 'update'],
+                        'actions' => ['create'],
                         'allow' => true,
-                        'roles' => ['admin.access'],
+                        'roles' => ['user.create'],
                     ],
                     [
-                        'actions' => ['index', 'list', 'assign-role'],
+                        'actions' => ['update'],
+                        'allow' => true,
+                        'roles' => ['user.update'],
+                    ],
+                    [
+                        'actions' => ['index', 'list'],
+                        'allow' => true,
+                        'roles' => [
+                            'user.view',
+                            'user.create',
+                            'user.update',
+                            'user.delete',
+                            'user.assignRole',
+                        ],
+                    ],
+                    [
+                        'actions' => ['assign-role'],
                         'allow' => true,
                         'roles' => ['user.assignRole'],
+                    ],
+                    [
+                        'actions' => ['delete'],
+                        'allow' => true,
+                        'roles' => ['user.delete'],
                     ],
                 ],
             ],
@@ -42,6 +64,7 @@ class AdminUserController extends Controller
                     'create' => ['GET', 'POST'],
                     'assign-role' => ['post'],
                     'update' => ['GET', 'POST'],
+                    'delete' => ['post'],
                 ],
             ],
         ];
@@ -197,6 +220,70 @@ class AdminUserController extends Controller
         }
 
         Yii::$app->session->setFlash('success', "The role for {$user->username} was updated.");
+
+        return $this->redirect(['list']);
+    }
+
+    public function actionDelete(int $id): Response
+    {
+        if ((string) $id === (string) Yii::$app->user->id) {
+            throw new ForbiddenHttpException('You cannot delete your own account.');
+        }
+
+        $auth = Yii::$app->authManager;
+        $user = User::findOne($id);
+        if ($user === null) {
+            throw new NotFoundHttpException('The requested user was not found.');
+        }
+
+        $currentRoles = $auth->getRolesByUser($user->id);
+        if (isset($currentRoles['admin']) && count($auth->getUserIdsByRole('admin')) <= 1) {
+            Yii::$app->session->setFlash('error', 'The last administrator cannot be deleted.');
+
+            return $this->redirect(['list']);
+        }
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $lockedId = Yii::$app->db->createCommand(
+                'SELECT id FROM {{%users}} WHERE id = :id FOR UPDATE',
+                [':id' => $id],
+            )->queryScalar();
+
+            if ($lockedId === false) {
+                throw new NotFoundHttpException('The requested user was not found.');
+            }
+
+            $user = User::findOne($lockedId);
+            if ($user === null) {
+                throw new NotFoundHttpException('The requested user was not found.');
+            }
+
+            if (Order::find()->where(['user_id' => $user->id])->exists()) {
+                $transaction->rollBack();
+                Yii::$app->session->setFlash(
+                    'error',
+                    'This account has order history and cannot be permanently deleted.',
+                );
+
+                return $this->redirect(['list']);
+            }
+
+            $auth->revokeAll($user->id);
+            if ($user->delete() === false) {
+                throw new BadRequestHttpException('The user account could not be deleted.');
+            }
+
+            $transaction->commit();
+        } catch (\Throwable $exception) {
+            if ($transaction->isActive) {
+                $transaction->rollBack();
+            }
+
+            throw $exception;
+        }
+
+        Yii::$app->session->setFlash('success', "Account '{$user->username}' was deleted.");
 
         return $this->redirect(['list']);
     }

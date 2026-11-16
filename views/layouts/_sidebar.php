@@ -29,31 +29,20 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
             <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" data-accordion="false">
                 <li class="nav-item">
                     <?= Html::a(
-                        '<i class="nav-icon bi bi-speedometer2"></i><p>Dashboard</p>',
+                        '<i class="nav-icon bi bi-house"></i><p>Home</p>',
                         $dashboardRoute,
                         ['class' => 'nav-link' . ($currentRoute === $dashboardRouteName ? ' active' : '')],
                     ) ?>
                 </li>
-                <?php if (Yii::$app->user->can('user.view')): ?>
-                    <li class="nav-item">
-                        <?= Html::a(
-                            '<i class="nav-icon bi bi-person-lines-fill"></i><p>User list</p>',
-                            ['/admin-user/list'],
-                            ['class' => 'nav-link' . ($currentRoute === 'admin-user/list' ? ' active' : '')],
-                        ) ?>
-                    </li>
-                <?php endif; ?>
-                <?php if (Yii::$app->user->can('user.assignRole')): ?>
-                    <li class="nav-item">
-                        <?= Html::a(
-                            '<i class="nav-icon bi bi-shield-lock"></i><p>Roles</p>',
-                            ['/admin-role/index'],
-                            ['class' => 'nav-link' . ($currentRoute === 'admin-role/index' ? ' active' : '')],
-                        ) ?>
-                    </li>
-                <?php endif; ?>
 
-                <?php if (Yii::$app->user->can('product.view')): ?>
+
+                <?php if (
+                    Yii::$app->user->can('product.view')
+                    || Yii::$app->user->can('product.create')
+                    || Yii::$app->user->can('product.update')
+                    || Yii::$app->user->can('product.archive')
+                    || Yii::$app->user->can('product.delete')
+                ): ?>
                     <li class="nav-item">
                         <?= Html::a(
                             '<i class="nav-icon bi bi-cup-hot"></i><p>Menu</p>',
@@ -69,6 +58,31 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
                             '<i class="nav-icon bi bi-receipt"></i><p>Orders</p>',
                             ['/order/index'],
                             ['class' => 'nav-link' . (str_starts_with($currentRoute, 'order/') ? ' active' : '')],
+                        ) ?>
+                    </li>
+                <?php endif; ?>
+
+                <?php if (
+                    Yii::$app->user->can('user.view')
+                    || Yii::$app->user->can('user.create')
+                    || Yii::$app->user->can('user.update')
+                    || Yii::$app->user->can('user.delete')
+                    || Yii::$app->user->can('user.assignRole')
+                ): ?>
+                    <li class="nav-item">
+                        <?= Html::a(
+                            '<i class="nav-icon bi bi-person-lines-fill"></i><p>User list</p>',
+                            ['/admin-user/list'],
+                            ['class' => 'nav-link' . ($currentRoute === 'admin-user/list' ? ' active' : '')],
+                        ) ?>
+                    </li>
+                <?php endif; ?>
+                <?php if (Yii::$app->user->can('user.assignRole')): ?>
+                    <li class="nav-item">
+                        <?= Html::a(
+                            '<i class="nav-icon bi bi-shield-lock"></i><p>Roles</p>',
+                            ['/admin-role/index'],
+                            ['class' => 'nav-link' . ($currentRoute === 'admin-role/index' ? ' active' : '')],
                         ) ?>
                     </li>
                 <?php endif; ?>

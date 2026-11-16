@@ -7,6 +7,7 @@ use yii\helpers\Html;
 
 $canUpdateProducts = Yii::$app->user->can('product.update');
 $canArchiveProducts = Yii::$app->user->can('product.archive');
+$canDeleteProducts = Yii::$app->user->can('product.delete');
 ?>
 
 <article class="card product-card product-catalog-card h-100 position-relative">
@@ -36,7 +37,7 @@ $canArchiveProducts = Yii::$app->user->can('product.archive');
             <strong class="product-card-price"><?= Yii::$app->formatter->asCurrency($product->price) ?></strong>
             <span class="small text-primary fw-semibold">View details</span>
         </div>
-        <?php if ($canUpdateProducts || $canArchiveProducts) : ?>
+        <?php if ($canUpdateProducts || $canArchiveProducts || $canDeleteProducts) : ?>
             <div class="product-card-actions position-relative z-2 mt-3">
                 <?php if ($canUpdateProducts) : ?>
                     <?= Html::a('Edit', ['/product/update', 'id' => $product->id], [
@@ -51,7 +52,7 @@ $canArchiveProducts = Yii::$app->user->can('product.archive');
                     ) ?>
                     <?= Html::submitButton('Archive', [
                         'class' => 'btn btn-sm btn-outline-danger',
-                        'data-confirm' => 'Archive this product?',
+                        'data-confirm-modal' => 'Archive this product?',
                     ]) ?>
                     <?= Html::endForm() ?>
                 <?php elseif ($canUpdateProducts && !$product->isActive()) : ?>
@@ -62,7 +63,19 @@ $canArchiveProducts = Yii::$app->user->can('product.archive');
                     ) ?>
                     <?= Html::submitButton('Restore', [
                         'class' => 'btn btn-sm btn-outline-success',
-                        'data-confirm' => 'Restore this product to the active catalog?',
+                        'data-confirm-modal' => 'Restore this product to the active catalog?',
+                    ]) ?>
+                    <?= Html::endForm() ?>
+                <?php endif; ?>
+                <?php if ($canDeleteProducts) : ?>
+                    <?= Html::beginForm(
+                        ['/product/delete', 'id' => $product->id],
+                        'post',
+                        ['class' => 'd-inline'],
+                    ) ?>
+                    <?= Html::submitButton('Delete permanently', [
+                        'class' => 'btn btn-sm btn-outline-danger',
+                        'data-confirm-modal' => 'Permanently delete this product? This cannot be undone.',
                     ]) ?>
                     <?= Html::endForm() ?>
                 <?php endif; ?>

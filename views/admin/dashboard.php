@@ -69,28 +69,3 @@ $displayName = $identity instanceof User
         ]) ?>
     </div>
 </div>
-
-<!-- <div class="row g-4">
-    <div class="col-12 col-xl-6">
-        <section class="card dashboard-action-card h-100">
-            <div class="card-body">
-                <span class="cafebara-dashboard-icon mb-3"><i class="bi bi-people" aria-hidden="true"></i></span>
-                <h2 class="h5">People and access</h2>
-                <p class="text-body-secondary">Manage account status, roles, and permissions.</p>
-                <?= Html::a('Open user list', ['/admin-user/list'], ['class' => 'btn btn-primary']) ?>
-                <?= Html::a('Open roles', ['/admin-role/index'], ['class' => 'btn btn-outline-primary']) ?>
-            </div>
-        </section>
-    </div>
-    <div class="col-12 col-xl-6">
-        <section class="card dashboard-action-card h-100">
-            <div class="card-body">
-                <span class="cafebara-dashboard-icon mb-3"><i class="bi bi-box-seam" aria-hidden="true"></i></span>
-                <h2 class="h5">Menu and orders</h2>
-                <p class="text-body-secondary">Review the catalog and order activity.</p>
-                <?= Html::a('Menu', ['/product/index'], ['class' => 'btn btn-primary']) ?>
-                <?= Html::a('Orders', ['/order/index'], ['class' => 'btn btn-outline-primary']) ?>
-            </div>
-        </section>
-    </div>
-</div> -->
