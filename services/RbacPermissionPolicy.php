@@ -4,53 +4,40 @@ declare(strict_types=1);
 
 namespace app\services;
 
+use Yii;
+
 final class RbacPermissionPolicy
 {
-    private const FORBIDDEN_PERMISSIONS = [
-        'staff' => [
-            'admin.access',
-            'customer.access',
-            'user.view',
-            'user.create',
-            'user.update',
-            'user.delete',
-            'user.assignRole',
-        ],
-        'customer' => [
-            'admin.access',
-            'staff.access',
-            'user.view',
-            'user.create',
-            'user.update',
-            'user.delete',
-            'user.assignRole',
-            'product.create',
-            'product.update',
-            'product.archive',
-            'product.delete',
-            'order.process',
-            'order.receipt.print',
-        ],
-    ];
-
     public static function isAllowed(string $roleName, string $permissionName): bool
     {
-        if ($roleName === 'admin') {
-            return true;
-        }
-
-        if ($permissionName === 'admin.access') {
-            return false;
-        }
-
-        if (isset(self::FORBIDDEN_PERMISSIONS[$roleName])) {
-            return !in_array(
-                $permissionName,
-                self::FORBIDDEN_PERMISSIONS[$roleName],
-                true,
-            );
+        if (in_array($permissionName, ['admin.access', 'user.assignRole'], true)) {
+            return $roleName === 'admin';
         }
 
         return true;
+    }
+
+    public static function isStaffAccessDisabledForCurrentUser(): bool
+    {
+        if (Yii::$app->user->isGuest) {
+            return false;
+        }
+
+        $roles = Yii::$app->authManager->getRolesByUser(Yii::$app->user->id);
+
+        return !self::isStaffRoleAccessAllowed(
+            array_keys($roles),
+            Yii::$app->user->can('staff.access'),
+        );
+    }
+
+    /**
+     * @param list<string> $roleNames
+     */
+    public static function isStaffRoleAccessAllowed(array $roleNames, bool $hasStaffAccess): bool
+    {
+        return in_array('admin', $roleNames, true)
+            || !in_array('staff', $roleNames, true)
+            || $hasStaffAccess;
     }
 }

@@ -9,28 +9,29 @@ use Codeception\Test\Unit;
 
 final class RbacPermissionPolicyTest extends Unit
 {
-    public function testStaffCanOnlyReceiveOperationalPermissions(): void
+    public function testRolesCanReceiveConfigurablePermissionsWithoutAdminPrivilegeEscalation(): void
     {
         self::assertTrue(RbacPermissionPolicy::isAllowed('staff', 'product.update'));
         self::assertTrue(RbacPermissionPolicy::isAllowed('staff', 'order.process'));
         self::assertTrue(RbacPermissionPolicy::isAllowed('staff', 'order.receipt.print'));
         self::assertTrue(RbacPermissionPolicy::isAllowed('staff', 'order.create'));
-        self::assertFalse(RbacPermissionPolicy::isAllowed('staff', 'customer.access'));
+        self::assertTrue(RbacPermissionPolicy::isAllowed('staff', 'customer.access'));
+        self::assertTrue(RbacPermissionPolicy::isAllowed('staff', 'user.delete'));
         self::assertFalse(RbacPermissionPolicy::isAllowed('staff', 'admin.access'));
         self::assertFalse(RbacPermissionPolicy::isAllowed('staff', 'user.assignRole'));
-        self::assertFalse(RbacPermissionPolicy::isAllowed('staff', 'user.delete'));
     }
 
-    public function testCustomerCannotReceiveStaffOrAdministratorPermissions(): void
+    public function testCustomerPermissionsCanBeConfiguredWithoutAdminPrivileges(): void
     {
         self::assertTrue(RbacPermissionPolicy::isAllowed('customer', 'order.create'));
         self::assertTrue(RbacPermissionPolicy::isAllowed('customer', 'order.update'));
-        self::assertFalse(RbacPermissionPolicy::isAllowed('customer', 'staff.access'));
-        self::assertFalse(RbacPermissionPolicy::isAllowed('customer', 'order.process'));
-        self::assertFalse(RbacPermissionPolicy::isAllowed('customer', 'order.receipt.print'));
-        self::assertFalse(RbacPermissionPolicy::isAllowed('customer', 'product.archive'));
-        self::assertFalse(RbacPermissionPolicy::isAllowed('customer', 'user.view'));
+        self::assertTrue(RbacPermissionPolicy::isAllowed('customer', 'staff.access'));
+        self::assertTrue(RbacPermissionPolicy::isAllowed('customer', 'order.process'));
+        self::assertTrue(RbacPermissionPolicy::isAllowed('customer', 'order.receipt.print'));
+        self::assertTrue(RbacPermissionPolicy::isAllowed('customer', 'product.archive'));
+        self::assertTrue(RbacPermissionPolicy::isAllowed('customer', 'user.view'));
         self::assertFalse(RbacPermissionPolicy::isAllowed('customer', 'admin.access'));
+        self::assertFalse(RbacPermissionPolicy::isAllowed('customer', 'user.assignRole'));
     }
 
     public function testCustomRolesCanReceivePermissionsExceptAdministratorAccess(): void
@@ -43,5 +44,13 @@ final class RbacPermissionPolicyTest extends Unit
     {
         self::assertTrue(RbacPermissionPolicy::isAllowed('admin', 'admin.access'));
         self::assertTrue(RbacPermissionPolicy::isAllowed('admin', 'user.assignRole'));
+    }
+
+    public function testDisablingStaffAccessBlocksOnlyTheStaffRole(): void
+    {
+        self::assertFalse(RbacPermissionPolicy::isStaffRoleAccessAllowed(['staff'], false));
+        self::assertTrue(RbacPermissionPolicy::isStaffRoleAccessAllowed(['staff'], true));
+        self::assertTrue(RbacPermissionPolicy::isStaffRoleAccessAllowed(['cashier'], false));
+        self::assertTrue(RbacPermissionPolicy::isStaffRoleAccessAllowed(['admin', 'staff'], false));
     }
 }

@@ -4,10 +4,12 @@
 
 use yii\helpers\Html;
 use app\models\Product;
+use app\services\RbacPermissionPolicy;
 
 /** @var Product[] $featuredProducts */
 
 $this->title = 'Cafébara | Cafe ordering';
+$staffAccessDisabled = RbacPermissionPolicy::isStaffAccessDisabledForCurrentUser();
 ?>
 <div class="site-index">
     <section class="cafebara-hero rounded-4 p-4 p-lg-5 mb-5">
@@ -49,11 +51,13 @@ $this->title = 'Cafébara | Cafe ordering';
                                 <p class="cafebara-section-kicker mb-2">From the counter</p>
                                 <h2 class="h2 fw-bold mb-0">Featured drinks and bites</h2>
                             </div>
-                            <?= Html::a(
-                                'Browse menu',
-                                ['/product/index'],
-                                ['class' => 'btn btn-cafebara-outline-light'],
-                            ) ?>
+                            <?php if (!$staffAccessDisabled): ?>
+                                <?= Html::a(
+                                    'Browse menu',
+                                    ['/product/index'],
+                                    ['class' => 'btn btn-cafebara-outline-light'],
+                                ) ?>
+                            <?php endif; ?>
                         </div>
                         <div class="row g-4">
                             <?php foreach ($featuredProducts as $product) : ?>

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\filters\StaffAccessFilter;
 use app\models\Order;
 use app\services\OrderAccessPolicy;
 use app\services\OrderService;
@@ -29,6 +30,9 @@ class OrderController extends Controller
     public function behaviors(): array
     {
         return [
+            'staffAccess' => [
+                'class' => StaffAccessFilter::class,
+            ],
             'access' => [
                 'class' => AccessControl::class,
                 'rules' => [
@@ -39,6 +43,11 @@ class OrderController extends Controller
                     ],
                     [
                         'actions' => ['create'],
+                        'allow' => true,
+                        'roles' => ['order.create'],
+                    ],
+                    [
+                        'actions' => ['create-product'],
                         'allow' => true,
                         'roles' => ['order.create'],
                     ],
@@ -69,6 +78,7 @@ class OrderController extends Controller
                 'actions' => [
                     'cancel' => ['post'],
                     'process' => ['post'],
+                    'create-product' => ['post'],
                 ],
             ],
         ];
@@ -139,6 +149,25 @@ class OrderController extends Controller
         $order = (new OrderService())->create(
             (int) Yii::$app->user->id,
             $items,
+        );
+
+        return $this->redirect(['view', 'id' => $order->id]);
+    }
+
+    public function actionCreateProduct(int $id): Response
+    {
+        $quantity = filter_var(
+            $this->request->post('quantity'),
+            FILTER_VALIDATE_INT,
+        );
+
+        if ($quantity === false || $quantity < 1) {
+            throw new BadRequestHttpException('Enter a quantity of at least one.');
+        }
+
+        $order = (new OrderService())->create(
+            (int) Yii::$app->user->id,
+            [['product_id' => $id, 'quantity' => $quantity]],
         );
 
         return $this->redirect(['view', 'id' => $order->id]);

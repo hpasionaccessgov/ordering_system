@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
-use app\models\Product;
 use app\models\OrderItem;
+use app\models\Product;
+use app\filters\StaffAccessFilter;
 use app\services\ProductCatalogPolicy;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -22,6 +23,10 @@ class ProductController extends Controller
     public function behaviors(): array
     {
         return [
+            'staffAccess' => [
+                'class' => StaffAccessFilter::class,
+                'except' => ['view', 'image'],
+            ],
             'access' => [
                 'class' => AccessControl::class,
                 'rules' => [

@@ -3,10 +3,13 @@
 declare(strict_types=1);
 
 use yii\helpers\Html;
+use app\services\RbacPermissionPolicy;
 
 $currentRoute = Yii::$app->controller->route;
+$staffAccessDisabled = RbacPermissionPolicy::isStaffAccessDisabledForCurrentUser();
 $dashboardRoute = match (true) {
     Yii::$app->user->can('admin.access') => ['/admin/dashboard'],
+    $staffAccessDisabled => ['/site/index'],
     Yii::$app->user->can('staff.access') => ['/staff/dashboard'],
     default => ['/customer/dashboard'],
 };
@@ -37,11 +40,14 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
 
 
                 <?php if (
+                    !$staffAccessDisabled
+                    && (
                     Yii::$app->user->can('product.view')
                     || Yii::$app->user->can('product.create')
                     || Yii::$app->user->can('product.update')
                     || Yii::$app->user->can('product.archive')
                     || Yii::$app->user->can('product.delete')
+                    )
                 ): ?>
                     <li class="nav-item">
                         <?= Html::a(
@@ -52,7 +58,7 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
                     </li>
                 <?php endif; ?>
 
-                <?php if (Yii::$app->user->can('order.view')): ?>
+                <?php if (!$staffAccessDisabled && Yii::$app->user->can('order.view')): ?>
                     <li class="nav-item">
                         <?= Html::a(
                             '<i class="nav-icon bi bi-receipt"></i><p>Orders</p>',
@@ -63,11 +69,14 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
                 <?php endif; ?>
 
                 <?php if (
+                    !$staffAccessDisabled
+                    && (
                     Yii::$app->user->can('user.view')
                     || Yii::$app->user->can('user.create')
                     || Yii::$app->user->can('user.update')
                     || Yii::$app->user->can('user.delete')
                     || Yii::$app->user->can('user.assignRole')
+                    )
                 ): ?>
                     <li class="nav-item">
                         <?= Html::a(
@@ -77,7 +86,7 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
                         ) ?>
                     </li>
                 <?php endif; ?>
-                <?php if (Yii::$app->user->can('user.assignRole')): ?>
+                <?php if (!$staffAccessDisabled && Yii::$app->user->can('user.assignRole')): ?>
                     <li class="nav-item">
                         <?= Html::a(
                             '<i class="nav-icon bi bi-shield-lock"></i><p>Roles</p>',
@@ -87,13 +96,15 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
                     </li>
                 <?php endif; ?>
 
-                <li class="nav-item">
-                    <?= Html::a(
-                        '<i class="nav-icon bi bi-person"></i><p>Profile</p>',
-                        ['/site/profile'],
-                        ['class' => 'nav-link' . ($currentRoute === 'site/profile' ? ' active' : '')],
-                    ) ?>
-                </li>
+                <?php if (!$staffAccessDisabled): ?>
+                    <li class="nav-item">
+                        <?= Html::a(
+                            '<i class="nav-icon bi bi-person"></i><p>Profile</p>',
+                            ['/site/profile'],
+                            ['class' => 'nav-link' . ($currentRoute === 'site/profile' ? ' active' : '')],
+                        ) ?>
+                    </li>
+                <?php endif; ?>
                 <!-- <li class="nav-item">
                     <?= Html::a(
                         '<i class="nav-icon bi bi-key"></i><p>Change password</p>',

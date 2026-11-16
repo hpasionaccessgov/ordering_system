@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use yii\helpers\Html;
+use app\services\RbacPermissionPolicy;
 
 $user = Yii::$app->user->identity;
+$staffAccessDisabled = RbacPermissionPolicy::isStaffAccessDisabledForCurrentUser();
 ?>
 <nav class="app-header navbar navbar-expand bg-body">
     <div class="container-fluid">
@@ -50,7 +52,9 @@ $user = Yii::$app->user->identity;
 
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <?= Html::a('Profile', ['/site/profile'], ['class' => 'dropdown-item']) ?>
+                            <?php if (!$staffAccessDisabled): ?>
+                                <?= Html::a('Profile', ['/site/profile'], ['class' => 'dropdown-item']) ?>
+                            <?php endif; ?>
                         </li>
                         <!-- <li>
                             <?= Html::a('Change password', ['/site/change-password'], [

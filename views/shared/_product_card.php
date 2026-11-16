@@ -1,13 +1,15 @@
 <?php
 
 use app\models\Product;
+use app\services\RbacPermissionPolicy;
 use yii\helpers\Html;
 
 /** @var Product $product */
 
-$canUpdateProducts = Yii::$app->user->can('product.update');
-$canArchiveProducts = Yii::$app->user->can('product.archive');
-$canDeleteProducts = Yii::$app->user->can('product.delete');
+$canManageProductActions = !RbacPermissionPolicy::isStaffAccessDisabledForCurrentUser();
+$canUpdateProducts = $canManageProductActions && Yii::$app->user->can('product.update');
+$canArchiveProducts = $canManageProductActions && Yii::$app->user->can('product.archive');
+$canDeleteProducts = $canManageProductActions && Yii::$app->user->can('product.delete');
 ?>
 
 <article class="card product-card product-catalog-card h-100 position-relative">

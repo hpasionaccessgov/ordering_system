@@ -114,6 +114,9 @@ uksort($permissionGroups, static function (string $left, string $right) use ($mo
                     <?= Html::beginForm(['/admin-role/update-permissions', 'name' => $role->name], 'post') ?>
                     <?php $isAdminRole = $role->name === 'admin'; ?>
                     <?php $children = array_keys($auth->getChildren($role->name)); ?>
+                    <p class="small text-body-secondary">
+                        Configure permissions for this role. Administrator access and role management are reserved.
+                    </p>
                     <?php foreach ($permissionGroups as $module => $modulePermissions) : ?>
                         <section class="permission-module-group mb-3">
                             <h4 class="h6 text-body-secondary mb-2">
@@ -127,7 +130,9 @@ uksort($permissionGroups, static function (string $left, string $right) use ($mo
                                             $role->name,
                                             $permission->name,
                                         );
-                                        $isChecked = $isAdminRole || in_array($permission->name, $children, true);
+                                        $isChecked = in_array($permission->name, $children, true);
+                                        $isProtectedAdminPermission = $isAdminRole
+                                            && in_array($permission->name, ['admin.access', 'user.assignRole'], true);
                                         ?>
                                         <?= Html::checkbox(
                                             'permissions[]',
@@ -136,7 +141,7 @@ uksort($permissionGroups, static function (string $left, string $right) use ($mo
                                                 'value' => $permission->name,
                                                 'label' => Html::encode($permission->name),
                                                 'title' => $permission->name,
-                                                'disabled' => $isAdminRole || !$canAssignPermission,
+                                                'disabled' => $isProtectedAdminPermission || !$canAssignPermission,
                                                 'uncheck' => null,
                                             ],
                                         ) ?>
@@ -147,14 +152,13 @@ uksort($permissionGroups, static function (string $left, string $right) use ($mo
                     <?php endforeach; ?>
                     <?php if ($isAdminRole) : ?>
                         <p class="small text-body-secondary mt-3 mb-0">
-                            Administrator permissions are fixed and always enabled.
+                            Administrator access and role-management permissions are protected.
                         </p>
-                    <?php else : ?>
-                        <?= Html::submitButton(
-                            'Save permissions',
-                            ['class' => 'btn btn-sm btn-outline-primary mt-3']
-                        ) ?>
                     <?php endif; ?>
+                    <?= Html::submitButton(
+                        'Save permissions',
+                        ['class' => 'btn btn-sm btn-outline-primary mt-3']
+                    ) ?>
                     <?= Html::endForm() ?>
                     <hr>
                     <?= Html::beginForm(

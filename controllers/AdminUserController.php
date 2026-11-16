@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\filters\StaffAccessFilter;
 use app\models\AdminUserCreateForm;
 use app\models\Order;
 use app\models\User;
@@ -22,6 +23,9 @@ class AdminUserController extends Controller
     public function behaviors(): array
     {
         return [
+            'staffAccess' => [
+                'class' => StaffAccessFilter::class,
+            ],
             'access' => [
                 'class' => AccessControl::class,
                 'rules' => [

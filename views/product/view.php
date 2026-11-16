@@ -1,14 +1,16 @@
 <?php
 
 use app\models\Product;
+use app\services\RbacPermissionPolicy;
 use yii\helpers\Html;
 
 /** @var Product $model */
 
 $this->title = $model->name;
-$canManageProducts = Yii::$app->user->can('product.update');
-$canDeleteProducts = Yii::$app->user->can('product.delete');
-$canOrder = Yii::$app->user->can('order.create') && $model->isActive();
+$staffAccessEnabled = !RbacPermissionPolicy::isStaffAccessDisabledForCurrentUser();
+$canManageProducts = $staffAccessEnabled && Yii::$app->user->can('product.update');
+$canDeleteProducts = $staffAccessEnabled && Yii::$app->user->can('product.delete');
+$canOrder = $staffAccessEnabled && Yii::$app->user->can('order.create') && $model->isActive();
 ?>
 
 <section class="product-detail-page mx-auto">
@@ -69,9 +71,40 @@ $canOrder = Yii::$app->user->can('order.create') && $model->isActive();
 
                     <div class="d-flex flex-wrap gap-2 mt-4">
                         <?php if ($canOrder) : ?>
-                            <?= Html::a('Start an order', ['/order/create'], [
-                                'class' => 'btn btn-primary',
-                            ]) ?>
+                            <div class="product-order-panel mt-4">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                                    <div>
+                                        <h3 class="h6 fw-bold mb-1">Order this item</h3>
+                                        <p class="small text-body-secondary mb-0">
+                                            Choose a quantity; only <?= Html::encode($model->name) ?> will be added.
+                                        </p>
+                                    </div>
+                                    <strong class="product-order-unit-price">
+                                        <?= Yii::$app->formatter->asCurrency($model->price) ?> each
+                                    </strong>
+                                </div>
+                                <?= Html::beginForm(
+                                    ['/order/create-product', 'id' => $model->id],
+                                    'post',
+                                    ['class' => 'd-flex flex-wrap align-items-end gap-3'],
+                                ) ?>
+                                <div>
+                                    <?= Html::label('Quantity', 'product-order-quantity', [
+                                        'class' => 'form-label small fw-semibold',
+                                    ]) ?>
+                                    <?= Html::input('number', 'quantity', 1, [
+                                        'id' => 'product-order-quantity',
+                                        'class' => 'form-control order-quantity-input',
+                                        'min' => 1,
+                                        'step' => 1,
+                                        'required' => true,
+                                        'inputmode' => 'numeric',
+                                        'aria-label' => 'Quantity of ' . $model->name,
+                                    ]) ?>
+                                </div>
+                                <?= Html::submitButton('Start order', ['class' => 'btn btn-primary']) ?>
+                                <?= Html::endForm() ?>
+                            </div>
                         <?php endif; ?>
 
                         <?php if ($canManageProducts) : ?>
@@ -81,7 +114,8 @@ $canOrder = Yii::$app->user->can('order.create') && $model->isActive();
                         <?php endif; ?>
 
                         <?php if (
-                            Yii::$app->user->can('product.archive')
+                            $staffAccessEnabled
+                            && Yii::$app->user->can('product.archive')
                             && $model->isActive()
 ) : ?>
                             <?= Html::beginForm(

@@ -5,6 +5,7 @@ declare(strict_types=1);
 /** @var yii\web\View $this */
 
 use yii\helpers\Html;
+use app\services\RbacPermissionPolicy;
 
 $currentRoute = Yii::$app->controller->route;
 $navigationItems = [
@@ -13,6 +14,7 @@ $navigationItems = [
     ['label' => 'Contact', 'route' => 'site/contact', 'url' => ['/site/contact']],
 ];
 $user = Yii::$app->user->identity;
+$staffAccessDisabled = RbacPermissionPolicy::isStaffAccessDisabledForCurrentUser();
 $brand = Html::img(Yii::getAlias('@web/images/Cafebara_logo.png'), [
     'alt' => '',
     'class' => 'cafebara-brand-logo',
@@ -65,12 +67,17 @@ $brand = Html::img(Yii::getAlias('@web/images/Cafebara_logo.png'), [
                             'class' => 'btn btn-primary',
                         ]) ?>
                     <?php else: ?>
-                        <?= Html::a('Dashboard', ['/site/dashboard'], [
+                        <?= Html::a(
+                            $staffAccessDisabled ? 'Home' : 'Dashboard',
+                            $staffAccessDisabled ? ['/site/index'] : ['/site/dashboard'],
+                            [
                             'class' => 'btn btn-primary',
                         ]) ?>
-                        <?= Html::a('Profile', ['/site/profile'], [
-                            'class' => 'btn btn-outline-primary',
-                        ]) ?>
+                        <?php if (!$staffAccessDisabled): ?>
+                            <?= Html::a('Profile', ['/site/profile'], [
+                                'class' => 'btn btn-outline-primary',
+                            ]) ?>
+                        <?php endif; ?>
                         <?= Html::beginForm(['/site/logout'], 'post', ['class' => 'm-0']) ?>
                         <?= Html::submitButton('Sign out', ['class' => 'btn btn-link cafebara-sign-out']) ?>
                         <?= Html::endForm() ?>

@@ -291,6 +291,58 @@ body.confirm-modal-open .modal-backdrop {
     font-variant-numeric: tabular-nums;
 }
 
+.product-order-panel {
+    padding: 1rem;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 1rem;
+    background: var(--bs-secondary-bg);
+}
+
+.product-order-unit-price {
+    color: var(--cafebara-brown);
+    font-variant-numeric: tabular-nums;
+}
+
+.product-editor-card {
+    overflow: hidden;
+}
+
+.product-editor-card .card-header {
+    padding: 1rem 1.25rem;
+    border-bottom-color: var(--bs-border-color);
+    background: transparent;
+}
+
+.product-editor-preview {
+    display: grid;
+    overflow: hidden;
+    min-height: 13rem;
+    place-items: center;
+    border: 1px dashed var(--bs-border-color);
+    border-radius: 1rem;
+    background: var(--bs-secondary-bg);
+}
+
+.product-editor-preview-image {
+    width: 100%;
+    height: 15rem;
+    object-fit: cover;
+}
+
+.product-editor-preview-placeholder {
+    display: grid;
+    gap: .5rem;
+    justify-items: center;
+    padding: 1.5rem;
+    color: var(--bs-secondary-color);
+    text-align: center;
+}
+
+.product-editor-preview-placeholder i {
+    color: var(--cafebara-brown);
+    font-size: 2rem;
+}
+
 .product-featured-badge {
     border: 1px solid rgba(137, 67, 28, .2);
     background: var(--cafebara-cream);

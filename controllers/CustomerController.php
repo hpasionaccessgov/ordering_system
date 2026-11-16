@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\filters\StaffAccessFilter;
 use app\models\Order;
 use app\models\Product;
 use Yii;
@@ -15,6 +16,9 @@ class CustomerController extends Controller
     public function behaviors(): array
     {
         return [
+            'staffAccess' => [
+                'class' => StaffAccessFilter::class,
+            ],
             'access' => [
                 'class' => AccessControl::class,
                 'rules' => [

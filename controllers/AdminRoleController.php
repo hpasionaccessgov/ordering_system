@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\filters\StaffAccessFilter;
 use app\models\RoleForm;
 use app\services\RbacPermissionPolicy;
 use Yii;
@@ -11,7 +12,6 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
-use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
 class AdminRoleController extends Controller
@@ -19,6 +19,9 @@ class AdminRoleController extends Controller
     public function behaviors(): array
     {
         return [
+            'staffAccess' => [
+                'class' => StaffAccessFilter::class,
+            ],
             'access' => [
                 'class' => AccessControl::class,
                 'rules' => [
@@ -44,7 +47,7 @@ class AdminRoleController extends Controller
         return $this->renderRoles(new RoleForm());
     }
 
-    public function actionCreate(): Response
+    public function actionCreate(): Response|string
     {
         $model = new RoleForm();
         if ($model->load($this->request->post()) && $model->validate()) {
@@ -112,10 +115,6 @@ class AdminRoleController extends Controller
 
     public function actionUpdatePermissions(string $name): Response
     {
-        if ($name === 'admin') {
-            throw new ForbiddenHttpException('Administrator permissions cannot be changed.');
-        }
-
         $auth = Yii::$app->authManager;
         $role = $auth->getRole($name);
         $permissionNames = $this->request->post('permissions', []);
@@ -141,6 +140,13 @@ class AdminRoleController extends Controller
                     "The permission '{$permissionName}' cannot be assigned to the '{$name}' role.",
                 );
             }
+        }
+
+        if ($name === 'admin') {
+            $permissionNames = array_values(array_unique(array_merge(
+                $permissionNames,
+                ['admin.access', 'user.assignRole'],
+            )));
         }
 
         $transaction = Yii::$app->db->beginTransaction();
