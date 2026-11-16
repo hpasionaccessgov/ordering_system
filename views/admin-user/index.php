@@ -4,7 +4,6 @@
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
 use app\models\User;
-use app\widgets\AdminButton;
 use app\widgets\AdminGridView;
 use yii\helpers\Html;
 
@@ -17,7 +16,7 @@ $this->title = 'User list';
     </div>
     <div class="card-body border-bottom">
         <p class="text-body-secondary mb-0">
-            Review account details and allow or block access.
+            Review accounts and update their personal details or access.
         </p>
     </div>
     <?= AdminGridView::widget([
@@ -25,23 +24,20 @@ $this->title = 'User list';
         'columns' => [
             'id',
             'username',
+            'full_name',
             'email:email',
             [
-                'label' => 'Status',
+                'label' => 'Actions',
                 'format' => 'raw',
                 'value' => static function (User $user): string {
-                    $isActive = $user->status === User::STATUS_ACTIVE;
-                    return Html::beginForm(
-                        ['/admin-user/update-status', 'id' => $user->id],
-                        'post',
-                        ['class' => 'd-flex gap-2 align-items-center'],
-                    )
-                        . Html::dropDownList('status', $user->status, [
-                            User::STATUS_ACTIVE => 'Allowed',
-                            User::STATUS_DISABLED => 'Blocked',
-                        ], ['class' => 'form-select form-select-sm', 'aria-label' => 'Status for ' . $user->username])
-                        . AdminButton::submit('Save', 'primary', ['class' => 'btn-sm'])
-                        . Html::endForm();
+                    if (!Yii::$app->user->can('admin.access')) {
+                        return '';
+                    }
+
+                    return Html::a('Edit', ['/admin-user/update', 'id' => $user->id], [
+                        'class' => 'btn btn-outline-primary',
+                        'aria-label' => 'Edit personal data for ' . $user->username,
+                    ]);
                 },
             ],
         ],

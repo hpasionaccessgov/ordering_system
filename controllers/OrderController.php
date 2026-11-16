@@ -57,6 +57,11 @@ class OrderController extends Controller
                         'allow' => true,
                         'roles' => ['order.process'],
                     ],
+                    [
+                        'actions' => ['receipt'],
+                        'allow' => true,
+                        'roles' => ['order.receipt.print'],
+                    ],
                 ],
             ],
             'verbs' => [
@@ -77,11 +82,13 @@ class OrderController extends Controller
             Order::find(),
             Yii::$app->user->id,
             $this->canViewAllOrders(),
-        )->orderBy(['created_at' => SORT_DESC]);
+        );
 
         return $this->render('index', [
             'dataProvider' => new ActiveDataProvider([
                 'query' => $query,
+                'pagination' => ['pageSize' => 15],
+                'sort' => ['defaultOrder' => ['created_at' => SORT_DESC]],
             ]),
         ]);
     }
@@ -92,6 +99,20 @@ class OrderController extends Controller
         $order = $this->findAccessibleOrder($id);
 
         return $this->render('view', [
+            'model' => $order,
+        ]);
+    }
+
+    public function actionReceipt(int $id): string
+    {
+        if (!Yii::$app->user->can('order.view')) {
+            throw new ForbiddenHttpException('You are not allowed to view this order.');
+        }
+
+        $this->layout = 'admin';
+        $order = $this->findAccessibleOrder($id);
+
+        return $this->render('receipt', [
             'model' => $order,
         ]);
     }

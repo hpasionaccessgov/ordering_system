@@ -1,7 +1,7 @@
 <?php
 
 use app\models\Order;
-use yii\grid\GridView;
+use app\widgets\AdminGridView;
 use yii\helpers\Html;
 
 /** @var yii\data\ActiveDataProvider $dataProvider */
@@ -13,7 +13,7 @@ $this->title = 'Orders';
 <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
     <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
 
-    <?php if (Yii::$app->user->can('order.create')): ?>
+    <?php if (Yii::$app->user->can('order.create')) : ?>
         <?= Html::a(
             'Create order',
             ['/order/create'],
@@ -23,11 +23,8 @@ $this->title = 'Orders';
 </div>
 
 <div class="order-table-card">
-<?= GridView::widget([
+<?= AdminGridView::widget([
     'dataProvider' => $dataProvider,
-    'tableOptions' => ['class' => 'table table-hover align-middle'],
-    'summaryOptions' => ['class' => 'px-3 pt-3 mb-0 text-body-secondary small'],
-    'options' => ['class' => 'table-responsive'],
     'columns' => [
         'id',
         'status',
@@ -38,6 +35,7 @@ $this->title = 'Orders';
         ],
         [
             'class' => 'yii\grid\ActionColumn',
+            'header' => 'Action',
             'template' => '{view}',
             'buttons' => [
                 'view' => static fn ($url, Order $model): string => Html::a(

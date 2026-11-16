@@ -1,7 +1,7 @@
 <?php
 
 use app\models\Product;
-use yii\grid\GridView;
+use app\widgets\AdminGridView;
 use yii\helpers\Html;
 
 /** @var yii\data\ActiveDataProvider $dataProvider */
@@ -69,7 +69,7 @@ $this->title = 'Products';
 </div>
 <?= Html::endForm() ?>
 
-<?= GridView::widget([
+<?= AdminGridView::widget([
     'dataProvider' => $dataProvider,
     'columns' => [
         [

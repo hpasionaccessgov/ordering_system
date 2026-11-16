@@ -17,14 +17,17 @@ use yii\web\Response;
 
 class AdminUserController extends Controller
 {
-    private const ASSIGNABLE_ROLES = ['admin', 'staff', 'customer'];
-
     public function behaviors(): array
     {
         return [
             'access' => [
                 'class' => AccessControl::class,
                 'rules' => [
+                    [
+                        'actions' => ['update'],
+                        'allow' => true,
+                        'roles' => ['admin.access'],
+                    ],
                     [
                         'allow' => true,
                         'roles' => ['user.assignRole'],
@@ -35,7 +38,7 @@ class AdminUserController extends Controller
                 'class' => VerbFilter::class,
                 'actions' => [
                     'assign-role' => ['post'],
-                    'update-status' => ['post'],
+                    'update' => ['GET', 'POST'],
                 ],
             ],
         ];
@@ -58,29 +61,32 @@ class AdminUserController extends Controller
         ]);
     }
 
-    public function actionUpdateStatus(int $id): Response
+    public function actionUpdate(int $id): Response|string
     {
         $user = User::findOne($id);
-        $status = $this->request->post('status');
-
         if ($user === null) {
             throw new NotFoundHttpException('The requested user was not found.');
         }
-        if ((string) $user->id === (string) Yii::$app->user->id) {
-            throw new ForbiddenHttpException('You cannot block your own account.');
-        }
-        if (!in_array((int) $status, [User::STATUS_ACTIVE, User::STATUS_DISABLED], true)) {
-            throw new BadRequestHttpException('Select a valid account status.');
+
+        $this->layout = 'admin';
+        $user->scenario = User::SCENARIO_ADMIN_PROFILE_UPDATE;
+
+        if ($user->load($this->request->post())) {
+            if (
+                (string) $user->id === (string) Yii::$app->user->id
+                && (int) $user->status !== User::STATUS_ACTIVE
+            ) {
+                throw new ForbiddenHttpException('You cannot block your own account.');
+            }
+
+            if ($user->save()) {
+                Yii::$app->session->setFlash('success', "Account details for {$user->username} were updated.");
+
+                return $this->redirect(['list']);
+            }
         }
 
-        $user->status = (int) $status;
-        if (!$user->save(false, ['status', 'updated_at'])) {
-            throw new BadRequestHttpException('User status could not be updated.');
-        }
-
-        Yii::$app->session->setFlash('success', "Account status for {$user->username} was updated.");
-
-        return $this->redirect(['list']);
+        return $this->render('update', ['model' => $user]);
     }
 
     public function actionRoles(): string
@@ -95,7 +101,7 @@ class AdminUserController extends Controller
     public function actionAssignRole(int $id): Response
     {
         $roleName = $this->request->post('role');
-        if (!is_string($roleName) || !in_array($roleName, self::ASSIGNABLE_ROLES, true)) {
+        if (!is_string($roleName) || $roleName === '') {
             throw new BadRequestHttpException('Select a valid role.');
         }
 

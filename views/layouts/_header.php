@@ -52,11 +52,11 @@ $user = Yii::$app->user->identity;
                         <li>
                             <?= Html::a('Profile', ['/site/profile'], ['class' => 'dropdown-item']) ?>
                         </li>
-                        <li>
+                        <!-- <li>
                             <?= Html::a('Change password', ['/site/change-password'], [
                                 'class' => 'dropdown-item',
                             ]) ?>
-                        </li>
+                        </li> -->
                         <li>
                             <hr class="dropdown-divider">
                         </li>

@@ -2,7 +2,7 @@
 
 use app\models\ChangePasswordForm;
 use app\widgets\AdminActiveForm;
-use app\widgets\AdminButton;
+use yii\helpers\Html;
 
 /** @var ChangePasswordForm $model */
 
@@ -22,7 +22,7 @@ $this->title = 'Change password';
                 <?= $form->field($model, 'newPassword')->passwordInput() ?>
                 <?= $form->field($model, 'confirmPassword')->passwordInput() ?>
 
-                <?= AdminButton::submit('Update password') ?>
+                <?= Html::submitButton('Update password', ['class' => 'btn btn-primary']) ?>
 
                 <?php AdminActiveForm::end(); ?>
             </div>

@@ -106,7 +106,9 @@ class ProductController extends Controller
 
         return $this->render('index', [
             'dataProvider' => new ActiveDataProvider([
-                'query' => $query->orderBy(['name' => SORT_ASC]),
+                'query' => $query,
+                'pagination' => ['pageSize' => 12],
+                'sort' => ['defaultOrder' => ['name' => SORT_ASC]],
             ]),
             'categories' => $categoryQuery->orderBy('category')->column(),
             'canManageProducts' => $canManageProducts,

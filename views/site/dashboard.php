@@ -4,7 +4,6 @@
 
 use app\models\User;
 use yii\helpers\Html;
-use app\widgets\AdminButton;
 
 $this->title = 'Dashboard';
 $identity = Yii::$app->user->identity;
@@ -23,7 +22,7 @@ $displayName = $identity instanceof User
                 <p class="lead mb-4">
                     This is the home for your cafe activity and ordering tools.
                 </p>
-                <?= AdminButton::link('Manage profile', ['/site/profile'], 'cafebara-light') ?>
+                <?= Html::a('Manage profile', ['/site/profile'], ['class' => 'btn btn-cafebara-light']) ?>
             </div>
             <div class="col-lg-4 d-none d-lg-flex justify-content-center">
                 <?= Html::img(Yii::getAlias('@web/images/Cafebara_logo.png'), [
@@ -88,9 +87,7 @@ $displayName = $identity instanceof User
                     <p class="text-body-secondary mb-3">
                         Update your personal details or change your password.
                     </p>
-                    <?= AdminButton::link('Account settings', ['/site/profile'], 'link', [
-                        'class' => 'fw-semibold',
-                    ]) ?>
+                    <?= Html::a('Account settings', ['/site/profile'], ['class' => 'btn btn-link fw-semibold']) ?>
                 </div>
             </section>
         </div>

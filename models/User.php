@@ -15,6 +15,7 @@ class User extends ActiveRecord implements IdentityInterface
     public const STATUS_INACTIVE = 0;
     public const STATUS_ACTIVE = 10;
     public const STATUS_DISABLED = 20;
+    public const SCENARIO_ADMIN_PROFILE_UPDATE = 'adminProfileUpdate';
 
     public static function tableName(): string
     {
@@ -47,6 +48,14 @@ class User extends ActiveRecord implements IdentityInterface
                 self::STATUS_DISABLED,
             ]],
         ];
+    }
+
+    public function scenarios(): array
+    {
+        $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_ADMIN_PROFILE_UPDATE] = ['username', 'email', 'full_name', 'status'];
+
+        return $scenarios;
     }
 
     public static function findIdentity($id): ?static

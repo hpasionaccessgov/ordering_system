@@ -6,6 +6,7 @@ namespace app\controllers;
 
 use app\models\Order;
 use app\models\Product;
+use app\services\OrderStatistics;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 
@@ -36,6 +37,7 @@ class StaffController extends Controller
             'processingOrderCount' => (int) Order::find()->where([
                 'status' => Order::STATUS_PROCESSING,
             ])->count(),
+            'orderStatusCounts' => OrderStatistics::statusCounts(),
         ]);
     }
 }

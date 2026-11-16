@@ -62,4 +62,3 @@ OR Install Laragon v6 for all in one universal pack (https://laragon.org/downloa
    ```bash
    php yii seed/products
    ```
-   Seeded products are updated in place to preserve existing order references. Products not in the seeder are archived rather than deleted.

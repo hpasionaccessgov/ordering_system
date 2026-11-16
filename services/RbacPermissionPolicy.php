@@ -17,6 +17,7 @@ final class RbacPermissionPolicy
             'order.update',
             'order.cancel',
             'order.process',
+            'order.receipt.print',
         ],
         'customer' => [
             'customer.access',
@@ -32,6 +33,10 @@ final class RbacPermissionPolicy
     {
         if ($roleName === 'admin') {
             return true;
+        }
+
+        if ($roleName === 'customer' && $permissionName === 'order.receipt.print') {
+            return false;
         }
 
         if (isset(self::BUILT_IN_ROLE_PERMISSIONS[$roleName])) {

@@ -7,6 +7,7 @@ namespace app\controllers;
 use app\models\Order;
 use app\models\Product;
 use app\models\User;
+use app\services\OrderStatistics;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 
@@ -36,6 +37,7 @@ class AdminController extends Controller
             'activeUserCount' => (int) User::find()->where(['status' => User::STATUS_ACTIVE])->count(),
             'productCount' => (int) Product::find()->where(['status' => Product::STATUS_ACTIVE])->count(),
             'pendingOrderCount' => (int) Order::find()->where(['status' => Order::STATUS_PENDING])->count(),
+            'orderStatusCounts' => OrderStatistics::statusCounts(),
         ]);
     }
 }

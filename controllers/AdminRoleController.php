@@ -7,10 +7,12 @@ namespace app\controllers;
 use app\models\User;
 use app\services\RbacPermissionPolicy;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
 class AdminRoleController extends Controller
@@ -43,7 +45,11 @@ class AdminRoleController extends Controller
         return $this->render('../admin-user/roles', [
             'roles' => Yii::$app->authManager->getRoles(),
             'permissions' => Yii::$app->authManager->getPermissions(),
-            'users' => User::find()->orderBy(['id' => SORT_ASC])->all(),
+            'usersDataProvider' => new ActiveDataProvider([
+                'query' => User::find(),
+                'pagination' => ['pageSize' => 15],
+                'sort' => ['defaultOrder' => ['id' => SORT_ASC]],
+            ]),
         ]);
     }
 
@@ -101,16 +107,16 @@ class AdminRoleController extends Controller
 
     public function actionUpdatePermissions(string $name): Response
     {
+        if ($name === 'admin') {
+            throw new ForbiddenHttpException('Administrator permissions cannot be changed.');
+        }
+
         $auth = Yii::$app->authManager;
         $role = $auth->getRole($name);
         $permissionNames = $this->request->post('permissions', []);
 
         if ($role === null || !is_array($permissionNames)) {
             throw new BadRequestHttpException('Role or permissions are invalid.');
-        }
-
-        if ($name === 'admin') {
-            $permissionNames = array_keys($auth->getPermissions());
         }
 
         foreach ($permissionNames as $permissionName) {

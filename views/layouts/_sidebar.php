@@ -80,13 +80,13 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
                         ['class' => 'nav-link' . ($currentRoute === 'site/profile' ? ' active' : '')],
                     ) ?>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <?= Html::a(
                         '<i class="nav-icon bi bi-key"></i><p>Change password</p>',
                         ['/site/change-password'],
                         ['class' => 'nav-link' . ($currentRoute === 'site/change-password' ? ' active' : '')],
                     ) ?>
-                </li>
+                </li> -->
             </ul>
         </nav>
     </div>

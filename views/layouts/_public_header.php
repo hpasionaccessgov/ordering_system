@@ -5,7 +5,6 @@ declare(strict_types=1);
 /** @var yii\web\View $this */
 
 use yii\helpers\Html;
-use app\widgets\AdminButton;
 
 $currentRoute = Yii::$app->controller->route;
 $navigationItems = [
@@ -73,7 +72,7 @@ $brand = Html::img(Yii::getAlias('@web/images/Cafebara_logo.png'), [
                             'class' => 'btn btn-outline-primary',
                         ]) ?>
                         <?= Html::beginForm(['/site/logout'], 'post', ['class' => 'm-0']) ?>
-                        <?= AdminButton::submit('Sign out', 'link', ['class' => 'cafebara-sign-out']) ?>
+                        <?= Html::submitButton('Sign out', ['class' => 'btn btn-link cafebara-sign-out']) ?>
                         <?= Html::endForm() ?>
                     <?php endif ?>
                 </div>

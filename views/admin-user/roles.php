@@ -1,15 +1,23 @@
 <?php
 
 use app\services\RbacPermissionPolicy;
+use app\widgets\AdminGridView;
+use app\models\User;
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */
-/** @var app\models\User[] $users */
+/** @var yii\data\ActiveDataProvider $usersDataProvider */
 
 $this->title = 'Roles';
 $auth = Yii::$app->authManager;
 $permissions = $auth->getPermissions();
 $roles = $auth->getRoles();
+$roleOptions = ['' => 'Select role'];
+foreach ($roles as $role) {
+    $roleOptions[$role->name] = $role->description !== ''
+        ? $role->description . ' (' . $role->name . ')'
+        : ucfirst($role->name);
+}
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -47,48 +55,39 @@ $roles = $auth->getRoles();
     <div class="card-body">
         <h2 class="h5">Assign roles to users</h2>
         <p class="text-body-secondary">Each account receives one application role.</p>
-        <div class="table-responsive">
-            <table class="table align-middle">
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($users as $user) : ?>
-                        <?php
+        <?= AdminGridView::widget([
+            'dataProvider' => $usersDataProvider,
+            'columns' => [
+                'username',
+                'email:email',
+                [
+                    'label' => 'Role',
+                    'format' => 'raw',
+                    'value' => static function (User $user) use ($roleOptions): string {
+                        $auth = Yii::$app->authManager;
                         $assigned = $auth->getRolesByUser($user->id);
                         $selected = count($assigned) === 1 ? array_key_first($assigned) : '';
-                        ?>
-                        <tr>
-                            <td><?= Html::encode($user->username) ?></td>
-                            <td><?= Html::encode($user->email) ?></td>
-                            <td>
-                                <?php if ((string) $user->id === (string) Yii::$app->user->id) : ?>
-                                    <span class="text-body-secondary">Current account</span>
-                                <?php else : ?>
-                                    <?= Html::beginForm(
-                                        ['/admin-user/assign-role', 'id' => $user->id],
-                                        'post',
-                                        ['class' => 'd-flex gap-2']
-                                    ) ?>
-                                    <?= Html::dropDownList('role', $selected, [
-                                        '' => 'Select role',
-                                        'admin' => 'Admin',
-                                        'staff' => 'Staff',
-                                        'customer' => 'Customer',
-                                    ], ['class' => 'form-select form-select-sm', 'required' => true]) ?>
-                                    <?= Html::submitButton('Save', ['class' => 'btn btn-sm btn-primary']) ?>
-                                    <?= Html::endForm() ?>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
+
+                        if ((string) $user->id === (string) Yii::$app->user->id) {
+                            return '<span class="text-body-secondary">Current account</span>';
+                        }
+
+                        return Html::beginForm(
+                            ['/admin-user/assign-role', 'id' => $user->id],
+                            'post',
+                            ['class' => 'd-flex flex-wrap gap-2 role-assignment-form']
+                        )
+                            . Html::dropDownList('role', $selected, $roleOptions, [
+                                'class' => 'form-select form-select-sm',
+                                'required' => true,
+                                'aria-label' => 'Role for ' . $user->username,
+                            ])
+                            . Html::submitButton('Save', ['class' => 'btn btn-sm btn-primary'])
+                            . Html::endForm();
+                    },
+                ],
+            ],
+        ]) ?>
     </div>
 </section>
 
@@ -123,6 +122,7 @@ $roles = $auth->getRoles();
                     <h3 class="small text-uppercase text-body-secondary">Permissions</h3>
                     <?= Html::beginForm(['/admin-role/update-permissions', 'name' => $role->name], 'post') ?>
                     <div class="row g-2">
+                        <?php $isAdminRole = $role->name === 'admin'; ?>
                         <?php $children = array_keys($auth->getChildren($role->name)); ?>
                         <?php foreach ($permissions as $permission) : ?>
                             <div class="col-12 col-md-6">
@@ -131,11 +131,7 @@ $roles = $auth->getRoles();
                                     $role->name,
                                     $permission->name,
                                 );
-                                $isChecked = $role->name === 'admin'
-                                    || (
-                                        $canAssignPermission
-                                        && in_array($permission->name, $children, true)
-                                    );
+                                $isChecked = $isAdminRole || in_array($permission->name, $children, true);
                                 ?>
                                 <?= Html::checkbox(
                                     'permissions[]',
@@ -143,13 +139,23 @@ $roles = $auth->getRoles();
                                     [
                                         'value' => $permission->name,
                                         'label' => Html::encode($permission->name),
-                                        'disabled' => !$canAssignPermission || $role->name === 'admin',
+                                        'title' => $permission->name,
+                                        'disabled' => $isAdminRole || !$canAssignPermission,
                                     ],
                                 ) ?>
                             </div>
                         <?php endforeach; ?>
                     </div>
-                    <?= Html::submitButton('Save permissions', ['class' => 'btn btn-sm btn-outline-primary mt-3']) ?>
+                    <?php if ($isAdminRole) : ?>
+                        <p class="small text-body-secondary mt-3 mb-0">
+                            Administrator permissions are fixed and always enabled.
+                        </p>
+                    <?php else : ?>
+                        <?= Html::submitButton(
+                            'Save permissions',
+                            ['class' => 'btn btn-sm btn-outline-primary mt-3']
+                        ) ?>
+                    <?php endif; ?>
                     <?= Html::endForm() ?>
                     <hr>
                     <?= Html::beginForm(

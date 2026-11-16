@@ -6,12 +6,20 @@
       return;
     }
 
-    const container = input.closest(".input-group") || input.parentElement;
+    const inputGroup = input.closest(".input-group");
+    const container = inputGroup || document.createElement("div");
+    if (!inputGroup) {
+      container.className = "password-toggle-field";
+      input.parentNode.insertBefore(container, input);
+      container.append(input);
+    } else {
+      container.classList.add("password-toggle-wrapper");
+    }
+
     if (!container) {
       return;
     }
 
-    container.classList.add("password-toggle-wrapper");
     input.classList.add("password-toggle-input");
 
     const button = document.createElement("button");
