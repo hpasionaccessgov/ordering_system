@@ -12,7 +12,7 @@ final class RbacPermissionPolicyTest extends Unit
     public function testRemovingViewAlsoRemovesPermissionsThatRenderRecordDetails(): void
     {
         self::assertSame(
-            ['order.index', 'order.process'],
+            [],
             RbacPermissionPolicy::normalizeRolePermissions([
                 'order.index',
                 'order.update',
@@ -28,11 +28,25 @@ final class RbacPermissionPolicyTest extends Unit
             ]),
         );
         self::assertSame(
-            ['user.index'],
+            [],
             RbacPermissionPolicy::normalizeRolePermissions([
                 'user.index',
                 'user.update',
             ]),
+        );
+    }
+
+    public function testCheckingViewExpandsTheWholeModuleInTheRoleEditor(): void
+    {
+        self::assertSame(
+            [
+                'user.view',
+                'user.index',
+                'user.create',
+                'user.delete',
+                'user.update',
+            ],
+            RbacPermissionPolicy::expandViewPermission('user.view', ['user.view']),
         );
     }
 

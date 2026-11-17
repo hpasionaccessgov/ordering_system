@@ -26,11 +26,11 @@ $this->registerJs(<<<JS
                 return;
             }
 
-            if (viewDependencies[input.dataset.permission] && !input.checked) {
+            if (viewDependencies[input.dataset.permission]) {
                 viewDependencies[input.dataset.permission].forEach(name => {
                     const dependent = permissionByName.get(name);
                     if (dependent) {
-                        dependent.checked = false;
+                        dependent.checked = input.checked;
                     }
                 });
             }
@@ -160,8 +160,8 @@ uksort($permissionGroups, static function (string $left, string $right) use ($mo
                     <?php $children = array_keys($auth->getChildren($role->name)); ?>
                     <p class="small text-body-secondary">
                         Index permissions control lists; view permissions control individual records.
-                        Unchecking view also clears dependent permissions that expose record details.
-                        All permissions are configurable, including administrator access and role management.
+                        Checking or unchecking view synchronizes the module's permissions, while individual
+                        permissions remain editable afterward. All permissions are configurable.
                     </p>
                     <?php if ($role->name === 'admin') : ?>
                         <p class="small text-warning-emphasis">

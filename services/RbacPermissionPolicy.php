@@ -9,14 +9,27 @@ use Yii;
 final class RbacPermissionPolicy
 {
     /**
-     * Permissions that expose an existing record also require its view permission.
+     * Module permissions controlled by each module's view checkbox in the role editor.
      *
      * @var array<string, list<string>>
      */
     private const VIEW_DEPENDENTS = [
-        'user.view' => ['user.update'],
-        'product.view' => ['product.update'],
-        'order.view' => ['order.update', 'order.receipt.print'],
+        'user.view' => ['user.index', 'user.create', 'user.delete', 'user.update'],
+        'product.view' => [
+            'product.index',
+            'product.create',
+            'product.update',
+            'product.delete',
+            'product.archive',
+        ],
+        'order.view' => [
+            'order.index',
+            'order.create',
+            'order.update',
+            'order.cancel',
+            'order.process',
+            'order.receipt.print',
+        ],
     ];
 
     /**
@@ -43,6 +56,21 @@ final class RbacPermissionPolicy
             foreach ($dependentPermissions as $dependentPermission) {
                 unset($selected[$dependentPermission]);
             }
+        }
+
+        return array_keys($selected);
+    }
+
+    /**
+     * @param list<string> $permissionNames
+     * @return list<string>
+     */
+    public static function expandViewPermission(string $viewPermission, array $permissionNames): array
+    {
+        $selected = array_fill_keys($permissionNames, true);
+
+        foreach (self::VIEW_DEPENDENTS[$viewPermission] ?? [] as $dependentPermission) {
+            $selected[$dependentPermission] = true;
         }
 
         return array_keys($selected);

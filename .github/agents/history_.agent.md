@@ -33,7 +33,7 @@ Continue work on the existing Cafébara Yii2 ordering system. Inspect the curren
 
 - `*.index` is the permission for a module's list/table page.
 - `*.view` is the permission for opening an individual record's details.
-- These are separate permissions. Removing `*.view` should not implicitly grant or revoke `*.index`; to remove list access, remove the corresponding `*.index`.
+- These remain separate permissions at runtime, but the role editor treats `*.view` as the module-level toggle: checking it selects the module's operational permissions, and unchecking it clears them, including `*.index`.
 - Implemented index permissions:
   - `order.index` for `OrderController::actionIndex()`
   - `product.index` for `ProductController::actionIndex()`
@@ -44,13 +44,13 @@ Continue work on the existing Cafébara Yii2 ordering system. Inspect the curren
 
 ### Permission dependencies
 
-The role editor clears dependent permissions when a record-view permission is unchecked. The same normalization runs server-side when role permissions are saved, so disabling JavaScript cannot bypass it:
+The role editor synchronizes module permissions when a record-view permission is toggled. The same normalization runs server-side when role permissions are saved, so disabling JavaScript cannot retain operational permissions without the corresponding view permission:
 
-- `user.view` is required for `user.update`.
-- `product.view` is required for `product.update`.
-- `order.view` is required for `order.update` and `order.receipt.print`.
+- `user.view` synchronizes `user.index`, `user.create`, `user.delete`, and `user.update`.
+- `product.view` synchronizes `product.index`, `product.create`, `product.update`, `product.delete`, and `product.archive`.
+- `order.view` synchronizes `order.index`, `order.create`, `order.update`, `order.cancel`, `order.process`, and `order.receipt.print`.
 
-When a dependent permission is selected in the UI, its matching view permission is selected as well. Keep the dependency map in `services/RbacPermissionPolicy.php` synchronized with controller checks.
+Individual permissions remain editable after the module view checkbox is enabled. Selecting a dependent in the UI also enables its matching view permission. Keep the dependency map in `services/RbacPermissionPolicy.php` synchronized with controller checks.
 
 ### Admin access recovery
 
@@ -86,7 +86,7 @@ When a dependent permission is selected in the UI, its matching view permission 
 
 ## Recent validation
 
-- Focused Codeception RBAC policy tests passed: 2 tests, 7 assertions.
+- Focused Codeception RBAC policy tests passed: 3 tests, 8 assertions.
 - Changed PHP files passed `php -l`; `git diff --check` passed.
 - `php yii migrate --interactive=0` reported no pending migrations after the new migration was applied.
 - `php yii rbac/restore-admin-access` completed successfully.
