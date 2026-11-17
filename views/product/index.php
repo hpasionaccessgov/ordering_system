@@ -6,6 +6,7 @@ use yii\helpers\Html;
 /** @var yii\data\ActiveDataProvider $dataProvider */
 /** @var string[] $categories */
 /** @var bool $canManageProducts */
+/** @var bool $canViewProducts */
 /** @var string $status */
 
 $this->title = 'Product';
@@ -25,6 +26,7 @@ $this->title = 'Product';
     <?php endif; ?>
 </div>
 
+<?php if ($canViewProducts) : ?>
 <?= Html::beginForm(['/product/index'], 'get', ['class' => 'catalog-filter mb-4']) ?>
 <div class="row g-2">
     <div class="col-12 col-md-3">
@@ -77,7 +79,13 @@ $this->title = 'Product';
     </div>
 </div>
 <?= Html::endForm() ?>
+<?php else : ?>
+    <div class="alert alert-warning mb-4" role="alert">
+        You do not have permission to view products.
+    </div>
+<?php endif; ?>
 
+<?php if ($canViewProducts) : ?>
 <div class="row g-3">
     <?php foreach ($dataProvider->getModels() as $product) : ?>
         <div class="col-12 col-sm-6 col-xl-4">
@@ -94,3 +102,4 @@ $this->title = 'Product';
     </div>
 <?php endif; ?>
 <?= LinkPager::widget(['pagination' => $dataProvider->pagination]) ?>
+<?php endif; ?>

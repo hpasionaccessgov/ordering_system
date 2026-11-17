@@ -92,6 +92,7 @@ class ProductController extends Controller
     public function actionIndex(): string
     {
         $this->layout = 'admin';
+        $canViewProducts = Yii::$app->user->can('product.view');
         $canManageProducts = $this->canManageArchivedProducts();
         $requestedStatus = $this->request->get('status', 'all');
         $status = ProductCatalogPolicy::normalizeStatus(
@@ -104,6 +105,10 @@ class ProductController extends Controller
             Product::find()->select('category')->distinct(),
             $status,
         );
+        if (!$canViewProducts) {
+            $query->andWhere(['id' => null]);
+            $categoryQuery->andWhere(['id' => null]);
+        }
 
         $search = trim((string) $this->request->get('q', ''));
         $category = trim((string) $this->request->get('category', ''));
@@ -135,6 +140,7 @@ class ProductController extends Controller
             ]),
             'categories' => $categoryQuery->orderBy('category')->column(),
             'canManageProducts' => $canManageProducts,
+            'canViewProducts' => $canViewProducts,
             'status' => $status,
         ]);
     }

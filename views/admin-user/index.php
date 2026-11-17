@@ -86,6 +86,13 @@ foreach ($roles as $role) {
                 'format' => 'raw',
                 'value' => static function (User $user): string {
                     $actions = [];
+                    if (Yii::$app->user->can('user.view')) {
+                        $actions[] = Html::a('View', ['/admin-user/view', 'id' => $user->id], [
+                            'class' => 'btn btn-sm btn-outline-secondary',
+                            'aria-label' => 'View account details for ' . $user->username,
+                        ]);
+                    }
+
                     if (
                         Yii::$app->user->can('user.update')
                         && Yii::$app->user->can('user.view')
