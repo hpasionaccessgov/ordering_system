@@ -9,6 +9,61 @@ use Yii;
 final class RbacPermissionPolicy
 {
     /**
+     * Role-entry permissions that control feature bundles in the role editor.
+     *
+     * @var array<string, list<string>>
+     */
+    private const ACCESS_DEPENDENTS = [
+        'admin.access' => [
+            'staff.access',
+            'customer.access',
+            'user.assignRole',
+            'user.index',
+            'user.view',
+            'user.create',
+            'user.update',
+            'user.delete',
+            'product.index',
+            'product.view',
+            'product.create',
+            'product.update',
+            'product.archive',
+            'product.delete',
+            'order.index',
+            'order.view',
+            'order.create',
+            'order.update',
+            'order.cancel',
+            'order.process',
+            'order.receipt.print',
+        ],
+        'staff.access' => [
+            'product.index',
+            'product.view',
+            'product.create',
+            'product.update',
+            'product.archive',
+            'product.delete',
+            'order.index',
+            'order.view',
+            'order.create',
+            'order.update',
+            'order.cancel',
+            'order.process',
+            'order.receipt.print',
+        ],
+        'customer.access' => [
+            'product.index',
+            'product.view',
+            'order.index',
+            'order.view',
+            'order.create',
+            'order.update',
+            'order.cancel',
+        ],
+    ];
+
+    /**
      * Module permissions controlled by each module's index checkbox.
      *
      * @var array<string, list<string>>
@@ -54,6 +109,14 @@ final class RbacPermissionPolicy
     /**
      * @return array<string, list<string>>
      */
+    public static function accessDependents(): array
+    {
+        return self::ACCESS_DEPENDENTS;
+    }
+
+    /**
+     * @return array<string, list<string>>
+     */
     public static function viewDependents(): array
     {
         return self::VIEW_DEPENDENTS;
@@ -63,9 +126,27 @@ final class RbacPermissionPolicy
      * @param list<string> $permissionNames
      * @return list<string>
      */
-    public static function normalizeRolePermissions(array $permissionNames): array
+    public static function normalizeRolePermissions(array $permissionNames, ?string $roleName = null): array
     {
         $selected = array_fill_keys($permissionNames, true);
+
+        foreach (self::ACCESS_DEPENDENTS as $accessPermission => $dependentPermissions) {
+            if (!isset($selected[$accessPermission])) {
+                if ($accessPermission === 'admin.access' && $roleName !== 'admin') {
+                    continue;
+                }
+
+                foreach ($dependentPermissions as $dependentPermission) {
+                    unset($selected[$dependentPermission]);
+                }
+
+                continue;
+            }
+
+            foreach ($dependentPermissions as $dependentPermission) {
+                $selected[$dependentPermission] = true;
+            }
+        }
 
         foreach (self::INDEX_DEPENDENTS as $indexPermission => $dependentPermissions) {
             if (isset($selected[$indexPermission])) {
@@ -100,6 +181,22 @@ final class RbacPermissionPolicy
 
         $selected[$indexPermission] = true;
         foreach (self::INDEX_DEPENDENTS[$indexPermission] ?? [] as $dependentPermission) {
+            $selected[$dependentPermission] = true;
+        }
+
+        return array_keys($selected);
+    }
+
+    /**
+     * @param list<string> $permissionNames
+     * @return list<string>
+     */
+    public static function expandAccessPermission(string $accessPermission, array $permissionNames): array
+    {
+        $selected = array_fill_keys($permissionNames, true);
+        $selected[$accessPermission] = true;
+
+        foreach (self::ACCESS_DEPENDENTS[$accessPermission] ?? [] as $dependentPermission) {
             $selected[$dependentPermission] = true;
         }
 

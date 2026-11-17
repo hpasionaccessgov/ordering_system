@@ -9,6 +9,10 @@ use yii\helpers\Html;
 /** @var RoleForm $roleForm */
 
 $this->title = 'Roles';
+$accessDependenciesJson = json_encode(
+    RbacPermissionPolicy::accessDependents(),
+    JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT,
+);
 $indexDependenciesJson = json_encode(
     RbacPermissionPolicy::indexDependents(),
     JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT,
@@ -19,6 +23,7 @@ $viewDependenciesJson = json_encode(
 );
 $this->registerJs(<<<JS
 (() => {
+    const accessDependencies = {$accessDependenciesJson};
     const indexDependencies = {$indexDependenciesJson};
     const viewDependencies = {$viewDependenciesJson};
     document.querySelectorAll('form[data-role-permission-form]').forEach(form => {
@@ -35,7 +40,7 @@ $this->registerJs(<<<JS
             const assignRole = permissionByName.get('user.assignRole');
             recoveryWarning.classList.toggle(
                 'd-none',
-                !adminAccess || !assignRole || adminAccess.checked || assignRole.checked,
+                !adminAccess || !assignRole || (adminAccess.checked && assignRole.checked),
             );
         };
 
@@ -43,6 +48,15 @@ $this->registerJs(<<<JS
             const input = event.target;
             if (!(input instanceof HTMLInputElement) || !input.matches('input[name="permissions[]"]')) {
                 return;
+            }
+
+            if (accessDependencies[input.dataset.permission]) {
+                accessDependencies[input.dataset.permission].forEach(name => {
+                    const dependent = permissionByName.get(name);
+                    if (dependent) {
+                        dependent.checked = input.checked;
+                    }
+                });
             }
 
             if (indexDependencies[input.dataset.permission]) {
@@ -89,11 +103,11 @@ $permissions = $auth->getPermissions();
 $roles = $auth->getRoles();
 $permissionModuleLabels = [
     'admin' => 'Administration',
+    'staff' => 'Staff',
+    'customer' => 'Customers',
     'user' => 'Users',
     'product' => 'Products',
     'order' => 'Orders',
-    'staff' => 'Staff',
-    'customer' => 'Customers',
 ];
 $permissionDescriptions = [
     'admin.access' => 'Access the administrator dashboard.',
@@ -183,10 +197,6 @@ uksort($permissionGroups, static function (string $left, string $right) use ($mo
             Create a new role to assign permissions to users. Role names must be unique and use lowercase letters,
             numbers, dots, dashes, or underscores.
         </p>
-        <p class="small text-body-secondary mt-2 mb-0">
-            Administrative task will not be available if this module <code>admin.access</code> nor <code>user.assignRole</code> is unchecked, Restore administrator access from the console with
-            <code>php yii rbac/restore-admin-access</code>.
-        </p>
     </div>
 </section>
 
@@ -227,13 +237,12 @@ uksort($permissionGroups, static function (string $left, string $right) use ($mo
                     <h3 class="small text-uppercase text-body-secondary">Permissions</h3>
                     <?php $children = array_keys($auth->getChildren($role->name)); ?>
                     <p class="small text-body-secondary">
-                        Index permissions control module access and lists. View permissions control individual
-                        records. Hover over a permission for details.
+                        Access permissions are master switches for feature bundles. Index permissions control
+                        module lists, while view permissions control individual records.
                     </p>
                     <?php if ($role->name === 'admin') : ?>
                         <div class="alert alert-warning small d-none" data-admin-recovery-warning role="alert">
-                            The administrator role has neither <code>admin.access</code> nor
-                            <code>user.assignRole</code>. Restore administrator access from the console with
+                            Administrator access or role management is disabled. Restore both from the console with
                             <code>php yii rbac/restore-admin-access</code>.
                         </div>
                     <?php endif; ?>

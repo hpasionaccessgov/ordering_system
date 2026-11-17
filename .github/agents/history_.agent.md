@@ -54,6 +54,8 @@ Individual permissions remain editable after the module view checkbox is enabled
 
 The role editor also enables the module's `*.index` permission when an action permission such as `user.update` or `product.delete` is selected, so the corresponding module remains visible in navigation. Permission inputs expose descriptions through hover tooltips. The built-in admin role displays a recovery warning when both `admin.access` and `user.assignRole` are unchecked.
 
+The role editor treats `admin.access`, `staff.access`, and `customer.access` as master switches. Enabling one selects its configured feature bundle; disabling one clears that bundle. The built-in admin role's bundle includes administrator, staff, customer, product, order, and user permissions, while customer and staff bundles remain narrower.
+
 ### Admin access recovery
 
 - A new migration, `m261117_090000_add_resource_index_permissions.php`, adds the three index permissions, preserves existing list access based on prior permissions, and restores essential permissions on the built-in admin role.
@@ -66,7 +68,7 @@ The role editor also enables the module's `*.index` permission when an action pe
   ```
 
 - The recovery helper is also used by `RbacController::actionMakeAdmin()`, admin account creation/role assignment, and `commands/seeders/UserSeeder.php`.
-- Recovery repairs only the two essential admin-role permissions; it does not restore every other permission that may have been removed.
+- Recovery restores the admin master permission and its configured administrator bundle, including `user.assignRole`, so the role editor remains usable after accidental lockout.
 - The role editor warns administrators about the recovery command. Avoid adding protections that silently re-add every checkbox selection; explicit role configuration remains supported.
 
 ## Important files for this work

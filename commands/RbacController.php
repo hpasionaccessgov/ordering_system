@@ -59,7 +59,7 @@ class RbacController extends Controller
             throw $exception;
         }
 
-        $this->stdout("Restored admin.access and user.assignRole on the admin role.\n");
+        $this->stdout("Restored the admin access bundle on the admin role.\n");
 
         return ExitCode::OK;
     }

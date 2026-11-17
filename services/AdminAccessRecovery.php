@@ -19,7 +19,12 @@ final class AdminAccessRecovery
             throw new InvalidConfigException('The admin RBAC role is missing. Run the RBAC migrations first.');
         }
 
-        foreach (['admin.access', 'user.assignRole'] as $permissionName) {
+        $permissionsToRestore = array_merge(
+            ['admin.access'],
+            RbacPermissionPolicy::accessDependents()['admin.access'],
+        );
+
+        foreach (array_unique($permissionsToRestore) as $permissionName) {
             $permission = $auth->getPermission($permissionName);
             if ($permission === null) {
                 $permission = $auth->createPermission($permissionName);
