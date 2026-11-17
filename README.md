@@ -3,6 +3,7 @@
         <source media="(prefers-color-scheme: dark)" srcset="https://www.yiiframework.com/image/design/logo/yii3_full_for_dark.svg">
         <source media="(prefers-color-scheme: light)" srcset="https://www.yiiframework.com/image/design/logo/yii3_full_for_light.svg">
         <img src="https://www.yiiframework.com/image/design/logo/yii3_full_for_light.svg" alt="Yii Framework" height="100">
+        <img src="web\Cafebara_logo.png" alt="Cafebara Logo" height="100">
     </picture>
     <h1 align="center">Ordering System</h1>
     <br>
@@ -11,21 +12,23 @@
 A Yii2 basic application for ordering system. This application is built using Yii2 framework and provides a simple ordering system for products.
 
 ## Requirements
+
 - PHP 8.2 or higher
 - Composer
-- MySQL 8.0.30
+- MariaDB 10.4+ or MySQL 8.0+
 - Git
-OR Install Laragon v6 for all in one universal pack (https://laragon.org/download/)
+  OR Install Laragon v6 for all in one universal pack (https://laragon.org/download/)
 
 ## Local setup
+
 1. Clone the repository:
-   ```bash
-   git clone <repository-url>
+    ```bash
+    git clone <repository-url>
     ```
 2. Install local dependencies:
-   ```bash
-   composer install && npm install
-   ```
+    ```bash
+    composer install && npm install
+    ```
 3. Create a `.env` file in the root directory of the project and configure your database connection settings, You can use the provided `.env.example` file as a template
 4. Create the database:
     ```bash
@@ -35,24 +38,25 @@ OR Install Laragon v6 for all in one universal pack (https://laragon.org/downloa
     ```bash
     CREATE DATABASE ordering_system
     CHARACTER SET utf8mb4
-    COLLATE utf8mb4_0900_ai_ci;
+    COLLATE utf8mb4_unicode_ci;
     ```
-5. Create Yii's RBAC tables, then run the application migrations:
-   ```bash
-   php yii migrate --migrationPath=@yii/rbac/migrations
-   php yii migrate
-   ```
+5. Run the application migrations:
+    ```bash
+    php yii migrate --interactive=0
+    ```
 6. Start the development server:
-   ```bash
-   php yii serve
-   ```
-   OR use the laragon GUI to start the server.
+    ```bash
+    php yii serve
+    ```
+    OR use the laragon GUI to start the server.
 7. Start the laragon apache and MySQL services, then open the link: http://localhost/ordering_system/web/
 8. Register a new account. Registration activates the account and signs you in immediately; new accounts receive the Customer role.
 9. Promote your first account to Admin from the project directory:
-   ```bash
-   php yii rbac/make-admin your-email@example.com
-   ```
-10. Sign in again or refresh the application. Admins can assign Admin, Staff, and Customer roles from the **User roles** link in the dashboard sidebar.
-
-The Admin, Staff, and Customer dashboards are protected by Yii RBAC. Product and order workflows are not implemented yet; their dashboard cards are placeholders until those modules and their ownership checks are added.
+    ```bash
+    php yii rbac/make-admin your-email@example.com
+    ```
+    OR run the seeder to create an seeded users account such as customer, staff, and admin:
+    ```bash
+    php yii seed/test-data
+    ```
+10. Sign in or reload your page to see the admin dashboard link in the navigation bar. The admin dashboard is accessible only to users with the Admin role.

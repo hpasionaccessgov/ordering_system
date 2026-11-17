@@ -2,71 +2,126 @@
 
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
+/** @var yii\rbac\Role[] $roles */
 
 use app\models\User;
-use app\widgets\AdminButton;
 use app\widgets\AdminGridView;
 use yii\helpers\Html;
 
-$this->title = 'User roles';
+$this->title = 'User list';
+$roleOptions = ['' => 'Select role'];
+foreach ($roles as $role) {
+    $roleOptions[$role->name] = $role->description !== ''
+        ? $role->description . ' (' . $role->name . ')'
+        : ucfirst($role->name);
+}
 ?>
 
-<div class="card">
-    <div class="card-header">
-        <h1 class="h5 mb-0">User roles</h1>
+<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Administration</p>
+        <h1 class="h3 mb-0">User list</h1>
     </div>
-    <div class="card-body border-bottom">
-        <p class="text-body-secondary mb-0">
-            Assign one role per account. New registrations are always assigned the Customer role.
-            You cannot change your own role or demote the last administrator.
-        </p>
+    <?php if (Yii::$app->user->can('user.create')) : ?>
+        <?= Html::a('Create account', ['/admin-user/create'], ['class' => 'btn btn-primary']) ?>
+    <?php endif; ?>
+</div>
+
+<section class="card admin-panel">
+    <div class="card-header">
+        <p class="text-body-secondary mb-0">Review account details, roles, and access.</p>
     </div>
     <?= AdminGridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
             'id',
-            'username',
+            [
+                'attribute' => 'username',
+                'format' => 'raw',
+                'value' => static function (User $user): string {
+                    if (!Yii::$app->user->can('user.view')) {
+                        return Html::encode($user->username);
+                    }
+
+                    return Html::a(
+                        Html::encode($user->username),
+                        ['/admin-user/view', 'id' => $user->id],
+                    );
+                },
+            ],
+            'full_name',
             'email:email',
             [
                 'label' => 'Role',
                 'format' => 'raw',
-                'value' => static function (User $user): string {
-                    $roles = Yii::$app->authManager->getRolesByUser($user->id);
-                    $selectedRole = count($roles) === 1 ? array_key_first($roles) : '';
+                'value' => static function (User $user) use ($roleOptions): string {
+                    $auth = Yii::$app->authManager;
+                    $assigned = $auth->getRolesByUser($user->id);
+                    $selected = count($assigned) === 1 ? array_key_first($assigned) : '';
+
+                    if (!Yii::$app->user->can('user.assignRole')) {
+                        return Html::encode(implode(', ', array_keys($assigned)) ?: 'No role assigned');
+                    }
 
                     if ((string) $user->id === (string) Yii::$app->user->id) {
-                        return Html::tag(
-                            'span',
-                            Html::encode($selectedRole === '' ? 'Multiple or unassigned' : ucfirst($selectedRole))
-                                . ' (current account)',
-                            ['class' => 'text-body-secondary'],
-                        );
+                        return '<span class="text-body-secondary">Current account</span>';
                     }
 
                     return Html::beginForm(
                         ['/admin-user/assign-role', 'id' => $user->id],
                         'post',
-                        ['class' => 'd-flex gap-2 align-items-center'],
+                        ['class' => 'd-flex flex-wrap gap-2 role-assignment-form'],
                     )
-                        . Html::dropDownList(
-                            'role',
-                            $selectedRole,
-                            [
-                                '' => 'Select role',
-                                'admin' => 'Admin',
-                                'staff' => 'Staff',
-                                'customer' => 'Customer',
-                            ],
-                            [
-                                'class' => 'form-select form-select-sm',
-                                'aria-label' => 'Role for ' . $user->username,
-                                'required' => true,
-                            ],
-                        )
-                        . AdminButton::submit('Save', 'primary', ['class' => 'btn-sm'])
+                        . Html::dropDownList('role', $selected, $roleOptions, [
+                            'class' => 'form-select form-select-sm',
+                            'required' => true,
+                            'aria-label' => 'Role for ' . $user->username,
+                        ])
+                        . Html::submitButton('Save', ['class' => 'btn btn-sm btn-primary'])
                         . Html::endForm();
+                },
+            ],
+            [
+                'label' => 'Actions',
+                'format' => 'raw',
+                'value' => static function (User $user): string {
+                    $actions = [];
+                    if (Yii::$app->user->can('user.view')) {
+                        $actions[] = Html::a('View', ['/admin-user/view', 'id' => $user->id], [
+                            'class' => 'btn btn-sm btn-outline-secondary',
+                            'aria-label' => 'View account details for ' . $user->username,
+                        ]);
+                    }
+
+                    if (
+                        Yii::$app->user->can('user.update')
+                        && Yii::$app->user->can('user.view')
+                    ) {
+                        $actions[] = Html::a('Edit', ['/admin-user/update', 'id' => $user->id], [
+                            'class' => 'btn btn-sm btn-outline-primary',
+                            'aria-label' => 'Edit personal data for ' . $user->username,
+                        ]);
+                    }
+
+                    if (
+                        Yii::$app->user->can('user.delete')
+                        && (string) $user->id !== (string) Yii::$app->user->id
+                    ) {
+                        $actions[] = Html::beginForm(
+                            ['/admin-user/delete', 'id' => $user->id],
+                            'post',
+                            ['class' => 'd-inline'],
+                        )
+                            . Html::submitButton('Delete', [
+                                'class' => 'btn btn-sm btn-outline-danger',
+                                'data-confirm-modal' => 'Permanently delete this account? Accounts with order history cannot be deleted.',
+                            ])
+                            . Html::endForm();
+                    }
+
+                    return implode(' ', $actions);
                 },
             ],
         ],
     ]) ?>
-</div>
+</section>

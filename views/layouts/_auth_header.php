@@ -12,7 +12,7 @@ $otherAuthLabel = $actionId === 'login' ? 'Create account' : 'Sign in';
     <nav class="navbar">
         <div class="container">
             <?= Html::a(
-                Html::img(Yii::getAlias('@web/images/Cafebara_logo.png'), [
+                Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                     'alt' => '',
                     'class' => 'cafebara-brand-logo',
                 ]) . Html::tag('span', 'Cafébara', ['class' => 'cafebara-brand-name']),

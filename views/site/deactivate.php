@@ -2,7 +2,7 @@
 
 use app\models\DeactivateForm;
 use app\widgets\AdminActiveForm;
-use app\widgets\AdminButton;
+use yii\helpers\Html;
 
 /** @var DeactivateForm $model */
 
@@ -28,7 +28,7 @@ $this->title = 'Deactivate account';
                     ->passwordInput()
                     ->label('Confirm your current password') ?>
 
-                <?= AdminButton::submit('Deactivate my account', 'danger') ?>
+                <?= Html::submitButton('Deactivate my account', ['class' => 'btn btn-danger']) ?>
 
                 <?php AdminActiveForm::end(); ?>
             </div>

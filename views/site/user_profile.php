@@ -3,7 +3,6 @@
 use app\models\ProfileForm;
 use app\models\User;
 use app\widgets\AdminActiveForm;
-use app\widgets\AdminButton;
 use yii\helpers\Html;
 
 /** @var User $user */
@@ -32,7 +31,7 @@ $this->title = 'My Profile';
 
                 <?= $form->field($model, 'fullName')->textInput(['maxlength' => true]) ?>
 
-                <?= AdminButton::submit('Save profile') ?>
+                <?= Html::submitButton('Save profile', ['class' => 'btn btn-primary']) ?>
 
                 <?php AdminActiveForm::end(); ?>
             </div>
@@ -44,12 +43,12 @@ $this->title = 'My Profile';
             </div>
 
             <div class="card-body d-flex flex-wrap gap-2">
-                <?= AdminButton::link('Change password', ['/site/change-password'], 'outline-primary') ?>
+                <?= Html::a('Change password', ['/site/change-password'], ['class' => 'btn btn-outline-primary']) ?>
 
-                <?= AdminButton::link('Deactivate account', ['/site/deactivate'], 'outline-danger') ?>
+                <?= Html::a('Deactivate account', ['/site/deactivate'], ['class' => 'btn btn-outline-danger']) ?>
 
                 <?= Html::beginForm(['/site/logout'], 'post', ['class' => 'd-inline']) ?>
-                <?= AdminButton::submit('Logout', 'outline-warning') ?>
+                <?= Html::submitButton('Logout', ['class' => 'btn btn-outline-warning']) ?>
                 <?= Html::endForm() ?>
             </div>
         </div>

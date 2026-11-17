@@ -40,3 +40,6 @@ tests/_support/_generated
 .env
 .env.*
 !.env.example
+
+# github md files
+# .github/agents/

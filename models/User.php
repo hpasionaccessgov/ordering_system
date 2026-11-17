@@ -8,7 +8,6 @@ use Override;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
-use yii\base\BaseObject;
 use yii\web\IdentityInterface;
 
 class User extends ActiveRecord implements IdentityInterface
@@ -16,6 +15,7 @@ class User extends ActiveRecord implements IdentityInterface
     public const STATUS_INACTIVE = 0;
     public const STATUS_ACTIVE = 10;
     public const STATUS_DISABLED = 20;
+    public const SCENARIO_ADMIN_PROFILE_UPDATE = 'adminProfileUpdate';
 
     public static function tableName(): string
     {
@@ -50,6 +50,14 @@ class User extends ActiveRecord implements IdentityInterface
         ];
     }
 
+    public function scenarios(): array
+    {
+        $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_ADMIN_PROFILE_UPDATE] = ['username', 'email', 'full_name', 'status'];
+
+        return $scenarios;
+    }
+
     public static function findIdentity($id): ?static
     {
         return static::findOne([
@@ -65,9 +73,25 @@ class User extends ActiveRecord implements IdentityInterface
     public static function findByUsername($username): ?static
     {
         return static::findOne([
-            'username' => $username,
+            'username' => trim($username),
             'status' => self::STATUS_ACTIVE,
         ]);
+    }
+
+    public static function findByLoginIdentifier(string $identifier): ?static
+    {
+        $identifier = trim($identifier);
+
+        return static::find()
+            ->where([
+                'status' => self::STATUS_ACTIVE,
+            ])
+            ->andWhere([
+                'or',
+                ['username' => $identifier],
+                ['email' => mb_strtolower($identifier)],
+            ])
+            ->one();
     }
 
     public function getId(): int|string

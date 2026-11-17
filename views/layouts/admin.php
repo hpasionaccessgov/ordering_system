@@ -8,6 +8,7 @@ declare(strict_types=1);
 use app\assets\AdminLteAsset;
 use app\assets\CafebaraThemeAsset;
 use app\widgets\Alert;
+use app\widgets\ConfirmModal;
 use yii\helpers\Html;
 
 AdminLteAsset::register($this);
@@ -31,13 +32,13 @@ $this->registerMetaTag([
 <?php $this->beginBody() ?>
 
 <div class="app-wrapper">
-    <?= $this->render('_admin_header') ?>
-    <?= $this->render('_admin_sidebar') ?>
+    <?= $this->render('_header') ?>
+    <?= $this->render('_sidebar') ?>
 
     <main class="app-main">
         <div class="app-content-header">
             <div class="container-fluid">
-                <h1 class="mb-0 fs-3"><?= Html::encode($this->title) ?></h1>
+                <span class="visually-hidden"><?= Html::encode($this->title) ?></span>
             </div>
         </div>
 
@@ -53,6 +54,8 @@ $this->registerMetaTag([
         <strong>&copy; <?= date('Y') ?> <?= Html::encode(Yii::$app->name) ?></strong>
     </footer>
 </div>
+
+<?= ConfirmModal::widget() ?>
 
 <?php $this->endBody() ?>
 </body>

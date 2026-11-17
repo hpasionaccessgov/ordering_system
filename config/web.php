@@ -33,6 +33,11 @@ $config = [
         'cache' => [
             'class' => \yii\caching\FileCache::class,
         ],
+        'formatter' => [
+            'class' => \yii\i18n\Formatter::class,
+            'locale' => 'en_PH',
+            'currencyCode' => 'PHP',
+        ],
         'user' => [
             'identityClass' => \app\models\User::class,
             'enableAutoLogin' => true,

@@ -5,26 +5,27 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use Yii;
+use app\filters\StaffAccessFilter;
 use app\models\ContactForm;
 use app\models\LoginForm;
 use app\models\RegisterForm;
 use app\models\User;
+use app\models\ChangePasswordForm;
+use app\models\ProfileForm;
+use app\models\DeactivateForm;
+use app\models\Product;
+use yii\web\Controller;
+use yii\web\ErrorAction;
+use yii\web\Response;
+use yii\web\ForbiddenHttpException;
 use yii\captcha\CaptchaAction;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\base\Security;
 use yii\mail\MailerInterface;
-use yii\web\Controller;
-use yii\web\ErrorAction;
-use yii\web\Response;
-use app\models\ChangePasswordForm;
-use app\models\ProfileForm;
-use yii\web\ForbiddenHttpException;
-use app\models\DeactivateForm;
 
 class SiteController extends Controller
 {
-
     private function getCurrentUser(): User
     {
         $user = Yii::$app->user->identity;
@@ -52,6 +53,10 @@ class SiteController extends Controller
     public function behaviors(): array
     {
         return [
+            'staffAccess' => [
+                'class' => StaffAccessFilter::class,
+                'only' => ['profile', 'change-password', 'deactivate', 'dashboard'],
+            ],
             'access' => [
                 'class' => AccessControl::class,
                 'only' => ['logout', 'profile', 'change-password', 'deactivate', 'dashboard'],
@@ -99,7 +104,16 @@ class SiteController extends Controller
      */
     public function actionIndex(): string
     {
-        return $this->render('index');
+        return $this->render('index', [
+            'featuredProducts' => Product::find()
+                ->where([
+                    'status' => Product::STATUS_ACTIVE,
+                    'is_featured' => true,
+                ])
+                ->orderBy(['name' => SORT_ASC])
+                ->limit(6)
+                ->all(),
+        ]);
     }
 
     /**
@@ -207,7 +221,7 @@ class SiteController extends Controller
         return $this->render('login', ['model' => $model]);
     }
 
-    /** 
+    /**
      * Dashboard action
      * @return Response|string
      */
@@ -227,12 +241,17 @@ class SiteController extends Controller
             return $this->redirect(['/customer/dashboard']);
         }
 
-        throw new ForbiddenHttpException('No application role is assigned to this account.');
+        Yii::$app->session->setFlash(
+            'warning',
+            'No dashboard is enabled for your account. You were returned to the public home page.',
+        );
+
+        return $this->redirect(['/site/index']);
     }
 
-    /** 
+    /**
      * Profile action
-     * 
+     *
      * @return Response|string
      */
     public function actionProfile(): Response|string
@@ -245,8 +264,9 @@ class SiteController extends Controller
             $user->full_name = $model->fullName;
 
             if ($user->save(false, ['full_name', 'updated_at'])) {
-                Yii::$app->session->setFlash('success', 'Your profile was update.');
-                return $this->refresh();
+                Yii::$app->session->setFlash('success', 'Your profile was updated.');
+
+                return $this->redirect(['profile']);
             }
 
             Yii::error("Could not update profile for user ID {$user->id}.", __METHOD__);
@@ -261,7 +281,7 @@ class SiteController extends Controller
 
     /**
      * Change password action
-     * 
+     *
      * @return Response|string
      */
     public function actionChangePassword(): Response|string
@@ -290,9 +310,9 @@ class SiteController extends Controller
         return $this->render('change_password', ['model' => $model]);
     }
 
-    /** 
+    /**
      * Deaction aciton
-     * 
+     *
      * @return Response|string
      */
     public function actionDeactivate(): Response|string

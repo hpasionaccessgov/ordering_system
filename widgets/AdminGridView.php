@@ -14,10 +14,14 @@ class AdminGridView extends GridView
     ];
 
     public $tableOptions = [
-        'class' => 'table table-hover align-middle mb-0',
+        'class' => 'table table-striped table-hover align-middle mb-0 cafebara-data-table',
     ];
 
-    public $layout = "{items}\n<div class=\"d-flex justify-content-end p-3\">{pager}</div>";
+    public $layout = "{summary}\n{items}\n<div class=\"d-flex justify-content-end p-3\">{pager}</div>";
+
+    public $summaryOptions = [
+        'class' => 'px-3 pt-3 mb-0 text-body-secondary small',
+    ];
 
     public $pager = [
         'class' => LinkPager::class,

@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\filters\StaffAccessFilter;
+use app\models\Order;
+use app\models\Product;
+use app\models\User;
+use app\services\OrderStatistics;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 
@@ -12,6 +17,9 @@ class AdminController extends Controller
     public function behaviors(): array
     {
         return [
+            'staffAccess' => [
+                'class' => StaffAccessFilter::class,
+            ],
             'access' => [
                 'class' => AccessControl::class,
                 'rules' => [
@@ -28,6 +36,12 @@ class AdminController extends Controller
     {
         $this->layout = 'admin';
 
-        return $this->render('dashboard');
+        return $this->render('dashboard', [
+            'userCount' => (int) User::find()->count(),
+            'activeUserCount' => (int) User::find()->where(['status' => User::STATUS_ACTIVE])->count(),
+            'productCount' => (int) Product::find()->where(['status' => Product::STATUS_ACTIVE])->count(),
+            'pendingOrderCount' => (int) Order::find()->where(['status' => Order::STATUS_PENDING])->count(),
+            'orderStatusCounts' => OrderStatistics::statusCounts(),
+        ]);
     }
 }

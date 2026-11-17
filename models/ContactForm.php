@@ -7,9 +7,6 @@ namespace app\models;
 use yii\base\Model;
 use yii\mail\MailerInterface;
 
-/**
- * ContactForm is the model behind the contact form.
- */
 class ContactForm extends Model
 {
     public string $name = '';

@@ -6,6 +6,7 @@ declare(strict_types=1);
 /** @var string $content */
 
 use app\widgets\Alert;
+use app\widgets\ConfirmModal;
 use yii\bootstrap5\Breadcrumbs;
 use yii\helpers\Html;
 
@@ -21,7 +22,7 @@ $this->render('_head');
 <body class="d-flex flex-column h-100">
 <?php $this->beginBody() ?>
 
-<?= $this->render('_header') ?>
+<?= $this->render('_public_header') ?>
 
 <main id="main" class="flex-grow-1" role="main">
     <div class="container">
@@ -35,6 +36,8 @@ $this->render('_head');
 </main>
 
 <?= $this->render('_footer') ?>
+
+<?= ConfirmModal::widget() ?>
 
 <?php $this->endBody() ?>
 </body>
