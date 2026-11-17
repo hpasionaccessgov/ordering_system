@@ -66,6 +66,9 @@ final class RbacPermissionPolicyTest extends Unit
         self::assertContains('customer.access', $customerPermissions);
         self::assertContains('order.create', $customerPermissions);
         self::assertNotContains('product.delete', $customerPermissions);
+        $staffPermissions = RbacPermissionPolicy::normalizeRolePermissions(['staff.access'], 'staff');
+        self::assertContains('product.update', $staffPermissions);
+        self::assertContains('order.process', $staffPermissions);
         self::assertSame(
             [],
             RbacPermissionPolicy::normalizeRolePermissions(['product.view'], 'cashier'),

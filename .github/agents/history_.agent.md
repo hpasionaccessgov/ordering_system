@@ -56,6 +56,8 @@ The role editor also enables the module's `*.index` permission when an action pe
 
 The role editor treats `admin.access`, `staff.access`, and `customer.access` as master switches. Enabling one selects its configured feature bundle; disabling one clears that bundle. The built-in admin role's bundle includes administrator, staff, customer, product, order, and user permissions, while customer and staff bundles remain narrower.
 
+When access bundles overlap on product/order permissions, server-side normalization preserves permissions owned by any active access master, so saving `staff.access` does not lose its staff feature bundle because `customer.access` is absent.
+
 ### Admin access recovery
 
 - A new migration, `m261117_090000_add_resource_index_permissions.php`, adds the three index permissions, preserves existing list access based on prior permissions, and restores essential permissions on the built-in admin role.

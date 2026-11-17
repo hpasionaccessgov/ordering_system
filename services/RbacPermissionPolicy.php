@@ -129,6 +129,10 @@ final class RbacPermissionPolicy
     public static function normalizeRolePermissions(array $permissionNames, ?string $roleName = null): array
     {
         $selected = array_fill_keys($permissionNames, true);
+        $activeAccessPermissions = array_keys(array_intersect_key(
+            self::ACCESS_DEPENDENTS,
+            $selected,
+        ));
 
         foreach (self::ACCESS_DEPENDENTS as $accessPermission => $dependentPermissions) {
             if (!isset($selected[$accessPermission])) {
@@ -137,6 +141,24 @@ final class RbacPermissionPolicy
                 }
 
                 foreach ($dependentPermissions as $dependentPermission) {
+                    $ownedByActiveAccess = false;
+                    foreach ($activeAccessPermissions as $activeAccessPermission) {
+                        if (
+                            in_array(
+                                $dependentPermission,
+                                self::ACCESS_DEPENDENTS[$activeAccessPermission],
+                                true,
+                            )
+                        ) {
+                            $ownedByActiveAccess = true;
+                            break;
+                        }
+                    }
+
+                    if ($ownedByActiveAccess) {
+                        continue;
+                    }
+
                     unset($selected[$dependentPermission]);
                 }
 
