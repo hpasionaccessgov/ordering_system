@@ -7,11 +7,15 @@ use app\services\RbacPermissionPolicy;
 
 $currentRoute = Yii::$app->controller->route;
 $staffAccessDisabled = RbacPermissionPolicy::isStaffAccessDisabledForCurrentUser();
+$hasDashboardAccess = Yii::$app->user->can('admin.access')
+    || Yii::$app->user->can('staff.access')
+    || Yii::$app->user->can('customer.access');
 $dashboardRoute = match (true) {
     Yii::$app->user->can('admin.access') => ['/admin/dashboard'],
     $staffAccessDisabled => ['/site/index'],
     Yii::$app->user->can('staff.access') => ['/staff/dashboard'],
-    default => ['/customer/dashboard'],
+    Yii::$app->user->can('customer.access') => ['/customer/dashboard'],
+    default => ['/site/index'],
 };
 $dashboardRouteName = ltrim($dashboardRoute[0], '/');
 ?>
@@ -32,7 +36,9 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
             <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" data-accordion="false">
                 <li class="nav-item">
                     <?= Html::a(
-                        '<i class="nav-icon bi bi-house"></i><p>Home</p>',
+                        '<i class="nav-icon bi bi-house"></i><p>'
+                            . ($hasDashboardAccess ? 'Dashboard' : 'Home')
+                            . '</p>',
                         $dashboardRoute,
                         ['class' => 'nav-link' . ($currentRoute === $dashboardRouteName ? ' active' : '')],
                     ) ?>

@@ -54,9 +54,7 @@ Individual permissions remain editable after the module view checkbox is enabled
 
 The role editor also enables the module's `*.index` permission when an action permission such as `user.update` or `product.delete` is selected, so the corresponding module remains visible in navigation. Permission inputs expose descriptions through hover tooltips. The built-in admin role displays a recovery warning when both `admin.access` and `user.assignRole` are unchecked.
 
-The role editor treats `admin.access`, `staff.access`, and `customer.access` as master switches. Enabling one selects its configured feature bundle; disabling one clears that bundle. The built-in admin role's bundle includes administrator, staff, customer, product, order, and user permissions, while customer and staff bundles remain narrower.
-
-When access bundles overlap on product/order permissions, server-side normalization preserves permissions owned by any active access master, so saving `staff.access` does not lose its staff feature bundle because `customer.access` is absent.
+The role editor treats `admin.access`, `staff.access`, and `customer.access` as independent role-entry permissions. They control dashboard/context access only; module permissions remain separately configurable.
 
 ### Admin access recovery
 

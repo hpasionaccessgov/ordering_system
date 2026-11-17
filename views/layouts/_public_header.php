@@ -15,6 +15,9 @@ $navigationItems = [
 ];
 $user = Yii::$app->user->identity;
 $staffAccessDisabled = RbacPermissionPolicy::isStaffAccessDisabledForCurrentUser();
+$hasDashboardAccess = Yii::$app->user->can('admin.access')
+    || Yii::$app->user->can('staff.access')
+    || Yii::$app->user->can('customer.access');
 $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
     'alt' => '',
     'class' => 'cafebara-brand-logo',
@@ -68,8 +71,8 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                         ]) ?>
                     <?php else: ?>
                         <?= Html::a(
-                            $staffAccessDisabled ? 'Home' : 'Dashboard',
-                            $staffAccessDisabled ? ['/site/index'] : ['/site/dashboard'],
+                            $hasDashboardAccess ? 'Dashboard' : 'Home',
+                            $hasDashboardAccess ? ['/site/dashboard'] : ['/site/index'],
                             [
                             'class' => 'btn btn-primary',
                         ]) ?>

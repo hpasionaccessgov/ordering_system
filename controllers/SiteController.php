@@ -241,7 +241,12 @@ class SiteController extends Controller
             return $this->redirect(['/customer/dashboard']);
         }
 
-        throw new ForbiddenHttpException('No application role is assigned to this account.');
+        Yii::$app->session->setFlash(
+            'warning',
+            'No dashboard is enabled for your account. You were returned to the public home page.',
+        );
+
+        return $this->redirect(['/site/index']);
     }
 
     /**

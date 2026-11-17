@@ -93,7 +93,7 @@ class AdminRoleController extends Controller
             throw new BadRequestHttpException('Role name already exists.');
         }
 
-        $permissionNames = $this->normalizePermissionNames($permissionNames, $role->name);
+        $permissionNames = $this->normalizePermissionNames($permissionNames);
 
         $transaction = Yii::$app->db->beginTransaction();
         try {
@@ -147,7 +147,7 @@ class AdminRoleController extends Controller
             throw new BadRequestHttpException('Role or permissions are invalid.');
         }
 
-        $permissionNames = $this->normalizePermissionNames($permissionNames, $role->name);
+        $permissionNames = $this->normalizePermissionNames($permissionNames);
 
         $transaction = Yii::$app->db->beginTransaction();
         try {
@@ -172,7 +172,7 @@ class AdminRoleController extends Controller
      * @param array $permissionNames the raw permission names from the request.
      * @return string[] the validated permission names.
      */
-    private function normalizePermissionNames(array $permissionNames, string $roleName): array
+    private function normalizePermissionNames(array $permissionNames): array
     {
         $auth = Yii::$app->authManager;
         $permissionNames = array_values(array_filter(
@@ -189,7 +189,7 @@ class AdminRoleController extends Controller
             }
         }
 
-        return RbacPermissionPolicy::normalizeRolePermissions($permissionNames, $roleName);
+        return RbacPermissionPolicy::normalizeRolePermissions($permissionNames);
     }
 
     /**

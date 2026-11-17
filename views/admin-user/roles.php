@@ -9,10 +9,6 @@ use yii\helpers\Html;
 /** @var RoleForm $roleForm */
 
 $this->title = 'Roles';
-$accessDependenciesJson = json_encode(
-    RbacPermissionPolicy::accessDependents(),
-    JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT,
-);
 $indexDependenciesJson = json_encode(
     RbacPermissionPolicy::indexDependents(),
     JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT,
@@ -23,7 +19,6 @@ $viewDependenciesJson = json_encode(
 );
 $this->registerJs(<<<JS
 (() => {
-    const accessDependencies = {$accessDependenciesJson};
     const indexDependencies = {$indexDependenciesJson};
     const viewDependencies = {$viewDependenciesJson};
     document.querySelectorAll('form[data-role-permission-form]').forEach(form => {
@@ -40,7 +35,7 @@ $this->registerJs(<<<JS
             const assignRole = permissionByName.get('user.assignRole');
             recoveryWarning.classList.toggle(
                 'd-none',
-                !adminAccess || !assignRole || (adminAccess.checked && assignRole.checked),
+                !adminAccess || !assignRole || adminAccess.checked || assignRole.checked,
             );
         };
 
@@ -48,15 +43,6 @@ $this->registerJs(<<<JS
             const input = event.target;
             if (!(input instanceof HTMLInputElement) || !input.matches('input[name="permissions[]"]')) {
                 return;
-            }
-
-            if (accessDependencies[input.dataset.permission]) {
-                accessDependencies[input.dataset.permission].forEach(name => {
-                    const dependent = permissionByName.get(name);
-                    if (dependent) {
-                        dependent.checked = input.checked;
-                    }
-                });
             }
 
             if (indexDependencies[input.dataset.permission]) {
@@ -237,12 +223,12 @@ uksort($permissionGroups, static function (string $left, string $right) use ($mo
                     <h3 class="small text-uppercase text-body-secondary">Permissions</h3>
                     <?php $children = array_keys($auth->getChildren($role->name)); ?>
                     <p class="small text-body-secondary">
-                        Access permissions are master switches for feature bundles. Index permissions control
-                        module lists, while view permissions control individual records.
+                        Access permissions control dashboard and role context. Index permissions control module
+                        lists, while view permissions control individual records.
                     </p>
                     <?php if ($role->name === 'admin') : ?>
                         <div class="alert alert-warning small d-none" data-admin-recovery-warning role="alert">
-                            Administrator access or role management is disabled. Restore both from the console with
+                            Both administrator access and role management are disabled. Restore them from the console with
                             <code>php yii rbac/restore-admin-access</code>.
                         </div>
                     <?php endif; ?>
