@@ -132,6 +132,8 @@ class AdminRoleController extends Controller
             Yii::$app->authManager->remove($role);
         }
 
+        Yii::$app->session->setFlash('success', "Role '{$name}' was deleted.");
+
         return $this->redirect(['index']);
     }
 

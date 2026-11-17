@@ -1133,10 +1133,27 @@ body {
     min-width: 36rem;
 }
 
-.cafebara-admin-grid .table thead th {
+.cafebara-admin-grid .table,
+.cafebara-data-table {
+    --bs-table-striped-bg: rgba(var(--cafebara-brown-rgb), .07);
+    --bs-table-hover-bg: rgba(var(--cafebara-brown-rgb), .13);
+    --bs-table-hover-color: var(--bs-body-color);
+}
+
+.cafebara-admin-grid .table thead th,
+.cafebara-data-table thead th {
     background-color: var(--cafebara-cream);
     color: var(--cafebara-dark);
     white-space: nowrap;
+    font-size: .75rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.cafebara-admin-grid .table > :not(caption) > * > *,
+.cafebara-data-table > :not(caption) > * > * {
+    padding: .8rem 1rem;
+    vertical-align: middle;
 }
 
 .cafebara-admin-grid .pagination {
@@ -1168,7 +1185,8 @@ body {
     height: 280px;
 }
 
-[data-bs-theme="dark"] .cafebara-admin-grid .table thead th {
+[data-bs-theme="dark"] .cafebara-admin-grid .table thead th,
+[data-bs-theme="dark"] .cafebara-data-table thead th {
     border-bottom-color: var(--bs-border-color);
     background-color: var(--cafebara-surface-raised);
     color: var(--bs-body-color);

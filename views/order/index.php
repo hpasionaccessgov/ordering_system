@@ -57,5 +57,6 @@ if (Yii::$app->user->can('order.view')) {
             'dataProvider' => $dataProvider,
             'columns' => $columns,
         ]) ?>
+
     </div>
 </div>

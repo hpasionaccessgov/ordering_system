@@ -14,7 +14,7 @@ class AdminGridView extends GridView
     ];
 
     public $tableOptions = [
-        'class' => 'table table-hover align-middle mb-0',
+        'class' => 'table table-striped table-hover align-middle mb-0 cafebara-data-table',
     ];
 
     public $layout = "{summary}\n{items}\n<div class=\"d-flex justify-content-end p-3\">{pager}</div>";

@@ -78,7 +78,7 @@ $nextStatus = $model->nextStatus();
             <h2 class="h5 mb-0">Items in this order</h2>
         </div>
         <div class="table-responsive">
-            <table class="table align-middle mb-0">
+            <table class="table table-striped table-hover align-middle mb-0 cafebara-data-table">
                 <thead>
                     <tr>
                         <th>Product</th>
