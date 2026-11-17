@@ -27,7 +27,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                 <div class="d-flex flex-column justify-content-between p-4 p-lg-5 w-100">
                     <div>
                         <?= Html::img(
-                            Yii::getAlias('@web/images/Cafebara_logo.png'),
+                            Yii::getAlias('@web/Cafebara_logo.png'),
                             [
                                 'alt' => 'Cafébara',
                                 'class' => 'login-brand-logo mb-4',
@@ -52,7 +52,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                         <!-- Mobile-only logo -->
                         <div class="d-md-none mb-3">
                             <?= Html::img(
-                                Yii::getAlias('@web/images/Cafebara_logo.png'),
+                                Yii::getAlias('@web/Cafebara_logo.png'),
                                 [
                                     'alt' => 'Cafébara',
                                     'class' => 'login-mobile-logo',

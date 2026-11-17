@@ -30,7 +30,7 @@ $this->params['meta_keywords'] = 'yii, yii2, about, php, framework';
                     </div>
                 </div>
                 <div class="col-lg-4 text-center">
-                    <?= Html::img(Yii::getAlias('@web/images/Cafebara_logo.png'), [
+                    <?= Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                         'class' => 'cafebara-about-logo',
                         'alt' => 'Cafébara capybara mascot',
                     ]) ?>

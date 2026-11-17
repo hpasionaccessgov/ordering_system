@@ -25,7 +25,7 @@ $labelOptions = ['class' => 'form-label fw-semibold'];
 
     <?php if (Yii::$app->session->hasFlash('success')) : ?>
         <section class="cafebara-contact-form-card p-4 p-lg-5 text-center" role="status">
-            <?= Html::img(Yii::getAlias('@web/images/Cafebara_logo.png'), [
+            <?= Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                 'class' => 'cafebara-about-logo mb-3',
                 'alt' => '',
             ]) ?>
@@ -49,7 +49,7 @@ $labelOptions = ['class' => 'form-label fw-semibold'];
         <div class="row g-4 align-items-stretch">
             <div class="col-12 col-lg-4">
                 <aside class="cafebara-contact-aside">
-                    <?= Html::img(Yii::getAlias('@web/images/Cafebara_logo.png'), [
+                    <?= Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                         'class' => 'cafebara-about-logo mb-4',
                         'alt' => '',
                     ]) ?>

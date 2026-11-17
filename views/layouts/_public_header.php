@@ -15,7 +15,7 @@ $navigationItems = [
 ];
 $user = Yii::$app->user->identity;
 $staffAccessDisabled = RbacPermissionPolicy::isStaffAccessDisabledForCurrentUser();
-$brand = Html::img(Yii::getAlias('@web/images/Cafebara_logo.png'), [
+$brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
     'alt' => '',
     'class' => 'cafebara-brand-logo',
 ]) . Html::tag(

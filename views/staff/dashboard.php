@@ -38,7 +38,7 @@ $displayName = $identity instanceof User
             </div>
         </div>
         <div class="col-auto d-none d-sm-block">
-            <?= Html::img(Yii::getAlias('@web/images/Cafebara_logo.png'), [
+            <?= Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                 'class' => 'dashboard-welcome-logo',
                 'alt' => '',
                 'aria-hidden' => 'true',

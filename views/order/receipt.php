@@ -32,7 +32,7 @@ $statusLabels = [
     <article class="order-detail-card order-receipt p-3 p-md-4" id="order-receipt">
         <header class="order-receipt-heading d-flex justify-content-between align-items-center gap-3 mb-4">
             <?= Html::img(
-                Yii::getAlias('@web/images/Cafebara_logo.png'),
+                Yii::getAlias('@web/Cafebara_logo.png'),
                 [
                     'class' => 'order-receipt-logo',
                     'alt' => 'Cafébara',

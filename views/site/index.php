@@ -71,7 +71,7 @@ $canViewFeaturedProducts = Yii::$app->user->isGuest || Yii::$app->user->can('pro
 
             <div class="col-lg-5">
                 <div class="cafebara-hero-art">
-                    <?= Html::img(Yii::getAlias('@web/images/Cafebara_logo.png'), [
+                    <?= Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                         'alt' => 'Cafébara mascot holding a cup of coffee',
                         'class' => 'cafebara-hero-logo',
                     ]) ?>

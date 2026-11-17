@@ -18,7 +18,7 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
 <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
     <div class="sidebar-brand">
         <?= Html::a(
-            Html::img(Yii::getAlias('@web/images/Cafebara_logo.png'), [
+            Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                 'alt' => 'Cafébara',
                 'class' => 'cafebara-sidebar-logo',
             ]) . '<span class="brand-text">' . Html::encode(Yii::$app->name) . '</span>',

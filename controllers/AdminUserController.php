@@ -137,7 +137,7 @@ class AdminUserController extends Controller
                         throw new \RuntimeException('The user account could not be saved.');
                     }
 
-                    if ($roleName === 'admin') {
+                    if ($model->roleName === 'admin') {
                         AdminAccessRecovery::restoreAdminRoleAccess();
                     }
                     $auth->assign($role, $user->id);

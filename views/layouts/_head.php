@@ -39,6 +39,6 @@ $this->registerLinkTag(
     [
         'rel' => 'icon',
         'type' => 'image/png',
-        'href' => Yii::getAlias('@web/images/Cafebara_logo.png'),
+        'href' => Yii::getAlias('@web/Cafebara_logo.png'),
     ],
 );
