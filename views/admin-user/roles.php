@@ -19,6 +19,20 @@ $this->registerJs(<<<JS
     document.querySelectorAll('form[data-role-permission-form]').forEach(form => {
         const permissions = Array.from(form.querySelectorAll('input[name="permissions[]"]'));
         const permissionByName = new Map(permissions.map(input => [input.dataset.permission, input]));
+        const recoveryWarning = form.querySelector('[data-admin-recovery-warning]');
+
+        const updateRecoveryWarning = () => {
+            if (!recoveryWarning) {
+                return;
+            }
+
+            const adminAccess = permissionByName.get('admin.access');
+            const assignRole = permissionByName.get('user.assignRole');
+            recoveryWarning.classList.toggle(
+                'd-none',
+                !adminAccess || !assignRole || adminAccess.checked || assignRole.checked,
+            );
+        };
 
         form.addEventListener('change', event => {
             const input = event.target;
@@ -36,6 +50,12 @@ $this->registerJs(<<<JS
             }
 
             if (input.checked) {
+                const module = input.dataset.permission.split('.')[0];
+                const indexInput = permissionByName.get(module + '.index');
+                if (indexInput && input.dataset.permission !== module + '.index') {
+                    indexInput.checked = true;
+                }
+
                 Object.entries(viewDependencies).forEach(([viewPermission, dependents]) => {
                     if (dependents.includes(input.dataset.permission)) {
                         const viewInput = permissionByName.get(viewPermission);
@@ -45,7 +65,17 @@ $this->registerJs(<<<JS
                     }
                 });
             }
+
+            updateRecoveryWarning();
         });
+
+        updateRecoveryWarning();
+    });
+
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(element => {
+        if (window.bootstrap) {
+            new bootstrap.Tooltip(element);
+        }
     });
 })();
 JS);
@@ -59,6 +89,30 @@ $permissionModuleLabels = [
     'order' => 'Orders',
     'staff' => 'Staff',
     'customer' => 'Customers',
+];
+$permissionDescriptions = [
+    'admin.access' => 'Access the administrator dashboard.',
+    'staff.access' => 'Access staff-only features.',
+    'customer.access' => 'Access customer features.',
+    'user.index' => 'View the list of users.',
+    'user.view' => 'View an individual user.',
+    'user.create' => 'Create a new user.',
+    'user.update' => 'Edit user information.',
+    'user.delete' => 'Delete a user account.',
+    'user.assignRole' => 'Assign roles to user accounts.',
+    'product.index' => 'View the product and menu list.',
+    'product.view' => 'View an individual product.',
+    'product.create' => 'Create a new product.',
+    'product.update' => 'Edit product information.',
+    'product.archive' => 'Archive or restore products.',
+    'product.delete' => 'Delete a product.',
+    'order.index' => 'View the list of orders.',
+    'order.view' => 'View an individual order.',
+    'order.create' => 'Create a new order.',
+    'order.update' => 'Edit order information.',
+    'order.cancel' => 'Cancel an order.',
+    'order.process' => 'Process an order status.',
+    'order.receipt.print' => 'Print an order receipt.',
 ];
 $permissionGroups = [];
 foreach ($permissions as $permission) {
@@ -78,7 +132,7 @@ uksort($permissionGroups, static function (string $left, string $right) use ($mo
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
         <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Access control</p>
-        <h1 class="h3 mb-0">Roles</h1>
+        <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
     </div>
 </div>
 
@@ -117,8 +171,17 @@ uksort($permissionGroups, static function (string $left, string $right) use ($mo
         <div class="col-12 col-md-3 d-flex align-items-end">
             <?= Html::submitButton('Create role', ['class' => 'btn btn-primary w-100']) ?>
         </div>
-
-        <?php AdminActiveForm::end(); ?>
+        <div class="col-12">
+            <?php AdminActiveForm::end(); ?>
+        </div>
+        <p class="small text-body-secondary mt-2 mb-0">
+            Create a new role to assign permissions to users. Role names must be unique and use lowercase letters,
+            numbers, dots, dashes, or underscores.
+        </p>
+        <p class="small text-body-secondary mt-2 mb-0">
+            Administrative task will not be available if this module <code>admin.access</code> nor <code>user.assignRole</code> is unchecked, Restore administrator access from the console with
+            <code>php yii rbac/restore-admin-access</code>.
+        </p>
     </div>
 </section>
 
@@ -159,18 +222,18 @@ uksort($permissionGroups, static function (string $left, string $right) use ($mo
                     <h3 class="small text-uppercase text-body-secondary">Permissions</h3>
                     <?php $children = array_keys($auth->getChildren($role->name)); ?>
                     <p class="small text-body-secondary">
-                        Index permissions control lists; view permissions control individual records.
-                        Checking or unchecking view synchronizes the module's permissions, while individual
-                        permissions remain editable afterward. All permissions are configurable.
+                        Select permissions to configure this role. Hover over a permission for details.
                     </p>
                     <?php if ($role->name === 'admin') : ?>
-                        <p class="small text-warning-emphasis">
-                            If admin.access and user.assignRole are both unchecked, restore them from the console with
+                        <div class="alert alert-warning small d-none" data-admin-recovery-warning role="alert">
+                            The administrator role has neither <code>admin.access</code> nor
+                            <code>user.assignRole</code>. Restore administrator access from the console with
                             <code>php yii rbac/restore-admin-access</code>.
-                        </p>
+                        </div>
                     <?php endif; ?>
+
                     <?php foreach ($permissionGroups as $module => $modulePermissions) : ?>
-                        <section class="permission-module-group mb-3">
+                        <section class="permission-module-group border rounded p-3 mb-3 bg-body-tertiary">
                             <h4 class="h6 text-body-secondary mb-2">
                                 <?= Html::encode($permissionModuleLabels[$module] ?? ucfirst($module)) ?>
                             </h4>
@@ -186,7 +249,12 @@ uksort($permissionGroups, static function (string $left, string $right) use ($mo
                                             [
                                                 'value' => $permission->name,
                                                 'label' => Html::encode($permission->name),
-                                                'title' => $permission->name,
+                                                'title' => $permissionDescriptions[$permission->name]
+                                                    ?? 'Permission: ' . $permission->name,
+                                                'data-bs-toggle' => 'tooltip',
+                                                'data-bs-placement' => 'top',
+                                                'data-bs-title' => $permissionDescriptions[$permission->name]
+                                                    ?? 'Permission: ' . $permission->name,
                                                 'data-permission' => $permission->name,
                                                 'uncheck' => null,
                                             ],

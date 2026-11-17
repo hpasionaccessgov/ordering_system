@@ -52,6 +52,8 @@ The role editor synchronizes module permissions when a record-view permission is
 
 Individual permissions remain editable after the module view checkbox is enabled. Selecting a dependent in the UI also enables its matching view permission. Keep the dependency map in `services/RbacPermissionPolicy.php` synchronized with controller checks.
 
+The role editor also enables the module's `*.index` permission when an action permission such as `user.update` or `product.delete` is selected, so the corresponding module remains visible in navigation. Permission inputs expose descriptions through hover tooltips. The built-in admin role displays a recovery warning when both `admin.access` and `user.assignRole` are unchecked.
+
 ### Admin access recovery
 
 - A new migration, `m261117_090000_add_resource_index_permissions.php`, adds the three index permissions, preserves existing list access based on prior permissions, and restores essential permissions on the built-in admin role.

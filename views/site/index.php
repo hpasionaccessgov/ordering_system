@@ -8,6 +8,7 @@ use app\models\Product;
 /** @var Product[] $featuredProducts */
 
 $this->title = 'Cafébara | Cafe ordering';
+$canViewFeaturedProducts = Yii::$app->user->isGuest || Yii::$app->user->can('product.view');
 ?>
 <div class="site-index">
     <section class="cafebara-hero rounded-4 p-4 p-lg-5 mb-5">
@@ -42,7 +43,7 @@ $this->title = 'Cafébara | Cafe ordering';
                     <?php endif ?>
                 </div>
 
-                <?php if ($featuredProducts !== []) : ?>
+                <?php if ($canViewFeaturedProducts && $featuredProducts !== []) : ?>
                     <section class="cafebara-catalog-preview mt-5">
                         <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
                             <div>

@@ -12,8 +12,10 @@ $this->title = 'Product';
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
-
+    <div>
+        <p class="text-uppercase small fw-semibold text-body-secondary mb-0">MENU AVAILABLE</p>
+        <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
+    </div>
     <?php if (Yii::$app->user->can('product.create')) : ?>
         <?= Html::a(
             'Create product',
@@ -62,33 +64,33 @@ $this->title = 'Product';
             'placeholder' => 'Max ₱',
         ]) ?>
     </div>
-        <div class="col-12 col-md-2">
-            <?= Html::dropDownList('sort', Yii::$app->request->get('sort', 'name'), [
-                'name' => 'Name: A to Z',
-                '-name' => 'Name: Z to A',
-                'price' => 'Price: low to high',
-                '-price' => 'Price: high to low',
-            ], ['class' => 'form-select', 'aria-label' => 'Sort products']) ?>
-        </div>
+    <div class="col-12 col-md-2">
+        <?= Html::dropDownList('sort', Yii::$app->request->get('sort', 'name'), [
+            'name' => 'Name: A to Z',
+            '-name' => 'Name: Z to A',
+            'price' => 'Price: low to high',
+            '-price' => 'Price: high to low',
+        ], ['class' => 'form-select', 'aria-label' => 'Sort products']) ?>
+    </div>
     <div class="col-12 col-md-1">
         <?= Html::submitButton('Filter', ['class' => 'btn btn-primary w-100']) ?>
     </div>
 </div>
 <?= Html::endForm() ?>
 
-    <div class="row g-3">
-        <?php foreach ($dataProvider->getModels() as $product) : ?>
-            <div class="col-12 col-sm-6 col-xl-4">
-                <?= $this->render('../shared/_product_card', ['product' => $product]) ?>
-            </div>
-        <?php endforeach; ?>
-    </div>
-    <?php if ($dataProvider->getCount() === 0) : ?>
-        <div class="card admin-panel">
-            <div class="card-body text-center py-5">
-                <h2 class="h5">No products match your filters</h2>
-                <p class="text-body-secondary mb-0">Try a different search or category.</p>
-            </div>
+<div class="row g-3">
+    <?php foreach ($dataProvider->getModels() as $product) : ?>
+        <div class="col-12 col-sm-6 col-xl-4">
+            <?= $this->render('../shared/_product_card', ['product' => $product]) ?>
         </div>
-    <?php endif; ?>
-    <?= LinkPager::widget(['pagination' => $dataProvider->pagination]) ?>
+    <?php endforeach; ?>
+</div>
+<?php if ($dataProvider->getCount() === 0) : ?>
+    <div class="card admin-panel">
+        <div class="card-body text-center py-5">
+            <h2 class="h5">No products match your filters</h2>
+            <p class="text-body-secondary mb-0">Try a different search or category.</p>
+        </div>
+    </div>
+<?php endif; ?>
+<?= LinkPager::widget(['pagination' => $dataProvider->pagination]) ?>
