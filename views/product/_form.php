@@ -7,6 +7,9 @@ use yii\helpers\Html;
 /** @var Product $model */
 
 $initialImageUrl = $model->getImageUrl();
+$cancelRoute = Yii::$app->user->can('product.index')
+    ? ['/product/index']
+    : ['/site/dashboard'];
 $this->registerJs(<<<'JS'
 (() => {
     const input = document.getElementById('product-image-upload');
@@ -127,7 +130,7 @@ $form = AdminActiveForm::begin([
 </div>
 
 <div class="d-flex flex-wrap justify-content-end gap-2 mt-4">
-    <?= Html::a('Cancel', ['/product/index'], ['class' => 'btn btn-outline-secondary']) ?>
+    <?= Html::a('Cancel', $cancelRoute, ['class' => 'btn btn-outline-secondary']) ?>
     <?= Html::submitButton('Save product', ['class' => 'btn btn-primary px-4']) ?>
 </div>
 

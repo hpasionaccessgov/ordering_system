@@ -8,7 +8,7 @@ use yii\helpers\Html;
 /** @var bool $canManageProducts */
 /** @var string $status */
 
-$this->title = 'Menu';
+$this->title = 'Product';
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">

@@ -11,21 +11,23 @@
 A Yii2 basic application for ordering system. This application is built using Yii2 framework and provides a simple ordering system for products.
 
 ## Requirements
+
 - PHP 8.2 or higher
 - Composer
 - MariaDB 10.4+ or MySQL 8.0+
 - Git
-OR Install Laragon v6 for all in one universal pack (https://laragon.org/download/)
+  OR Install Laragon v6 for all in one universal pack (https://laragon.org/download/)
 
 ## Local setup
+
 1. Clone the repository:
-   ```bash
-   git clone <repository-url>
+    ```bash
+    git clone <repository-url>
     ```
 2. Install local dependencies:
-   ```bash
-   composer install && npm install
-   ```
+    ```bash
+    composer install && npm install
+    ```
 3. Create a `.env` file in the root directory of the project and configure your database connection settings, You can use the provided `.env.example` file as a template
 4. Create the database:
     ```bash
@@ -38,27 +40,23 @@ OR Install Laragon v6 for all in one universal pack (https://laragon.org/downloa
     COLLATE utf8mb4_unicode_ci;
     ```
 5. Create Yii's RBAC tables, then run the application migrations:
-   ```bash
-   php yii migrate --migrationPath=@yii/rbac/migrations
-   php yii migrate
-   ```
+    ```bash
+    php yii migrate --migrationPath=@yii/rbac/migrations
+    php yii migrate
+    ```
 6. Start the development server:
-   ```bash
-   php yii serve
-   ```
-   OR use the laragon GUI to start the server.
+    ```bash
+    php yii serve
+    ```
+    OR use the laragon GUI to start the server.
 7. Start the laragon apache and MySQL services, then open the link: http://localhost/ordering_system/web/
 8. Register a new account. Registration activates the account and signs you in immediately; new accounts receive the Customer role.
 9. Promote your first account to Admin from the project directory:
-   ```bash
-   php yii rbac/make-admin your-email@example.com
-   ```
+    ```bash
+    php yii rbac/make-admin your-email@example.com
+    ```
 10. Sign in again or refresh the application. Admins can assign Admin, Staff, and Customer roles from the **Roles** link in the dashboard sidebar.
 11. You can also run the test data seeder:
-   ```bash
-   php yii seed/test-data
-   ```
-12. To refresh only the product catalog and load the bundled product images:
-   ```bash
-   php yii seed/products
-   ```
+```bash
+php yii seed/test-data
+```

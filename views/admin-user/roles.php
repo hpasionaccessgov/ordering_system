@@ -1,6 +1,7 @@
 <?php
 
 use app\models\RoleForm;
+use app\services\RbacPermissionPolicy;
 use app\widgets\AdminActiveForm;
 use yii\helpers\Html;
 
@@ -8,6 +9,46 @@ use yii\helpers\Html;
 /** @var RoleForm $roleForm */
 
 $this->title = 'Roles';
+$viewDependenciesJson = json_encode(
+    RbacPermissionPolicy::viewDependents(),
+    JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT,
+);
+$this->registerJs(<<<JS
+(() => {
+    const viewDependencies = {$viewDependenciesJson};
+    document.querySelectorAll('form[data-role-permission-form]').forEach(form => {
+        const permissions = Array.from(form.querySelectorAll('input[name="permissions[]"]'));
+        const permissionByName = new Map(permissions.map(input => [input.dataset.permission, input]));
+
+        form.addEventListener('change', event => {
+            const input = event.target;
+            if (!(input instanceof HTMLInputElement) || !input.matches('input[name="permissions[]"]')) {
+                return;
+            }
+
+            if (viewDependencies[input.dataset.permission] && !input.checked) {
+                viewDependencies[input.dataset.permission].forEach(name => {
+                    const dependent = permissionByName.get(name);
+                    if (dependent) {
+                        dependent.checked = false;
+                    }
+                });
+            }
+
+            if (input.checked) {
+                Object.entries(viewDependencies).forEach(([viewPermission, dependents]) => {
+                    if (dependents.includes(input.dataset.permission)) {
+                        const viewInput = permissionByName.get(viewPermission);
+                        if (viewInput) {
+                            viewInput.checked = true;
+                        }
+                    }
+                });
+            }
+        });
+    });
+})();
+JS);
 $auth = Yii::$app->authManager;
 $permissions = $auth->getPermissions();
 $roles = $auth->getRoles();
@@ -109,13 +150,25 @@ uksort($permissionGroups, static function (string $left, string $right) use ($mo
                         <?php endforeach; ?>
                     </div>
                     <hr>
+                    <?= Html::beginForm(
+                        ['/admin-role/update', 'name' => $role->name],
+                        'post',
+                        ['data-role-permission-form' => 'true'],
+                    ) ?>
+                    <?= Html::hiddenInput('new_name', $role->name) ?>
                     <h3 class="small text-uppercase text-body-secondary">Permissions</h3>
-                    <?= Html::beginForm(['/admin-role/update-permissions', 'name' => $role->name], 'post') ?>
                     <?php $children = array_keys($auth->getChildren($role->name)); ?>
                     <p class="small text-body-secondary">
+                        Index permissions control lists; view permissions control individual records.
+                        Unchecking view also clears dependent permissions that expose record details.
                         All permissions are configurable, including administrator access and role management.
-                        Assigning these permissions grants powerful access to this role.
                     </p>
+                    <?php if ($role->name === 'admin') : ?>
+                        <p class="small text-warning-emphasis">
+                            If admin.access and user.assignRole are both unchecked, restore them from the console with
+                            <code>php yii rbac/restore-admin-access</code>.
+                        </p>
+                    <?php endif; ?>
                     <?php foreach ($permissionGroups as $module => $modulePermissions) : ?>
                         <section class="permission-module-group mb-3">
                             <h4 class="h6 text-body-secondary mb-2">
@@ -134,6 +187,7 @@ uksort($permissionGroups, static function (string $left, string $right) use ($mo
                                                 'value' => $permission->name,
                                                 'label' => Html::encode($permission->name),
                                                 'title' => $permission->name,
+                                                'data-permission' => $permission->name,
                                                 'uncheck' => null,
                                             ],
                                         ) ?>
@@ -142,27 +196,18 @@ uksort($permissionGroups, static function (string $left, string $right) use ($mo
                             </div>
                         </section>
                     <?php endforeach; ?>
-                    <?= Html::submitButton(
-                        'Save permissions',
-                        ['class' => 'btn btn-sm btn-outline-primary mt-3']
-                    ) ?>
-                    <?= Html::endForm() ?>
-                    <hr>
-                    <?= Html::beginForm(
-                        ['/admin-role/update', 'name' => $role->name],
-                        'post',
-                        ['class' => 'row g-2']
-                    ) ?>
-                    <?= Html::hiddenInput('new_name', $role->name) ?>
-                    <div class="col-12">
+                    <div class="mt-3">
+                        <label for="role-description-<?= Html::encode($role->name) ?>" class="form-label small text-uppercase text-body-secondary">
+                            Description
+                        </label>
                         <?= Html::input('text', 'description', $role->description, [
+                            'id' => 'role-description-' . $role->name,
                             'class' => 'form-control form-control-sm',
+                            'maxlength' => 255,
                             'aria-label' => 'Description for ' . $role->name,
                         ]) ?>
                     </div>
-                    <div class="col-12">
-                        <?= Html::submitButton('Save description', ['class' => 'btn btn-sm btn-outline-primary']) ?>
-                    </div>
+                    <?= Html::submitButton('Save changes', ['class' => 'btn btn-sm btn-primary mt-3']) ?>
                     <?= Html::endForm() ?>
                 </div>
             </section>

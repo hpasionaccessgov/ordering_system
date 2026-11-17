@@ -28,18 +28,23 @@ $nextStatus = $model->nextStatus();
             <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
         </div>
         <div class="d-flex flex-wrap gap-2">
-            <?php if (Yii::$app->user->can('order.receipt.print')) : ?>
+            <?php if (
+                Yii::$app->user->can('order.view')
+                && Yii::$app->user->can('order.receipt.print')
+            ) : ?>
                 <?= Html::a(
                     'View printable receipt',
                     ['/order/receipt', 'id' => $model->id],
                     ['class' => 'btn btn-outline-primary'],
                 ) ?>
             <?php endif; ?>
-            <?= Html::a(
-                'Back to orders',
-                ['/order/index'],
-                ['class' => 'btn btn-outline-secondary'],
-            ) ?>
+            <?php if (Yii::$app->user->can('order.index')) : ?>
+                <?= Html::a(
+                    'Back to orders',
+                    ['/order/index'],
+                    ['class' => 'btn btn-outline-secondary'],
+                ) ?>
+            <?php endif; ?>
         </div>
     </div>
 

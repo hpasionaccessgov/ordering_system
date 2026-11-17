@@ -25,7 +25,9 @@ foreach ($roles as $role) {
                 <h1 class="h3 mb-1">Create account</h1>
                 <p class="text-body-secondary mb-0">Create a user and assign an existing role.</p>
             </div>
-            <?= Html::a('Back to user list', ['/admin-user/list'], ['class' => 'btn btn-outline-secondary']) ?>
+            <?php if (Yii::$app->user->can('user.index')) : ?>
+                <?= Html::a('Back to user list', ['/admin-user/list'], ['class' => 'btn btn-outline-secondary']) ?>
+            <?php endif; ?>
         </div>
 
         <section class="card admin-panel">
@@ -64,7 +66,9 @@ foreach ($roles as $role) {
 
                 <div class="d-flex flex-wrap gap-2 mt-4">
                     <?= Html::submitButton('Create account', ['class' => 'btn btn-primary']) ?>
-                    <?= Html::a('Cancel', ['/admin-user/list'], ['class' => 'btn btn-outline-secondary']) ?>
+                    <?php if (Yii::$app->user->can('user.index')) : ?>
+                        <?= Html::a('Cancel', ['/admin-user/list'], ['class' => 'btn btn-outline-secondary']) ?>
+                    <?php endif; ?>
                 </div>
 
                 <?php AdminActiveForm::end(); ?>

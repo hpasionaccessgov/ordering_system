@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\commands;
 
 use app\models\User;
+use app\services\AdminAccessRecovery;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\console\Controller;
@@ -27,6 +28,7 @@ class RbacController extends Controller
 
         $transaction = Yii::$app->db->beginTransaction();
         try {
+            AdminAccessRecovery::restoreAdminRoleAccess();
             $auth->revokeAll($user->id);
             $auth->assign($adminRole, $user->id);
             $transaction->commit();
@@ -39,6 +41,25 @@ class RbacController extends Controller
         }
 
         $this->stdout("Admin role assigned to {$user->email}.\n");
+
+        return ExitCode::OK;
+    }
+
+    public function actionRestoreAdminAccess(): int
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            AdminAccessRecovery::restoreAdminRoleAccess();
+            $transaction->commit();
+        } catch (\Throwable $exception) {
+            if ($transaction->isActive) {
+                $transaction->rollBack();
+            }
+
+            throw $exception;
+        }
+
+        $this->stdout("Restored admin.access and user.assignRole on the admin role.\n");
 
         return ExitCode::OK;
     }

@@ -20,7 +20,11 @@ $this->title = 'Edit user details';
                     Update the account's name, username, and email address.
                 </p>
             </div>
-            <?= Html::a('Back to user list', ['/admin-user/list'], ['class' => 'btn btn-outline-secondary']) ?>
+            <?php if (Yii::$app->user->can('user.index')) : ?>
+                <?= Html::a('Back to user list', ['/admin-user/list'], [
+                    'class' => 'btn btn-outline-secondary',
+                ]) ?>
+            <?php endif; ?>
         </div>
 
         <section class="card admin-panel">
@@ -54,7 +58,11 @@ $this->title = 'Edit user details';
 
                 <div class="d-flex flex-wrap gap-2 mt-4">
                     <?= Html::submitButton('Save changes', ['class' => 'btn btn-primary']) ?>
-                    <?= Html::a('Cancel', ['/admin-user/list'], ['class' => 'btn btn-outline-secondary']) ?>
+                    <?php if (Yii::$app->user->can('user.index')) : ?>
+                        <?= Html::a('Cancel', ['/admin-user/list'], [
+                            'class' => 'btn btn-outline-secondary',
+                        ]) ?>
+                    <?php endif; ?>
                 </div>
 
                 <?php AdminActiveForm::end(); ?>

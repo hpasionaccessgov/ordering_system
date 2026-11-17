@@ -8,7 +8,10 @@ use yii\helpers\Html;
 
 $this->title = $model->name;
 $staffAccessEnabled = !RbacPermissionPolicy::isStaffAccessDisabledForCurrentUser();
-$canManageProducts = $staffAccessEnabled && Yii::$app->user->can('product.update');
+$canViewProducts = Yii::$app->user->can('product.index');
+$canManageProducts = $staffAccessEnabled
+    && Yii::$app->user->can('product.view')
+    && Yii::$app->user->can('product.update');
 $canDeleteProducts = $staffAccessEnabled && Yii::$app->user->can('product.delete');
 $canOrder = $staffAccessEnabled && Yii::$app->user->can('order.create') && $model->isActive();
 ?>
@@ -19,11 +22,13 @@ $canOrder = $staffAccessEnabled && Yii::$app->user->can('order.create') && $mode
             <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Cafébara menu</p>
             <h1 class="h3 mb-0"><?= Html::encode($model->name) ?></h1>
         </div>
-        <?= Html::a(
-            'Back to products',
-            ['/product/index'],
-            ['class' => 'btn btn-outline-secondary'],
-        ) ?>
+        <?php if ($canViewProducts) : ?>
+            <?= Html::a(
+                'Back to products',
+                ['/product/index'],
+                ['class' => 'btn btn-outline-secondary'],
+            ) ?>
+        <?php endif; ?>
     </div>
 
     <div class="row g-4 align-items-stretch">
@@ -117,7 +122,7 @@ $canOrder = $staffAccessEnabled && Yii::$app->user->can('order.create') && $mode
                             $staffAccessEnabled
                             && Yii::$app->user->can('product.archive')
                             && $model->isActive()
-) : ?>
+                        ) : ?>
                             <?= Html::beginForm(
                                 ['/product/archive', 'id' => $model->id],
                                 'post',

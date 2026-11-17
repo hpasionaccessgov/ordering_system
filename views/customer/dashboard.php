@@ -23,8 +23,12 @@ $displayName = $identity instanceof User
             <h1 class="h3 mt-2 mb-2">Welcome, <?= Html::encode($displayName) ?>!</h1>
             <p class="mb-3">Find a favorite, place an order, and follow its progress.</p>
             <div class="d-flex flex-wrap gap-2">
-                <?= Html::a('Browse menu', ['/product/index'], ['class' => 'btn btn-cafebara-light']) ?>
-                <?= Html::a('View orders', ['/order/index'], ['class' => 'btn btn-cafebara-outline-light']) ?>
+                <?php if (Yii::$app->user->can('product.index')) : ?>
+                    <?= Html::a('Browse menu', ['/product/index'], ['class' => 'btn btn-cafebara-light']) ?>
+                <?php endif; ?>
+                <?php if (Yii::$app->user->can('order.index')) : ?>
+                    <?= Html::a('View orders', ['/order/index'], ['class' => 'btn btn-cafebara-outline-light']) ?>
+                <?php endif; ?>
             </div>
         </div>
         <div class="col-auto d-none d-sm-block">
@@ -43,7 +47,9 @@ $displayName = $identity instanceof User
             <p class="text-body-secondary mb-1">Your order history</p>
             <h2 class="h4 mb-0"><?= Html::encode((string) $orderCount) ?> orders placed</h2>
         </div>
-        <?= Html::a('View your orders', ['/order/index'], ['class' => 'btn btn-outline-primary ms-auto']) ?>
+        <?php if (Yii::$app->user->can('order.index')) : ?>
+            <?= Html::a('View your orders', ['/order/index'], ['class' => 'btn btn-outline-primary ms-auto']) ?>
+        <?php endif; ?>
     </div>
 </section>
 
@@ -53,7 +59,9 @@ $displayName = $identity instanceof User
             <p class="text-body-secondary mb-1">From the menu</p>
             <h2 class="h4 mb-0">Featured drinks and bites</h2>
         </div>
-        <?= Html::a('Browse all products', ['/product/index'], ['class' => 'link-primary fw-semibold']) ?>
+        <?php if (Yii::$app->user->can('product.index')) : ?>
+            <?= Html::a('Browse all products', ['/product/index'], ['class' => 'link-primary fw-semibold']) ?>
+        <?php endif; ?>
     </div>
     <div class="row g-3">
         <?php foreach ($featuredProducts as $product) : ?>

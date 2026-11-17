@@ -15,7 +15,11 @@ $this->title = 'Update product';
             Update <?= Html::encode($model->name) ?> and its customer-facing menu details.
         </p>
     </div>
-    <?= Html::a('Back to menu', ['/product/index'], ['class' => 'btn btn-outline-secondary']) ?>
+    <?= Html::a(
+        Yii::$app->user->can('product.index') ? 'Back to menu' : 'Back to dashboard',
+        Yii::$app->user->can('product.index') ? ['/product/index'] : ['/site/dashboard'],
+        ['class' => 'btn btn-outline-secondary'],
+    ) ?>
 </div>
 
 <?= $this->render('_form', ['model' => $model]) ?>

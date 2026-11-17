@@ -13,7 +13,11 @@ $this->title = 'Create product';
         <h1 class="h3 mb-1"><?= Html::encode($this->title) ?></h1>
         <p class="text-body-secondary mb-0">Add a menu item with its price, photo, and availability.</p>
     </div>
-    <?= Html::a('Back to menu', ['/product/index'], ['class' => 'btn btn-outline-secondary']) ?>
+    <?= Html::a(
+        Yii::$app->user->can('product.index') ? 'Back to menu' : 'Back to dashboard',
+        Yii::$app->user->can('product.index') ? ['/product/index'] : ['/site/dashboard'],
+        ['class' => 'btn btn-outline-secondary'],
+    ) ?>
 </div>
 
 <?= $this->render('_form', ['model' => $model]) ?>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\commands\seeders;
 
 use app\models\User;
+use app\services\AdminAccessRecovery;
 use Yii;
 
 class UserSeeder
@@ -23,6 +24,7 @@ class UserSeeder
         ];
         $added = 0;
         $auth = Yii::$app->authManager;
+        AdminAccessRecovery::restoreAdminRoleAccess();
 
         foreach ($records as [$username, $email, $fullName, $roleName]) {
             $user = User::find()->where(['or', ['username' => $username], ['email' => $email]])->one();

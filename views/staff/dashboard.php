@@ -25,8 +25,16 @@ $displayName = $identity instanceof User
             <h1 class="h3 mt-2 mb-2">Welcome, <?= Html::encode($displayName) ?></h1>
             <p class="mb-3">Keep the menu current and move customer orders through service.</p>
             <div class="d-flex flex-wrap gap-2">
-                <?= Html::a('Process orders', ['/order/index'], ['class' => 'btn btn-cafebara-light']) ?>
-                <?= Html::a('Manage products', ['/product/index'], ['class' => 'btn btn-cafebara-outline-light']) ?>
+                <?php if (Yii::$app->user->can('order.index')) : ?>
+                    <?= Html::a('Process orders', ['/order/index'], ['class' => 'btn btn-cafebara-light']) ?>
+                <?php elseif (Yii::$app->user->can('order.create')) : ?>
+                    <?= Html::a('Create order', ['/order/create'], ['class' => 'btn btn-cafebara-light']) ?>
+                <?php endif; ?>
+                <?php if (Yii::$app->user->can('product.index')) : ?>
+                    <?= Html::a('Manage products', ['/product/index'], ['class' => 'btn btn-cafebara-outline-light']) ?>
+                <?php elseif (Yii::$app->user->can('product.create')) : ?>
+                    <?= Html::a('Create product', ['/product/create'], ['class' => 'btn btn-cafebara-outline-light']) ?>
+                <?php endif; ?>
             </div>
         </div>
         <div class="col-auto d-none d-sm-block">

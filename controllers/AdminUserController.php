@@ -8,6 +8,7 @@ use app\filters\StaffAccessFilter;
 use app\models\AdminUserCreateForm;
 use app\models\Order;
 use app\models\User;
+use app\services\AdminAccessRecovery;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -40,15 +41,14 @@ class AdminUserController extends Controller
                         'roles' => ['user.update'],
                     ],
                     [
+                        'actions' => ['view'],
+                        'allow' => true,
+                        'roles' => ['user.view'],
+                    ],
+                    [
                         'actions' => ['index', 'list'],
                         'allow' => true,
-                        'roles' => [
-                            'user.view',
-                            'user.create',
-                            'user.update',
-                            'user.delete',
-                            'user.assignRole',
-                        ],
+                        'roles' => ['user.index'],
                     ],
                     [
                         'actions' => ['assign-role'],
@@ -67,6 +67,7 @@ class AdminUserController extends Controller
                 'actions' => [
                     'create' => ['GET', 'POST'],
                     'assign-role' => ['post'],
+                    'view' => ['get'],
                     'update' => ['GET', 'POST'],
                     'delete' => ['post'],
                 ],
@@ -89,6 +90,21 @@ class AdminUserController extends Controller
                 'pagination' => ['pageSize' => 20],
             ]),
             'roles' => Yii::$app->authManager->getRoles(),
+        ]);
+    }
+
+    public function actionView(int $id): string
+    {
+        $user = User::findOne($id);
+        if ($user === null) {
+            throw new NotFoundHttpException('The requested user was not found.');
+        }
+
+        $this->layout = 'admin';
+
+        return $this->render('view', [
+            'model' => $user,
+            'roles' => array_keys(Yii::$app->authManager->getRolesByUser($user->id)),
         ]);
     }
 
@@ -121,6 +137,9 @@ class AdminUserController extends Controller
                         throw new \RuntimeException('The user account could not be saved.');
                     }
 
+                    if ($roleName === 'admin') {
+                        AdminAccessRecovery::restoreAdminRoleAccess();
+                    }
                     $auth->assign($role, $user->id);
                     $transaction->commit();
                 } catch (\Throwable $exception) {
@@ -133,7 +152,7 @@ class AdminUserController extends Controller
 
                 Yii::$app->session->setFlash('success', "Account for {$user->username} was created.");
 
-                return $this->redirect(['list']);
+                return $this->redirect($this->getUserReturnRoute());
             }
         }
 
@@ -145,6 +164,10 @@ class AdminUserController extends Controller
 
     public function actionUpdate(int $id): Response|string
     {
+        if (!Yii::$app->user->can('user.view')) {
+            throw new ForbiddenHttpException('You are not allowed to view this account.');
+        }
+
         $user = User::findOne($id);
         if ($user === null) {
             throw new NotFoundHttpException('The requested user was not found.');
@@ -164,7 +187,7 @@ class AdminUserController extends Controller
             if ($user->save()) {
                 Yii::$app->session->setFlash('success', "Account details for {$user->username} were updated.");
 
-                return $this->redirect(['list']);
+                return $this->redirect($this->getUserReturnRoute());
             }
         }
 
@@ -212,6 +235,9 @@ class AdminUserController extends Controller
 
         $transaction = Yii::$app->db->beginTransaction();
         try {
+            if ($roleName === 'admin') {
+                AdminAccessRecovery::restoreAdminRoleAccess();
+            }
             $auth->revokeAll($user->id);
             $auth->assign($role, $user->id);
             $transaction->commit();
@@ -225,7 +251,7 @@ class AdminUserController extends Controller
 
         Yii::$app->session->setFlash('success', "The role for {$user->username} was updated.");
 
-        return $this->redirect(['list']);
+        return $this->redirect($this->getUserReturnRoute());
     }
 
     public function actionDelete(int $id): Response
@@ -244,7 +270,7 @@ class AdminUserController extends Controller
         if (isset($currentRoles['admin']) && count($auth->getUserIdsByRole('admin')) <= 1) {
             Yii::$app->session->setFlash('error', 'The last administrator cannot be deleted.');
 
-            return $this->redirect(['list']);
+            return $this->redirect($this->getUserReturnRoute());
         }
 
         $transaction = Yii::$app->db->beginTransaction();
@@ -270,7 +296,7 @@ class AdminUserController extends Controller
                     'This account has order history and cannot be permanently deleted.',
                 );
 
-                return $this->redirect(['list']);
+                return $this->redirect($this->getUserReturnRoute());
             }
 
             $auth->revokeAll($user->id);
@@ -289,6 +315,16 @@ class AdminUserController extends Controller
 
         Yii::$app->session->setFlash('success', "Account '{$user->username}' was deleted.");
 
-        return $this->redirect(['list']);
+        return $this->redirect($this->getUserReturnRoute());
+    }
+
+    /**
+     * @return array|string
+     */
+    private function getUserReturnRoute(): array|string
+    {
+        return Yii::$app->user->can('user.index')
+            ? ['list']
+            : ['/site/dashboard'];
     }
 }

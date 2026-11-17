@@ -6,9 +6,11 @@ namespace app\controllers;
 
 use app\filters\StaffAccessFilter;
 use app\models\RoleForm;
+use app\services\RbacPermissionPolicy;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\rbac\Role;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\Response;
@@ -74,11 +76,15 @@ class AdminRoleController extends Controller
     {
         $newName = trim((string) $this->request->post('new_name'));
         $description = trim((string) $this->request->post('description'));
+        $permissionNames = $this->request->post('permissions', []);
         $auth = Yii::$app->authManager;
         $role = $auth->getRole($name);
 
         if ($role === null) {
             throw new BadRequestHttpException('Role not found.');
+        }
+        if (!is_array($permissionNames)) {
+            throw new BadRequestHttpException('Permissions are invalid.');
         }
         if (in_array($name, ['admin', 'staff', 'customer'], true) && $newName !== $name) {
             throw new BadRequestHttpException('Built-in role names cannot be changed.');
@@ -87,13 +93,30 @@ class AdminRoleController extends Controller
             throw new BadRequestHttpException('Role name already exists.');
         }
 
-        if ($newName !== $name) {
-            $role->name = $newName;
-            $auth->remove($auth->getRole($name));
-            $auth->add($role);
+        $permissionNames = $this->normalizePermissionNames($permissionNames);
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            if ($newName !== $name) {
+                $role->name = $newName;
+                $auth->remove($auth->getRole($name));
+                $auth->add($role);
+            }
+            $role->description = $description;
+            $auth->update($role->name, $role);
+
+            $this->syncRolePermissions($role, $permissionNames);
+
+            $transaction->commit();
+        } catch (\Throwable $exception) {
+            if ($transaction->isActive) {
+                $transaction->rollBack();
+            }
+
+            throw $exception;
         }
-        $role->description = $description;
-        $auth->update($role->name, $role);
+
+        Yii::$app->session->setFlash('success', "Role '{$role->name}' was updated.");
 
         return $this->redirect(['index']);
     }
@@ -122,6 +145,34 @@ class AdminRoleController extends Controller
             throw new BadRequestHttpException('Role or permissions are invalid.');
         }
 
+        $permissionNames = $this->normalizePermissionNames($permissionNames);
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $this->syncRolePermissions($role, $permissionNames);
+            $transaction->commit();
+        } catch (\Throwable $exception) {
+            if ($transaction->isActive) {
+                $transaction->rollBack();
+            }
+
+            throw $exception;
+        }
+
+        Yii::$app->session->setFlash('success', "Permissions for '{$name}' were updated.");
+
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * Validates the submitted permission names and returns them as a list.
+     *
+     * @param array $permissionNames the raw permission names from the request.
+     * @return string[] the validated permission names.
+     */
+    private function normalizePermissionNames(array $permissionNames): array
+    {
+        $auth = Yii::$app->authManager;
         $permissionNames = array_values(array_filter(
             $permissionNames,
             static fn ($permissionName): bool => $permissionName !== '0',
@@ -136,27 +187,25 @@ class AdminRoleController extends Controller
             }
         }
 
-        $transaction = Yii::$app->db->beginTransaction();
-        try {
-            $auth->removeChildren($role);
-            foreach ($permissionNames as $permissionName) {
-                $permission = $auth->getPermission($permissionName);
-                if (!$auth->addChild($role, $permission)) {
-                    throw new \RuntimeException("Could not assign permission '{$permissionName}'.");
-                }
-            }
-            $transaction->commit();
-        } catch (\Throwable $exception) {
-            if ($transaction->isActive) {
-                $transaction->rollBack();
-            }
+        return RbacPermissionPolicy::normalizeRolePermissions($permissionNames);
+    }
 
-            throw $exception;
+    /**
+     * Replaces the role's permissions with the given ones.
+     *
+     * @param Role $role the role to update.
+     * @param string[] $permissionNames the validated permission names to assign.
+     */
+    private function syncRolePermissions(Role $role, array $permissionNames): void
+    {
+        $auth = Yii::$app->authManager;
+        $auth->removeChildren($role);
+        foreach ($permissionNames as $permissionName) {
+            $permission = $auth->getPermission($permissionName);
+            if (!$auth->addChild($role, $permission)) {
+                throw new \RuntimeException("Could not assign permission '{$permissionName}'.");
+            }
         }
-
-        Yii::$app->session->setFlash('success', "Permissions for '{$name}' were updated.");
-
-        return $this->redirect(['index']);
     }
 
     private function renderRoles(RoleForm $roleForm): string

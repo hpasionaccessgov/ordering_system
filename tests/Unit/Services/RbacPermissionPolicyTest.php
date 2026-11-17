@@ -9,6 +9,33 @@ use Codeception\Test\Unit;
 
 final class RbacPermissionPolicyTest extends Unit
 {
+    public function testRemovingViewAlsoRemovesPermissionsThatRenderRecordDetails(): void
+    {
+        self::assertSame(
+            ['order.index', 'order.process'],
+            RbacPermissionPolicy::normalizeRolePermissions([
+                'order.index',
+                'order.update',
+                'order.receipt.print',
+                'order.process',
+            ]),
+        );
+        self::assertSame(
+            ['product.view', 'product.update'],
+            RbacPermissionPolicy::normalizeRolePermissions([
+                'product.view',
+                'product.update',
+            ]),
+        );
+        self::assertSame(
+            ['user.index'],
+            RbacPermissionPolicy::normalizeRolePermissions([
+                'user.index',
+                'user.update',
+            ]),
+        );
+    }
+
     public function testDisablingStaffAccessBlocksOnlyTheStaffRole(): void
     {
         self::assertFalse(RbacPermissionPolicy::isStaffRoleAccessAllowed(['staff'], false));

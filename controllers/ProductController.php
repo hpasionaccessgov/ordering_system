@@ -14,6 +14,7 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\UploadedFile;
@@ -36,15 +37,14 @@ class ProductController extends Controller
                         'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['index', 'view'],
+                        'actions' => ['index'],
                         'allow' => true,
-                        'roles' => [
-                            'product.view',
-                            'product.create',
-                            'product.update',
-                            'product.archive',
-                            'product.delete',
-                        ],
+                        'roles' => ['product.index'],
+                    ],
+                    [
+                        'actions' => ['view'],
+                        'allow' => true,
+                        'roles' => ['product.view'],
                     ],
                     [
                         'actions' => ['image'],
@@ -187,7 +187,7 @@ class ProductController extends Controller
             if ($this->saveProduct($model)) {
                 Yii::$app->session->setFlash('success', 'Product created.');
 
-                return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect($this->getProductReturnRoute((int) $model->id));
             }
         }
 
@@ -198,6 +198,10 @@ class ProductController extends Controller
 
     public function actionUpdate(int $id): Response|string
     {
+        if (!Yii::$app->user->can('product.view')) {
+            throw new ForbiddenHttpException('You are not allowed to view this product.');
+        }
+
         $this->layout = 'admin';
         $model = $this->findProduct($id);
 
@@ -227,7 +231,7 @@ class ProductController extends Controller
 
         Yii::$app->session->setFlash('success', 'Product archived.');
 
-        return $this->redirect(['index']);
+        return $this->redirect($this->getProductListReturnRoute());
     }
 
     public function actionRestore(int $id): Response
@@ -244,7 +248,7 @@ class ProductController extends Controller
 
         Yii::$app->session->setFlash('success', 'Product restored.');
 
-        return $this->redirect(['index', 'status' => 'active']);
+        return $this->redirect($this->getProductListReturnRoute());
     }
 
     public function actionDelete(int $id): Response
@@ -273,7 +277,7 @@ class ProductController extends Controller
                     'This product is part of order history and cannot be permanently deleted. Archive it instead.',
                 );
 
-                return $this->redirect(['index']);
+                return $this->redirect($this->getProductListReturnRoute());
             }
 
             if ($model->delete() === false) {
@@ -291,7 +295,7 @@ class ProductController extends Controller
 
         Yii::$app->session->setFlash('success', 'Product permanently deleted.');
 
-        return $this->redirect(['index']);
+        return $this->redirect($this->getProductListReturnRoute());
     }
 
     private function findProduct(int $id): Product
@@ -308,6 +312,31 @@ class ProductController extends Controller
         }
 
         return $model;
+    }
+
+    /**
+     * @return array|string
+     */
+    private function getProductReturnRoute(int $id): array|string
+    {
+        if (Yii::$app->user->can('product.view')) {
+            return ['view', 'id' => $id];
+        }
+        if (Yii::$app->user->can('product.index')) {
+            return ['index'];
+        }
+
+        return ['/site/dashboard'];
+    }
+
+    /**
+     * @return array|string
+     */
+    private function getProductListReturnRoute(): array|string
+    {
+        return Yii::$app->user->can('product.index')
+            ? ['index']
+            : ['/site/dashboard'];
     }
 
     private function saveProduct(Product $model): bool

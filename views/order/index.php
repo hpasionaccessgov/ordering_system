@@ -7,6 +7,30 @@ use yii\helpers\Html;
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
 $this->title = 'Orders';
+$columns = [
+    'id',
+    'status',
+    'total_amount:currency',
+    [
+        'attribute' => 'created_at',
+        'format' => ['date', 'php:Y-m-d H:i'],
+    ],
+];
+
+if (Yii::$app->user->can('order.view')) {
+    $columns[] = [
+        'class' => 'yii\grid\ActionColumn',
+        'header' => 'Action',
+        'template' => '{view}',
+        'buttons' => [
+            'view' => static fn ($url, Order $model): string => Html::a(
+                'View',
+                ['/order/view', 'id' => $model->id],
+                ['class' => 'btn btn-sm btn-outline-primary'],
+            ),
+        ],
+    ];
+}
 ?>
 
 <div class="order-page">
@@ -25,27 +49,7 @@ $this->title = 'Orders';
 <div class="order-table-card">
 <?= AdminGridView::widget([
     'dataProvider' => $dataProvider,
-    'columns' => [
-        'id',
-        'status',
-        'total_amount:currency',
-        [
-            'attribute' => 'created_at',
-            'format' => ['date', 'php:Y-m-d H:i'],
-        ],
-        [
-            'class' => 'yii\grid\ActionColumn',
-            'header' => 'Action',
-            'template' => '{view}',
-            'buttons' => [
-                'view' => static fn ($url, Order $model): string => Html::a(
-                    'View',
-                    ['/order/view', 'id' => $model->id],
-                    ['class' => 'btn btn-sm btn-outline-primary'],
-                ),
-            ],
-        ],
-    ],
+    'columns' => $columns,
 ]) ?>
 </div>
 </div>

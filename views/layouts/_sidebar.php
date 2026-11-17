@@ -42,27 +42,34 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
                 <?php if (
                     !$staffAccessDisabled
                     && (
-                    Yii::$app->user->can('product.view')
-                    || Yii::$app->user->can('product.create')
-                    || Yii::$app->user->can('product.update')
-                    || Yii::$app->user->can('product.archive')
-                    || Yii::$app->user->can('product.delete')
+                        Yii::$app->user->can('product.index')
+                        || Yii::$app->user->can('product.create')
                     )
                 ): ?>
                     <li class="nav-item">
                         <?= Html::a(
-                            '<i class="nav-icon bi bi-cup-hot"></i><p>Menu</p>',
-                            ['/product/index'],
+                            '<i class="nav-icon bi bi-cup-hot"></i><p>Product</p>',
+                            Yii::$app->user->can('product.index')
+                                ? ['/product/index']
+                                : ['/product/create'],
                             ['class' => 'nav-link' . (str_starts_with($currentRoute, 'product/') ? ' active' : '')],
                         ) ?>
                     </li>
                 <?php endif; ?>
 
-                <?php if (!$staffAccessDisabled && Yii::$app->user->can('order.view')): ?>
+                <?php if (
+                    !$staffAccessDisabled
+                    && (
+                        Yii::$app->user->can('order.index')
+                        || Yii::$app->user->can('order.create')
+                    )
+                ): ?>
                     <li class="nav-item">
                         <?= Html::a(
                             '<i class="nav-icon bi bi-receipt"></i><p>Orders</p>',
-                            ['/order/index'],
+                            Yii::$app->user->can('order.index')
+                                ? ['/order/index']
+                                : ['/order/create'],
                             ['class' => 'nav-link' . (str_starts_with($currentRoute, 'order/') ? ' active' : '')],
                         ) ?>
                     </li>
@@ -71,17 +78,16 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
                 <?php if (
                     !$staffAccessDisabled
                     && (
-                    Yii::$app->user->can('user.view')
-                    || Yii::$app->user->can('user.create')
-                    || Yii::$app->user->can('user.update')
-                    || Yii::$app->user->can('user.delete')
-                    || Yii::$app->user->can('user.assignRole')
+                        Yii::$app->user->can('user.index')
+                        || Yii::$app->user->can('user.create')
                     )
                 ): ?>
                     <li class="nav-item">
                         <?= Html::a(
                             '<i class="nav-icon bi bi-person-lines-fill"></i><p>User list</p>',
-                            ['/admin-user/list'],
+                            Yii::$app->user->can('user.index')
+                                ? ['/admin-user/list']
+                                : ['/admin-user/create'],
                             ['class' => 'nav-link' . ($currentRoute === 'admin-user/list' ? ' active' : '')],
                         ) ?>
                     </li>

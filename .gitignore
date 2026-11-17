@@ -42,4 +42,4 @@ tests/_support/_generated
 !.env.example
 
 # github md files
-.github/agents/
+# .github/agents/

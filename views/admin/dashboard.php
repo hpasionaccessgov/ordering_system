@@ -26,8 +26,14 @@ $displayName = $identity instanceof User
             <h1 class="h3 mt-2 mb-2">Welcome, <?= Html::encode($displayName) ?></h1>
             <p class="mb-3">Manage access, keep the catalog healthy, and monitor cafe operations.</p>
             <div class="d-flex flex-wrap gap-2">
-                <?= Html::a('Manage people', ['/admin-user/list'], ['class' => 'btn btn-cafebara-light']) ?>
-                <?= Html::a('Review roles', ['/admin-role/index'], ['class' => 'btn btn-cafebara-outline-light']) ?>
+                <?php if (Yii::$app->user->can('user.index')) : ?>
+                    <?= Html::a('Manage people', ['/admin-user/list'], ['class' => 'btn btn-cafebara-light']) ?>
+                <?php elseif (Yii::$app->user->can('user.create')) : ?>
+                    <?= Html::a('Create account', ['/admin-user/create'], ['class' => 'btn btn-cafebara-light']) ?>
+                <?php endif; ?>
+                <?php if (Yii::$app->user->can('user.assignRole')) : ?>
+                    <?= Html::a('Review roles', ['/admin-role/index'], ['class' => 'btn btn-cafebara-outline-light']) ?>
+                <?php endif; ?>
             </div>
         </div>
         <div class="col-auto d-none d-sm-block">

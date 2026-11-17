@@ -7,7 +7,10 @@ use yii\helpers\Html;
 /** @var Product $product */
 
 $canManageProductActions = !RbacPermissionPolicy::isStaffAccessDisabledForCurrentUser();
-$canUpdateProducts = $canManageProductActions && Yii::$app->user->can('product.update');
+$canViewProduct = Yii::$app->user->isGuest || Yii::$app->user->can('product.view');
+$canUpdateProducts = $canManageProductActions
+    && $canViewProduct
+    && Yii::$app->user->can('product.update');
 $canArchiveProducts = $canManageProductActions && Yii::$app->user->can('product.archive');
 $canDeleteProducts = $canManageProductActions && Yii::$app->user->can('product.delete');
 ?>
@@ -28,16 +31,22 @@ $canDeleteProducts = $canManageProductActions && Yii::$app->user->can('product.d
     <div class="card-body d-flex flex-column">
         <p class="product-category mb-2"><?= Html::encode($product->category ?: 'Cafébara menu') ?></p>
         <h2 class="h5 mb-2">
-            <?= Html::a(Html::encode($product->name), ['/product/view', 'id' => $product->id], [
-                'class' => 'stretched-link link-body-emphasis text-decoration-none',
-            ]) ?>
+            <?php if ($canViewProduct) : ?>
+                <?= Html::a(Html::encode($product->name), ['/product/view', 'id' => $product->id], [
+                    'class' => 'stretched-link link-body-emphasis text-decoration-none',
+                ]) ?>
+            <?php else : ?>
+                <?= Html::encode($product->name) ?>
+            <?php endif; ?>
         </h2>
         <p class="text-body-secondary small mb-3">
             <?= Html::encode($product->description ?? '') ?>
         </p>
         <div class="mt-auto d-flex justify-content-between align-items-center gap-2">
             <strong class="product-card-price"><?= Yii::$app->formatter->asCurrency($product->price) ?></strong>
-            <span class="small text-primary fw-semibold">View details</span>
+            <?php if ($canViewProduct) : ?>
+                <span class="small text-primary fw-semibold">View details</span>
+            <?php endif; ?>
         </div>
         <?php if ($canUpdateProducts || $canArchiveProducts || $canDeleteProducts) : ?>
             <div class="product-card-actions position-relative z-2 mt-3">

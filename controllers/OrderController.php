@@ -37,7 +37,12 @@ class OrderController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     [
-                        'actions' => ['index', 'view'],
+                        'actions' => ['index'],
+                        'allow' => true,
+                        'roles' => ['order.index'],
+                    ],
+                    [
+                        'actions' => ['view'],
                         'allow' => true,
                         'roles' => ['order.view'],
                     ],
@@ -151,7 +156,7 @@ class OrderController extends Controller
             $items,
         );
 
-        return $this->redirect(['view', 'id' => $order->id]);
+        return $this->redirect($this->getOrderReturnRoute((int) $order->id));
     }
 
     public function actionCreateProduct(int $id): Response
@@ -170,11 +175,15 @@ class OrderController extends Controller
             [['product_id' => $id, 'quantity' => $quantity]],
         );
 
-        return $this->redirect(['view', 'id' => $order->id]);
+        return $this->redirect($this->getOrderReturnRoute((int) $order->id));
     }
 
     public function actionUpdate(int $id): Response|string
     {
+        if (!Yii::$app->user->can('order.view')) {
+            throw new ForbiddenHttpException('You are not allowed to view this order.');
+        }
+
         $this->layout = 'admin';
         $order = $this->findAccessibleOrder($id);
 
@@ -204,7 +213,7 @@ class OrderController extends Controller
 
         Yii::$app->session->setFlash('success', 'Order updated.');
 
-        return $this->redirect(['view', 'id' => $order->id]);
+        return $this->redirect($this->getOrderReturnRoute((int) $order->id));
     }
 
     public function actionCancel(int $id): Response
@@ -239,7 +248,7 @@ class OrderController extends Controller
 
         Yii::$app->session->setFlash('success', 'Order cancelled.');
 
-        return $this->redirect(['view', 'id' => $order->id]);
+        return $this->redirect($this->getOrderReturnRoute((int) $order->id));
     }
 
     public function actionProcess(int $id): Response
@@ -260,7 +269,7 @@ class OrderController extends Controller
 
         Yii::$app->session->setFlash('success', 'Order status updated.');
 
-        return $this->redirect(['view', 'id' => $order->id]);
+        return $this->redirect($this->getOrderReturnRoute((int) $order->id));
     }
 
     private function findAccessibleOrder(int $id): Order
@@ -286,5 +295,20 @@ class OrderController extends Controller
             Yii::$app->user->can('admin.access'),
             Yii::$app->user->can('staff.access'),
         );
+    }
+
+    /**
+     * @return array|string
+     */
+    private function getOrderReturnRoute(int $id): array|string
+    {
+        if (Yii::$app->user->can('order.view')) {
+            return ['view', 'id' => $id];
+        }
+        if (Yii::$app->user->can('order.index')) {
+            return ['index'];
+        }
+
+        return ['/site/dashboard'];
     }
 }

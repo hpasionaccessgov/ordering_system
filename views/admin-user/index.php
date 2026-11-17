@@ -35,7 +35,20 @@ foreach ($roles as $role) {
         'dataProvider' => $dataProvider,
         'columns' => [
             'id',
-            'username',
+            [
+                'attribute' => 'username',
+                'format' => 'raw',
+                'value' => static function (User $user): string {
+                    if (!Yii::$app->user->can('user.view')) {
+                        return Html::encode($user->username);
+                    }
+
+                    return Html::a(
+                        Html::encode($user->username),
+                        ['/admin-user/view', 'id' => $user->id],
+                    );
+                },
+            ],
             'full_name',
             'email:email',
             [
@@ -73,7 +86,10 @@ foreach ($roles as $role) {
                 'format' => 'raw',
                 'value' => static function (User $user): string {
                     $actions = [];
-                    if (Yii::$app->user->can('user.update')) {
+                    if (
+                        Yii::$app->user->can('user.update')
+                        && Yii::$app->user->can('user.view')
+                    ) {
                         $actions[] = Html::a('Edit', ['/admin-user/update', 'id' => $user->id], [
                             'class' => 'btn btn-sm btn-outline-primary',
                             'aria-label' => 'Edit personal data for ' . $user->username,
