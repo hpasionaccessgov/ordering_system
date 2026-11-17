@@ -6,7 +6,6 @@ namespace app\controllers;
 
 use app\filters\StaffAccessFilter;
 use app\models\RoleForm;
-use app\services\RbacPermissionPolicy;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -135,18 +134,6 @@ class AdminRoleController extends Controller
             if ($auth->getPermission($permissionName) === null) {
                 throw new BadRequestHttpException("Permission '{$permissionName}' does not exist.");
             }
-            if (!RbacPermissionPolicy::isAllowed($name, $permissionName)) {
-                throw new BadRequestHttpException(
-                    "The permission '{$permissionName}' cannot be assigned to the '{$name}' role.",
-                );
-            }
-        }
-
-        if ($name === 'admin') {
-            $permissionNames = array_values(array_unique(array_merge(
-                $permissionNames,
-                ['admin.access', 'user.assignRole'],
-            )));
         }
 
         $transaction = Yii::$app->db->beginTransaction();

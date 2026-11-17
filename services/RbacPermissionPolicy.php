@@ -8,15 +8,6 @@ use Yii;
 
 final class RbacPermissionPolicy
 {
-    public static function isAllowed(string $roleName, string $permissionName): bool
-    {
-        if (in_array($permissionName, ['admin.access', 'user.assignRole'], true)) {
-            return $roleName === 'admin';
-        }
-
-        return true;
-    }
-
     public static function isStaffAccessDisabledForCurrentUser(): bool
     {
         if (Yii::$app->user->isGuest) {
