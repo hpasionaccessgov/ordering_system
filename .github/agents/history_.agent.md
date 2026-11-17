@@ -33,7 +33,7 @@ Continue work on the existing Cafébara Yii2 ordering system. Inspect the curren
 
 - `*.index` is the permission for a module's list/table page.
 - `*.view` is the permission for opening an individual record's details.
-- These remain separate permissions at runtime, but the role editor treats `*.view` as the module-level toggle: checking it selects the module's operational permissions, and unchecking it clears them, including `*.index`.
+- These remain separate permissions at runtime. The role editor treats `*.index` as the module-level toggle: checking it selects the module's operational permissions, and unchecking it clears them. `*.view` remains the individual-record/detail permission.
 - Implemented index permissions:
   - `order.index` for `OrderController::actionIndex()`
   - `product.index` for `ProductController::actionIndex()`
@@ -44,7 +44,7 @@ Continue work on the existing Cafébara Yii2 ordering system. Inspect the curren
 
 ### Permission dependencies
 
-The role editor synchronizes module permissions when a record-view permission is toggled. The same normalization runs server-side when role permissions are saved, so disabling JavaScript cannot retain operational permissions without the corresponding view permission:
+The role editor synchronizes module permissions when a module-index permission is toggled. The same normalization runs server-side when role permissions are saved, so disabling JavaScript cannot retain operational permissions without the corresponding index permission:
 
 - `user.view` synchronizes `user.index`, `user.create`, `user.delete`, and `user.update`.
 - `product.view` synchronizes `product.index`, `product.create`, `product.update`, `product.delete`, and `product.archive`.

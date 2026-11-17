@@ -92,7 +92,7 @@ class ProductController extends Controller
     public function actionIndex(): string
     {
         $this->layout = 'admin';
-        $canManageProducts = Yii::$app->user->can('product.update');
+        $canManageProducts = $this->canManageArchivedProducts();
         $requestedStatus = $this->request->get('status', 'all');
         $status = ProductCatalogPolicy::normalizeStatus(
             $canManageProducts,
@@ -157,7 +157,7 @@ class ProductController extends Controller
 
         if (
             $model === null
-            || ($model->status !== Product::STATUS_ACTIVE && !Yii::$app->user->can('product.update'))
+            || ($model->status !== Product::STATUS_ACTIVE && !$this->canManageArchivedProducts())
             || $model->image_data === null
         ) {
             throw new NotFoundHttpException('Product image not found.');
@@ -301,7 +301,7 @@ class ProductController extends Controller
     private function findProduct(int $id): Product
     {
         $query = Product::find()->where(['id' => $id]);
-        if (!Yii::$app->user->can('product.update')) {
+        if (!$this->canManageArchivedProducts()) {
             $query->andWhere(['status' => Product::STATUS_ACTIVE]);
         }
 
@@ -312,6 +312,13 @@ class ProductController extends Controller
         }
 
         return $model;
+    }
+
+    private function canManageArchivedProducts(): bool
+    {
+        return Yii::$app->user->can('product.update')
+            || Yii::$app->user->can('product.archive')
+            || Yii::$app->user->can('product.delete');
     }
 
     /**

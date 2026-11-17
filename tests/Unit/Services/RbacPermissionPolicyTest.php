@@ -9,10 +9,10 @@ use Codeception\Test\Unit;
 
 final class RbacPermissionPolicyTest extends Unit
 {
-    public function testRemovingViewAlsoRemovesPermissionsThatRenderRecordDetails(): void
+    public function testRemovingIndexOrViewRemovesDependentPermissions(): void
     {
         self::assertSame(
-            [],
+            ['order.index'],
             RbacPermissionPolicy::normalizeRolePermissions([
                 'order.index',
                 'order.update',
@@ -21,14 +21,15 @@ final class RbacPermissionPolicyTest extends Unit
             ]),
         );
         self::assertSame(
-            ['product.view', 'product.update'],
+            ['product.index', 'product.view', 'product.update'],
             RbacPermissionPolicy::normalizeRolePermissions([
+                'product.index',
                 'product.view',
                 'product.update',
             ]),
         );
         self::assertSame(
-            [],
+            ['user.index'],
             RbacPermissionPolicy::normalizeRolePermissions([
                 'user.index',
                 'user.update',
@@ -36,17 +37,17 @@ final class RbacPermissionPolicyTest extends Unit
         );
     }
 
-    public function testCheckingViewExpandsTheWholeModuleInTheRoleEditor(): void
+    public function testCheckingIndexExpandsTheWholeModuleInTheRoleEditor(): void
     {
         self::assertSame(
             [
-                'user.view',
                 'user.index',
+                'user.view',
                 'user.create',
                 'user.delete',
                 'user.update',
             ],
-            RbacPermissionPolicy::expandViewPermission('user.view', ['user.view']),
+            RbacPermissionPolicy::expandIndexPermission('user.index', ['user.index']),
         );
     }
 

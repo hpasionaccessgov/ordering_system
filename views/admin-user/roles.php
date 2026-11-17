@@ -9,12 +9,17 @@ use yii\helpers\Html;
 /** @var RoleForm $roleForm */
 
 $this->title = 'Roles';
+$indexDependenciesJson = json_encode(
+    RbacPermissionPolicy::indexDependents(),
+    JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT,
+);
 $viewDependenciesJson = json_encode(
     RbacPermissionPolicy::viewDependents(),
     JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT,
 );
 $this->registerJs(<<<JS
 (() => {
+    const indexDependencies = {$indexDependenciesJson};
     const viewDependencies = {$viewDependenciesJson};
     document.querySelectorAll('form[data-role-permission-form]').forEach(form => {
         const permissions = Array.from(form.querySelectorAll('input[name="permissions[]"]'));
@@ -40,8 +45,8 @@ $this->registerJs(<<<JS
                 return;
             }
 
-            if (viewDependencies[input.dataset.permission]) {
-                viewDependencies[input.dataset.permission].forEach(name => {
+            if (indexDependencies[input.dataset.permission]) {
+                indexDependencies[input.dataset.permission].forEach(name => {
                     const dependent = permissionByName.get(name);
                     if (dependent) {
                         dependent.checked = input.checked;
@@ -94,19 +99,19 @@ $permissionDescriptions = [
     'admin.access' => 'Access the administrator dashboard.',
     'staff.access' => 'Access staff-only features.',
     'customer.access' => 'Access customer features.',
-    'user.index' => 'View the list of users.',
+    'user.index' => 'View the page and list of users.',
     'user.view' => 'View an individual user.',
     'user.create' => 'Create a new user.',
     'user.update' => 'Edit user information.',
     'user.delete' => 'Delete a user account.',
     'user.assignRole' => 'Assign roles to user accounts.',
-    'product.index' => 'View the product and menu list.',
+    'product.index' => 'View the page and product list.',
     'product.view' => 'View an individual product.',
     'product.create' => 'Create a new product.',
     'product.update' => 'Edit product information.',
     'product.archive' => 'Archive or restore products.',
     'product.delete' => 'Delete a product.',
-    'order.index' => 'View the list of orders.',
+    'order.index' => 'View the page and list of orders.',
     'order.view' => 'View an individual order.',
     'order.create' => 'Create a new order.',
     'order.update' => 'Edit order information.',
@@ -222,7 +227,8 @@ uksort($permissionGroups, static function (string $left, string $right) use ($mo
                     <h3 class="small text-uppercase text-body-secondary">Permissions</h3>
                     <?php $children = array_keys($auth->getChildren($role->name)); ?>
                     <p class="small text-body-secondary">
-                        Select permissions to configure this role. Hover over a permission for details.
+                        Index permissions control module access and lists. View permissions control individual
+                        records. Hover over a permission for details.
                     </p>
                     <?php if ($role->name === 'admin') : ?>
                         <div class="alert alert-warning small d-none" data-admin-recovery-warning role="alert">

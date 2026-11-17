@@ -9,21 +9,21 @@ use Yii;
 final class RbacPermissionPolicy
 {
     /**
-     * Module permissions controlled by each module's view checkbox in the role editor.
+     * Module permissions controlled by each module's index checkbox.
      *
      * @var array<string, list<string>>
      */
-    private const VIEW_DEPENDENTS = [
-        'user.view' => ['user.index', 'user.create', 'user.delete', 'user.update'],
-        'product.view' => [
-            'product.index',
+    private const INDEX_DEPENDENTS = [
+        'user.index' => ['user.view', 'user.create', 'user.delete', 'user.update'],
+        'product.index' => [
+            'product.view',
             'product.create',
             'product.update',
             'product.delete',
             'product.archive',
         ],
-        'order.view' => [
-            'order.index',
+        'order.index' => [
+            'order.view',
             'order.create',
             'order.update',
             'order.cancel',
@@ -31,6 +31,25 @@ final class RbacPermissionPolicy
             'order.receipt.print',
         ],
     ];
+
+    /**
+     * Permissions that require access to an individual record.
+     *
+     * @var array<string, list<string>>
+     */
+    private const VIEW_DEPENDENTS = [
+        'user.view' => ['user.create', 'user.delete', 'user.update'],
+        'product.view' => ['product.create', 'product.update', 'product.delete', 'product.archive'],
+        'order.view' => ['order.create', 'order.update', 'order.cancel', 'order.process', 'order.receipt.print'],
+    ];
+
+    /**
+     * @return array<string, list<string>>
+     */
+    public static function indexDependents(): array
+    {
+        return self::INDEX_DEPENDENTS;
+    }
 
     /**
      * @return array<string, list<string>>
@@ -47,6 +66,16 @@ final class RbacPermissionPolicy
     public static function normalizeRolePermissions(array $permissionNames): array
     {
         $selected = array_fill_keys($permissionNames, true);
+
+        foreach (self::INDEX_DEPENDENTS as $indexPermission => $dependentPermissions) {
+            if (isset($selected[$indexPermission])) {
+                continue;
+            }
+
+            foreach ($dependentPermissions as $dependentPermission) {
+                unset($selected[$dependentPermission]);
+            }
+        }
 
         foreach (self::VIEW_DEPENDENTS as $viewPermission => $dependentPermissions) {
             if (isset($selected[$viewPermission])) {
@@ -65,11 +94,12 @@ final class RbacPermissionPolicy
      * @param list<string> $permissionNames
      * @return list<string>
      */
-    public static function expandViewPermission(string $viewPermission, array $permissionNames): array
+    public static function expandIndexPermission(string $indexPermission, array $permissionNames): array
     {
         $selected = array_fill_keys($permissionNames, true);
 
-        foreach (self::VIEW_DEPENDENTS[$viewPermission] ?? [] as $dependentPermission) {
+        $selected[$indexPermission] = true;
+        foreach (self::INDEX_DEPENDENTS[$indexPermission] ?? [] as $dependentPermission) {
             $selected[$dependentPermission] = true;
         }
 
