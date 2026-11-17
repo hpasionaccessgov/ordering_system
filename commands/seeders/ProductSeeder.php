@@ -8,6 +8,7 @@ use app\models\Product;
 use RuntimeException;
 use Throwable;
 use Yii;
+use yii\db\Transaction;
 
 class ProductSeeder
 {
@@ -55,13 +56,18 @@ class ProductSeeder
                 'Butter_Croissant.webp',
             ],
         ];
-        $names = array_column($records, 0);
-        $transaction = Product::getDb()->beginTransaction();
+        $added = 0;
 
-        try {
-            foreach ($records as [$name, $description, $category, $price, $featured, $imageName]) {
-                [$imageData, $imageMime] = $this->loadImage($imageName);
-                $product = Product::findOne(['name' => $name]) ?? new Product();
+        foreach ($records as [$name, $description, $category, $price, $featured, $imageName]) {
+            if (Product::findOne(['name' => $name]) !== null) {
+                continue;
+            }
+
+            [$imageData, $imageMime] = $this->loadImage($imageName);
+            $transaction = Product::getDb()->beginTransaction();
+
+            try {
+                $product = new Product();
                 $product->setAttributes([
                     'name' => $name,
                     'description' => $description,
@@ -77,29 +83,20 @@ class ProductSeeder
 
                 if (!$product->save()) {
                     throw new RuntimeException(
-                        "Could not seed product {$name}: " . json_encode($product->getErrors())
+                        "Could not seed product {$name}: " . json_encode($product->getErrors()),
                     );
                 }
+
+                $transaction->commit();
+                $added++;
+            } catch (Throwable $exception) {
+                $this->rollback($transaction);
+
+                throw $exception;
             }
-
-            Product::updateAll(
-                [
-                    'status' => Product::STATUS_ARCHIVED,
-                    'updated_at' => time(),
-                ],
-                ['not in', 'name', $names],
-            );
-
-            $transaction->commit();
-        } catch (Throwable $exception) {
-            if ($transaction->isActive) {
-                $transaction->rollBack();
-            }
-
-            throw $exception;
         }
 
-        return count($records);
+        return $added;
     }
 
     /**
@@ -128,5 +125,22 @@ class ProductSeeder
         }
 
         return [$imageData, $imageMime];
+    }
+
+    private function rollback(Transaction $transaction): void
+    {
+        if (!$transaction->isActive) {
+            return;
+        }
+
+        try {
+            $transaction->rollBack();
+        } catch (Throwable $rollbackException) {
+            Yii::error(
+                'Product seeder rollback failed after the database connection was lost: '
+                . $rollbackException->getMessage(),
+                __METHOD__,
+            );
+        }
     }
 }

@@ -15,7 +15,7 @@ class SeedController extends Controller
     {
         $products = (new ProductSeeder())->run();
 
-        $this->stdout("Product catalog refreshed. Seeded products processed: {$products}.\n");
+        $this->stdout("Product catalog seeded. Products added: {$products}.\n");
 
         return ExitCode::OK;
     }
@@ -26,7 +26,7 @@ class SeedController extends Controller
         $products = (new ProductSeeder())->run();
 
         $this->stdout(
-            "Seed complete. Users added: {$users}; products created or refreshed: {$products}.\n"
+            "Seed complete. Users added: {$users}; products added: {$products}.\n"
         );
 
         return ExitCode::OK;

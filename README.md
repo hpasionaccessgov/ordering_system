@@ -13,7 +13,7 @@ A Yii2 basic application for ordering system. This application is built using Yi
 
 ## Requirements
 
-- PHP 8.2 or higher
+- PHP 8.3 or higher
 - Composer
 - MariaDB 10.4+ or MySQL 8.0+
 - Git
@@ -40,23 +40,78 @@ A Yii2 basic application for ordering system. This application is built using Yi
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
     ```
-5. Run the application migrations:
+5. Configure the database in `.env`. For Laragon, a typical local configuration is:
+    ```dotenv
+    DB_DSN="mysql:host=127.0.0.1;port=3306;dbname=ordering_system"
+    DB_USERNAME=root
+    DB_PASSWORD=
+    ```
+    If your MySQL root account has a password, set it in `DB_PASSWORD`.
+6. Run the application migrations:
     ```bash
     php yii migrate --interactive=0
     ```
-6. Start the development server:
+    For an existing database where Yii RBAC tables were already created by
+    Yii's original RBAC migration path, run this once before migrating:
+    ```bash
+    php yii migrate/mark m261112_000000_create_rbac_tables
+    ```
+    New databases do not need the `migrate/mark` step.
+7. Seed local test data:
+    ```bash
+    php yii seed/test-data
+    ```
+    The seeder is additive and idempotent. It adds only missing users and
+    products and does not archive, update, delete, or reassign existing data.
+8. Start the development server:
     ```bash
     php yii serve
     ```
     OR use the laragon GUI to start the server.
-7. Start the laragon apache and MySQL services, then open the link: http://localhost/ordering_system/web/
-8. Register a new account. Registration activates the account and signs you in immediately; new accounts receive the Customer role.
-9. Promote your first account to Admin from the project directory:
+9. Start Laragon Apache and MySQL, then open http://localhost/ordering_system/web/.
+10. Register a new account. Registration activates the account and signs you in immediately; new accounts receive the Customer role.
+11. Promote your first account to Admin from the project directory:
     ```bash
     php yii rbac/make-admin your-email@example.com
     ```
-    OR run the seeder to create an seeded users account such as customer, staff, and admin:
-    ```bash
-    php yii seed/test-data
-    ```
-10. Sign in or reload your page to see the admin dashboard link in the navigation bar. The admin dashboard is accessible only to users with the Admin role.
+12. Sign in or reload the page. The admin dashboard is accessible only to users with the Admin role.
+
+## PHP and Composer checks
+
+The locked PHPUnit version requires PHP 8.3. On Laragon, select
+`C:\laragon\bin\php\php-8.3.36-1-Win32-vs16-x64` as the active PHP version.
+
+```powershell
+php -v
+composer check-platform-reqs
+```
+
+If PowerShell still resolves XAMPP PHP, use the Laragon executable explicitly:
+
+```powershell
+& "C:\laragon\bin\php\php-8.3.36-1-Win32-vs16-x64\php.exe" -v
+```
+
+## Troubleshooting `MySQL server has gone away`
+
+The seeder stores sample product images in the database. Confirm MySQL is
+running in Laragon and use the same PHP version for migrations and seeding:
+
+```powershell
+& "C:\laragon\bin\php\php-8.3.36-1-Win32-vs16-x64\php.exe" yii migrate --interactive=0
+& "C:\laragon\bin\php\php-8.3.36-1-Win32-vs16-x64\php.exe" yii seed/test-data
+```
+
+If MySQL still disconnects while inserting an image, increase
+`max_allowed_packet` in the active MySQL/MariaDB configuration to at least
+`64M`, restart MySQL in Laragon, and rerun the seeder. The seeder processes
+each new product independently, preserves the original database error, and
+does not mutate existing products.
+
+Seed credentials:
+
+| Username | Email | Password | Role |
+|---|---|---|---|
+| `seed_admin` | `seed.admin@cafebara.test` | `CafebaraTest123!` | Admin |
+| `seed_staff` | `seed.staff@cafebara.test` | `CafebaraTest123!` | Staff |
+| `seed_customer` | `seed.customer@cafebara.test` | `CafebaraTest123!` | Customer |
