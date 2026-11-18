@@ -50,13 +50,11 @@ $canViewFeaturedProducts = Yii::$app->user->isGuest || Yii::$app->user->can('pro
                                 <p class="cafebara-section-kicker mb-2">From the counter</p>
                                 <h2 class="h2 fw-bold mb-0">Featured drinks and bites</h2>
                             </div>
-                            <?php if (Yii::$app->user->can('product.index')): ?>
-                                <?= Html::a(
-                                    'Browse menu',
-                                    ['/product/index'],
-                                    ['class' => 'btn btn-cafebara-outline-light'],
-                                ) ?>
-                            <?php endif; ?>
+                            <?= Html::a(
+                                'Browse menu',
+                                ['/site/menu'],
+                                ['class' => 'btn btn-cafebara-outline-light'],
+                            ) ?>
                         </div>
                         <div class="row g-4">
                             <?php foreach ($featuredProducts as $product) : ?>

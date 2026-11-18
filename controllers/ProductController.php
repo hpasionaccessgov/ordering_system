@@ -162,7 +162,7 @@ class ProductController extends Controller
 
     public function actionView(int $id): string
     {
-        $this->layout = 'admin';
+        $this->layout = Yii::$app->user->isGuest ? 'main' : 'admin';
 
         return $this->render('view', [
             'model' => $this->findProduct($id),

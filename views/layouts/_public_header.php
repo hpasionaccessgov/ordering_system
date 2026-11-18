@@ -9,6 +9,7 @@ use yii\helpers\Html;
 $currentRoute = Yii::$app->controller->route;
 $navigationItems = [
     ['label' => 'Home', 'route' => 'site/index', 'url' => ['/site/index']],
+    ['label' => 'Menu', 'route' => 'site/menu', 'url' => ['/site/menu']],
     ['label' => 'About', 'route' => 'site/about', 'url' => ['/site/about']],
     ['label' => 'Contact', 'route' => 'site/contact', 'url' => ['/site/contact']],
 ];

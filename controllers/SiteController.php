@@ -13,6 +13,7 @@ use app\models\ChangePasswordForm;
 use app\models\ProfileForm;
 use app\models\DeactivateForm;
 use app\models\Product;
+use app\models\Category;
 use yii\web\Controller;
 use yii\web\ErrorAction;
 use yii\web\Response;
@@ -22,6 +23,8 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\base\Security;
 use yii\mail\MailerInterface;
+use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
 
 class SiteController extends Controller
 {
@@ -108,6 +111,58 @@ class SiteController extends Controller
                 ->orderBy(['name' => SORT_ASC])
                 ->limit(6)
                 ->all(),
+        ]);
+    }
+
+    public function actionMenu(): string
+    {
+        $requestedSearch = $this->request->get('q', '');
+        $search = is_string($requestedSearch) ? trim($requestedSearch) : '';
+        $requestedCategory = $this->request->get('category_id', '');
+        $categoryId = is_scalar($requestedCategory)
+            ? trim((string) $requestedCategory)
+            : '';
+
+        $query = Product::find()
+            ->with('categoryRecord')
+            ->where(['status' => Product::STATUS_ACTIVE]);
+        if ($search !== '') {
+            $query->andWhere([
+                'or',
+                ['like', 'name', $search],
+                ['like', 'description', $search],
+            ]);
+        }
+        if ($categoryId !== '') {
+            if (ctype_digit($categoryId)) {
+                $query->andWhere(['category_id' => (int) $categoryId]);
+            } else {
+                $query->andWhere(['id' => null]);
+            }
+        }
+
+        return $this->render('menu', [
+            'dataProvider' => new ActiveDataProvider([
+                'query' => $query,
+                'pagination' => ['pageSize' => 9, 'pageSizeLimit' => [9, 9]],
+                'sort' => [
+                    'attributes' => ['name', 'price', 'id'],
+                    'defaultOrder' => ['name' => SORT_ASC, 'id' => SORT_ASC],
+                ],
+            ]),
+            'categories' => ArrayHelper::map(
+                Category::find()
+                    ->where(['status' => Category::STATUS_ACTIVE])
+                    ->andWhere(['id' => Product::find()->select('category_id')->where([
+                        'status' => Product::STATUS_ACTIVE,
+                    ])])
+                    ->orderBy(['name' => SORT_ASC])
+                    ->all(),
+                'id',
+                'name',
+            ),
+            'search' => $search,
+            'categoryId' => $categoryId,
         ]);
     }
 
