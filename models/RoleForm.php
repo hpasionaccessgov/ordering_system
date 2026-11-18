@@ -7,6 +7,14 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 
+/**
+ * Class RoleForm
+ * @package app\models
+ *
+ * @property string $name
+ * @property string $description
+ */
+
 class RoleForm extends Model
 {
     public $name = '';

@@ -5,7 +5,6 @@ declare(strict_types=1);
 /** @var yii\web\View $this */
 
 use yii\helpers\Html;
-use app\services\RbacPermissionPolicy;
 
 $currentRoute = Yii::$app->controller->route;
 $navigationItems = [
@@ -14,7 +13,6 @@ $navigationItems = [
     ['label' => 'Contact', 'route' => 'site/contact', 'url' => ['/site/contact']],
 ];
 $user = Yii::$app->user->identity;
-$staffAccessDisabled = RbacPermissionPolicy::isStaffAccessDisabledForCurrentUser();
 $hasDashboardAccess = Yii::$app->user->can('admin.access')
     || Yii::$app->user->can('staff.access')
     || Yii::$app->user->can('customer.access');
@@ -76,11 +74,9 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                             [
                             'class' => 'btn btn-primary',
                         ]) ?>
-                        <?php if (!$staffAccessDisabled): ?>
-                            <?= Html::a('Profile', ['/site/profile'], [
-                                'class' => 'btn btn-outline-primary',
-                            ]) ?>
-                        <?php endif; ?>
+                        <?= Html::a('Profile', ['/site/profile'], [
+                            'class' => 'btn btn-outline-primary',
+                        ]) ?>
                         <?= Html::beginForm(['/site/logout'], 'post', ['class' => 'm-0']) ?>
                         <?= Html::submitButton('Sign out', ['class' => 'btn btn-link cafebara-sign-out']) ?>
                         <?= Html::endForm() ?>

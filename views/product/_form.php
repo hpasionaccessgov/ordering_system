@@ -5,6 +5,7 @@ use app\widgets\AdminActiveForm;
 use yii\helpers\Html;
 
 /** @var Product $model */
+/** @var array<int, string> $categories */
 
 $initialImageUrl = $model->getImageUrl();
 $cancelRoute = Yii::$app->user->can('product.index')
@@ -64,9 +65,8 @@ $form = AdminActiveForm::begin([
 
                 <div class="row g-3">
                     <div class="col-12 col-md-6">
-                        <?= $form->field($model, 'category')->textInput([
-                            'maxlength' => true,
-                            'placeholder' => 'Coffee, pastries, seasonal...',
+                        <?= $form->field($model, 'category_id')->dropDownList($categories, [
+                            'prompt' => 'Select a category',
                         ]) ?>
                     </div>
                     <div class="col-12 col-md-6">

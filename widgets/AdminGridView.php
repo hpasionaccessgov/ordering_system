@@ -25,5 +25,7 @@ class AdminGridView extends GridView
 
     public $pager = [
         'class' => LinkPager::class,
+        'prevPageLabel' => 'Previous',
+        'nextPageLabel' => 'Next',
     ];
 }

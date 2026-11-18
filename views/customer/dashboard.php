@@ -53,6 +53,7 @@ $displayName = $identity instanceof User
     </div>
 </section>
 
+<?php if (Yii::$app->user->can('product.view')) : ?>
 <section class="mb-4">
     <div class="d-flex justify-content-between align-items-end mb-3">
         <div>
@@ -71,3 +72,4 @@ $displayName = $identity instanceof User
         <?php endforeach; ?>
     </div>
 </section>
+<?php endif; ?>

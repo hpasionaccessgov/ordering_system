@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use Yii;
-use app\filters\StaffAccessFilter;
 use app\models\ContactForm;
 use app\models\LoginForm;
 use app\models\RegisterForm;
@@ -53,10 +52,6 @@ class SiteController extends Controller
     public function behaviors(): array
     {
         return [
-            'staffAccess' => [
-                'class' => StaffAccessFilter::class,
-                'only' => ['profile', 'change-password', 'deactivate', 'dashboard'],
-            ],
             'access' => [
                 'class' => AccessControl::class,
                 'only' => ['logout', 'profile', 'change-password', 'deactivate', 'dashboard'],

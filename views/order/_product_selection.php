@@ -97,7 +97,9 @@ JS);
                 <?php endif; ?>
 
                 <div class="card-body d-flex flex-column">
-                    <p class="product-category mb-2"><?= Html::encode($product->category ?: 'Cafébara menu') ?></p>
+                    <p class="product-category mb-2">
+                        <?= Html::encode($product->categoryRecord?->name ?? 'Cafébara menu') ?>
+                    </p>
                     <h2 class="h5"><?= Html::encode($product->name) ?></h2>
                     <p class="text-body-secondary small flex-grow-1">
                         <?= Html::encode($product->description ?? '') ?>

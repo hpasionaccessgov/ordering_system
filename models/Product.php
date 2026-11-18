@@ -6,9 +6,25 @@ namespace app\models;
 
 use yii\web\UploadedFile;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\Url;
 
+/**
+ * This is the model class for table "{{%products}}".
+ *
+ * @property int $id
+ * @property int $category_id
+ * @property string $name
+ * @property string|null $description
+ * @property float $price
+ * @property int $status
+ * @property string|null $image_path
+ * @property string|null $image_mime
+ * @property string|null $image_name
+ * @property bool $is_featured
+ * @property Category $categoryRecord
+ */
 class Product extends ActiveRecord
 {
     public ?UploadedFile $imageFile = null;
@@ -29,9 +45,18 @@ class Product extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['name', 'price', 'status'], 'required'],
+            [['name', 'category_id', 'price', 'status'], 'required'],
             [['description'], 'string'],
-            [['category'], 'string', 'max' => 80],
+            [['category_id', 'status'], 'integer'],
+            [
+                ['category_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Category::class,
+                'targetAttribute' => ['category_id' => 'id'],
+                'message' => 'Select a valid category.',
+            ],
+            [['category_id'], 'validateCategoryStatus'],
             [['image_path'], 'string', 'max' => 255],
             [['image_mime'], 'string', 'max' => 100],
             [['image_name'], 'string', 'max' => 255],
@@ -41,7 +66,6 @@ class Product extends ActiveRecord
             [['price'], 'filter', 'filter' => static function ($value): string {
                 return number_format((float) $value, 2, '.', '');
             }],
-            [['status'], 'integer'],
             [
                 ['status'],
                 'in',
@@ -52,6 +76,37 @@ class Product extends ActiveRecord
             ],
             [['name'], 'string', 'max' => 150],
         ];
+    }
+
+    public function attributeLabels(): array
+    {
+        return array_merge(parent::attributeLabels(), [
+            'category_id' => 'Category',
+        ]);
+    }
+
+    public function getCategoryRecord(): ActiveQuery
+    {
+        return $this->hasOne(Category::class, ['id' => 'category_id']);
+    }
+
+    public function validateCategoryStatus(string $attribute): void
+    {
+        if ($this->hasErrors($attribute) || $this->$attribute === null) {
+            return;
+        }
+
+        $category = Category::findOne((int) $this->$attribute);
+        if ($category === null) {
+            return;
+        }
+
+        $categoryWasUnchanged = !$this->isNewRecord
+            && (int) $this->getOldAttribute($attribute) === (int) $this->$attribute;
+
+        if ((int) $category->status !== Category::STATUS_ACTIVE && !$categoryWasUnchanged) {
+            $this->addError($attribute, 'Select an active category.');
+        }
     }
 
     public function isActive(): bool

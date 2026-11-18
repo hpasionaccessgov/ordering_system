@@ -7,6 +7,17 @@ namespace app\models;
 use yii\base\Model;
 use yii\mail\MailerInterface;
 
+/** 
+ * Class ContactForm
+ * @package app\models
+ *
+ * @property string $name
+ * @property string $email
+ * @property string $subject
+ * @property string $body
+ * @property string $verifyCode
+ */
+
 class ContactForm extends Model
 {
     public string $name = '';

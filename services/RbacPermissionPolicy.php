@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace app\services;
 
-use Yii;
-
 final class RbacPermissionPolicy
 {
     /**
@@ -15,6 +13,7 @@ final class RbacPermissionPolicy
      */
     private const INDEX_DEPENDENTS = [
         'user.index' => ['user.view', 'user.create', 'user.delete', 'user.update'],
+        'category.index' => ['category.view', 'category.create', 'category.update', 'category.delete'],
         'product.index' => [
             'product.view',
             'product.create',
@@ -39,6 +38,7 @@ final class RbacPermissionPolicy
      */
     private const VIEW_DEPENDENTS = [
         'user.view' => ['user.create', 'user.delete', 'user.update'],
+        'category.view' => ['category.create', 'category.update', 'category.delete'],
         'product.view' => ['product.create', 'product.update', 'product.delete', 'product.archive'],
         'order.view' => ['order.create', 'order.update', 'order.cancel', 'order.process', 'order.receipt.print'],
     ];
@@ -104,29 +104,5 @@ final class RbacPermissionPolicy
         }
 
         return array_keys($selected);
-    }
-
-    public static function isStaffAccessDisabledForCurrentUser(): bool
-    {
-        if (Yii::$app->user->isGuest) {
-            return false;
-        }
-
-        $roles = Yii::$app->authManager->getRolesByUser(Yii::$app->user->id);
-
-        return !self::isStaffRoleAccessAllowed(
-            array_keys($roles),
-            Yii::$app->user->can('staff.access'),
-        );
-    }
-
-    /**
-     * @param list<string> $roleNames
-     */
-    public static function isStaffRoleAccessAllowed(array $roleNames, bool $hasStaffAccess): bool
-    {
-        return in_array('admin', $roleNames, true)
-            || !in_array('staff', $roleNames, true)
-            || $hasStaffAccess;
     }
 }
