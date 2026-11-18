@@ -42,29 +42,6 @@ $canViewFeaturedProducts = Yii::$app->user->isGuest || Yii::$app->user->can('pro
                         ]) ?>
                     <?php endif ?>
                 </div>
-
-                <?php if ($canViewFeaturedProducts && $featuredProducts !== []) : ?>
-                    <section class="cafebara-catalog-preview mt-5">
-                        <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
-                            <div>
-                                <p class="cafebara-section-kicker mb-2">From the counter</p>
-                                <h2 class="h2 fw-bold mb-0">Featured drinks and bites</h2>
-                            </div>
-                            <?= Html::a(
-                                'Browse menu',
-                                ['/site/menu'],
-                                ['class' => 'btn btn-cafebara-outline-light'],
-                            ) ?>
-                        </div>
-                        <div class="row g-4">
-                            <?php foreach ($featuredProducts as $product) : ?>
-                                <div class="col-12 col-sm-6 col-lg-4">
-                                    <?= $this->render('../shared/_product_card', ['product' => $product]) ?>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </section>
-                <?php endif; ?>
             </div>
 
             <div class="col-lg-5">
@@ -86,6 +63,29 @@ $canViewFeaturedProducts = Yii::$app->user->isGuest || Yii::$app->user->can('pro
             </div>
         </div>
     </section>
+
+    <?php if ($canViewFeaturedProducts && $featuredProducts !== []) : ?>
+        <section class="cafebara-featured mb-5">
+            <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+                <div>
+                    <p class="cafebara-section-kicker mb-2">From the counter</p>
+                    <h2 class="h2 fw-bold mb-0">Featured drinks and bites</h2>
+                </div>
+                <?= Html::a(
+                    'Browse menu',
+                    ['/site/menu'],
+                    ['class' => 'btn btn-outline-primary'],
+                ) ?>
+            </div>
+            <div class="row g-4">
+                <?php foreach ($featuredProducts as $product) : ?>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <?= $this->render('../shared/_product_card', ['product' => $product]) ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+    <?php endif; ?>
 
     <section class="cafebara-intro pb-4">
         <div class="row align-items-end g-3 mb-4">

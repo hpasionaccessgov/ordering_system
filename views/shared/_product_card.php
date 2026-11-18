@@ -12,17 +12,19 @@ $canDeleteProducts = Yii::$app->user->can('product.delete');
 ?>
 
 <article class="card product-card product-catalog-card h-100 position-relative">
-    <?php if ($product->getImageUrl() !== null) : ?>
-        <?= Html::img($product->getImageUrl(), [
-            'class' => 'product-card-image',
-            'alt' => $product->name,
-            'loading' => 'lazy',
-        ]) ?>
-    <?php else : ?>
-        <div class="product-card-placeholder" aria-hidden="true">
-            <i class="bi bi-cup-hot"></i>
-        </div>
-    <?php endif; ?>
+    <div class="product-card-media">
+        <?php if ($product->getImageUrl() !== null) : ?>
+            <?= Html::img($product->getImageUrl(), [
+                'class' => 'product-card-image',
+                'alt' => $product->name,
+                'loading' => 'lazy',
+            ]) ?>
+        <?php else : ?>
+            <div class="product-card-placeholder" aria-hidden="true">
+                <i class="bi bi-cup-hot"></i>
+            </div>
+        <?php endif; ?>
+    </div>
 
     <div class="card-body d-flex flex-column">
         <p class="product-category mb-2">

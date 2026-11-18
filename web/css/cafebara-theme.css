@@ -147,16 +147,34 @@ body.confirm-modal-open .modal-backdrop {
 }
 
 .product-card {
-    overflow: hidden;
+    overflow: visible;
     transition: transform .2s ease, box-shadow .2s ease;
 }
 
-.product-card:hover {
+.product-card:hover,
+.product-card:focus-within {
+    z-index: 5;
     transform: translateY(-3px);
     box-shadow: 0 .75rem 1.5rem rgba(48, 18, 6, .12);
 }
 
+/* The media lifts and grows past the card edge on hover so the picture pops out. */
+.product-card-media {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1rem 1rem 0 0;
+    pointer-events: none;
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.product-card:hover .product-card-media,
+.product-card:focus-within .product-card-media {
+    transform: translateY(-8px) scale(1.06);
+    box-shadow: 0 .9rem 1.75rem rgba(48, 18, 6, .22);
+}
+
 .product-card-image {
+    display: block;
     width: 100%;
     height: 190px;
     object-fit: cover;
@@ -930,7 +948,8 @@ body {
 }
 
 .cafebara-hero-logo {
-    width: min(100%, 340px);
+    width: min(100%, clamp(260px, 32vw, 400px));
+    height: auto;
     filter: drop-shadow(0 1rem 1.5rem rgba(0, 0, 0, .28));
 }
 
@@ -978,6 +997,34 @@ body {
 .cafebara-hero-note small {
     margin-top: .15rem;
     color: #74523d;
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+    .cafebara-hero-art {
+        min-height: 240px;
+    }
+
+    .cafebara-hero-logo {
+        width: min(60%, 300px);
+    }
+}
+
+@media (max-width: 575.98px) {
+    .cafebara-hero-art {
+        flex-direction: column;
+        gap: 1rem;
+        min-height: 0;
+        margin-top: .5rem;
+    }
+
+    .cafebara-hero-logo {
+        width: min(75%, 260px);
+    }
+
+    .cafebara-hero-note {
+        position: static;
+        max-width: 100%;
+    }
 }
 
 .cafebara-section-kicker {
@@ -1384,20 +1431,6 @@ body {
         --bs-btn-padding-y: .375rem;
         --bs-btn-padding-x: .6rem;
         font-size: .875rem;
-    }
-
-    .cafebara-hero-art {
-        min-height: 230px;
-        margin-top: .5rem;
-    }
-
-    .cafebara-hero-logo {
-        width: min(75%, 260px);
-    }
-
-    .cafebara-hero-note {
-        right: 0;
-        bottom: 0;
     }
 }
 
