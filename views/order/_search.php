@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 
 /** @var string $search */
+/** @var string $status */
 
 $sort = Yii::$app->request->get('sort');
 ?>
@@ -11,8 +12,21 @@ $sort = Yii::$app->request->get('sort');
     <div class="col-12 col-md">
         <?= Html::input('search', 'q', $search, [
             'class' => 'form-control',
-            'placeholder' => 'Search by order ID or status',
+            'placeholder' => 'Search order number, status, or customer',
             'aria-label' => 'Search orders',
+        ]) ?>
+    </div>
+    <div class="col-12 col-md-auto">
+        <?= Html::dropDownList('status', $status, [
+            '' => 'All statuses',
+            'pending' => 'Pending',
+            'confirmed' => 'Confirmed',
+            'processing' => 'Processing',
+            'completed' => 'Completed',
+            'cancelled' => 'Cancelled',
+        ], [
+            'class' => 'form-select',
+            'aria-label' => 'Filter orders by status',
         ]) ?>
     </div>
     <?php if (is_string($sort) && $sort !== '') : ?>

@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\models\Order;
+use app\models\User;
 use app\services\ShoppingCart;
 use app\services\OrderAccessPolicy;
 use app\services\OrderService;
+use app\services\OrderStatusService;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -101,7 +103,7 @@ class OrderController extends Controller
         $this->layout = 'admin';
 
         $query = OrderAccessPolicy::scopeToOwner(
-            Order::find(),
+            Order::find()->with('user'),
             Yii::$app->user->id,
             $this->canViewAllOrders(),
         );
@@ -112,11 +114,30 @@ class OrderController extends Controller
                 'or',
                 ['like', 'status', $search],
                 ['like', 'order_number', $search],
+                [
+                    'user_id' => User::find()
+                        ->select('id')
+                        ->andWhere([
+                            'or',
+                            ['like', 'username', $search],
+                            ['like', 'full_name', $search],
+                            ['like', 'email', $search],
+                        ]),
+                ],
             ];
             if (ctype_digit($search)) {
                 $conditions[] = ['id' => $search];
             }
             $query->andWhere($conditions);
+        }
+        $requestedStatus = $this->request->get('status');
+        $status = is_string($requestedStatus)
+            ? $requestedStatus
+            : '';
+        if (in_array($status, Order::statusValues(), true)) {
+            $query->andWhere(['status' => $status]);
+        } else {
+            $status = '';
         }
 
         return $this->render('index', [
@@ -124,11 +145,12 @@ class OrderController extends Controller
                 'query' => $query,
                 'pagination' => ['pageSize' => 10, 'pageSizeLimit' => [10, 10]],
                 'sort' => [
-                    'attributes' => ['id', 'status', 'total_amount', 'created_at'],
+                    'attributes' => ['id', 'order_number', 'status', 'total_amount', 'created_at'],
                     'defaultOrder' => ['created_at' => SORT_DESC, 'id' => SORT_DESC],
                 ],
             ]),
             'search' => $search,
+            'status' => $status,
         ]);
     }
 
@@ -255,31 +277,11 @@ class OrderController extends Controller
     {
         $order = $this->findAccessibleOrder($id);
 
-        $isStaff = Yii::$app->user->can('order.process');
-
-        if (
-            $isStaff
-            && !$order->canBeCancelledByStaff()
-        ) {
-            throw new ForbiddenHttpException(
-                'This order cannot be cancelled at its current status.',
-            );
-        }
-
-        if (
-            !$isStaff
-            && !$order->canBeCancelledByCustomer()
-        ) {
-            throw new ForbiddenHttpException(
-                'Customers can only cancel pending orders.',
-            );
-        }
-
-        $order->status = Order::STATUS_CANCELLED;
-
-        if (!$order->save(false, ['status', 'updated_at'])) {
-            throw new ForbiddenHttpException('Order could not be cancelled.');
-        }
+        (new OrderStatusService())->cancel(
+            $order,
+            (int) Yii::$app->user->id,
+            Yii::$app->user->can('order.process'),
+        );
 
         Yii::$app->session->setFlash('success', 'Order cancelled.');
 
@@ -289,18 +291,10 @@ class OrderController extends Controller
     public function actionProcess(int $id): Response
     {
         $order = $this->findAccessibleOrder($id);
-        $nextStatus = $order->nextStatus();
-        if ($nextStatus === null) {
-            throw new ForbiddenHttpException(
-                'This order cannot be processed from its current status.',
-            );
-        }
-
-        $order->status = $nextStatus;
-
-        if (!$order->save(false, ['status', 'updated_at'])) {
-            throw new ForbiddenHttpException('Order status could not be updated.');
-        }
+        (new OrderStatusService())->process(
+            $order,
+            (int) Yii::$app->user->id,
+        );
 
         Yii::$app->session->setFlash('success', 'Order status updated.');
 
@@ -315,7 +309,7 @@ class OrderController extends Controller
             $this->canViewAllOrders(),
         );
 
-        $order = $query->with(['items.product', 'user'])->one();
+        $order = $query->with(['items.product', 'user', 'statusHistory.changedBy'])->one();
 
         if ($order === null) {
             throw new NotFoundHttpException('Order not found.');
