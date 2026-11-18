@@ -72,16 +72,11 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
                     </li>
                 <?php endif; ?>
 
-                <?php if (
-                    Yii::$app->user->can('order.index')
-                    || Yii::$app->user->can('order.create')
-                ): ?>
+                <?php if (Yii::$app->user->can('order.index')): ?>
                     <li class="nav-item">
                         <?= Html::a(
                             '<i class="nav-icon bi bi-receipt"></i><p>Orders</p>',
-                            Yii::$app->user->can('order.index')
-                                ? ['/order/index']
-                                : ['/order/create'],
+                            ['/order/index'],
                             ['class' => 'nav-link' . (str_starts_with($currentRoute, 'order/') ? ' active' : '')],
                         ) ?>
                     </li>

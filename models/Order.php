@@ -19,6 +19,7 @@ use yii\db\ActiveQuery;
  * @property string|null $checkout_token
  * @property string $status
  * @property float $total_amount
+ * @property OrderStatusHistory[] $statusHistory
  */
 
 class Order extends ActiveRecord
@@ -34,6 +35,17 @@ class Order extends ActiveRecord
         self::STATUS_CONFIRMED => self::STATUS_PROCESSING,
         self::STATUS_PROCESSING => self::STATUS_COMPLETED,
     ];
+
+    public static function statusValues(): array
+    {
+        return [
+            self::STATUS_PENDING,
+            self::STATUS_CONFIRMED,
+            self::STATUS_PROCESSING,
+            self::STATUS_COMPLETED,
+            self::STATUS_CANCELLED,
+        ];
+    }
 
     public static function tableName(): string
     {
@@ -79,6 +91,13 @@ class Order extends ActiveRecord
     public function getItems(): ActiveQuery
     {
         return $this->hasMany(OrderItem::class, ['order_id' => 'id']);
+    }
+
+    public function getStatusHistory(): ActiveQuery
+    {
+        return $this->hasMany(OrderStatusHistory::class, ['order_id' => 'id'])
+            ->with('changedBy')
+            ->orderBy(['created_at' => SORT_ASC, 'id' => SORT_ASC]);
     }
 
     public function isEditableByCustomer(): bool

@@ -50,6 +50,10 @@ class OrderService
             if (!$order->save()) {
                 throw new BadRequestHttpException('Order could not be created.');
             }
+            (new OrderStatusService())->recordCreation(
+                $order,
+                $userId,
+            );
 
             $total = 0.0;
 
