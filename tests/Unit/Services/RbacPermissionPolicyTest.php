@@ -78,4 +78,31 @@ final class RbacPermissionPolicyTest extends Unit
             RbacPermissionPolicy::normalizeRolePermissions(['admin.access', 'user.assignRole']),
         );
     }
+
+    public function testCartIndexControlsEveryCartAction(): void
+    {
+        $permissions = ['cart.index'];
+
+        self::assertSame(
+            ['cart.index', 'cart.add', 'cart.update', 'cart.remove', 'cart.checkout'],
+            RbacPermissionPolicy::expandIndexPermission('cart.index', $permissions),
+        );
+        self::assertSame(
+            ['cart.index', 'cart.add', 'cart.update', 'cart.remove', 'cart.checkout'],
+            RbacPermissionPolicy::normalizeRolePermissions([
+                'cart.index',
+                'cart.add',
+                'cart.update',
+                'cart.remove',
+                'cart.checkout',
+            ]),
+        );
+        self::assertSame(
+            [],
+            RbacPermissionPolicy::normalizeRolePermissions([
+                'cart.add',
+                'cart.checkout',
+            ]),
+        );
+    }
 }

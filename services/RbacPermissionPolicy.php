@@ -29,6 +29,12 @@ final class RbacPermissionPolicy
             'order.process',
             'order.receipt.print',
         ],
+        'cart.index' => [
+            'cart.add',
+            'cart.update',
+            'cart.remove',
+            'cart.checkout',
+        ],
     ];
 
     /**

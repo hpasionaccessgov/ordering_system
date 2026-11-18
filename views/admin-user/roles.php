@@ -95,6 +95,7 @@ $permissionModuleLabels = [
     'category' => 'Categories',
     'product' => 'Products',
     'order' => 'Orders',
+    'cart' => 'Cart & checkout',
 ];
 $permissionDescriptions = [
     'admin.access' => 'Access the administrator dashboard.',
@@ -124,6 +125,11 @@ $permissionDescriptions = [
     'order.cancel' => 'Cancel an order.',
     'order.process' => 'Process an order status.',
     'order.receipt.print' => 'Print an order receipt.',
+    'cart.index' => 'View and manage the shopping cart page.',
+    'cart.add' => 'Add active products to a cart.',
+    'cart.update' => 'Change quantities in a cart.',
+    'cart.remove' => 'Remove products from a cart.',
+    'cart.checkout' => 'Place an order from a cart and view its confirmation.',
 ];
 $permissionGroups = [];
 foreach ($permissions as $permission) {

@@ -8,6 +8,8 @@ use yii\web\BadRequestHttpException;
 
 final class OrderItemSelection
 {
+    public const MAX_QUANTITY = 99;
+
     /**
      * @param array<mixed> $requestedItems
      * @return list<array{product_id: int, quantity: int}>
@@ -32,9 +34,21 @@ final class OrderItemSelection
                 continue;
             }
 
-            $selectedItems[] = [
+            if ($quantity > self::MAX_QUANTITY) {
+                throw new BadRequestHttpException(
+                    'Quantity cannot exceed ' . self::MAX_QUANTITY . ' per product.',
+                );
+            }
+
+            $combinedQuantity = ($selectedItems[$productId]['quantity'] ?? 0) + $quantity;
+            if ($combinedQuantity > self::MAX_QUANTITY) {
+                throw new BadRequestHttpException(
+                    'Quantity cannot exceed ' . self::MAX_QUANTITY . ' per product.',
+                );
+            }
+            $selectedItems[$productId] = [
                 'product_id' => $productId,
-                'quantity' => $quantity,
+                'quantity' => $combinedQuantity,
             ];
         }
 
@@ -42,6 +56,6 @@ final class OrderItemSelection
             throw new BadRequestHttpException('An order must contain at least one product.');
         }
 
-        return $selectedItems;
+        return array_values($selectedItems);
     }
 }

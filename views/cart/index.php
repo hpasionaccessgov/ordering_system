@@ -1,0 +1,103 @@
+<?php
+
+use app\models\Product;
+use app\services\ShoppingCart;
+use yii\helpers\Html;
+
+/** @var array{lines: list<array{product: Product, quantity: int, subtotal: string}>, total: string, count: int} $summary */
+
+$this->title = 'Shopping cart';
+?>
+
+<section class="shopping-cart-page">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Your selection</p>
+            <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
+        </div>
+        <?php if (Yii::$app->user->can('product.index')) : ?>
+            <?= Html::a('Continue shopping', ['/product/index'], ['class' => 'btn btn-outline-primary']) ?>
+        <?php endif; ?>
+    </div>
+
+    <?php if ($summary['lines'] === []): ?>
+        <div class="card admin-panel">
+            <div class="card-body text-center py-5">
+                <h2 class="h5">Your cart is empty</h2>
+                <p class="text-body-secondary">Choose active products from the catalog.</p>
+                <?php if (Yii::$app->user->can('product.index')) : ?>
+                    <?= Html::a('Browse menu', ['/product/index'], ['class' => 'btn btn-primary']) ?>
+                <?php endif; ?>
+            </div>
+        </div>
+    <?php else: ?>
+        <div class="row g-4">
+            <div class="col-12 col-lg-8">
+                <?php foreach ($summary['lines'] as $line): ?>
+                    <?php $product = $line['product']; ?>
+                    <article class="card admin-panel mb-3">
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap align-items-center gap-3">
+                                <div class="flex-grow-1">
+                                    <h2 class="h5 mb-1"><?= Html::encode($product->name) ?></h2>
+                                    <p class="text-body-secondary mb-1">
+                                        <?= Html::encode($product->categoryRecord?->name ?? 'Cafébara menu') ?>
+                                    </p>
+                                    <strong><?= Yii::$app->formatter->asCurrency($product->price) ?> each</strong>
+                                </div>
+                                <?php if (Yii::$app->user->can('cart.update')) : ?>
+                                    <?= Html::beginForm(['/cart/update', 'id' => $product->id], 'post', [
+                                        'class' => 'd-flex align-items-end gap-2',
+                                    ]) ?>
+                                    <?= Html::input('number', 'quantity', $line['quantity'], [
+                                        'class' => 'form-control order-quantity-input',
+                                        'min' => 0,
+                                        'max' => ShoppingCart::MAX_QUANTITY,
+                                        'step' => 1,
+                                        'aria-label' => 'Quantity of ' . $product->name,
+                                    ]) ?>
+                                    <?= Html::submitButton('Update', ['class' => 'btn btn-outline-primary']) ?>
+                                    <?= Html::endForm() ?>
+                                <?php endif; ?>
+                                <div class="text-end">
+                                    <span class="d-block text-body-secondary small">Subtotal</span>
+                                    <strong><?= Yii::$app->formatter->asCurrency($line['subtotal']) ?></strong>
+                                </div>
+                                <?php if (Yii::$app->user->can('cart.remove')) : ?>
+                                    <?= Html::beginForm(['/cart/remove', 'id' => $product->id], 'post', [
+                                        'class' => 'ms-lg-2',
+                                    ]) ?>
+                                    <?= Html::submitButton('Remove', [
+                                        'class' => 'btn btn-sm btn-outline-danger',
+                                        'aria-label' => 'Remove ' . $product->name,
+                                    ]) ?>
+                                    <?= Html::endForm() ?>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+            <div class="col-12 col-lg-4">
+                <section class="card admin-panel">
+                    <div class="card-body">
+                        <h2 class="h5">Order summary</h2>
+                        <div class="d-flex justify-content-between my-3">
+                            <span>Items</span>
+                            <strong><?= Html::encode((string) $summary['count']) ?></strong>
+                        </div>
+                        <div class="d-flex justify-content-between border-top pt-3 mb-4">
+                            <span>Total</span>
+                            <strong><?= Yii::$app->formatter->asCurrency($summary['total']) ?></strong>
+                        </div>
+                        <?php if (Yii::$app->user->can('cart.checkout')) : ?>
+                            <?= Html::a('Continue to checkout', ['/cart/checkout'], [
+                                'class' => 'btn btn-primary w-100',
+                            ]) ?>
+                        <?php endif; ?>
+                    </div>
+                </section>
+            </div>
+        </div>
+    <?php endif; ?>
+</section>

@@ -15,6 +15,8 @@ use yii\db\ActiveQuery;
  * @package app\models
  *
  * @property int $user_id
+ * @property string $order_number
+ * @property string|null $checkout_token
  * @property string $status
  * @property float $total_amount
  */
@@ -48,8 +50,12 @@ class Order extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['user_id', 'status', 'total_amount'], 'required'],
+            [['user_id', 'order_number', 'status', 'total_amount'], 'required'],
             [['user_id'], 'integer'],
+            [['order_number'], 'string', 'max' => 40],
+            [['checkout_token'], 'string', 'max' => 64],
+            [['order_number'], 'unique'],
+            [['checkout_token'], 'unique', 'skipOnEmpty' => true],
             [['total_amount'], 'number', 'min' => 0],
             [
                 ['status'],

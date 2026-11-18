@@ -5,7 +5,7 @@ use yii\helpers\Html;
 
 /** @var Order $model */
 
-$this->title = "Order #{$model->id}";
+$this->title = $model->order_number;
 $statusLabels = [
     Order::STATUS_PENDING => 'Pending',
     Order::STATUS_CONFIRMED => 'Confirmed',
@@ -90,12 +90,12 @@ $nextStatus = $model->nextStatus();
                 <tbody>
                     <?php foreach ($model->items as $item) : ?>
                         <tr>
-                            <td><?= Html::encode($item->product->name) ?></td>
+                            <td><?= Html::encode($item->product_name) ?></td>
                             <td><?= Html::encode((string) $item->quantity) ?></td>
                             <td><?= Yii::$app->formatter->asCurrency($item->unit_price) ?></td>
                             <td>
                                 <?= Yii::$app->formatter->asCurrency(
-                                    (float) $item->unit_price * $item->quantity,
+                                    $item->subtotal,
                                 ) ?>
                             </td>
                         </tr>

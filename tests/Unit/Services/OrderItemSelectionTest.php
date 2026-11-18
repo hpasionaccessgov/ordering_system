@@ -41,4 +41,20 @@ final class OrderItemSelectionTest extends Unit
             ['product_id' => 'not-an-id', 'quantity' => '1'],
         ]);
     }
+
+    public function testDuplicateProductsAreCombinedAndQuantityIsLimited(): void
+    {
+        self::assertSame(
+            [['product_id' => 2, 'quantity' => 3]],
+            OrderItemSelection::selectedItems([
+                ['product_id' => '2', 'quantity' => '1'],
+                ['product_id' => '2', 'quantity' => '2'],
+            ]),
+        );
+
+        $this->expectException(BadRequestHttpException::class);
+        OrderItemSelection::selectedItems([
+            ['product_id' => 2, 'quantity' => OrderItemSelection::MAX_QUANTITY + 1],
+        ]);
+    }
 }
