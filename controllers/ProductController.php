@@ -115,7 +115,8 @@ class ProductController extends Controller
         $maxPrice = $this->request->get('max_price');
 
         if ($search !== '') {
-            $query->andWhere(['or',
+            $query->andWhere([
+                'or',
                 ['like', 'name', $search],
                 ['like', 'description', $search],
                 [

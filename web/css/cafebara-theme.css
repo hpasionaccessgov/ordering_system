@@ -1156,12 +1156,45 @@ body {
 
 .cafebara-admin-grid .table thead th,
 .cafebara-data-table thead th {
+    position: relative;
     background-color: var(--cafebara-cream);
     color: var(--cafebara-dark);
     white-space: nowrap;
     font-size: .75rem;
     letter-spacing: .06em;
     text-transform: uppercase;
+    border-bottom: 2px solid rgba(var(--cafebara-brown-rgb), .22);
+}
+
+.cafebara-admin-grid .table thead th a {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    color: inherit;
+    text-decoration: none;
+}
+
+.cafebara-admin-grid .table thead th a::after {
+    content: "\2195";
+    opacity: .45;
+    font-size: .85rem;
+    line-height: 1;
+}
+
+.cafebara-admin-grid .table thead th a.asc::after {
+    content: "\2191";
+    opacity: 1;
+}
+
+.cafebara-admin-grid .table thead th a.desc::after {
+    content: "\2193";
+    opacity: 1;
+}
+
+.cafebara-admin-grid .table thead th a:focus-visible {
+    border-radius: .25rem;
+    outline: 2px solid var(--bs-primary);
+    outline-offset: 3px;
 }
 
 .cafebara-admin-grid .table > :not(caption) > * > *,

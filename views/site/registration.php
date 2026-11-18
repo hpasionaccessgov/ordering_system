@@ -73,11 +73,11 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
 
                     <?= $form->errorSummary($model) ?>
 
-                    <?= $form->field($model, 'username', ['template' => sprintf($htmlIcon, '&#128100;')])->textInput(['autofocus' => true, 'placeholder' => 'Enter your username']) ?>
-                    <?= $form->field($model, 'email', ['template' => sprintf($htmlIcon, '&#9993;')])->textInput(['placeholder' => 'Enter your email address']) ?>
-                    <?= $form->field($model, 'fullName', ['template' => sprintf($htmlIcon, '&#128100;')])->textInput(['placeholder' => 'Enter your full name']) ?>
-                    <?= $form->field($model, 'password', ['template' => sprintf($htmlIcon, '&#128274;')])->passwordInput(['placeholder' => 'Create a password']) ?>
-                    <?= $form->field($model, 'passwordConfirm', ['template' => sprintf($htmlIcon, '&#128274;')])->passwordInput(['placeholder' => 'Confirm your password']) ?>
+                    <?= $form->field($model, 'username', ['template' => sprintf($htmlIcon, '<i class="nav-icon bi bi-people "></i>')])->textInput(['autofocus' => true, 'placeholder' => 'Enter your username']) ?>
+                    <?= $form->field($model, 'email', ['template' => sprintf($htmlIcon, '<i class="nav-icon bi bi-envelope"></i>')])->textInput(['placeholder' => 'Enter your email address']) ?>
+                    <?= $form->field($model, 'fullName', ['template' => sprintf($htmlIcon, '<i class="nav-icon bi bi-person"></i>')])->textInput(['placeholder' => 'Enter your full name']) ?>
+                    <?= $form->field($model, 'password', ['template' => sprintf($htmlIcon, '<i class="nav-icon bi bi-lock"></i>')])->passwordInput(['placeholder' => 'Create a password']) ?>
+                    <?= $form->field($model, 'passwordConfirm', ['template' => sprintf($htmlIcon, '<i class="nav-icon bi bi-lock"></i>')])->passwordInput(['placeholder' => 'Confirm your password']) ?>
 
                     <div class="d-grid mb-3">
                         <?= Html::submitButton(

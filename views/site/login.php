@@ -68,7 +68,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                     <div class="mb-3">
                         <?= $form->field($model, 'username', [
                             'options' => ['class' => 'mb-0'],
-                            'template' => sprintf($htmlIcon, '&#128100;'),
+                            'template' => sprintf($htmlIcon, '<i class="nav-icon bi bi-people "></i>'),
                             'inputOptions' => [
                                 'class' => 'form-control',
                                 'placeholder' => 'Username or email',
@@ -80,7 +80,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                     <div class="mb-3">
                         <?= $form->field($model, 'password', [
                             'options' => ['class' => 'mb-0'],
-                            'template' => sprintf($htmlIcon, '&#128274;'),
+                            'template' => sprintf($htmlIcon, '<i class="nav-icon bi bi-lock"></i>'),
                             'inputOptions' => [
                                 'class' => 'form-control',
                                 'placeholder' => 'Password',

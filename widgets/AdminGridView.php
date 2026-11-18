@@ -17,6 +17,10 @@ class AdminGridView extends GridView
         'class' => 'table table-striped table-hover align-middle mb-0 cafebara-data-table',
     ];
 
+    public $headerRowOptions = [
+        'class' => 'cafebara-table-header',
+    ];
+
     public $layout = "{summary}\n{items}\n<div class=\"d-flex justify-content-end p-3\">{pager}</div>";
 
     public $summaryOptions = [

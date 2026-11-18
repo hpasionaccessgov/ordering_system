@@ -39,4 +39,31 @@ final class AdminGridPaginationTest extends Unit
         $provider->refresh();
         self::assertCount(5, $provider->getModels());
     }
+
+    public function testGridUsesSharedHeaderAndSortableColumnLinks(): void
+    {
+        Yii::$app->request->setScriptUrl('/index.php');
+        Yii::$app->request->setUrl('/index.php');
+        $provider = new ArrayDataProvider([
+            'allModels' => [
+                ['id' => 1, 'name' => 'Coffee'],
+                ['id' => 2, 'name' => 'Tea'],
+            ],
+            'pagination' => false,
+            'sort' => [
+                'attributes' => ['name'],
+                'defaultOrder' => ['name' => SORT_ASC],
+                'route' => 'category/index',
+            ],
+        ]);
+
+        $html = AdminGridView::widget([
+            'dataProvider' => $provider,
+            'columns' => ['id', 'name'],
+        ]);
+
+        self::assertStringContainsString('cafebara-table-header', $html);
+        self::assertStringContainsString('class="asc"', $html);
+        self::assertStringContainsString('data-sort="-name"', $html);
+    }
 }
