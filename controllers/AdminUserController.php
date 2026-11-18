@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
-use app\filters\StaffAccessFilter;
 use app\models\AdminUserCreateForm;
 use app\models\Order;
 use app\models\User;
@@ -24,9 +23,6 @@ class AdminUserController extends Controller
     public function behaviors(): array
     {
         return [
-            'staffAccess' => [
-                'class' => StaffAccessFilter::class,
-            ],
             'access' => [
                 'class' => AccessControl::class,
                 'rules' => [
@@ -83,13 +79,29 @@ class AdminUserController extends Controller
     public function actionList(): string
     {
         $this->layout = 'admin';
+        $requestedSearch = $this->request->get('q', '');
+        $search = is_string($requestedSearch) ? trim($requestedSearch) : '';
+        $query = User::find();
+
+        if ($search !== '') {
+            $query->andWhere(['or',
+                ['like', 'username', $search],
+                ['like', 'full_name', $search],
+                ['like', 'email', $search],
+            ]);
+        }
 
         return $this->render('index', [
             'dataProvider' => new ActiveDataProvider([
-                'query' => User::find()->orderBy(['id' => SORT_ASC]),
-                'pagination' => ['pageSize' => 20],
+                'query' => $query,
+                'pagination' => ['pageSize' => 10, 'pageSizeLimit' => [10, 10]],
+                'sort' => [
+                    'attributes' => ['id', 'username', 'full_name', 'email'],
+                    'defaultOrder' => ['id' => SORT_ASC],
+                ],
             ]),
             'roles' => Yii::$app->authManager->getRoles(),
+            'search' => $search,
         ]);
     }
 

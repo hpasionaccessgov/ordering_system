@@ -6,6 +6,16 @@ namespace app\models;
 
 use yii\base\Model;
 
+/**
+ * Class RegisterForm
+ * @package app\models
+ *
+ * @property string $username
+ * @property string $email
+ * @property string $password
+ * @property string $passwordConfirm
+ * @property string $fullName
+ */
 class RegisterForm extends Model
 {
     public string $username = '';

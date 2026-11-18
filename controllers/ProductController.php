@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\models\Category;
 use app\models\OrderItem;
 use app\models\Product;
-use app\filters\StaffAccessFilter;
 use app\services\ProductCatalogPolicy;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
@@ -24,10 +25,6 @@ class ProductController extends Controller
     public function behaviors(): array
     {
         return [
-            'staffAccess' => [
-                'class' => StaffAccessFilter::class,
-                'except' => ['view', 'image'],
-            ],
             'access' => [
                 'class' => AccessControl::class,
                 'rules' => [
@@ -100,18 +97,20 @@ class ProductController extends Controller
             is_string($requestedStatus) ? $requestedStatus : 'all',
         );
 
-        $query = ProductCatalogPolicy::applyStatusFilter(Product::find(), $status);
-        $categoryQuery = ProductCatalogPolicy::applyStatusFilter(
-            Product::find()->select('category')->distinct(),
+        $query = ProductCatalogPolicy::applyStatusFilter(
+            Product::find()->with('categoryRecord'),
             $status,
         );
         if (!$canViewProducts) {
             $query->andWhere(['id' => null]);
-            $categoryQuery->andWhere(['id' => null]);
         }
 
-        $search = trim((string) $this->request->get('q', ''));
-        $category = trim((string) $this->request->get('category', ''));
+        $requestedSearch = $this->request->get('q', '');
+        $search = is_string($requestedSearch) ? trim($requestedSearch) : '';
+        $requestedCategoryId = $this->request->get('category_id', '');
+        $categoryId = is_scalar($requestedCategoryId)
+            ? trim((string) $requestedCategoryId)
+            : '';
         $minPrice = $this->request->get('min_price');
         $maxPrice = $this->request->get('max_price');
 
@@ -119,11 +118,19 @@ class ProductController extends Controller
             $query->andWhere(['or',
                 ['like', 'name', $search],
                 ['like', 'description', $search],
-                ['like', 'category', $search],
+                [
+                    'category_id' => Category::find()
+                        ->select('id')
+                        ->andWhere(['like', 'name', $search]),
+                ],
             ]);
         }
-        if ($category !== '') {
-            $query->andWhere(['category' => $category]);
+        if ($categoryId !== '') {
+            if (ctype_digit($categoryId)) {
+                $query->andWhere(['category_id' => (int) $categoryId]);
+            } else {
+                $query->andWhere(['id' => null]);
+            }
         }
         if (is_numeric($minPrice)) {
             $query->andWhere(['>=', 'price', (float) $minPrice]);
@@ -135,13 +142,21 @@ class ProductController extends Controller
         return $this->render('index', [
             'dataProvider' => new ActiveDataProvider([
                 'query' => $query,
-                'pagination' => ['pageSize' => 12],
-                'sort' => ['defaultOrder' => ['name' => SORT_ASC]],
+                'pagination' => ['pageSize' => 10, 'pageSizeLimit' => [10, 10]],
+                'sort' => [
+                    'attributes' => ['name', 'price', 'id'],
+                    'defaultOrder' => ['name' => SORT_ASC, 'id' => SORT_ASC],
+                ],
             ]),
-            'categories' => $categoryQuery->orderBy('category')->column(),
+            'categories' => ArrayHelper::map(
+                Category::find()->orderBy('name')->all(),
+                'id',
+                'name',
+            ),
             'canManageProducts' => $canManageProducts,
             'canViewProducts' => $canViewProducts,
             'status' => $status,
+            'search' => $search,
         ]);
     }
 
@@ -199,6 +214,7 @@ class ProductController extends Controller
 
         return $this->render('create', [
             'model' => $model,
+            'categories' => $this->getCategoryOptions($model),
         ]);
     }
 
@@ -223,6 +239,7 @@ class ProductController extends Controller
 
         return $this->render('update', [
             'model' => $model,
+            'categories' => $this->getCategoryOptions($model),
         ]);
     }
 
@@ -325,6 +342,19 @@ class ProductController extends Controller
         return Yii::$app->user->can('product.update')
             || Yii::$app->user->can('product.archive')
             || Yii::$app->user->can('product.delete');
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getCategoryOptions(Product $product): array
+    {
+        $query = Category::find()->where(['status' => Category::STATUS_ACTIVE]);
+        if ($product->category_id !== null) {
+            $query->orWhere(['id' => $product->category_id]);
+        }
+
+        return ArrayHelper::map($query->orderBy('name')->all(), 'id', 'name');
     }
 
     /**

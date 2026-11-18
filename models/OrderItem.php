@@ -8,6 +8,15 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\ActiveQuery;
 
+/**
+ * Class OrderItem
+ * @package app\models
+ *
+ * @property int $order_id
+ * @property int $product_id
+ * @property int $quantity
+ * @property float $unit_price
+ */
 class OrderItem extends ActiveRecord
 {
     public static function tableName(): string

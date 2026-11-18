@@ -4,6 +4,15 @@ declare(strict_types=1);
 
 namespace app\models;
 
+/**
+ * Class ChangePasswordForm
+ * @package app\models
+ *
+ * @property string $currentPassword
+ * @property string $newPassword
+ * @property string $confirmPassword
+ */
+
 use yii\base\Model;
 
 class ChangePasswordForm extends Model

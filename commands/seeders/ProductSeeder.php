@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\commands\seeders;
 
+use app\models\Category;
 use app\models\Product;
 use RuntimeException;
 use Throwable;
@@ -63,6 +64,16 @@ class ProductSeeder
                 continue;
             }
 
+            $categoryModel = Category::findOne([
+                'name' => $category,
+                'status' => Category::STATUS_ACTIVE,
+            ]);
+            if ($categoryModel === null) {
+                throw new RuntimeException(
+                    "Active category {$category} is required before seeding products.",
+                );
+            }
+
             [$imageData, $imageMime] = $this->loadImage($imageName);
             $transaction = Product::getDb()->beginTransaction();
 
@@ -71,7 +82,7 @@ class ProductSeeder
                 $product->setAttributes([
                     'name' => $name,
                     'description' => $description,
-                    'category' => $category,
+                    'category_id' => $categoryModel->id,
                     'price' => number_format($price, 2, '.', ''),
                     'status' => Product::STATUS_ACTIVE,
                     'is_featured' => $featured,

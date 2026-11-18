@@ -3,6 +3,7 @@
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 /** @var yii\rbac\Role[] $roles */
+/** @var string $search */
 
 use app\models\User;
 use app\widgets\AdminGridView;
@@ -17,7 +18,7 @@ foreach ($roles as $role) {
 }
 ?>
 
-<div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
     <div>
         <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Administration</p>
         <h1 class="h3 mb-0">User list</h1>
@@ -26,6 +27,8 @@ foreach ($roles as $role) {
         <?= Html::a('Create account', ['/admin-user/create'], ['class' => 'btn btn-primary']) ?>
     <?php endif; ?>
 </div>
+
+<?= $this->render('_search', ['search' => $search]) ?>
 
 <section class="card admin-panel">
     <div class="card-header">

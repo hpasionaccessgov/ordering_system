@@ -43,6 +43,26 @@ final class RbacPermissionPolicyTest extends Unit
         );
     }
 
+    public function testCategoryDependenciesMatchOtherModules(): void
+    {
+        self::assertSame(
+            ['category.index', 'category.view', 'category.create', 'category.update', 'category.delete'],
+            RbacPermissionPolicy::expandIndexPermission('category.index', []),
+        );
+        self::assertSame(
+            ['category.index'],
+            RbacPermissionPolicy::normalizeRolePermissions([
+                'category.index', 'category.update', 'category.delete',
+            ]),
+        );
+        self::assertSame(
+            ['category.index', 'category.view', 'category.update'],
+            RbacPermissionPolicy::normalizeRolePermissions([
+                'category.index', 'category.view', 'category.update',
+            ]),
+        );
+    }
+
     public function testAccessPermissionsRemainIndependent(): void
     {
         self::assertSame(
@@ -57,13 +77,5 @@ final class RbacPermissionPolicyTest extends Unit
             ['admin.access', 'user.assignRole'],
             RbacPermissionPolicy::normalizeRolePermissions(['admin.access', 'user.assignRole']),
         );
-    }
-
-    public function testDisablingStaffAccessBlocksOnlyTheStaffRole(): void
-    {
-        self::assertFalse(RbacPermissionPolicy::isStaffRoleAccessAllowed(['staff'], false));
-        self::assertTrue(RbacPermissionPolicy::isStaffRoleAccessAllowed(['staff'], true));
-        self::assertTrue(RbacPermissionPolicy::isStaffRoleAccessAllowed(['cashier'], false));
-        self::assertTrue(RbacPermissionPolicy::isStaffRoleAccessAllowed(['admin', 'staff'], false));
     }
 }

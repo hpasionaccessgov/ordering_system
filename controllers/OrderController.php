@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
-use app\filters\StaffAccessFilter;
 use app\models\Order;
 use app\services\OrderAccessPolicy;
 use app\services\OrderService;
@@ -30,9 +29,6 @@ class OrderController extends Controller
     public function behaviors(): array
     {
         return [
-            'staffAccess' => [
-                'class' => StaffAccessFilter::class,
-            ],
             'access' => [
                 'class' => AccessControl::class,
                 'rules' => [
@@ -98,13 +94,26 @@ class OrderController extends Controller
             Yii::$app->user->id,
             $this->canViewAllOrders(),
         );
+        $requestedSearch = $this->request->get('q', '');
+        $search = is_string($requestedSearch) ? trim($requestedSearch) : '';
+        if ($search !== '') {
+            $conditions = ['or', ['like', 'status', $search]];
+            if (ctype_digit($search)) {
+                $conditions[] = ['id' => $search];
+            }
+            $query->andWhere($conditions);
+        }
 
         return $this->render('index', [
             'dataProvider' => new ActiveDataProvider([
                 'query' => $query,
-                'pagination' => ['pageSize' => 15],
-                'sort' => ['defaultOrder' => ['created_at' => SORT_DESC]],
+                'pagination' => ['pageSize' => 10, 'pageSizeLimit' => [10, 10]],
+                'sort' => [
+                    'attributes' => ['id', 'status', 'total_amount', 'created_at'],
+                    'defaultOrder' => ['created_at' => SORT_DESC, 'id' => SORT_DESC],
+                ],
             ]),
+            'search' => $search,
         ]);
     }
 

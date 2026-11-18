@@ -6,6 +6,13 @@ namespace app\models;
 
 use yii\base\Model;
 
+/**
+ * Class DeactivateForm
+ * @package app\models
+ *
+ * @property string $currentPassword
+ */
+
 class DeactivateForm extends Model
 {
     public string $currentPassword = '';

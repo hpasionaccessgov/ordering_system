@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 
 /** @var app\models\Product $model */
+/** @var array<int, string> $categories */
 
 $this->title = 'Update product';
 ?>
@@ -22,4 +23,4 @@ $this->title = 'Update product';
     ) ?>
 </div>
 
-<?= $this->render('_form', ['model' => $model]) ?>
+<?= $this->render('_form', ['model' => $model, 'categories' => $categories]) ?>

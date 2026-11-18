@@ -10,6 +10,18 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
+/**
+ * Class User
+ * @package app\models
+ *
+ * @property string $username
+ * @property string $email
+ * @property string $password_hash
+ * @property string $full_name
+ * @property string $auth_key
+ * @property int $status
+ */
+
 class User extends ActiveRecord implements IdentityInterface
 {
     public const STATUS_INACTIVE = 0;

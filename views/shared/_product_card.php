@@ -1,18 +1,14 @@
 <?php
 
 use app\models\Product;
-use app\services\RbacPermissionPolicy;
 use yii\helpers\Html;
 
 /** @var Product $product */
 
-$canManageProductActions = !RbacPermissionPolicy::isStaffAccessDisabledForCurrentUser();
 $canViewProduct = Yii::$app->user->isGuest || Yii::$app->user->can('product.view');
-$canUpdateProducts = $canManageProductActions
-    && $canViewProduct
-    && Yii::$app->user->can('product.update');
-$canArchiveProducts = $canManageProductActions && Yii::$app->user->can('product.archive');
-$canDeleteProducts = $canManageProductActions && Yii::$app->user->can('product.delete');
+$canUpdateProducts = $canViewProduct && Yii::$app->user->can('product.update');
+$canArchiveProducts = Yii::$app->user->can('product.archive');
+$canDeleteProducts = Yii::$app->user->can('product.delete');
 ?>
 
 <article class="card product-card product-catalog-card h-100 position-relative">
@@ -29,7 +25,9 @@ $canDeleteProducts = $canManageProductActions && Yii::$app->user->can('product.d
     <?php endif; ?>
 
     <div class="card-body d-flex flex-column">
-        <p class="product-category mb-2"><?= Html::encode($product->category ?: 'Cafébara menu') ?></p>
+        <p class="product-category mb-2">
+            <?= Html::encode($product->categoryRecord?->name ?? 'Cafébara menu') ?>
+        </p>
         <h2 class="h5 mb-2">
             <?php if ($canViewProduct) : ?>
                 <?= Html::a(Html::encode($product->name), ['/product/view', 'id' => $product->id], [

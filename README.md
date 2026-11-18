@@ -47,7 +47,9 @@ A Yii2 basic application for ordering system. This application is built using Yi
     DB_PASSWORD=
     ```
     If your MySQL root account has a password, set it in `DB_PASSWORD`.
-6. Run the application migrations:
+6. For an existing database, back it up and check the legacy category-column
+    removal precautions under **Category permissions** before migrating.
+    Run the application migrations:
     ```bash
     php yii migrate --interactive=0
     ```
@@ -75,6 +77,44 @@ A Yii2 basic application for ordering system. This application is built using Yi
     php yii rbac/make-admin your-email@example.com
     ```
 12. Sign in or reload the page. The admin dashboard is accessible only to users with the Admin role.
+
+## Category permissions
+
+Run `php yii migrate` after updating the application to add the category
+permissions. The migration grants them to the built-in `admin` role; existing
+custom roles are not changed. In Roles, grant `category.index` and
+`category.view`, plus the desired create, update, and delete permissions, to
+each role that should manage categories. Search, sorting, and pagination use
+the list permission and do not need separate permissions. Selecting
+`category.index` in the role editor selects all category actions; uncheck
+actions that the role should not have.
+
+Module permissions apply equally to built-in and custom roles. `staff.access`
+controls the staff dashboard and, like `admin.access`, permits access to all
+orders when the role also has the relevant order permissions. Without either
+access permission, order queries remain limited to the user's own orders.
+
+Products use `category_id` as the category source of truth. Before applying the
+legacy category-column removal migration, back up the database, stop application
+writers, and verify that external reports, exports, and integrations no longer
+read `products.category`. The migration checks the non-null foreign key and
+existing references before removing that column. Its rollback recreates the
+column from current category names, not the original legacy values; restore a
+backup if the original values are needed.
+
+An active product remains visible when its category is inactive. New category
+assignments must use an active category; an existing product may retain its
+unchanged inactive category.
+
+Category-reference tests require the separate `yii2basic_test` database from
+`config/test_db.php`. After creating that database, migrate it from Git Bash:
+
+```bash
+DB_DSN='mysql:host=127.0.0.1;port=3306;dbname=yii2basic_test' php yii migrate --interactive=0
+php vendor/bin/codecept run Unit --filter ProductCategoryTest
+```
+
+Never point the test configuration at a development or production database.
 
 ## PHP and Composer checks
 

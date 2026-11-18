@@ -5,8 +5,11 @@ use app\widgets\AdminGridView;
 use yii\helpers\Html;
 
 /** @var yii\data\ActiveDataProvider $dataProvider */
+/** @var string $search */
 
 $this->title = 'Orders';
+$this->params['breadcrumbs'][] = $this->title;
+
 $columns = [
     'id',
     'status',
@@ -33,30 +36,23 @@ if (Yii::$app->user->can('order.view')) {
 }
 ?>
 
-<div class="order-page">
-    <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
-        <div>
-            <p class="text-uppercase small fw-semibold text-body-secondary mb-1">CUSTOMER ORDERS</p>
-            <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
-        </div>
-
-        <?php if (Yii::$app->user->can('order.create')) : ?>
-            <?= Html::a(
-                'Create order',
-                ['/order/create'],
-                ['class' => 'btn btn-primary'],
-            ) ?>
-        <?php endif; ?>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <p class="text-uppercase small fw-semibold text-body-secondary mb-1">CUSTOMER ORDERS</p>
+        <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
     </div>
+    <?= Html::a('Create order', ['/order/create'], ['class' => 'btn btn-primary']) ?>
+</div>
 
-    <div class="order-table-card">
-        <div class="card-header">
-            <p class="text-body-secondary mb-0">Review order details.</p>
-        </div>
-        <?= AdminGridView::widget([
-            'dataProvider' => $dataProvider,
-            'columns' => $columns,
-        ]) ?>
+<?= $this->render('_search', ['search' => $search]) ?>
 
+<div class="order-table-card">
+    <div class="card-header">
+        <p class="text-body-secondary mb-0">Review order details.</p>
     </div>
+    <?= AdminGridView::widget([
+        'dataProvider' => $dataProvider,
+        'columns' => $columns,
+    ]) ?>
+
 </div>

@@ -6,6 +6,13 @@ namespace app\models;
 
 use Yii;
 
+/**
+ * Class AdminUserCreateForm
+ * @package app\models
+ *
+ * @property string $roleName
+ */
+
 class AdminUserCreateForm extends RegisterForm
 {
     public $roleName = 'customer';

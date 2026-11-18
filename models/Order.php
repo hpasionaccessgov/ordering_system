@@ -10,6 +10,15 @@ use yii\db\ActiveRecord;
 use yii\web\ForbiddenHttpException;
 use yii\db\ActiveQuery;
 
+/**
+ * Class Order
+ * @package app\models
+ *
+ * @property int $user_id
+ * @property string $status
+ * @property float $total_amount
+ */
+
 class Order extends ActiveRecord
 {
     public const STATUS_PENDING = 'pending';

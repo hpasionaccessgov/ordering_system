@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
-use app\filters\StaffAccessFilter;
 use app\models\RoleForm;
 use app\services\RbacPermissionPolicy;
 use Yii;
@@ -20,9 +19,6 @@ class AdminRoleController extends Controller
     public function behaviors(): array
     {
         return [
-            'staffAccess' => [
-                'class' => StaffAccessFilter::class,
-            ],
             'access' => [
                 'class' => AccessControl::class,
                 'rules' => [

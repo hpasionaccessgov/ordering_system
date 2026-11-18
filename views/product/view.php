@@ -1,19 +1,16 @@
 <?php
 
 use app\models\Product;
-use app\services\RbacPermissionPolicy;
 use yii\helpers\Html;
 
 /** @var Product $model */
 
 $this->title = $model->name;
-$staffAccessEnabled = !RbacPermissionPolicy::isStaffAccessDisabledForCurrentUser();
 $canViewProducts = Yii::$app->user->can('product.index');
-$canManageProducts = $staffAccessEnabled
-    && Yii::$app->user->can('product.view')
+$canManageProducts = Yii::$app->user->can('product.view')
     && Yii::$app->user->can('product.update');
-$canDeleteProducts = $staffAccessEnabled && Yii::$app->user->can('product.delete');
-$canOrder = $staffAccessEnabled && Yii::$app->user->can('order.create') && $model->isActive();
+$canDeleteProducts = Yii::$app->user->can('product.delete');
+$canOrder = Yii::$app->user->can('order.create') && $model->isActive();
 ?>
 
 <section class="product-detail-page mx-auto">
@@ -52,7 +49,7 @@ $canOrder = $staffAccessEnabled && Yii::$app->user->can('order.create') && $mode
                 <div class="card-body d-flex flex-column p-4 p-xl-5">
                     <div class="d-flex flex-wrap gap-2 mb-3">
                         <span class="badge rounded-pill text-bg-secondary">
-                            <?= Html::encode($model->category) ?>
+                            <?= Html::encode($model->categoryRecord?->name ?? 'Cafébara menu') ?>
                         </span>
                         <?php if ($model->is_featured) : ?>
                             <span class="badge rounded-pill product-featured-badge">
@@ -119,8 +116,7 @@ $canOrder = $staffAccessEnabled && Yii::$app->user->can('order.create') && $mode
                         <?php endif; ?>
 
                         <?php if (
-                            $staffAccessEnabled
-                            && Yii::$app->user->can('product.archive')
+                            Yii::$app->user->can('product.archive')
                             && $model->isActive()
                         ) : ?>
                             <?= Html::beginForm(

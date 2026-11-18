@@ -92,12 +92,13 @@ $permissionModuleLabels = [
     'staff' => 'Staff',
     'customer' => 'Customers',
     'user' => 'Users',
+    'category' => 'Categories',
     'product' => 'Products',
     'order' => 'Orders',
 ];
 $permissionDescriptions = [
     'admin.access' => 'Access the administrator dashboard.',
-    'staff.access' => 'Access staff-only features.',
+    'staff.access' => 'Access the staff dashboard and staff order context.',
     'customer.access' => 'Access customer features.',
     'user.index' => 'View the page and list of users.',
     'user.view' => 'View an individual user.',
@@ -105,6 +106,11 @@ $permissionDescriptions = [
     'user.update' => 'Edit user information.',
     'user.delete' => 'Delete a user account.',
     'user.assignRole' => 'Assign roles to user accounts.',
+    'category.index' => 'Access the category list page.',
+    'category.view' => 'View categories and their details.',
+    'category.create' => 'Create a category.',
+    'category.update' => 'Edit a category.',
+    'category.delete' => 'Delete a category not assigned to products.',
     'product.index' => 'View the page and product list.',
     'product.view' => 'View an individual product.',
     'product.create' => 'Create a new product.',
@@ -226,12 +232,12 @@ uksort($permissionGroups, static function (string $left, string $right) use ($mo
                         Access permissions control dashboard and role context. Index permissions control module
                         lists, while view permissions control individual records.
                     </p>
-                    <?php if ($role->name === 'admin') : ?>
+                    <!-- <?php if ($auth->checkAccess(Yii::$app->user->id, 'user.assignRole')) : ?>
                         <div class="alert alert-warning small d-none" data-admin-recovery-warning role="alert">
-                            Both administrator access and role management are disabled. Restore them from the console with
+                            If both administrator access and role management are disabled, access for the system will be lost. Restore them from the console with
                             <code>php yii rbac/restore-admin-access</code>.
                         </div>
-                    <?php endif; ?>
+                    <?php endif; ?> -->
 
                     <?php foreach ($permissionGroups as $module => $modulePermissions) : ?>
                         <section class="permission-module-group border rounded p-3 mb-3 bg-body-tertiary">

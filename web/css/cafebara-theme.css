@@ -349,10 +349,7 @@ body.confirm-modal-open .modal-backdrop {
     color: var(--cafebara-dark);
 }
 
-.order-page,
-.profile-page {
-    max-width: 1100px;
-}
+
 
 .order-table-card {
     border: 1px solid var(--bs-border-color);
@@ -1249,6 +1246,10 @@ body {
     min-width: 0;
 }
 
+.password-toggle-input::-ms-reveal {
+    display: none;
+}
+
 .password-toggle-button {
     position: absolute;
     top: 50%;
@@ -1260,6 +1261,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: 0;
+    margin-right: 1.5rem;
     border: 0;
     border-radius: .35rem;
     transform: translateY(-50%);
