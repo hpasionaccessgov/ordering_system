@@ -11,7 +11,7 @@ $this->title = 'Orders';
 $this->params['breadcrumbs'][] = $this->title;
 
 $columns = [
-    'id',
+    'order_number',
     'status',
     'total_amount:currency',
     [
@@ -41,7 +41,9 @@ if (Yii::$app->user->can('order.view')) {
         <p class="text-uppercase small fw-semibold text-body-secondary mb-1">CUSTOMER ORDERS</p>
         <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
     </div>
-    <?= Html::a('Create order', ['/order/create'], ['class' => 'btn btn-primary']) ?>
+    <?php if (Yii::$app->user->can('order.create')) : ?>
+        <?= Html::a('Open cart', ['/cart/index'], ['class' => 'btn btn-primary']) ?>
+    <?php endif; ?>
 </div>
 
 <?= $this->render('_search', ['search' => $search]) ?>

@@ -86,6 +86,15 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
                         ) ?>
                     </li>
                 <?php endif; ?>
+                <?php if (Yii::$app->user->can('cart.index')): ?>
+                    <li class="nav-item">
+                        <?= Html::a(
+                            '<i class="nav-icon bi bi-cart"></i><p>Cart</p>',
+                            ['/cart/index'],
+                            ['class' => 'nav-link' . (str_starts_with($currentRoute, 'cart/') ? ' active' : '')],
+                        ) ?>
+                    </li>
+                <?php endif; ?>
 
                 <?php if (
                     Yii::$app->user->can('user.index')

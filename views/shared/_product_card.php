@@ -46,6 +46,24 @@ $canDeleteProducts = Yii::$app->user->can('product.delete');
                 <span class="small text-primary fw-semibold">View details</span>
             <?php endif; ?>
         </div>
+        <?php if (
+            !Yii::$app->user->isGuest
+            && Yii::$app->user->can('cart.add')
+            && $product->isActive()
+        ) : ?>
+            <?= Html::beginForm(['/cart/add', 'id' => $product->id], 'post', [
+                'class' => 'd-flex gap-2 position-relative z-2 mt-3',
+            ]) ?>
+            <?= Html::input('number', 'quantity', 1, [
+                'class' => 'form-control',
+                'min' => 1,
+                'max' => 99,
+                'step' => 1,
+                'aria-label' => 'Quantity of ' . $product->name,
+            ]) ?>
+            <?= Html::submitButton('Add to cart', ['class' => 'btn btn-primary']) ?>
+            <?= Html::endForm() ?>
+        <?php endif; ?>
         <?php if ($canUpdateProducts || $canArchiveProducts || $canDeleteProducts) : ?>
             <div class="product-card-actions position-relative z-2 mt-3">
                 <?php if ($canUpdateProducts) : ?>

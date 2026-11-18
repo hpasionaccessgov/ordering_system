@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\models\Order;
+use app\services\ShoppingCart;
 use app\services\OrderAccessPolicy;
 use app\services\OrderService;
 use Yii;
@@ -41,6 +42,16 @@ class OrderController extends Controller
                         'actions' => ['view'],
                         'allow' => true,
                         'roles' => ['order.view'],
+                    ],
+                    [
+                        'actions' => ['confirmation'],
+                        'allow' => true,
+                        'roles' => ['order.view'],
+                    ],
+                    [
+                        'actions' => ['confirmation'],
+                        'allow' => true,
+                        'roles' => ['cart.checkout'],
                     ],
                     [
                         'actions' => ['create'],
@@ -97,7 +108,11 @@ class OrderController extends Controller
         $requestedSearch = $this->request->get('q', '');
         $search = is_string($requestedSearch) ? trim($requestedSearch) : '';
         if ($search !== '') {
-            $conditions = ['or', ['like', 'status', $search]];
+            $conditions = [
+                'or',
+                ['like', 'status', $search],
+                ['like', 'order_number', $search],
+            ];
             if (ctype_digit($search)) {
                 $conditions[] = ['id' => $search];
             }
@@ -141,8 +156,21 @@ class OrderController extends Controller
         ]);
     }
 
+    public function actionConfirmation(int $id): string
+    {
+        $this->layout = 'admin';
+
+        return $this->render('confirmation', [
+            'model' => $this->findAccessibleOrder($id),
+        ]);
+    }
+
     public function actionCreate(): Response|string
     {
+        if (!$this->canViewAllOrders()) {
+            return $this->redirect(['/cart/index']);
+        }
+
         $this->layout = 'admin';
 
         if (!$this->request->isPost) {
@@ -179,12 +207,10 @@ class OrderController extends Controller
             throw new BadRequestHttpException('Enter a quantity of at least one.');
         }
 
-        $order = (new OrderService())->create(
-            (int) Yii::$app->user->id,
-            [['product_id' => $id, 'quantity' => $quantity]],
-        );
+        (new ShoppingCart())->add($id, $quantity);
+        Yii::$app->session->setFlash('success', 'Product added to your cart.');
 
-        return $this->redirect($this->getOrderReturnRoute((int) $order->id));
+        return $this->redirect(['/cart/index']);
     }
 
     public function actionUpdate(int $id): Response|string

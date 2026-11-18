@@ -14,8 +14,10 @@ use yii\db\ActiveQuery;
  *
  * @property int $order_id
  * @property int $product_id
+ * @property string $product_name
  * @property int $quantity
  * @property float $unit_price
+ * @property float $subtotal
  */
 class OrderItem extends ActiveRecord
 {
@@ -37,10 +39,12 @@ class OrderItem extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['order_id', 'product_id', 'quantity', 'unit_price'], 'required'],
+            [['order_id', 'product_id', 'product_name', 'quantity', 'unit_price', 'subtotal'], 'required'],
             [['order_id', 'product_id', 'quantity'], 'integer'],
             [['quantity'], 'integer', 'min' => 1],
-            [['unit_price'], 'number', 'min' => 0],
+            [['quantity'], 'integer', 'max' => 99],
+            [['product_name'], 'string', 'max' => 150],
+            [['unit_price', 'subtotal'], 'number', 'min' => 0],
         ];
     }
 

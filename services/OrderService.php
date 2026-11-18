@@ -8,6 +8,7 @@ use app\models\Order;
 use app\models\OrderItem;
 use app\models\Product;
 use Yii;
+use yii\db\IntegrityException;
 use yii\web\BadRequestHttpException;
 
 class OrderService
@@ -20,24 +21,28 @@ class OrderService
      * @return Order The created order.
      * @throws BadRequestHttpException If the order cannot be created.
      */
-    public function create(int $userId, array $requestedItems): Order
+    public function create(int $userId, array $requestedItems, ?string $checkoutToken = null): Order
     {
+        if ($checkoutToken !== null) {
+            $existing = Order::findOne(['checkout_token' => $checkoutToken]);
+            if ($existing !== null) {
+                if ((int) $existing->user_id !== $userId) {
+                    throw new BadRequestHttpException('Checkout token is invalid.');
+                }
+
+                return $existing;
+            }
+        }
+
         $requestedItems = OrderItemSelection::selectedItems($requestedItems);
-        $productIds = array_column($requestedItems, 'product_id');
-
-        $products = Product::find()
-            ->where([
-                'id' => $productIds,
-                'status' => Product::STATUS_ACTIVE,
-            ])
-            ->indexBy('id')
-            ->all();
-
         $transaction = Yii::$app->db->beginTransaction();
 
         try {
+            $products = $this->lockActiveProducts($requestedItems);
             $order = new Order([
                 'user_id' => $userId,
+                'order_number' => $this->newOrderNumber(),
+                'checkout_token' => $checkoutToken,
                 'status' => Order::STATUS_PENDING,
                 'total_amount' => 0,
             ]);
@@ -65,8 +70,10 @@ class OrderService
                 $item = new OrderItem([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
+                    'product_name' => $product->name,
                     'quantity' => $quantity,
                     'unit_price' => number_format($unitPrice, 2, '.', ''),
+                    'subtotal' => number_format($unitPrice * $quantity, 2, '.', ''),
                 ]);
 
                 if (!$item->save()) {
@@ -90,6 +97,13 @@ class OrderService
         } catch (\Throwable $exception) {
             if ($transaction->isActive) {
                 $transaction->rollBack();
+            }
+
+            if ($checkoutToken !== null && $exception instanceof IntegrityException) {
+                $existing = Order::findOne(['checkout_token' => $checkoutToken]);
+                if ($existing !== null && (int) $existing->user_id === $userId) {
+                    return $existing;
+                }
             }
 
             throw $exception;
@@ -139,8 +153,10 @@ class OrderService
                 $item = new OrderItem([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
+                    'product_name' => $product->name,
                     'quantity' => $quantity,
                     'unit_price' => number_format($unitPrice, 2, '.', ''),
+                    'subtotal' => number_format($unitPrice * $quantity, 2, '.', ''),
                 ]);
 
                 if (!$item->save()) {
@@ -148,6 +164,7 @@ class OrderService
                         'Order item could not be saved.',
                     );
                 }
+
             }
 
             $order->total_amount = number_format($total, 2, '.', '');
@@ -165,5 +182,37 @@ class OrderService
 
             throw $exception;
         }
+    }
+
+    private function newOrderNumber(): string
+    {
+        return sprintf(
+            'CB-%s-%s',
+            date('Ymd'),
+            strtoupper(bin2hex(random_bytes(4))),
+        );
+    }
+
+    /**
+     * @param list<array{product_id: int, quantity: int}> $requestedItems
+     * @return array<int, Product>
+     */
+    private function lockActiveProducts(array $requestedItems): array
+    {
+        $productIds = array_column($requestedItems, 'product_id');
+        $query = Product::find()
+            ->select('id')
+            ->where([
+                'id' => $productIds,
+                'status' => Product::STATUS_ACTIVE,
+            ]);
+        $lockedIds = Yii::$app->db->createCommand(
+            $query->createCommand()->getRawSql() . ' FOR UPDATE',
+        )->queryColumn();
+
+        return Product::find()
+            ->where(['id' => $lockedIds])
+            ->indexBy('id')
+            ->all();
     }
 }

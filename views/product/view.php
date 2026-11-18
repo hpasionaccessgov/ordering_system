@@ -10,7 +10,7 @@ $canViewProducts = Yii::$app->user->can('product.index');
 $canManageProducts = Yii::$app->user->can('product.view')
     && Yii::$app->user->can('product.update');
 $canDeleteProducts = Yii::$app->user->can('product.delete');
-$canOrder = Yii::$app->user->can('order.create') && $model->isActive();
+$canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
 ?>
 
 <section class="product-detail-page mx-auto">
@@ -86,7 +86,7 @@ $canOrder = Yii::$app->user->can('order.create') && $model->isActive();
                                     </strong>
                                 </div>
                                 <?= Html::beginForm(
-                                    ['/order/create-product', 'id' => $model->id],
+                                    ['/cart/add', 'id' => $model->id],
                                     'post',
                                     ['class' => 'd-flex flex-wrap align-items-end gap-3'],
                                 ) ?>
@@ -104,7 +104,7 @@ $canOrder = Yii::$app->user->can('order.create') && $model->isActive();
                                         'aria-label' => 'Quantity of ' . $model->name,
                                     ]) ?>
                                 </div>
-                                <?= Html::submitButton('Start order', ['class' => 'btn btn-primary']) ?>
+                                <?= Html::submitButton('Add to cart', ['class' => 'btn btn-primary']) ?>
                                 <?= Html::endForm() ?>
                             </div>
                         <?php endif; ?>
