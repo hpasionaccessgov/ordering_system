@@ -144,7 +144,7 @@ class SiteController extends Controller
         return $this->render('menu', [
             'dataProvider' => new ActiveDataProvider([
                 'query' => $query,
-                'pagination' => ['pageSize' => 9, 'pageSizeLimit' => [9, 9]],
+                'pagination' => ['pageSize' => 8, 'pageSizeLimit' => [8, 8]],
                 'sort' => [
                     'attributes' => ['name', 'price', 'id'],
                     'defaultOrder' => ['name' => SORT_ASC, 'id' => SORT_ASC],
@@ -198,6 +198,12 @@ class SiteController extends Controller
                 $registrationSaved = $user->save();
 
                 if ($registrationSaved) {
+                    // Guest registration: no logged-in user for BlameableBehavior,
+                    // so credit the account to itself.
+                    $user->updateAttributes([
+                        'created_by' => $user->id,
+                        'updated_by' => $user->id,
+                    ]);
                     Yii::$app->authManager->assign($customerRole, $user->getId());
                     $transaction->commit();
                 } else {
@@ -313,7 +319,7 @@ class SiteController extends Controller
         if ($model->load($this->request->post()) && $model->validate()) {
             $user->full_name = $model->fullName;
 
-            if ($user->save(false, ['full_name', 'updated_at'])) {
+            if ($user->save(false, ['full_name', 'updated_at', 'updated_by'])) {
                 Yii::$app->session->setFlash('success', 'Your profile was updated.');
 
                 return $this->redirect(['profile']);
@@ -344,7 +350,7 @@ class SiteController extends Controller
             $user->setPassword($model->newPassword);
             $user->generateAuthKey();
 
-            if ($user->save(false, ['password_hash', 'auth_key', 'updated_at'])) {
+            if ($user->save(false, ['password_hash', 'auth_key', 'updated_at', 'updated_by'])) {
                 Yii::$app->user->logout();
                 Yii::$app->session->setFlash(
                     'success',
@@ -374,7 +380,7 @@ class SiteController extends Controller
         if ($model->load($this->request->post()) && $model->validate()) {
             $user->status = User::STATUS_DISABLED;
 
-            if ($user->save(false, ['status', 'updated_at'])) {
+            if ($user->save(false, ['status', 'updated_at', 'updated_by'])) {
                 Yii::$app->user->logout();
                 Yii::$app->session->setFlash(
                     'success',

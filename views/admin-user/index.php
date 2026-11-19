@@ -57,6 +57,18 @@ foreach ($roles as $role) {
             'created_at:datetime',
             'updated_at:datetime',
             [
+                'attribute' => 'created_by',
+                'label' => 'Created by',
+                'value' => static fn(User $user): string =>
+                $user->createdBy?->username ?? '—',
+            ],
+            [
+                'attribute' => 'updated_by',
+                'label' => 'Updated by',
+                'value' => static fn(User $user): string =>
+                $user->updatedBy?->username ?? '—',
+            ],
+            [
                 'label' => 'Role',
                 'format' => 'raw',
                 'value' => static function (User $user) use ($roleOptions): string {

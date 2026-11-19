@@ -40,6 +40,10 @@ $this->title = $model->name;
             <dd class="col-sm-9"><?= Yii::$app->formatter->asDatetime($model->created_at) ?></dd>
             <dt class="col-sm-3">Updated</dt>
             <dd class="col-sm-9"><?= Yii::$app->formatter->asDatetime($model->updated_at) ?></dd>
+            <dt class="col-sm-3">Created by</dt>
+            <dd class="col-sm-9"><?= Html::encode($model->createdBy->username ?? '—') ?></dd>
+            <dt class="col-sm-3">Updated by</dt>
+            <dd class="col-sm-9"><?= Html::encode($model->updatedBy->username ?? '—') ?></dd>
         </dl>
         <?php if (Yii::$app->user->can('category.delete')) : ?>
             <?= Html::beginForm(['delete', 'id' => $model->id], 'post', ['class' => 'mt-3']) ?>

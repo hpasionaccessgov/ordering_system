@@ -61,6 +61,7 @@ class AdminRoleController extends Controller
             }
 
             Yii::$app->session->setFlash('success', "Role '{$role->name}' was created.");
+            $this->stampRole($role->name, true);
 
             return $this->redirect(['index']);
         }
@@ -104,6 +105,7 @@ class AdminRoleController extends Controller
             $auth->update($role->name, $role);
 
             $this->syncRolePermissions($role, $permissionNames);
+            $this->stampRole($role->name);
 
             $transaction->commit();
         } catch (\Throwable $exception) {
@@ -150,6 +152,7 @@ class AdminRoleController extends Controller
         $transaction = Yii::$app->db->beginTransaction();
         try {
             $this->syncRolePermissions($role, $permissionNames);
+            $this->stampRole($name);
             $transaction->commit();
         } catch (\Throwable $exception) {
             if ($transaction->isActive) {
@@ -184,12 +187,24 @@ class AdminRoleController extends Controller
 
                 $permissionNames = $this->normalizePermissionNames($permissionNames);
 
+                $currentPermissions = array_keys($auth->getChildren($name));
+                sort($currentPermissions);
+                $newPermissions = $permissionNames;
+                sort($newPermissions);
+                $changed = $currentPermissions !== $newPermissions;
+
                 if (array_key_exists($name, $submittedDescriptions)) {
-                    $role->description = trim((string) $submittedDescriptions[$name]);
+                    $description = trim((string) $submittedDescriptions[$name]);
+                    $changed = $changed || $description !== (string) $role->description;
+                    $role->description = $description;
                     $auth->update($name, $role);
                 }
 
                 $this->syncRolePermissions($role, $permissionNames);
+
+                if ($changed) {
+                    $this->stampRole((string) $name);
+                }
             }
 
             $transaction->commit();
@@ -248,6 +263,25 @@ class AdminRoleController extends Controller
                 throw new \RuntimeException("Could not assign permission '{$permissionName}'.");
             }
         }
+    }
+
+    /**
+     * Records who created/updated a role. Yii's DbManager does not populate blame columns,
+     * so auth_item is updated directly.
+     *
+     * @param string $name the role name.
+     * @param bool $created true when the role is being created (also stamps created_by).
+     */
+    private function stampRole(string $name, bool $created = false): void
+    {
+        $columns = ['updated_by' => Yii::$app->user->id];
+        if ($created) {
+            $columns['created_by'] = Yii::$app->user->id;
+        }
+
+        Yii::$app->db->createCommand()
+            ->update('{{%auth_item}}', $columns, ['name' => $name])
+            ->execute();
     }
 
     private function renderRoles(RoleForm $roleForm): string

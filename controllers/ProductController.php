@@ -98,7 +98,7 @@ class ProductController extends Controller
         );
 
         $query = ProductCatalogPolicy::applyStatusFilter(
-            Product::find()->with('categoryRecord'),
+            Product::find()->with(['categoryRecord', 'createdBy', 'updatedBy']),
             $status,
         );
         if (!$canViewProducts) {
@@ -143,7 +143,7 @@ class ProductController extends Controller
         return $this->render('index', [
             'dataProvider' => new ActiveDataProvider([
                 'query' => $query,
-                'pagination' => ['pageSize' => 10, 'pageSizeLimit' => [10, 10]],
+                'pagination' => ['pageSize' => 8, 'pageSizeLimit' => [8, 8]],
                 'sort' => [
                     'attributes' => ['name', 'price', 'id'],
                     'defaultOrder' => ['name' => SORT_ASC, 'id' => SORT_ASC],
@@ -249,7 +249,7 @@ class ProductController extends Controller
         $model = $this->findProduct($id);
         $model->status = Product::STATUS_ARCHIVED;
 
-        if (!$model->save(false, ['status', 'updated_at'])) {
+        if (!$model->save(false, ['status', 'updated_at', 'updated_by'])) {
             throw new BadRequestHttpException('Product could not be archived.');
         }
 
@@ -266,7 +266,7 @@ class ProductController extends Controller
         }
 
         $model->status = Product::STATUS_ACTIVE;
-        if (!$model->save(false, ['status', 'updated_at'])) {
+        if (!$model->save(false, ['status', 'updated_at', 'updated_by'])) {
             throw new BadRequestHttpException('Product could not be restored.');
         }
 

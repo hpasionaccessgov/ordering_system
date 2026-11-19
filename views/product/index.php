@@ -42,30 +42,33 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'product-batch-cart' : null;
 <?php endif; ?>
 
 <?php if ($canViewProducts) : ?>
-<div class="row g-3">
-    <?php foreach ($dataProvider->getModels() as $product) : ?>
-        <div class="col-12 col-sm-6 col-xl-4">
-            <?= $this->render('../shared/_product_card', [
-                'product' => $product,
-                'batchFormId' => $batchFormId,
-            ]) ?>
-        </div>
-    <?php endforeach; ?>
-</div>
-<?php if ($dataProvider->getCount() === 0) : ?>
-    <div class="card admin-panel">
-        <div class="card-body text-center py-5">
-            <h2 class="h5">No products match your filters</h2>
-            <p class="text-body-secondary mb-0">Try a different search or category.</p>
-        </div>
+    <?php if ($batchFormId !== null && $dataProvider->getCount() > 0) : ?>
+        <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
+    <?php endif; ?>
+
+    <div class="row g-3">
+        <?php foreach ($dataProvider->getModels() as $product) : ?>
+            <div class="col-12 col-sm-6 col-xl-4">
+                <?= $this->render('../shared/_product_card', [
+                    'product' => $product,
+                    'batchFormId' => $batchFormId,
+                ]) ?>
+            </div>
+        <?php endforeach; ?>
     </div>
-<?php endif; ?>
-<?php if ($batchFormId !== null && $dataProvider->getCount() > 0) : ?>
-    <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
-<?php endif; ?>
-<?= LinkPager::widget([
-    'pagination' => $dataProvider->pagination,
-    'prevPageLabel' => 'Previous',
-    'nextPageLabel' => 'Next',
-]) ?>
+    <?php if ($dataProvider->getCount() === 0) : ?>
+        <div class="card admin-panel">
+            <div class="card-body text-center py-5">
+                <h2 class="h5">No products match your filters</h2>
+                <p class="text-body-secondary mb-0">Try a different search or category.</p>
+            </div>
+        </div>
+    <?php endif; ?>
+
+
+    <?= LinkPager::widget([
+        'pagination' => $dataProvider->pagination,
+        'prevPageLabel' => 'Previous',
+        'nextPageLabel' => 'Next',
+    ]) ?>
 <?php endif; ?>

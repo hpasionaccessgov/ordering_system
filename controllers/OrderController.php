@@ -103,7 +103,7 @@ class OrderController extends Controller
         $this->layout = 'admin';
 
         $query = OrderAccessPolicy::scopeToOwner(
-            Order::find()->with('user'),
+            Order::find()->with(['user', 'createdBy', 'updatedBy']),
             Yii::$app->user->id,
             $this->canViewAllOrders(),
         );
@@ -143,9 +143,24 @@ class OrderController extends Controller
         return $this->render('index', [
             'dataProvider' => new ActiveDataProvider([
                 'query' => $query,
-                'pagination' => ['pageSize' => 10, 'pageSizeLimit' => [10, 10]],
+                'pagination' => ['pageSize' => 8, 'pageSizeLimit' => [8, 8]],
                 'sort' => [
-                    'attributes' => ['id', 'order_number', 'status', 'total_amount', 'created_at'],
+                    'attributes' => [
+                        'id',
+                        'order_number',
+                        'status',
+                        'total_amount',
+                        'created_at',
+                        'updated_at',
+                        'created_by' => [
+                            'asc' => [User::usernameSortExpression('{{%orders}}', 'created_by', SORT_ASC)],
+                            'desc' => [User::usernameSortExpression('{{%orders}}', 'created_by', SORT_DESC)],
+                        ],
+                        'updated_by' => [
+                            'asc' => [User::usernameSortExpression('{{%orders}}', 'updated_by', SORT_ASC)],
+                            'desc' => [User::usernameSortExpression('{{%orders}}', 'updated_by', SORT_DESC)],
+                        ],
+                    ],
                     'defaultOrder' => ['created_at' => SORT_DESC, 'id' => SORT_DESC],
                 ],
             ]),

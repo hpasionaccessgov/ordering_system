@@ -81,7 +81,7 @@ class AdminUserController extends Controller
         $this->layout = 'admin';
         $requestedSearch = $this->request->get('q', '');
         $search = is_string($requestedSearch) ? trim($requestedSearch) : '';
-        $query = User::find();
+        $query = User::find()->with(['createdBy', 'updatedBy']);
 
         if ($search !== '') {
             $query->andWhere(['or',
@@ -94,9 +94,22 @@ class AdminUserController extends Controller
         return $this->render('index', [
             'dataProvider' => new ActiveDataProvider([
                 'query' => $query,
-                'pagination' => ['pageSize' => 10, 'pageSizeLimit' => [10, 10]],
+                'pagination' => ['pageSize' => 8, 'pageSizeLimit' => [8, 8]],
                 'sort' => [
-                    'attributes' => ['id', 'username', 'full_name', 'email'],
+                    'attributes' => [
+                        'id',
+                        'username',
+                        'full_name',
+                        'email',
+                        'created_by' => [
+                            'asc' => [User::usernameSortExpression('{{%users}}', 'created_by', SORT_ASC)],
+                            'desc' => [User::usernameSortExpression('{{%users}}', 'created_by', SORT_DESC)],
+                        ],
+                        'updated_by' => [
+                            'asc' => [User::usernameSortExpression('{{%users}}', 'updated_by', SORT_ASC)],
+                            'desc' => [User::usernameSortExpression('{{%users}}', 'updated_by', SORT_DESC)],
+                        ],
+                    ],
                     'defaultOrder' => ['id' => SORT_ASC],
                 ],
             ]),
@@ -238,6 +251,12 @@ class AdminUserController extends Controller
         }
 
         $currentRoles = $auth->getRolesByUser($user->id);
+        $roleChanged = count($currentRoles) !== 1 || !isset($currentRoles[$roleName]);
+        if (!$roleChanged) {
+            Yii::$app->session->setFlash('info', "{$user->username} already has this role.");
+
+            return $this->redirect($this->getUserReturnRoute());
+        }
         if (isset($currentRoles['admin']) && $roleName !== 'admin') {
             $adminIds = $auth->getUserIdsByRole('admin');
             if (count($adminIds) <= 1) {
@@ -252,6 +271,12 @@ class AdminUserController extends Controller
             }
             $auth->revokeAll($user->id);
             $auth->assign($role, $user->id);
+            if ($roleChanged) {
+                $user->updated_by = (int) Yii::$app->user->id;
+                if (!$user->save(false, ['updated_at', 'updated_by'])) {
+                    throw new \RuntimeException('The role audit information could not be saved.');
+                }
+            }
             $transaction->commit();
         } catch (\Throwable $exception) {
             if ($transaction->isActive) {

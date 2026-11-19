@@ -6,8 +6,11 @@ namespace app\models;
 
 use Override;
 use Yii;
+use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 use yii\web\IdentityInterface;
 
 /**
@@ -20,6 +23,8 @@ use yii\web\IdentityInterface;
  * @property string $full_name
  * @property string $auth_key
  * @property int $status
+ * @property User|null $createdBy
+ * @property User|null $updatedBy
  */
 
 class User extends ActiveRecord implements IdentityInterface
@@ -38,6 +43,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             TimestampBehavior::class,
+            BlameableBehavior::class,
         ];
     }
 
@@ -135,5 +141,41 @@ class User extends ActiveRecord implements IdentityInterface
     public function generateAuthKey(): void
     {
         $this->auth_key = Yii::$app->security->generateRandomString(32);
+    }
+
+    public function getCreatedBy(): ActiveQuery
+    {
+        return $this->hasOne(self::class, ['id' => 'created_by']);
+    }
+
+    public function getUpdatedBy(): ActiveQuery
+    {
+        return $this->hasOne(self::class, ['id' => 'updated_by']);
+    }
+
+    /**
+     * ORDER BY expression that sorts a table by the username of its created_by/updated_by user,
+     * without joining (a self-join would make unqualified columns ambiguous).
+     *
+     * @param string $relatedTable the source table, e.g. '{{%category}}'.
+     * @param string $foreignKey the source column, e.g. 'created_by'.
+     * @param int $direction SORT_ASC or SORT_DESC.
+     */
+    public static function usernameSortExpression(string $relatedTable, string $foreignKey, int $direction): Expression
+    {
+        $db = Yii::$app->db;
+        $users = $db->quoteSql(self::tableName());
+        $alias = $db->quoteSql('[[audit_user]]');
+        $order = $direction === SORT_DESC ? 'DESC' : 'ASC';
+
+        return new Expression(sprintf(
+            '(SELECT %s FROM %s AS %s WHERE %s = %s) %s',
+            $db->quoteSql('[[audit_user]].[[username]]'),
+            $users,
+            $alias,
+            $db->quoteSql('[[audit_user]].[[id]]'),
+            $db->quoteSql($relatedTable . '.[[' . $foreignKey . ']]'),
+            $order,
+        ));
     }
 }

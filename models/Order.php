@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use Yii;
+use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\ForbiddenHttpException;
@@ -20,6 +21,8 @@ use yii\db\ActiveQuery;
  * @property string $status
  * @property float $total_amount
  * @property OrderStatusHistory[] $statusHistory
+ * @property User|null $createdBy
+ * @property User|null $updatedBy
  */
 
 class Order extends ActiveRecord
@@ -56,6 +59,7 @@ class Order extends ActiveRecord
     {
         return [
             TimestampBehavior::class,
+            BlameableBehavior::class,
         ];
     }
 
@@ -86,6 +90,16 @@ class Order extends ActiveRecord
     public function getUser(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
+    }
+
+    public function getCreatedBy(): ActiveQuery
+    {
+        return $this->hasOne(User::class, ['id' => 'created_by']);
+    }
+
+    public function getUpdatedBy(): ActiveQuery
+    {
+        return $this->hasOne(User::class, ['id' => 'updated_by']);
     }
 
     public function getItems(): ActiveQuery

@@ -65,6 +65,9 @@ $displayName = $identity instanceof User
             <?= Html::a('Browse all products', ['/product/index'], ['class' => 'link-primary fw-semibold']) ?>
         <?php endif; ?>
     </div>
+    <?php if ($batchFormId !== null && $featuredProducts !== []) : ?>
+        <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
+    <?php endif; ?>
     <div class="row g-3">
         <?php foreach ($featuredProducts as $product) : ?>
             <div class="col-12 col-sm-6 col-xl-3">
@@ -75,8 +78,5 @@ $displayName = $identity instanceof User
             </div>
         <?php endforeach; ?>
     </div>
-    <?php if ($batchFormId !== null && $featuredProducts !== []) : ?>
-        <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
-    <?php endif; ?>
 </section>
 <?php endif; ?>

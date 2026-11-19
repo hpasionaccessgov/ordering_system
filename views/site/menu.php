@@ -59,6 +59,10 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
     </div>
     <?= Html::endForm() ?>
 
+    <?php if ($batchFormId !== null && $dataProvider->getCount() > 0) : ?>
+        <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
+    <?php endif; ?>
+
     <div class="row g-3">
         <?php foreach ($dataProvider->getModels() as $product) : ?>
             <div class="col-12 col-sm-6 col-lg-4">
@@ -69,10 +73,6 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
             </div>
         <?php endforeach; ?>
     </div>
-
-    <?php if ($batchFormId !== null && $dataProvider->getCount() > 0) : ?>
-        <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
-    <?php endif; ?>
 
     <?php if ($dataProvider->getCount() === 0) : ?>
         <div class="card admin-panel">

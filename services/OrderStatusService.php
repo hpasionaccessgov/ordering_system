@@ -86,7 +86,7 @@ final class OrderStatusService
 
             $fromStatus = (string) $fresh->status;
             $fresh->status = $toStatus;
-            if (!$fresh->save(false, ['status', 'updated_at'])) {
+            if (!$fresh->save(false, ['status', 'updated_at', 'updated_by'])) {
                 throw new BadRequestHttpException('Order status could not be updated.');
             }
             $this->record($fresh, $fromStatus, $toStatus, $changedBy);

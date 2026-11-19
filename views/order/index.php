@@ -13,18 +13,35 @@ $this->params['breadcrumbs'][] = $this->title;
 
 $columns = [
     'order_number',
-    'status',
+    [
+        'attribute' => 'status',
+        'value' => static fn(Order $order): string => ucfirst((string) $order->status),
+    ],
     'total_amount:currency',
     'created_at:datetime',
     'updated_at:datetime',
 ];
 
+// Customer and audit columns are internal: admins and staff only.
 if (Yii::$app->user->can('admin.access') || Yii::$app->user->can('staff.access')) {
     array_splice($columns, 1, 0, [[
         'label' => 'Customer',
         'value' => static fn(Order $order): string =>
         $order->user->full_name ?: $order->user->username,
     ]]);
+
+    $columns[] = [
+        'attribute' => 'created_by',
+        'label' => 'Created by',
+        'value' => static fn(Order $order): string =>
+        $order->createdBy?->username ?? '—',
+    ];
+    $columns[] = [
+        'attribute' => 'updated_by',
+        'label' => 'Updated by',
+        'value' => static fn(Order $order): string =>
+        $order->updatedBy?->username ?? '—',
+    ];
 }
 
 if (Yii::$app->user->can('order.view')) {

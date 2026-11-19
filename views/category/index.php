@@ -43,6 +43,18 @@ $this->params['breadcrumbs'][] = $this->title;
             'created_at:datetime',
             'updated_at:datetime',
             [
+                'attribute' => 'created_by',
+                'label' => 'Created by',
+                'value' => static fn(Category $category): string =>
+                $category->createdBy?->username ?? '—',
+            ],
+            [
+                'attribute' => 'updated_by',
+                'label' => 'Updated by',
+                'value' => static fn(Category $category): string =>
+                $category->updatedBy?->username ?? '—',
+            ],
+            [
                 'label' => 'Actions',
                 'format' => 'raw',
                 'value' => static function (Category $category): string {

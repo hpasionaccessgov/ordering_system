@@ -45,15 +45,30 @@ class CategorySearch extends Category
      */
     public function search($params, $formName = null)
     {
-        $query = Category::find();
+        $query = Category::find()->with(['createdBy', 'updatedBy']);
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => ['pageSize' => 10, 'pageSizeLimit' => [10, 10]],
+            'pagination' => ['pageSize' => 8, 'pageSizeLimit' => [8, 8]],
             'sort' => [
-                'attributes' => ['id', 'name', 'description', 'status', 'created_at', 'updated_at'],
+                'attributes' => [
+                    'id',
+                    'name',
+                    'description',
+                    'status',
+                    'created_at',
+                    'updated_at',
+                    'created_by' => [
+                        'asc' => [User::usernameSortExpression('{{%category}}', 'created_by', SORT_ASC)],
+                        'desc' => [User::usernameSortExpression('{{%category}}', 'created_by', SORT_DESC)],
+                    ],
+                    'updated_by' => [
+                        'asc' => [User::usernameSortExpression('{{%category}}', 'updated_by', SORT_ASC)],
+                        'desc' => [User::usernameSortExpression('{{%category}}', 'updated_by', SORT_DESC)],
+                    ],
+                ],
                 'defaultOrder' => ['name' => SORT_ASC, 'id' => SORT_ASC],
             ],
         ]);

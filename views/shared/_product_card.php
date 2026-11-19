@@ -11,6 +11,7 @@ $canViewProduct = Yii::$app->user->isGuest || Yii::$app->user->can('product.view
 $canUpdateProducts = $canViewProduct && Yii::$app->user->can('product.update');
 $canArchiveProducts = Yii::$app->user->can('product.archive');
 $canDeleteProducts = Yii::$app->user->can('product.delete');
+$canViewAudit = $canUpdateProducts || $canArchiveProducts || $canDeleteProducts;
 ?>
 
 <article class="card product-card product-catalog-card h-100 position-relative">
@@ -21,6 +22,12 @@ $canDeleteProducts = Yii::$app->user->can('product.delete');
                 'alt' => $product->name,
                 'loading' => 'lazy',
             ]) ?>
+            <?php if ($canViewProduct) : ?>
+                <div class="product-card-overlay" aria-hidden="true">
+                    <i class="bi bi-zoom-in product-card-overlay-icon"></i>
+                    <span class="product-card-overlay-label">View</span>
+                </div>
+            <?php endif; ?>
         <?php else : ?>
             <div class="product-card-placeholder" aria-hidden="true">
                 <i class="bi bi-cup-hot"></i>
@@ -47,7 +54,7 @@ $canDeleteProducts = Yii::$app->user->can('product.delete');
         <div class="mt-auto d-flex justify-content-between align-items-center gap-2">
             <strong class="product-card-price"><?= Yii::$app->formatter->asCurrency($product->price) ?></strong>
             <?php if ($canViewProduct) : ?>
-                <span class="small text-primary fw-semibold">View details</span>
+                <span class="small text-primary fw-semibold">Click to view details</span>
             <?php endif; ?>
         </div>
         <?php
@@ -56,7 +63,7 @@ $canDeleteProducts = Yii::$app->user->can('product.delete');
         <?php if ($canAddToCart && $product->isActive()) : ?>
             <?php if ($batchFormId !== null) : ?>
                 <div class="d-flex align-items-center gap-2 position-relative z-2 mt-3">
-                    <label class="form-label small mb-0" for="qty-<?= $product->id ?>">Qty</label>
+                    <label class="form-label small mb-0" for="qty-<?= $product->id ?>">Quantity</label>
                     <?= Html::input('number', 'quantities[' . $product->id . ']', 0, [
                         'id' => 'qty-' . $product->id,
                         'class' => 'form-control',
@@ -117,6 +124,26 @@ $canDeleteProducts = Yii::$app->user->can('product.delete');
                     ]) ?>
                     <?= Html::endForm() ?>
                 <?php endif; ?>
+            </div>
+        <?php endif; ?>
+        <?php if ($canViewAudit) : ?>
+            <div class="product-audit-summary mt-3 pt-3 small text-body-secondary">
+                <div class="d-flex justify-content-between gap-3">
+                    <span>Created by</span>
+                    <strong class="text-end">
+                        <?= Html::encode($product->createdBy?->username ?? '—') ?>
+                    </strong>
+                </div>
+                <div class="d-flex justify-content-between gap-3 mt-1">
+                    <span>Updated by</span>
+                    <strong class="text-end">
+                        <?= Html::encode($product->updatedBy?->username ?? '—') ?>
+                    </strong>
+                </div>
+                <div class="mt-2">
+                    Last update:
+                    <?= Yii::$app->formatter->asDatetime($product->updated_at) ?>
+                </div>
             </div>
         <?php endif; ?>
     </div>

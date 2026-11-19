@@ -78,6 +78,9 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'home-batch-cart' : null;
                     ['class' => 'btn btn-outline-primary'],
                 ) ?>
             </div>
+            <?php if ($batchFormId !== null) : ?>
+                <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
+            <?php endif; ?>
             <div class="row g-4">
                 <?php foreach ($featuredProducts as $product) : ?>
                     <div class="col-12 col-sm-6 col-lg-4">
@@ -89,9 +92,6 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'home-batch-cart' : null;
                 <?php endforeach; ?>
             </div>
         </section>
-        <?php if ($batchFormId !== null) : ?>
-            <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
-        <?php endif; ?>
     <?php endif; ?>
 
     <section class="cafebara-intro pb-4">

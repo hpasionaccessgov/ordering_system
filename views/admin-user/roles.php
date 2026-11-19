@@ -1,6 +1,7 @@
 <?php
 
 use app\models\RoleForm;
+use app\models\User;
 use app\services\RbacPermissionPolicy;
 use app\widgets\AdminActiveForm;
 use yii\helpers\Html;
@@ -198,10 +199,39 @@ $roleList = array_values($roles);
 $builtInRoles = ['admin', 'staff', 'customer'];
 $roleChildren = [];
 $roleUserCounts = [];
+$roleAudit = [];
+$auditUserIds = [];
 foreach ($roleList as $role) {
     $roleChildren[$role->name] = array_keys($auth->getChildren($role->name));
-    $roleUserCounts[$role->name] = count($roleUsers[$role->name] ?? []);
+    $userIds = $auth->getUserIdsByRole($role->name);
+    $roleUsers[$role->name] = $userIds === []
+        ? []
+        : User::find()->select('username')->where(['id' => $userIds])->column();
+    $roleUserCounts[$role->name] = count($roleUsers[$role->name]);
+
+    $audit = (new \yii\db\Query())
+        ->select(['created_by', 'updated_by'])
+        ->from('{{%auth_item}}')
+        ->where(['name' => $role->name])
+        ->one() ?: [];
+    $roleAudit[$role->name] = [
+        'created_by' => $audit['created_by'] ?? null,
+        'updated_by' => $audit['updated_by'] ?? null,
+    ];
+    foreach ($roleAudit[$role->name] as $auditId) {
+        if ($auditId !== null) {
+            $auditUserIds[] = (int) $auditId;
+        }
+    }
 }
+
+$auditNames = [];
+if ($auditUserIds !== []) {
+    foreach (User::find()->where(['id' => array_unique($auditUserIds)])->all() as $auditUser) {
+        $auditNames[(int) $auditUser->id] = $auditUser->username;
+    }
+}
+$auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[$id] ?? '—');
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -300,13 +330,20 @@ foreach ($roleList as $role) {
                     role="tabpanel" aria-labelledby="role-tab-<?= $index ?>" tabindex="0"
                     data-role-card data-role="<?= Html::encode($role->name) ?>">
                     <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
-                        <p class="small text-body-secondary mb-0">
-                            <strong><?= $roleUserCounts[$role->name] ?></strong>
-                            user<?= $roleUserCounts[$role->name] === 1 ? '' : 's' ?>:
-                            <?= $roleUsers[$role->name] === []
-                                ? 'none assigned'
-                                : Html::encode(implode(', ', $roleUsers[$role->name])) ?>
-                        </p>
+                        <div>
+                            <p class="small text-body-secondary mb-0">
+                                <strong><?= $roleUserCounts[$role->name] ?></strong>
+                                user<?= $roleUserCounts[$role->name] === 1 ? '' : 's' ?>:
+                                <strong><?= $roleUsers[$role->name] === []
+                                            ? 'none assigned'
+                                            : Html::encode(implode(', ', $roleUsers[$role->name])) ?></strong>
+                            </p>
+                            <p class="small text-body-secondary mb-0">
+                                Created by: <strong><?= Html::encode($auditName($roleAudit[$role->name]['created_by'])) ?> </strong>
+                                <br>
+                                Updated by: <strong><?= Html::encode($auditName($roleAudit[$role->name]['updated_by'])) ?></strong>
+                            </p>
+                        </div>
                         <div class="d-flex flex-wrap align-items-center gap-3">
                             <div class="form-check form-switch mb-0">
                                 <input type="checkbox" class="form-check-input" role="switch"

@@ -10,6 +10,9 @@ $canViewProducts = Yii::$app->user->can('product.index');
 $canManageProducts = Yii::$app->user->can('product.view')
     && Yii::$app->user->can('product.update');
 $canDeleteProducts = Yii::$app->user->can('product.delete');
+$canViewAudit = $canManageProducts
+    || Yii::$app->user->can('product.archive')
+    || $canDeleteProducts;
 $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
 ?>
 
@@ -144,6 +147,30 @@ $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
                             <?= Html::endForm() ?>
                         <?php endif; ?>
                     </div>
+                    <?php if ($canViewAudit) : ?>
+                        <div class="product-audit-summary mt-4 pt-4 small text-body-secondary">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <span class="d-block">Created by</span>
+                                    <strong class="text-body">
+                                        <?= Html::encode($model->createdBy?->username ?? '—') ?>
+                                    </strong>
+                                    <span class="d-block mt-1">
+                                        <?= Yii::$app->formatter->asDatetime($model->created_at) ?>
+                                    </span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="d-block">Updated by</span>
+                                    <strong class="text-body">
+                                        <?= Html::encode($model->updatedBy?->username ?? '—') ?>
+                                    </strong>
+                                    <span class="d-block mt-1">
+                                        <?= Yii::$app->formatter->asDatetime($model->updated_at) ?>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </section>
         </div>
