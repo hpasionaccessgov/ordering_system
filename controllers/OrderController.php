@@ -324,7 +324,13 @@ class OrderController extends Controller
             $this->canViewAllOrders(),
         );
 
-        $order = $query->with(['items.product', 'user', 'statusHistory.changedBy'])->one();
+        $order = $query->with([
+            'items.product',
+            'items.createdBy',
+            'items.updatedBy',
+            'user',
+            'statusHistory.changedBy',
+        ])->one();
 
         if ($order === null) {
             throw new NotFoundHttpException('Order not found.');

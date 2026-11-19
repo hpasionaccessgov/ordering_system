@@ -87,6 +87,10 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
                         <th>Quantity</th>
                         <th>Unit price</th>
                         <th>Subtotal</th>
+                        <?php if ($canViewCustomerInformation) : ?>
+                            <th>Created by</th>
+                            <th>Updated by</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -100,12 +104,16 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
                                     $item->subtotal,
                                 ) ?>
                             </td>
+                            <?php if ($canViewCustomerInformation) : ?>
+                                <td><?= Html::encode($item->createdBy?->username ?? 'System') ?></td>
+                                <td><?= Html::encode($item->updatedBy?->username ?? 'System') ?></td>
+                            <?php endif; ?>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="3" class="text-end">Total</th>
+                        <th colspan="<?= $canViewCustomerInformation ? 5 : 3 ?>" class="text-end">Total</th>
                         <th><?= Yii::$app->formatter->asCurrency($model->total_amount) ?></th>
                     </tr>
                 </tfoot>

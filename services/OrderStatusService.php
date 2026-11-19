@@ -6,6 +6,7 @@ namespace app\services;
 
 use app\models\Order;
 use app\models\OrderStatusHistory;
+use app\models\User;
 use Yii;
 use yii\web\BadRequestHttpException;
 
@@ -91,6 +92,7 @@ final class OrderStatusService
             }
             $this->record($fresh, $fromStatus, $toStatus, $changedBy);
             $transaction->commit();
+            $this->notifyCustomer($fresh);
 
             return $fresh;
         } catch (\Throwable $exception) {
@@ -99,6 +101,25 @@ final class OrderStatusService
             }
 
             throw $exception;
+        }
+    }
+
+    private function notifyCustomer(Order $order): void
+    {
+        try {
+            $order->populateRelation('user', User::findOne($order->user_id));
+            $notifier = Yii::createObject(OrderStatusNotifier::class);
+            if (!$notifier->send($order)) {
+                Yii::error(
+                    "Could not notify the customer about order {$order->id} status.",
+                    __METHOD__,
+                );
+            }
+        } catch (\Throwable $exception) {
+            Yii::error([
+                'message' => "Could not notify the customer about order {$order->id} status.",
+                'exception' => $exception,
+            ], __METHOD__);
         }
     }
 

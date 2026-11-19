@@ -16,6 +16,9 @@ use yii\base\Security;
  */
 class LoginForm extends Model
 {
+    private const MAX_ATTEMPTS = 5;
+    private const THROTTLE_SECONDS = 300;
+
     public string $username = '';
     public string $password = '';
     public bool $rememberMe = true;
@@ -51,10 +54,33 @@ class LoginForm extends Model
     public function validatePassword(string $attribute, array|null $params): void
     {
         if (!$this->hasErrors()) {
-            $user = $this->getUser();
+            $attempt = $this->attemptState();
+            $remaining = $attempt['blocked_until'] - time();
+            if ($remaining > 0) {
+                $this->addError(
+                    $attribute,
+                    "Too many login attempts. Try again in {$remaining} seconds.",
+                );
 
+                return;
+            }
+
+            $user = $this->getUser();
             if (!$user || !$user->validatePassword($this->password)) {
+                $this->recordFailedAttempt($attempt);
                 $this->addError($attribute, 'Incorrect username or password.');
+
+                return;
+            }
+
+            if ((int) $user->status !== User::STATUS_ACTIVE) {
+                $this->recordFailedAttempt($attempt);
+                $this->addError(
+                    $attribute,
+                    (int) $user->status === User::STATUS_DISABLED
+                        ? 'This account has been disabled. Contact an administrator.'
+                        : 'This account is inactive. Contact an administrator.',
+                );
             }
         }
     }
@@ -66,6 +92,7 @@ class LoginForm extends Model
     public function login(): bool
     {
         if ($this->validate()) {
+            Yii::$app->cache->delete($this->attemptKey());
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
         }
 
@@ -85,5 +112,54 @@ class LoginForm extends Model
         }
 
         return $this->_user;
+    }
+
+    /**
+     * @return array{failures: int, blocked_until: int}
+     */
+    private function attemptState(): array
+    {
+        $state = Yii::$app->cache->get($this->attemptKey());
+        if (
+            !is_array($state)
+            || !isset($state['failures'], $state['blocked_until'])
+        ) {
+            return ['failures' => 0, 'blocked_until' => 0];
+        }
+
+        return [
+            'failures' => (int) $state['failures'],
+            'blocked_until' => (int) $state['blocked_until'],
+        ];
+    }
+
+    /**
+     * @param array{failures: int, blocked_until: int} $attempt
+     */
+    private function recordFailedAttempt(array $attempt): void
+    {
+        $attempt['failures']++;
+        if ($attempt['failures'] >= self::MAX_ATTEMPTS) {
+            $attempt['blocked_until'] = time() + self::THROTTLE_SECONDS;
+            $attempt['failures'] = 0;
+        }
+        Yii::$app->cache->set(
+            $this->attemptKey(),
+            $attempt,
+            self::THROTTLE_SECONDS,
+        );
+    }
+
+    private function attemptKey(): string
+    {
+        $request = Yii::$app->request;
+        $ip = method_exists($request, 'getUserIP')
+            ? (string) $request->getUserIP()
+            : '';
+
+        return 'login-attempt:' . hash(
+            'sha256',
+            mb_strtolower(trim($this->username)) . '|' . $ip,
+        );
     }
 }

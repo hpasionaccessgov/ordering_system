@@ -30,6 +30,7 @@ final class OrderStatusServiceTest extends Unit
 
         $statusService = new OrderStatusService();
         $order = $statusService->process($order, (int) $user->id);
+        $this->tester->seeEmailIsSent(1);
         $order = $statusService->process($order, (int) $user->id);
         $order = $statusService->process($order, (int) $user->id);
 

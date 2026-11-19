@@ -6,6 +6,7 @@ namespace app\tests\Unit\Services;
 
 use app\models\Category;
 use app\models\Product;
+use app\models\User;
 use app\services\ShoppingCart;
 use Codeception\Test\Unit;
 use Yii;
@@ -73,6 +74,58 @@ final class ShoppingCartTest extends Unit
 
         $this->expectException(BadRequestHttpException::class);
         $cart->assertCheckoutToken(str_repeat('x', 48));
+    }
+
+    public function testAuthenticatedCartPersistsBeyondSessionData(): void
+    {
+        $user = new User([
+            'username' => 'persistent_' . substr(bin2hex(random_bytes(3)), 0, 6),
+            'email' => substr(bin2hex(random_bytes(4)), 0, 8) . '@cart.test',
+            'full_name' => 'Persistent cart',
+            'status' => User::STATUS_ACTIVE,
+        ]);
+        $user->setPassword('PersistentCart123!');
+        $user->generateAuthKey();
+        self::assertTrue($user->save(), json_encode($user->getErrors()));
+        $product = $this->createProduct('Persistent product', '4.00');
+
+        Yii::$app->user->setIdentity($user);
+        $cart = new ShoppingCart();
+        $cart->add((int) $product->id, 2);
+        Yii::$app->session->removeAll();
+
+        self::assertSame([(int) $product->id => 2], $cart->items());
+    }
+
+    public function testSessionCartMergesIntoExistingAccountCart(): void
+    {
+        $user = new User([
+            'username' => 'merge_' . substr(bin2hex(random_bytes(3)), 0, 6),
+            'email' => substr(bin2hex(random_bytes(4)), 0, 8) . '@merge.test',
+            'full_name' => 'Merged cart',
+            'status' => User::STATUS_ACTIVE,
+        ]);
+        $user->setPassword('MergeCart123!');
+        $user->generateAuthKey();
+        self::assertTrue($user->save(), json_encode($user->getErrors()));
+        $product = $this->createProduct('Merged product', '6.00');
+
+        Yii::$app->user->logout();
+        $cart = new ShoppingCart();
+        $cart->add((int) $product->id, 1);
+        Yii::$app->user->setIdentity($user);
+        Yii::$app->db->createCommand()->insert('{{%cart_items}}', [
+            'user_id' => $user->id,
+            'product_id' => $product->id,
+            'quantity' => 1,
+            'created_at' => time(),
+            'updated_at' => time(),
+        ])->execute();
+
+        $cart->mergeSessionIntoAccount();
+
+        self::assertSame([(int) $product->id => 2], $cart->items());
+        self::assertFalse(Yii::$app->session->has('shopping-cart'));
     }
 
     private function createProduct(string $name, string $price): Product

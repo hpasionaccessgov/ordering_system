@@ -13,6 +13,7 @@ use app\models\ChangePasswordForm;
 use app\models\ProfileForm;
 use app\models\DeactivateForm;
 use app\models\Product;
+use app\services\ShoppingCart;
 use app\models\Category;
 use yii\web\Controller;
 use yii\web\ErrorAction;
@@ -269,6 +270,8 @@ class SiteController extends Controller
         $model = new LoginForm($this->security);
 
         if ($model->load($this->request->post()) && $model->login()) {
+            (new ShoppingCart())->mergeSessionIntoAccount();
+
             return $this->redirect(['site/dashboard']);
         }
 

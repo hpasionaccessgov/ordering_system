@@ -102,9 +102,6 @@ class User extends ActiveRecord implements IdentityInterface
 
         return static::find()
             ->where([
-                'status' => self::STATUS_ACTIVE,
-            ])
-            ->andWhere([
                 'or',
                 ['username' => $identifier],
                 ['email' => mb_strtolower($identifier)],
