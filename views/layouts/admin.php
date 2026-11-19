@@ -20,6 +20,7 @@ $this->registerMetaTag([
     'name' => 'viewport',
     'content' => 'width=device-width, initial-scale=1',
 ]);
+$this->render('_favicon');
 ?>
 <?php $this->beginPage() ?>
 <!doctype html>

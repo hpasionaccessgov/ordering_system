@@ -17,10 +17,22 @@ $viewDependenciesJson = json_encode(
     RbacPermissionPolicy::viewDependents(),
     JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT,
 );
+$auth = Yii::$app->authManager;
+$defaultRolePermissions = [];
+foreach (['customer', 'staff', 'admin'] as $defaultRole) {
+    if ($auth->getRole($defaultRole) !== null) {
+        $defaultRolePermissions[$defaultRole] = array_keys($auth->getChildren($defaultRole));
+    }
+}
+$defaultRolePermissionsJson = json_encode(
+    $defaultRolePermissions,
+    JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT,
+);
 $this->registerJs(<<<JS
 (() => {
     const indexDependencies = {$indexDependenciesJson};
     const viewDependencies = {$viewDependenciesJson};
+    const defaultRolePermissions = {$defaultRolePermissionsJson};
     const form = document.querySelector('form[data-role-matrix-form]');
     if (!form) {
         return;
@@ -38,6 +50,13 @@ $this->registerJs(<<<JS
             if (toggle) {
                 toggle.checked = groupInputs.length > 0 && groupInputs.every(input => input.checked);
             }
+        });
+        const checked = new Set(inputs.filter(input => input.checked).map(input => input.dataset.permission));
+        card.querySelectorAll('[data-preset]').forEach(preset => {
+            const list = defaultRolePermissions[preset.dataset.preset] || [];
+            preset.checked = list.length > 0
+                && list.length === checked.size
+                && list.every(name => checked.has(name));
         });
     };
 
@@ -59,6 +78,13 @@ $this->registerJs(<<<JS
 
         if (input.matches('[data-grant-all]')) {
             permissionByName.forEach(item => { item.checked = input.checked; });
+            syncToggles(card);
+            return;
+        }
+
+        if (input.matches('[data-preset]')) {
+            const preset = new Set(defaultRolePermissions[input.dataset.preset] || []);
+            permissionByName.forEach((item, name) => { item.checked = preset.has(name); });
             syncToggles(card);
             return;
         }
@@ -236,8 +262,7 @@ foreach ($roleList as $role) {
         <div>
             <h2 class="h5 mb-1">Roles &amp; permissions</h2>
             <p class="text-body-secondary mb-0">
-                Each role is its own card, so the page never grows sideways. Tick the permissions a role needs,
-                or use <strong>Grant all permissions</strong> for full access, then save once.
+                Tick the permissions a role needs, then save changes.
             </p>
         </div>
         <?= Html::submitButton('Save changes', [
@@ -249,18 +274,32 @@ foreach ($roleList as $role) {
         'id' => 'role-matrix-form',
         'data-role-matrix-form' => 'true',
     ]) ?>
-    <div class="card-body d-flex flex-column gap-4">
-        <?php foreach ($roleList as $role) : ?>
-            <?php $isBuiltIn = in_array($role->name, $builtInRoles, true); ?>
-            <section class="border rounded-3 p-3" data-role-card data-role="<?= Html::encode($role->name) ?>">
-                <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
-                    <div>
-                        <h3 class="h6 mb-1">
+    <div class="card-body">
+        <div class="overflow-x-auto horizontal-scroll" style="-webkit-overflow-scrolling: touch;"
+            onwheel="if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) { const delta = event.deltaY; const max = this.scrollWidth - this.clientWidth; if ((delta > 0 && this.scrollLeft < max) || (delta < 0 && this.scrollLeft > 0)) { event.preventDefault(); this.scrollLeft += delta; } }">
+            <ul class="nav nav-tabs flex-nowrap mb-0" role="tablist"
+                style="width: max-content; min-width: 100%;">
+                <?php foreach ($roleList as $index => $role) : ?>
+                    <li class="nav-item flex-shrink-0" role="presentation">
+                        <button class="nav-link text-nowrap<?= $index === 0 ? ' active' : '' ?>"
+                            id="role-tab-<?= $index ?>" data-bs-toggle="tab"
+                            data-bs-target="#role-pane-<?= $index ?>" type="button"
+                            role="tab" aria-controls="role-pane-<?= $index ?>"
+                            aria-selected="<?= $index === 0 ? 'true' : 'false' ?>">
                             <?= Html::encode($role->name) ?>
-                            <?php if ($isBuiltIn) : ?>
-                                <span class="badge text-bg-secondary ms-1">Built-in</span>
-                            <?php endif; ?>
-                        </h3>
+                            <span class="badge text-bg-secondary ms-1"><?= $roleUserCounts[$role->name] ?></span>
+                        </button>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+        <div class="tab-content pt-3">
+            <?php foreach ($roleList as $index => $role) : ?>
+                <?php $isBuiltIn = in_array($role->name, $builtInRoles, true); ?>
+                <div class="tab-pane fade<?= $index === 0 ? ' show active' : '' ?>" id="role-pane-<?= $index ?>"
+                    role="tabpanel" aria-labelledby="role-tab-<?= $index ?>" tabindex="0"
+                    data-role-card data-role="<?= Html::encode($role->name) ?>">
+                    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
                         <p class="small text-body-secondary mb-0">
                             <strong><?= $roleUserCounts[$role->name] ?></strong>
                             user<?= $roleUserCounts[$role->name] === 1 ? '' : 's' ?>:
@@ -268,80 +307,96 @@ foreach ($roleList as $role) {
                                 ? 'none assigned'
                                 : Html::encode(implode(', ', $roleUsers[$role->name])) ?>
                         </p>
-                    </div>
-                    <div class="d-flex flex-wrap align-items-center gap-3">
-                        <div class="form-check form-switch mb-0">
-                            <input type="checkbox" class="form-check-input" role="switch"
-                                   id="grant-all-<?= Html::encode($role->name) ?>" data-grant-all
-                                   aria-label="Grant all permissions to <?= Html::encode($role->name) ?>">
-                            <label class="form-check-label small" for="grant-all-<?= Html::encode($role->name) ?>">
-                                Grant all permissions
-                            </label>
-                        </div>
-                        <?php if (!$isBuiltIn) : ?>
-                            <?= Html::submitButton('Delete role', [
-                                'form' => 'delete-role-' . $role->name,
-                                'class' => 'btn btn-sm btn-outline-danger',
-                                'data-confirm-modal' => 'Delete this role?',
-                            ]) ?>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
-                <div class="mt-3">
-                    <label class="form-label small fw-semibold" for="role-desc-<?= Html::encode($role->name) ?>">
-                        Description
-                    </label>
-                    <?= Html::input('text', 'descriptions[' . $role->name . ']', $role->description, [
-                        'id' => 'role-desc-' . Html::encode($role->name),
-                        'class' => 'form-control form-control-sm',
-                        'maxlength' => 255,
-                        'placeholder' => 'Shown on role badges',
-                    ]) ?>
-                </div>
-
-                <div class="row g-2 mt-1">
-                    <?php foreach ($permissionGroups as $module => $modulePermissions) : ?>
-                        <div class="col-12 col-lg-6 col-xxl-4" data-permission-group>
-                            <div class="border rounded-2 p-2 h-100">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="small text-uppercase fw-semibold text-body-secondary">
-                                        <?= Html::encode($permissionModuleLabels[$module] ?? ucfirst($module)) ?>
-                                    </span>
-                                    <label class="small text-body-secondary mb-0">
-                                        <input type="checkbox" class="form-check-input me-1" data-module-toggle>
-                                        All
-                                    </label>
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                            <div class="form-check form-switch mb-0">
+                                <input type="checkbox" class="form-check-input" role="switch"
+                                    id="grant-all-<?= $index ?>" data-grant-all
+                                    aria-label="Grant all permissions to <?= Html::encode($role->name) ?>">
+                                <label class="form-check-label small" for="grant-all-<?= $index ?>">
+                                    Grant all permissions
+                                </label>
+                            </div>
+                            <?php if ($defaultRolePermissions !== []) : ?>
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                    <span class="small text-body-secondary">Apply defaults:</span>
+                                    <?php foreach (array_keys($defaultRolePermissions) as $defaultName) : ?>
+                                        <div class="form-check form-check-inline mb-0">
+                                            <input type="checkbox" class="form-check-input"
+                                                id="preset-<?= $index ?>-<?= $defaultName ?>"
+                                                data-preset="<?= Html::encode($defaultName) ?>">
+                                            <label class="form-check-label small"
+                                                for="preset-<?= $index ?>-<?= $defaultName ?>">
+                                                <?= Html::encode(ucfirst($defaultName)) ?>
+                                            </label>
+                                        </div>
+                                    <?php endforeach; ?>
                                 </div>
-                                <?php foreach ($modulePermissions as $permission) : ?>
-                                    <?php $permissionId = 'perm-' . $role->name . '-' . $permission->name; ?>
-                                    <div class="form-check">
-                                        <?= Html::checkbox(
-                                            'permissions[' . $role->name . '][]',
-                                            in_array($permission->name, $roleChildren[$role->name], true),
-                                            [
-                                                'id' => $permissionId,
-                                                'value' => $permission->name,
-                                                'class' => 'form-check-input',
-                                                'data-permission' => $permission->name,
-                                                'data-role' => $role->name,
-                                                'uncheck' => null,
-                                                'style' => 'cursor: pointer;',
-                                            ],
-                                        ) ?>
-                                        <label class="form-check-label small" for="<?= Html::encode($permissionId) ?>"
-                                               title="<?= Html::encode($permissionDescriptions[$permission->name] ?? $permission->name) ?>"
-                                               style="cursor: pointer;">
-                                            <code><?= Html::encode($permission->name) ?></code>
+                            <?php endif; ?>
+                            <?php if (!$isBuiltIn) : ?>
+                                <?= Html::submitButton('Delete role', [
+                                    'form' => 'delete-role-' . $role->name,
+                                    'class' => 'btn btn-sm btn-outline-danger',
+                                    'data-confirm-modal' => 'Delete this role?',
+                                ]) ?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label small fw-semibold" for="role-desc-<?= $index ?>">
+                            Description
+                        </label>
+                        <?= Html::input('text', 'descriptions[' . $role->name . ']', $role->description, [
+                            'id' => 'role-desc-' . $index,
+                            'class' => 'form-control form-control-sm',
+                            'maxlength' => 255,
+                            'placeholder' => 'Shown on role badges',
+                        ]) ?>
+                    </div>
+
+                    <div class="row g-2 mt-1">
+                        <?php foreach ($permissionGroups as $module => $modulePermissions) : ?>
+                            <div class="col-12 col-lg-6 col-xxl-4" data-permission-group>
+                                <div class="border rounded-2 p-2 h-100">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="small text-uppercase fw-semibold text-body-secondary">
+                                            <?= Html::encode($permissionModuleLabels[$module] ?? ucfirst($module)) ?>
+                                        </span>
+                                        <label class="small text-body-secondary mb-0">
+                                            <input type="checkbox" class="form-check-input me-1" data-module-toggle>
+                                            All
                                         </label>
                                     </div>
-                                <?php endforeach; ?>
+                                    <?php foreach ($modulePermissions as $permission) : ?>
+                                        <?php $permissionId = 'perm-' . $role->name . '-' . $permission->name; ?>
+                                        <div class="form-check">
+                                            <?= Html::checkbox(
+                                                'permissions[' . $role->name . '][]',
+                                                in_array($permission->name, $roleChildren[$role->name], true),
+                                                [
+                                                    'id' => $permissionId,
+                                                    'value' => $permission->name,
+                                                    'class' => 'form-check-input',
+                                                    'data-permission' => $permission->name,
+                                                    'data-role' => $role->name,
+                                                    'uncheck' => null,
+                                                    'style' => 'cursor: pointer;',
+                                                ],
+                                            ) ?>
+                                            <label class="form-check-label small" for="<?= Html::encode($permissionId) ?>"
+                                                title="<?= Html::encode($permissionDescriptions[$permission->name] ?? $permission->name) ?>"
+                                                style="cursor: pointer;">
+                                                <code><?= Html::encode($permission->name) ?></code>
+                                            </label>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
                             </div>
-                        </div>
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
-            </section>
-        <?php endforeach; ?>
+            <?php endforeach; ?>
+        </div>
     </div>
     <?= Html::endForm() ?>
 </section>

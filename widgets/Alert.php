@@ -61,6 +61,12 @@ class Alert extends \yii\bootstrap5\Widget
     public array $closeButton = [];
 
     /**
+     * @var int number of seconds before each alert fades out and removes itself.
+     * Set to 0 to keep alerts open until the user dismisses them.
+     */
+    public int $autoDismiss = 5;
+
+    /**
      * {@inheritdoc}
      */
     public function run(): void
@@ -71,14 +77,20 @@ class Alert extends \yii\bootstrap5\Widget
             return;
         }
 
+        $rendered = false;
         foreach (array_keys($this->alertTypes) as $type) {
             $flash = $session->getFlash($type);
 
             foreach ((array) $flash as $i => $message) {
                 echo $this->renderAlert($type, (string) $i, (string) $message);
+                $rendered = true;
             }
 
             $session->removeFlash($type);
+        }
+
+        if ($rendered && $this->autoDismiss > 0) {
+            $this->registerAutoDismissJs();
         }
     }
 
@@ -94,6 +106,10 @@ class Alert extends \yii\bootstrap5\Widget
         $options = $this->options;
         $options['id'] = $this->getId() . '-' . $type . '-' . $index;
         $options['role'] = $options['role'] ?? 'alert';
+
+        if ($this->autoDismiss > 0) {
+            $options['data']['auto-dismiss'] = $this->autoDismiss;
+        }
 
         Html::addCssClass($options, 'alert');
         Html::addCssClass($options, $this->alertTypes[$type]);
@@ -126,5 +142,21 @@ class Alert extends \yii\bootstrap5\Widget
         }
 
         return Html::tag($tag, $label, $closeButton);
+    }
+
+    /**
+     * Registers the one-time script that fades out and removes auto-dismiss alerts.
+     */
+    private function registerAutoDismissJs(): void
+    {
+        $this->getView()->registerJs(<<<JS
+document.querySelectorAll('[data-auto-dismiss]').forEach(alert => {
+    setTimeout(() => {
+        alert.style.transition = 'opacity .4s ease';
+        alert.style.opacity = '0';
+        setTimeout(() => alert.remove(), 400);
+    }, Number(alert.dataset.autoDismiss) * 1000);
+});
+JS, \yii\web\View::POS_END);
     }
 }
