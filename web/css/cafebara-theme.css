@@ -635,6 +635,23 @@ body {
     font-weight: 700;
 }
 
+/* Tree-style grouping: separator per menu, indented submenu with a guide line. */
+.app-sidebar .sidebar-menu>.nav-item {
+    border-bottom: 1px solid rgba(248, 230, 203, .12);
+}
+
+.app-sidebar .sidebar-menu>.nav-item>.nav-treeview {
+    margin: 0 .65rem .35rem 1.5rem;
+    padding-left: .55rem;
+    border-left: 1px solid rgba(248, 230, 203, .28);
+}
+
+.app-sidebar .sidebar-menu .nav-treeview .nav-link {
+    margin: .1rem 0;
+    padding-left: .85rem;
+    border-left: 0;
+}
+
 .app-sidebar .nav-link:hover,
 .app-sidebar .nav-link:focus-visible {
     background-color: rgba(137, 67, 28, .3);
@@ -1234,6 +1251,35 @@ body {
     font-size: .7rem;
     letter-spacing: .06em;
     text-transform: uppercase;
+}
+
+/* Scroll inside the table instead of the page; keep the header (and optional first column) in view. */
+.cafebara-table-scroll {
+    max-height: 70vh;
+    overflow: auto;
+}
+
+.cafebara-table-scroll .table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    box-shadow: inset 0 -2px 0 rgba(var(--cafebara-brown-rgb), .22);
+}
+
+.cafebara-table-scroll .cafebara-sticky-col {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background-color: var(--bs-body-bg);
+}
+
+.cafebara-table-scroll thead .cafebara-sticky-col {
+    z-index: 3;
+    background-color: var(--cafebara-cream);
+}
+
+.cafebara-data-table.table-bordered> :not(caption)>*>* {
+    border-color: rgba(var(--cafebara-brown-rgb), .2);
 }
 
 .cafebara-admin-grid .table thead th a {

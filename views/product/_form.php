@@ -120,7 +120,7 @@ $form = AdminActiveForm::begin([
                 ]) ?>
 
                 <?= $form->field($model, 'is_featured')->checkbox([
-                    'label' => 'Feature this product on the home page',
+                    'label' => 'Feature this product',
                     'labelOptions' => ['class' => 'form-check-label fw-semibold'],
                     'class' => 'form-check-input',
                 ]) ?>

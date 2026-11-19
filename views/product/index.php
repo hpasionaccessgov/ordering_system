@@ -11,6 +11,7 @@ use yii\helpers\Html;
 /** @var string $search */
 
 $this->title = 'Product';
+$batchFormId = Yii::$app->user->can('cart.add') ? 'product-batch-cart' : null;
 ?>
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
@@ -44,7 +45,10 @@ $this->title = 'Product';
 <div class="row g-3">
     <?php foreach ($dataProvider->getModels() as $product) : ?>
         <div class="col-12 col-sm-6 col-xl-4">
-            <?= $this->render('../shared/_product_card', ['product' => $product]) ?>
+            <?= $this->render('../shared/_product_card', [
+                'product' => $product,
+                'batchFormId' => $batchFormId,
+            ]) ?>
         </div>
     <?php endforeach; ?>
 </div>
@@ -55,6 +59,9 @@ $this->title = 'Product';
             <p class="text-body-secondary mb-0">Try a different search or category.</p>
         </div>
     </div>
+<?php endif; ?>
+<?php if ($batchFormId !== null && $dataProvider->getCount() > 0) : ?>
+    <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
 <?php endif; ?>
 <?= LinkPager::widget([
     'pagination' => $dataProvider->pagination,

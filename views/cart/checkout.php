@@ -17,8 +17,8 @@ $this->title = 'Checkout';
     <div class="row g-4">
         <div class="col-12 col-lg-8">
             <section class="card admin-panel">
-                <div class="table-responsive">
-                    <table class="table table-striped align-middle mb-0 cafebara-data-table">
+                <div class="table-responsive cafebara-table-scroll">
+                    <table class="table table-striped table-bordered align-middle mb-0 cafebara-data-table">
                         <thead>
                             <tr>
                                 <th>Product</th>

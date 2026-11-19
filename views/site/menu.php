@@ -71,11 +71,7 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
     </div>
 
     <?php if ($batchFormId !== null && $dataProvider->getCount() > 0) : ?>
-        <div class="cafebara-batch-cart">
-            <?= Html::beginForm(['/cart/add-batch'], 'post', ['id' => $batchFormId]) ?>
-            <?= Html::submitButton('Add selected to cart', ['class' => 'btn btn-primary btn-lg']) ?>
-            <?= Html::endForm() ?>
-        </div>
+        <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
     <?php endif; ?>
 
     <?php if ($dataProvider->getCount() === 0) : ?>

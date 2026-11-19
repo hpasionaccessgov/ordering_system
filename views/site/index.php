@@ -9,6 +9,7 @@ use app\models\Product;
 
 $this->title = 'Cafébara | Cafe ordering';
 $canViewFeaturedProducts = Yii::$app->user->isGuest || Yii::$app->user->can('product.view');
+$batchFormId = Yii::$app->user->can('cart.add') ? 'home-batch-cart' : null;
 ?>
 <div class="site-index">
     <section class="cafebara-hero rounded-4 p-4 p-lg-5 mb-5">
@@ -80,11 +81,17 @@ $canViewFeaturedProducts = Yii::$app->user->isGuest || Yii::$app->user->can('pro
             <div class="row g-4">
                 <?php foreach ($featuredProducts as $product) : ?>
                     <div class="col-12 col-sm-6 col-lg-4">
-                        <?= $this->render('../shared/_product_card', ['product' => $product]) ?>
+                        <?= $this->render('../shared/_product_card', [
+                            'product' => $product,
+                            'batchFormId' => $batchFormId,
+                        ]) ?>
                     </div>
                 <?php endforeach; ?>
             </div>
         </section>
+        <?php if ($batchFormId !== null) : ?>
+            <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
+        <?php endif; ?>
     <?php endif; ?>
 
     <section class="cafebara-intro pb-4">

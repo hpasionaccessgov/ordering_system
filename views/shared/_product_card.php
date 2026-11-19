@@ -50,11 +50,10 @@ $canDeleteProducts = Yii::$app->user->can('product.delete');
                 <span class="small text-primary fw-semibold">View details</span>
             <?php endif; ?>
         </div>
-        <?php if (
-            !Yii::$app->user->isGuest
-            && Yii::$app->user->can('cart.add')
-            && $product->isActive()
-        ) : ?>
+        <?php
+        $canAddToCart = Yii::$app->user->isGuest || Yii::$app->user->can('cart.add');
+        ?>
+        <?php if ($canAddToCart && $product->isActive()) : ?>
             <?php if ($batchFormId !== null) : ?>
                 <div class="d-flex align-items-center gap-2 position-relative z-2 mt-3">
                     <label class="form-label small mb-0" for="qty-<?= $product->id ?>">Qty</label>
@@ -65,23 +64,16 @@ $canDeleteProducts = Yii::$app->user->can('product.delete');
                         'max' => 99,
                         'step' => 1,
                         'form' => $batchFormId,
-                        'aria-label' => 'Quantity of ' . $product->name,
+                        'aria-label' => 'Quantity of ' . $product->name . ' for the batch add',
                     ]) ?>
                 </div>
-            <?php else : ?>
-                <?= Html::beginForm(['/cart/add', 'id' => $product->id], 'post', [
-                    'class' => 'd-flex gap-2 position-relative z-2 mt-3',
-                ]) ?>
-                <?= Html::input('number', 'quantity', 1, [
-                    'class' => 'form-control',
-                    'min' => 1,
-                    'max' => 99,
-                    'step' => 1,
-                    'aria-label' => 'Quantity of ' . $product->name,
-                ]) ?>
-                <?= Html::submitButton('Cart', ['class' => 'btn btn-primary']) ?>
-                <?= Html::endForm() ?>
             <?php endif; ?>
+            <?= Html::beginForm(['/cart/add', 'id' => $product->id], 'post', [
+                'class' => 'position-relative z-2 mt-3',
+            ]) ?>
+            <?= Html::hiddenInput('quantity', '1') ?>
+            <?= Html::submitButton('Add to cart', ['class' => 'btn btn-primary w-100']) ?>
+            <?= Html::endForm() ?>
         <?php endif; ?>
         <?php if ($canUpdateProducts || $canArchiveProducts || $canDeleteProducts) : ?>
             <div class="product-card-actions position-relative z-2 mt-3">

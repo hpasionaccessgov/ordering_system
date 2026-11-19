@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\models\RoleForm;
+use app\models\User;
 use app\services\RbacPermissionPolicy;
 use Yii;
 use yii\filters\AccessControl;
@@ -252,11 +253,37 @@ class AdminRoleController extends Controller
     private function renderRoles(RoleForm $roleForm): string
     {
         $auth = Yii::$app->authManager;
+        $roles = $auth->getRoles();
+
+        $roleUserIds = [];
+        $userIds = [];
+        foreach ($roles as $name => $role) {
+            $ids = array_map('intval', $auth->getUserIdsByRole($name));
+            $roleUserIds[$name] = $ids;
+            $userIds = array_merge($userIds, $ids);
+        }
+
+        $usersById = [];
+        if ($userIds !== []) {
+            foreach (User::find()->where(['id' => array_unique($userIds)])->all() as $user) {
+                $usersById[(int) $user->id] = ($user->full_name ?? '') !== ''
+                    ? $user->full_name
+                    : $user->username;
+            }
+        }
+
+        $roleUsers = [];
+        foreach ($roleUserIds as $name => $ids) {
+            $roleUsers[$name] = array_values(array_filter(
+                array_map(static fn (int $id): ?string => $usersById[$id] ?? null, $ids),
+            ));
+        }
 
         return $this->render('../admin-user/roles', [
-            'roles' => $auth->getRoles(),
+            'roles' => $roles,
             'permissions' => $auth->getPermissions(),
             'roleForm' => $roleForm,
+            'roleUsers' => $roleUsers,
         ]);
     }
 }

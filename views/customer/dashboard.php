@@ -8,6 +8,7 @@ use app\models\User;
 use yii\helpers\Html;
 
 $this->title = 'Customer dashboard';
+$batchFormId = Yii::$app->user->can('cart.add') ? 'customer-batch-cart' : null;
 $identity = Yii::$app->user->identity;
 $displayName = $identity instanceof User
     ? ($identity->full_name ?: $identity->username)
@@ -67,9 +68,15 @@ $displayName = $identity instanceof User
     <div class="row g-3">
         <?php foreach ($featuredProducts as $product) : ?>
             <div class="col-12 col-sm-6 col-xl-3">
-                <?= $this->render('../shared/_product_card', ['product' => $product]) ?>
+                <?= $this->render('../shared/_product_card', [
+                    'product' => $product,
+                    'batchFormId' => $batchFormId,
+                ]) ?>
             </div>
         <?php endforeach; ?>
     </div>
+    <?php if ($batchFormId !== null && $featuredProducts !== []) : ?>
+        <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
+    <?php endif; ?>
 </section>
 <?php endif; ?>

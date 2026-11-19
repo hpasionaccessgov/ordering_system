@@ -79,8 +79,8 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
         <div class="card-header bg-transparent">
             <h2 class="h5 mb-0">Items in this order</h2>
         </div>
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle mb-0 cafebara-data-table">
+        <div class="table-responsive cafebara-table-scroll">
+            <table class="table table-striped table-hover table-bordered align-middle mb-0 cafebara-data-table">
                 <thead>
                     <tr>
                         <th>Product</th>

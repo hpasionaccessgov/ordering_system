@@ -26,24 +26,52 @@ $this->registerJs(<<<JS
         return;
     }
 
-    const permissionsByRole = new Map();
-    form.querySelectorAll('input[name^="permissions["]').forEach(input => {
-        const role = input.name.slice('permissions['.length, input.name.indexOf(']'));
-        if (!permissionsByRole.has(role)) {
-            permissionsByRole.set(role, new Map());
+    const syncToggles = card => {
+        const inputs = [...card.querySelectorAll('input[name^="permissions["]')];
+        const grantAll = card.querySelector('[data-grant-all]');
+        if (grantAll) {
+            grantAll.checked = inputs.length > 0 && inputs.every(input => input.checked);
         }
-        permissionsByRole.get(role).set(input.dataset.permission, input);
-    });
+        card.querySelectorAll('[data-permission-group]').forEach(group => {
+            const toggle = group.querySelector('[data-module-toggle]');
+            const groupInputs = [...group.querySelectorAll('input[name^="permissions["]')];
+            if (toggle) {
+                toggle.checked = groupInputs.length > 0 && groupInputs.every(input => input.checked);
+            }
+        });
+    };
 
     form.addEventListener('change', event => {
         const input = event.target;
-        if (!(input instanceof HTMLInputElement) || !input.matches('input[name^="permissions["]')) {
+        if (!(input instanceof HTMLInputElement)) {
             return;
         }
 
-        const role = input.name.slice('permissions['.length, input.name.indexOf(']'));
-        const permissionByName = permissionsByRole.get(role);
-        if (!permissionByName) {
+        const card = input.closest('[data-role-card]');
+        if (!card) {
+            return;
+        }
+
+        const permissionByName = new Map(
+            [...card.querySelectorAll('input[name^="permissions["]')]
+                .map(item => [item.dataset.permission, item]),
+        );
+
+        if (input.matches('[data-grant-all]')) {
+            permissionByName.forEach(item => { item.checked = input.checked; });
+            syncToggles(card);
+            return;
+        }
+
+        if (input.matches('[data-module-toggle]')) {
+            input.closest('[data-permission-group]')
+                .querySelectorAll('input[name^="permissions["]')
+                .forEach(item => { item.checked = input.checked; });
+            syncToggles(card);
+            return;
+        }
+
+        if (!input.matches('input[name^="permissions["]')) {
             return;
         }
 
@@ -72,9 +100,14 @@ $this->registerJs(<<<JS
                 }
             });
         }
+
+        syncToggles(card);
     });
+
+    form.querySelectorAll('[data-role-card]').forEach(syncToggles);
 })();
 JS);
+$roleUsers = $roleUsers ?? [];
 $auth = Yii::$app->authManager;
 $permissions = $auth->getPermissions();
 $roles = $auth->getRoles();
@@ -141,9 +174,8 @@ $roleChildren = [];
 $roleUserCounts = [];
 foreach ($roleList as $role) {
     $roleChildren[$role->name] = array_keys($auth->getChildren($role->name));
-    $roleUserCounts[$role->name] = count($auth->getUserIdsByRole($role->name));
+    $roleUserCounts[$role->name] = count($roleUsers[$role->name] ?? []);
 }
-$columnCount = 2 + count($roleList);
 ?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -185,7 +217,8 @@ $columnCount = 2 + count($roleList);
                 'maxlength' => 255,
             ]) ?>
         </div>
-        <div class="col-12 col-md-3 d-flex align-items-end">
+        <div class="col-12 col-md-3 d-flex flex-column">
+            <label class="form-label invisible d-none d-md-block" aria-hidden="true">Action</label>
             <?= Html::submitButton('Create role', ['class' => 'btn btn-primary w-100']) ?>
         </div>
         <div class="col-12">
@@ -199,89 +232,116 @@ $columnCount = 2 + count($roleList);
 </section>
 
 <section class="card admin-panel">
-    <div class="card-header">
-        <h2 class="h5 mb-1">Permission matrix</h2>
-        <p class="text-body-secondary mb-0">
-            Grant permissions to every role in one table. Access permissions control dashboards and role context;
-            index permissions control module lists, and view permissions control individual records.
-        </p>
+    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div>
+            <h2 class="h5 mb-1">Roles &amp; permissions</h2>
+            <p class="text-body-secondary mb-0">
+                Each role is its own card, so the page never grows sideways. Tick the permissions a role needs,
+                or use <strong>Grant all permissions</strong> for full access, then save once.
+            </p>
+        </div>
+        <?= Html::submitButton('Save changes', [
+            'form' => 'role-matrix-form',
+            'class' => 'btn btn-primary ms-auto',
+        ]) ?>
     </div>
-    <?= Html::beginForm(['/admin-role/update-matrix'], 'post', ['data-role-matrix-form' => 'true']) ?>
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0 cafebara-data-table">
-            <thead>
-                <tr>
-                    <th scope="col">Permission</th>
-                    <th scope="col">Description</th>
-                    <?php foreach ($roleList as $role) : ?>
-                        <th scope="col" class="text-center">
-                            <span class="d-block"><?= Html::encode($role->name) ?></span>
-                            <span class="d-block fw-normal text-body-secondary">
-                                <?= $roleUserCounts[$role->name] ?> user<?= $roleUserCounts[$role->name] === 1 ? '' : 's' ?>
-                            </span>
-                            <?php if (!in_array($role->name, $builtInRoles, true)) : ?>
-                                <?= Html::submitButton('Delete', [
-                                    'form' => 'delete-role-' . $role->name,
-                                    'class' => 'btn btn-sm btn-outline-danger mt-1',
-                                    'data-confirm-modal' => 'Delete this role?',
-                                ]) ?>
+    <?= Html::beginForm(['/admin-role/update-matrix'], 'post', [
+        'id' => 'role-matrix-form',
+        'data-role-matrix-form' => 'true',
+    ]) ?>
+    <div class="card-body d-flex flex-column gap-4">
+        <?php foreach ($roleList as $role) : ?>
+            <?php $isBuiltIn = in_array($role->name, $builtInRoles, true); ?>
+            <section class="border rounded-3 p-3" data-role-card data-role="<?= Html::encode($role->name) ?>">
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                    <div>
+                        <h3 class="h6 mb-1">
+                            <?= Html::encode($role->name) ?>
+                            <?php if ($isBuiltIn) : ?>
+                                <span class="badge text-bg-secondary ms-1">Built-in</span>
                             <?php endif; ?>
-                        </th>
-                    <?php endforeach; ?>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($permissionGroups as $module => $modulePermissions) : ?>
-                    <tr class="cafebara-table-group">
-                        <th scope="colgroup" colspan="<?= $columnCount ?>">
-                            <?= Html::encode($permissionModuleLabels[$module] ?? ucfirst($module)) ?>
-                        </th>
-                    </tr>
-                    <?php foreach ($modulePermissions as $permission) : ?>
-                        <tr>
-                            <td><code><?= Html::encode($permission->name) ?></code></td>
-                            <td class="small text-body-secondary">
-                                <?= Html::encode(
-                                    $permissionDescriptions[$permission->name]
-                                        ?? 'Permission: ' . $permission->name,
-                                ) ?>
-                            </td>
-                            <?php foreach ($roleList as $role) : ?>
-                                <td class="text-center">
-                                    <?= Html::checkbox(
-                                        'permissions[' . $role->name . '][]',
-                                        in_array($permission->name, $roleChildren[$role->name], true),
-                                        [
-                                            'value' => $permission->name,
-                                            'data-permission' => $permission->name,
-                                            'data-role' => $role->name,
-                                            'aria-label' => 'Grant ' . $permission->name . ' to ' . $role->name,
-                                            'uncheck' => null,
-                                        ],
-                                    ) ?>
-                                </td>
-                            <?php endforeach; ?>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php endforeach; ?>
-                <tr>
-                    <th scope="row" class="small text-uppercase text-body-secondary">Description</th>
-                    <td class="small text-body-secondary">Shown on role badges.</td>
-                    <?php foreach ($roleList as $role) : ?>
-                        <td>
-                            <?= Html::input('text', 'descriptions[' . $role->name . ']', $role->description, [
-                                'class' => 'form-control form-control-sm',
-                                'maxlength' => 255,
-                                'aria-label' => 'Description for ' . $role->name,
+                        </h3>
+                        <p class="small text-body-secondary mb-0">
+                            <strong><?= $roleUserCounts[$role->name] ?></strong>
+                            user<?= $roleUserCounts[$role->name] === 1 ? '' : 's' ?>:
+                            <?= $roleUsers[$role->name] === []
+                                ? 'none assigned'
+                                : Html::encode(implode(', ', $roleUsers[$role->name])) ?>
+                        </p>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <div class="form-check form-switch mb-0">
+                            <input type="checkbox" class="form-check-input" role="switch"
+                                   id="grant-all-<?= Html::encode($role->name) ?>" data-grant-all
+                                   aria-label="Grant all permissions to <?= Html::encode($role->name) ?>">
+                            <label class="form-check-label small" for="grant-all-<?= Html::encode($role->name) ?>">
+                                Grant all permissions
+                            </label>
+                        </div>
+                        <?php if (!$isBuiltIn) : ?>
+                            <?= Html::submitButton('Delete role', [
+                                'form' => 'delete-role-' . $role->name,
+                                'class' => 'btn btn-sm btn-outline-danger',
+                                'data-confirm-modal' => 'Delete this role?',
                             ]) ?>
-                        </td>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <label class="form-label small fw-semibold" for="role-desc-<?= Html::encode($role->name) ?>">
+                        Description
+                    </label>
+                    <?= Html::input('text', 'descriptions[' . $role->name . ']', $role->description, [
+                        'id' => 'role-desc-' . Html::encode($role->name),
+                        'class' => 'form-control form-control-sm',
+                        'maxlength' => 255,
+                        'placeholder' => 'Shown on role badges',
+                    ]) ?>
+                </div>
+
+                <div class="row g-2 mt-1">
+                    <?php foreach ($permissionGroups as $module => $modulePermissions) : ?>
+                        <div class="col-12 col-lg-6 col-xxl-4" data-permission-group>
+                            <div class="border rounded-2 p-2 h-100">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="small text-uppercase fw-semibold text-body-secondary">
+                                        <?= Html::encode($permissionModuleLabels[$module] ?? ucfirst($module)) ?>
+                                    </span>
+                                    <label class="small text-body-secondary mb-0">
+                                        <input type="checkbox" class="form-check-input me-1" data-module-toggle>
+                                        All
+                                    </label>
+                                </div>
+                                <?php foreach ($modulePermissions as $permission) : ?>
+                                    <?php $permissionId = 'perm-' . $role->name . '-' . $permission->name; ?>
+                                    <div class="form-check">
+                                        <?= Html::checkbox(
+                                            'permissions[' . $role->name . '][]',
+                                            in_array($permission->name, $roleChildren[$role->name], true),
+                                            [
+                                                'id' => $permissionId,
+                                                'value' => $permission->name,
+                                                'class' => 'form-check-input',
+                                                'data-permission' => $permission->name,
+                                                'data-role' => $role->name,
+                                                'uncheck' => null,
+                                                'style' => 'cursor: pointer;',
+                                            ],
+                                        ) ?>
+                                        <label class="form-check-label small" for="<?= Html::encode($permissionId) ?>"
+                                               title="<?= Html::encode($permissionDescriptions[$permission->name] ?? $permission->name) ?>"
+                                               style="cursor: pointer;">
+                                            <code><?= Html::encode($permission->name) ?></code>
+                                        </label>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
                     <?php endforeach; ?>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="card-body d-flex justify-content-end">
-        <?= Html::submitButton('Save changes', ['class' => 'btn btn-primary']) ?>
+                </div>
+            </section>
+        <?php endforeach; ?>
     </div>
     <?= Html::endForm() ?>
 </section>

@@ -62,7 +62,7 @@ $statusLabels = [
 
         <h2 class="h6 mb-3">Order details</h2>
         <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle cafebara-data-table">
+            <table class="table table-striped table-hover table-bordered align-middle cafebara-data-table">
                 <thead>
                     <tr>
                         <th>Product</th>
