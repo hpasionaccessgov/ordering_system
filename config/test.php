@@ -25,6 +25,11 @@ return [
             'useFileTransport' => true,
             'viewPath' => '@app/mail',
         ],
+        'formatter' => [
+            'class' => \yii\i18n\Formatter::class,
+            'timeZone' => 'Asia/Manila',
+            'datetimeFormat' => 'php:M j, Y g:i A',
+        ],
         'assetManager' => [
             'basePath' => __DIR__ . '/../web/assets',
         ],

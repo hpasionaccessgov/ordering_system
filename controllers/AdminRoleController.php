@@ -31,6 +31,7 @@ class AdminRoleController extends Controller
                     'create' => ['post'],
                     'update' => ['post'],
                     'update-permissions' => ['post'],
+                    'update-matrix' => ['post'],
                     'delete' => ['post'],
                 ],
             ],
@@ -158,6 +159,48 @@ class AdminRoleController extends Controller
         }
 
         Yii::$app->session->setFlash('success', "Permissions for '{$name}' were updated.");
+
+        return $this->redirect(['index']);
+    }
+
+    public function actionUpdateMatrix(): Response
+    {
+        $auth = Yii::$app->authManager;
+        $submittedPermissions = $this->request->post('permissions', []);
+        $submittedDescriptions = $this->request->post('descriptions', []);
+
+        if (!is_array($submittedPermissions) || !is_array($submittedDescriptions)) {
+            throw new BadRequestHttpException('Role data is invalid.');
+        }
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            foreach ($auth->getRoles() as $name => $role) {
+                $permissionNames = $submittedPermissions[$name] ?? [];
+                if (!is_array($permissionNames)) {
+                    throw new BadRequestHttpException("Permissions for '{$name}' are invalid.");
+                }
+
+                $permissionNames = $this->normalizePermissionNames($permissionNames);
+
+                if (array_key_exists($name, $submittedDescriptions)) {
+                    $role->description = trim((string) $submittedDescriptions[$name]);
+                    $auth->update($name, $role);
+                }
+
+                $this->syncRolePermissions($role, $permissionNames);
+            }
+
+            $transaction->commit();
+        } catch (\Throwable $exception) {
+            if ($transaction->isActive) {
+                $transaction->rollBack();
+            }
+
+            throw $exception;
+        }
+
+        Yii::$app->session->setFlash('success', 'Roles were updated.');
 
         return $this->redirect(['index']);
     }

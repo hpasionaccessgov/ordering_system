@@ -37,6 +37,8 @@ $config = [
             'class' => \yii\i18n\Formatter::class,
             'locale' => 'en_PH',
             'currencyCode' => 'PHP',
+            'timeZone' => 'Asia/Manila',
+            'datetimeFormat' => 'php:M j, Y g:i A',
         ],
         'user' => [
             'identityClass' => \app\models\User::class,

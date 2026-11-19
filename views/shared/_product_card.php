@@ -4,7 +4,9 @@ use app\models\Product;
 use yii\helpers\Html;
 
 /** @var Product $product */
+/** @var string|null $batchFormId id of a shared batch cart form, or null for per-card add */
 
+$batchFormId = $batchFormId ?? null;
 $canViewProduct = Yii::$app->user->isGuest || Yii::$app->user->can('product.view');
 $canUpdateProducts = $canViewProduct && Yii::$app->user->can('product.update');
 $canArchiveProducts = Yii::$app->user->can('product.archive');
@@ -53,18 +55,33 @@ $canDeleteProducts = Yii::$app->user->can('product.delete');
             && Yii::$app->user->can('cart.add')
             && $product->isActive()
         ) : ?>
-            <?= Html::beginForm(['/cart/add', 'id' => $product->id], 'post', [
-                'class' => 'd-flex gap-2 position-relative z-2 mt-3',
-            ]) ?>
-            <?= Html::input('number', 'quantity', 1, [
-                'class' => 'form-control',
-                'min' => 1,
-                'max' => 99,
-                'step' => 1,
-                'aria-label' => 'Quantity of ' . $product->name,
-            ]) ?>
-            <?= Html::submitButton('Add to cart', ['class' => 'btn btn-primary']) ?>
-            <?= Html::endForm() ?>
+            <?php if ($batchFormId !== null) : ?>
+                <div class="d-flex align-items-center gap-2 position-relative z-2 mt-3">
+                    <label class="form-label small mb-0" for="qty-<?= $product->id ?>">Qty</label>
+                    <?= Html::input('number', 'quantities[' . $product->id . ']', 0, [
+                        'id' => 'qty-' . $product->id,
+                        'class' => 'form-control',
+                        'min' => 0,
+                        'max' => 99,
+                        'step' => 1,
+                        'form' => $batchFormId,
+                        'aria-label' => 'Quantity of ' . $product->name,
+                    ]) ?>
+                </div>
+            <?php else : ?>
+                <?= Html::beginForm(['/cart/add', 'id' => $product->id], 'post', [
+                    'class' => 'd-flex gap-2 position-relative z-2 mt-3',
+                ]) ?>
+                <?= Html::input('number', 'quantity', 1, [
+                    'class' => 'form-control',
+                    'min' => 1,
+                    'max' => 99,
+                    'step' => 1,
+                    'aria-label' => 'Quantity of ' . $product->name,
+                ]) ?>
+                <?= Html::submitButton('Cart', ['class' => 'btn btn-primary']) ?>
+                <?= Html::endForm() ?>
+            <?php endif; ?>
         <?php endif; ?>
         <?php if ($canUpdateProducts || $canArchiveProducts || $canDeleteProducts) : ?>
             <div class="product-card-actions position-relative z-2 mt-3">

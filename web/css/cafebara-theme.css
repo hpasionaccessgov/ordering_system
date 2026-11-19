@@ -102,7 +102,7 @@ body.confirm-modal-open .modal-backdrop {
     padding: clamp(1.25rem, 3vw, 2rem);
 }
 
-.cafebara-contact-aside li + li {
+.cafebara-contact-aside li+li {
     margin-top: 1rem;
 }
 
@@ -223,6 +223,19 @@ body.confirm-modal-open .modal-backdrop {
 
 .cafebara-menu-page .product-card {
     box-shadow: 0 .5rem 1.25rem rgba(48, 18, 6, .06);
+}
+
+.cafebara-batch-cart {
+    position: sticky;
+    bottom: 1rem;
+    z-index: 3;
+    display: flex;
+    justify-content: flex-end;
+    padding: .75rem 1rem;
+    margin-top: 1.5rem;
+    border-radius: .75rem;
+    background: var(--cafebara-cream);
+    box-shadow: 0 .5rem 1.5rem rgba(48, 18, 6, .18);
 }
 
 .order-builder-summary {
@@ -397,7 +410,7 @@ body.confirm-modal-open .modal-backdrop {
     margin-bottom: 0;
 }
 
-.order-table-card .table > :not(caption) > * > * {
+.order-table-card .table> :not(caption)>*>* {
     padding: .9rem 1rem;
     vertical-align: middle;
 }
@@ -567,6 +580,8 @@ body {
     --bs-table-bg: transparent;
     --bs-table-color: var(--bs-body-color);
     --bs-table-border-color: var(--bs-border-color);
+    --bs-table-striped-bg: rgba(var(--cafebara-brown-rgb), .05);
+    --bs-table-striped-color: var(--bs-body-color);
 }
 
 .site-about,
@@ -635,7 +650,7 @@ body {
 }
 
 @media (max-width: 575.98px) {
-    .order-table-card .table > :not(caption) > * > * {
+    .order-table-card .table> :not(caption)>*>* {
         padding: .75rem .65rem;
     }
 
@@ -1213,6 +1228,14 @@ body {
     border-bottom: 2px solid rgba(var(--cafebara-brown-rgb), .22);
 }
 
+.cafebara-data-table .cafebara-table-group th {
+    background-color: rgba(var(--cafebara-brown-rgb), .07);
+    color: var(--bs-secondary-color);
+    font-size: .7rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
 .cafebara-admin-grid .table thead th a {
     display: inline-flex;
     align-items: center;
@@ -1244,8 +1267,8 @@ body {
     outline-offset: 3px;
 }
 
-.cafebara-admin-grid .table > :not(caption) > * > *,
-.cafebara-data-table > :not(caption) > * > * {
+.cafebara-admin-grid .table> :not(caption)>*>*,
+.cafebara-data-table> :not(caption)>*>* {
     padding: .8rem 1rem;
     vertical-align: middle;
 }

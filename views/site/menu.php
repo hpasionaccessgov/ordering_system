@@ -9,6 +9,9 @@ use yii\helpers\Html;
 /** @var string $categoryId */
 
 $this->title = 'Menu';
+$batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
+    ? 'menu-batch-cart'
+    : null;
 ?>
 
 <section class="cafebara-menu-page py-4 py-lg-5">
@@ -59,10 +62,21 @@ $this->title = 'Menu';
     <div class="row g-3">
         <?php foreach ($dataProvider->getModels() as $product) : ?>
             <div class="col-12 col-sm-6 col-lg-4">
-                <?= $this->render('../shared/_product_card', ['product' => $product]) ?>
+                <?= $this->render('../shared/_product_card', [
+                    'product' => $product,
+                    'batchFormId' => $batchFormId,
+                ]) ?>
             </div>
         <?php endforeach; ?>
     </div>
+
+    <?php if ($batchFormId !== null && $dataProvider->getCount() > 0) : ?>
+        <div class="cafebara-batch-cart">
+            <?= Html::beginForm(['/cart/add-batch'], 'post', ['id' => $batchFormId]) ?>
+            <?= Html::submitButton('Add selected to cart', ['class' => 'btn btn-primary btn-lg']) ?>
+            <?= Html::endForm() ?>
+        </div>
+    <?php endif; ?>
 
     <?php if ($dataProvider->getCount() === 0) : ?>
         <div class="card admin-panel">

@@ -15,10 +15,8 @@ $columns = [
     'order_number',
     'status',
     'total_amount:currency',
-    [
-        'attribute' => 'created_at',
-        'format' => ['date', 'php:Y-m-d H:i'],
-    ],
+    'created_at:datetime',
+    'updated_at:datetime',
 ];
 
 if (Yii::$app->user->can('admin.access') || Yii::$app->user->can('staff.access')) {

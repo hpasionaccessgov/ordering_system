@@ -104,7 +104,7 @@ $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
                                         'aria-label' => 'Quantity of ' . $model->name,
                                     ]) ?>
                                 </div>
-                                <?= Html::submitButton('Add to cart', ['class' => 'btn btn-primary']) ?>
+                                <?= Html::submitButton('Cart', ['class' => 'btn btn-primary']) ?>
                                 <?= Html::endForm() ?>
                             </div>
                         <?php endif; ?>

@@ -66,4 +66,24 @@ final class AdminGridPaginationTest extends Unit
         self::assertStringContainsString('class="asc"', $html);
         self::assertStringContainsString('data-sort="-name"', $html);
     }
+
+    public function testTimestampColumnRendersFriendlyFormat(): void
+    {
+        Yii::$app->request->setScriptUrl('/index.php');
+        Yii::$app->request->setUrl('/index.php');
+        $provider = new ArrayDataProvider([
+            'allModels' => [['id' => 1, 'created_at' => 1700000000]],
+            'pagination' => false,
+        ]);
+
+        $html = AdminGridView::widget([
+            'dataProvider' => $provider,
+            'columns' => ['created_at:datetime'],
+        ]);
+
+        self::assertStringNotContainsString('1700000000', $html);
+        self::assertStringContainsString('2023', $html);
+        // 1700000000 is 2023-11-14 22:13 UTC, i.e. 2023-11-15 06:13 Asia/Manila (12-hour).
+        self::assertStringContainsString('6:13 AM', $html);
+    }
 }

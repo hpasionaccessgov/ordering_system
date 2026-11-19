@@ -41,4 +41,38 @@ final class CartAccessTest extends Unit
             }
         }
     }
+
+    public function testBatchAddUsesTheCartAddPermission(): void
+    {
+        $controller = new CartController('cart', Yii::$app);
+        $filter = $controller->getBehavior('access');
+
+        $filter->user = $this->mockUser(
+            static fn(string $permission): bool => $permission === 'cart.add',
+        );
+        self::assertTrue($filter->beforeAction(new Action('add-batch', $controller)));
+
+        $filter->user = $this->mockUser(
+            static fn(string $permission): bool => $permission === 'cart.checkout',
+        );
+        try {
+            $filter->beforeAction(new Action('add-batch', $controller));
+            self::fail('add-batch should require cart.add.');
+        } catch (ForbiddenHttpException $exception) {
+            self::assertSame(403, $exception->statusCode);
+        }
+    }
+
+    private function mockUser(callable $can): User
+    {
+        $user = $this->getMockBuilder(User::class)
+            ->setConstructorArgs([['identityClass' => \app\models\User::class]])
+            ->onlyMethods(['getIsGuest', 'can'])
+            ->getMock();
+        $user->method('getIsGuest')->willReturn(false);
+        $user->method('can')->willReturnCallback($can);
+        Yii::$app->set('user', $user);
+
+        return $user;
+    }
 }

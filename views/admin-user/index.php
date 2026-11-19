@@ -54,6 +54,8 @@ foreach ($roles as $role) {
             ],
             'full_name',
             'email:email',
+            'created_at:datetime',
+            'updated_at:datetime',
             [
                 'label' => 'Role',
                 'format' => 'raw',
