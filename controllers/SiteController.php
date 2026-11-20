@@ -302,7 +302,7 @@ class SiteController extends Controller
 
         Yii::$app->session->setFlash(
             'warning',
-            'No dashboard is enabled for your account. You were returned to the public home page.',
+            'No dashboard is enabled for your account. Ask an administrator to assign your role and dashboard permission.',
         );
 
         return $this->redirect(['/site/index']);
@@ -317,12 +317,18 @@ class SiteController extends Controller
     {
         $this->layout = 'admin';
         $user = $this->getCurrentUser();
-        $model = new ProfileForm(['fullName' => $user->full_name]);
+        $model = new ProfileForm([
+            'fullName' => $user->full_name,
+            'username' => $user->username,
+            'email' => $user->email,
+        ]);
 
         if ($model->load($this->request->post()) && $model->validate()) {
             $user->full_name = $model->fullName;
+            $user->username = $model->username;
+            $user->email = $model->email;
 
-            if ($user->save(false, ['full_name', 'updated_at', 'updated_by'])) {
+            if ($user->save(false, ['full_name', 'username', 'email', 'updated_at', 'updated_by'])) {
                 Yii::$app->session->setFlash('success', 'Your profile was updated.');
 
                 return $this->redirect(['profile']);
