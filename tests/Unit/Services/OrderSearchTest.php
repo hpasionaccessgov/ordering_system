@@ -47,7 +47,7 @@ final class OrderSearchTest extends Unit
     public function testSearchKeepsCustomerOwnershipAndLimitsResults(): void
     {
         $user = $this->getMockBuilder(User::class)
-            ->setConstructorArgs([['identityClass' => \app\models\User::class]])
+            ->setConstructorArgs([['identityClass' => Account::class]])
             ->onlyMethods(['getId', 'can'])
             ->getMock();
         $user->method('getId')->willReturn(41);

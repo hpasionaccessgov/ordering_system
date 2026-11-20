@@ -76,6 +76,13 @@ $navGroups = [
                 'route' => ['/admin-role/index'],
                 'active' => $currentRoute === 'admin-role/index',
             ],
+            [
+                'label' => 'Activity logs',
+                'icon' => 'bi-clock-history',
+                'visible' => $can('admin.access'),
+                'route' => ['/admin/activity'],
+                'active' => $currentRoute === 'admin/activity',
+            ],
         ]
 
     ],
@@ -128,13 +135,13 @@ $navGroups = [
                         </li>
                     <?php else : ?>
                         <?php $groupActive = array_filter($visibleItems, static fn(array $item): bool => $item['active']) !== []; ?>
-                        <li class="nav-item<?= $groupActive ? ' menu-open' : '' ?>">
+                        <li class="nav-item menu-open<?= $groupActive ? ' has-active-child' : '' ?>">
                             <?= Html::a(
                                 '<i class="nav-icon bi ' . $group['icon'] . '"></i><p>'
                                     . Html::encode($group['label'])
                                     . '<i class="nav-arrow bi bi-chevron-right"></i></p>',
                                 '#',
-                                ['class' => 'nav-link' . ($groupActive ? ' active' : '')],
+                                ['class' => 'nav-link'],
                             ) ?>
                             <ul class="nav nav-treeview">
                                 <?php foreach ($visibleItems as $item) : ?>
@@ -151,24 +158,6 @@ $navGroups = [
                         </li>
                     <?php endif; ?>
                 <?php endforeach; ?>
-                <!-- <li class="menu-section">
-                    <h4 class="menu-text">System</h4>
-                    <i class="menu-icon bi bi-list"></i>
-                </li> -->
-                <!-- <li class="nav-item">
-                    <?= Html::a(
-                        '<i class="nav-icon bi bi-person"></i><p>Profile</p>',
-                        ['/site/profile'],
-                        ['class' => 'nav-link' . ($currentRoute === 'site/profile' ? ' active' : '')],
-                    ) ?>
-                </li> -->
-                <!-- <li class="nav-item">
-                    <?= Html::a(
-                        '<i class="nav-icon bi bi-key"></i><p>Change password</p>',
-                        ['/site/change-password'],
-                        ['class' => 'nav-link' . ($currentRoute === 'site/change-password' ? ' active' : '')],
-                    ) ?>
-                </li> -->
             </ul>
         </nav>
     </div>

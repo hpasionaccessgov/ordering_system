@@ -13,7 +13,7 @@ class ProductSearch extends Product
     public $q = '';
     public $categoryId = '';
     public $catalogStatus = 'all';
-    public $filters;
+    public ?ListingFilters $filters = null;
 
     public function rules(): array
     {

@@ -673,6 +673,29 @@ body {
     font-weight: 700;
 }
 
+/* Parent links follow their group state, not hover, so collapsing clears the tint at once. */
+.app-sidebar .sidebar-menu > .nav-item > .nav-link:hover,
+.app-sidebar .sidebar-menu > .nav-item > .nav-link:focus-visible {
+    background-color: transparent;
+    color: inherit;
+}
+
+.app-sidebar .sidebar-menu > .nav-item.menu-open:not(.has-active-child) > .nav-link {
+    background-color: transparent;
+    color: inherit;
+    font-weight: 400;
+    border-left-color: transparent;
+}
+
+.app-sidebar .sidebar-menu > .nav-item.menu-open.has-active-child > .nav-link,
+.app-sidebar .sidebar-menu > .nav-item.menu-open.has-active-child > .nav-link:hover,
+.app-sidebar .sidebar-menu > .nav-item.menu-open.has-active-child > .nav-link:focus-visible {
+    border-left-color: var(--cafebara-cream);
+    background-color: rgba(137, 67, 28, .48);
+    color: #fff;
+    font-weight: 700;
+}
+
 /* Tree-style grouping: separator per menu, indented submenu with a guide line. */
 .app-sidebar .sidebar-menu>.nav-item {
     border-bottom: 1px solid rgba(248, 230, 203, .12);
