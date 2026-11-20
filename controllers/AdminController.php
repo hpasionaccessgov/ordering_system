@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
-use app\models\ActivityLog;
 use app\models\Order;
 use app\models\Product;
 use app\models\User;
 use app\services\OrderStatistics;
-use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\Response;
 
 class AdminController extends Controller
 {
@@ -43,24 +42,11 @@ class AdminController extends Controller
         ]);
     }
 
-    public function actionActivity(): string
+    public function actionActivity(): Response
     {
-        $this->layout = 'admin';
-        $event = $this->request->get('event', '');
-        $events = [ActivityLog::VISIT, ActivityLog::LOGIN, ActivityLog::LOGOUT];
-        $event = is_string($event) && in_array($event, $events, true) ? $event : '';
-        $query = ActivityLog::find()->with('user')->orderBy(['id' => SORT_DESC]);
-        if ($event !== '') {
-            $query->andWhere(['event' => $event]);
-        }
+        $params = $this->request->queryParams;
+        unset($params['r']);
 
-        return $this->render('activity', [
-            'dataProvider' => new ActiveDataProvider([
-                'query' => $query,
-                'pagination' => ['pageSize' => 25],
-                'sort' => false,
-            ]),
-            'event' => $event,
-        ]);
+        return $this->redirect(['/activity-log/index'] + $params);
     }
 }

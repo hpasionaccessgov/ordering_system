@@ -2,7 +2,7 @@
 
 use app\models\OrderNotification;
 use yii\helpers\Html;
-use yii\widgets\LinkPager;
+use yii\bootstrap5\LinkPager;
 
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
@@ -31,7 +31,7 @@ $this->title = 'Notifications';
                     <?php if (Yii::$app->user->can('order.view')): ?>
                         <?= Html::a('View order', ['/order/view', 'id' => $notification->order_id], ['class' => 'btn btn-sm btn-outline-primary']) ?>
                     <?php endif ?>
-                    <?php if ($notification->read_at === null): ?>
+                    <?php if ($notification->read_at === null && Yii::$app->user->can('notification.read')): ?>
                         <?= Html::beginForm(['/notification/read', 'id' => $notification->id], 'post') ?>
                         <?= Html::submitButton('Mark as read', ['class' => 'btn btn-sm btn-outline-secondary']) ?>
                         <?= Html::endForm() ?>
@@ -44,4 +44,10 @@ $this->title = 'Notifications';
         <?php endif ?>
     </div>
 </div>
-<?= LinkPager::widget(['pagination' => $dataProvider->getPagination()]) ?>
+<div class="d-flex justify-content-center mt-4">
+    <?= LinkPager::widget([
+        'pagination' => $dataProvider->getPagination(),
+        'prevPageLabel' => 'Previous',
+        'nextPageLabel' => 'Next',
+    ]) ?>
+</div>

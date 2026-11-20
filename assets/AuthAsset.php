@@ -12,7 +12,7 @@ class AuthAsset extends AssetBundle
     public $baseUrl = '@web';
 
     public $css = [
-        'css/cafebara-theme.css',
+        'css/site.css',
     ];
 
     public $depends = [

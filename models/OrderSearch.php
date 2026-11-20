@@ -39,7 +39,7 @@ class OrderSearch extends Order
         $this->filters->loadFilters($params, $canViewAllOrders, true, true);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => ['pageSize' => 8, 'pageSizeLimit' => [8, 8]],
+            'pagination' => ['pageSize' => 9, 'pageSizeLimit' => [9, 9]],
             'sort' => [
                 'attributes' => [
                     'id', 'order_number', 'status', 'total_amount', 'created_at', 'updated_at',

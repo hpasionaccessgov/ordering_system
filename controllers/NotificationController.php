@@ -21,7 +21,10 @@ class NotificationController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'rules' => [['allow' => true, 'roles' => ['@']]],
+                'rules' => [
+                    ['allow' => true, 'actions' => ['index', 'unread-count'], 'roles' => ['notification.index']],
+                    ['allow' => true, 'actions' => ['read'], 'roles' => ['notification.read']],
+                ],
             ],
             'verbs' => [
                 'class' => VerbFilter::class,
@@ -39,7 +42,7 @@ class NotificationController extends Controller
                 'query' => $this->visibleNotifications()
                     ->with('order')
                     ->orderBy(['id' => SORT_DESC]),
-                'pagination' => ['pageSize' => 20],
+                'pagination' => ['pageSize' => 9, 'pageSizeLimit' => [9, 9]],
                 'sort' => false,
             ]),
         ]);

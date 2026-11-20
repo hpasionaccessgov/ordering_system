@@ -44,7 +44,7 @@ final class PublicMenuTest extends Unit
                     ['status' => \app\models\Product::STATUS_ACTIVE],
                     $params['dataProvider']->query->where[1],
                 );
-                self::assertSame(8, $params['dataProvider']->pagination->getPageSize());
+                self::assertSame(9, $params['dataProvider']->pagination->getPageSize());
                 self::assertSame('coffee', $params['search']);
                 self::assertSame('invalid', $params['categoryId']);
 

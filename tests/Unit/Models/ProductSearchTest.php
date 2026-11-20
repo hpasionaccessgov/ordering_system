@@ -53,6 +53,6 @@ final class ProductSearchTest extends Unit
             [(int) $products[0]->id, (int) $products[1]->id],
             array_map(static fn(Product $product): int => (int) $product->id, $public->getModels()),
         );
-        self::assertSame(8, $public->pagination->getPageSize());
+        self::assertSame(9, $public->pagination->getPageSize());
     }
 }

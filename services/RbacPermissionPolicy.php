@@ -35,6 +35,8 @@ final class RbacPermissionPolicy
             'cart.remove',
             'cart.checkout',
         ],
+        'activityLog.index' => ['activityLog.view'],
+        'notification.index' => ['notification.read'],
     ];
 
     /**

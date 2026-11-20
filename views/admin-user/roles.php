@@ -147,6 +147,8 @@ $permissionModuleLabels = [
     'product' => 'Products',
     'order' => 'Orders',
     'cart' => 'Cart & checkout',
+    'activityLog' => 'Activity logs',
+    'notification' => 'Notifications',
 ];
 $permissionDescriptions = [
     'admin.access' => 'Access the administrator dashboard.',
@@ -181,6 +183,10 @@ $permissionDescriptions = [
     'cart.update' => 'Change quantities in a cart.',
     'cart.remove' => 'Remove products from a cart.',
     'cart.checkout' => 'Place an order from a cart and view its confirmation.',
+    'activityLog.index' => 'Search and list activity logs.',
+    'activityLog.view' => 'View an individual activity log.',
+    'notification.index' => 'View personal notifications and unread count.',
+    'notification.read' => 'Mark personal notifications as read.',
 ];
 $permissionGroups = [];
 foreach ($permissions as $permission) {

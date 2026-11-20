@@ -18,8 +18,8 @@ final class AdminGridPaginationTest extends Unit
         $provider = new ArrayDataProvider([
             'allModels' => array_map(static fn(int $id): array => ['id' => $id], range(1, 25)),
             'pagination' => [
-                'pageSize' => 10,
-                'pageSizeLimit' => [10, 10],
+                'pageSize' => 9,
+                'pageSizeLimit' => [9, 9],
                 'params' => ['page' => 2, 'q' => 'coffee', 'sort' => '-name', 'per-page' => 100],
                 'route' => 'category/index',
             ],

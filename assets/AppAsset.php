@@ -27,7 +27,7 @@ class AppAsset extends AssetBundle
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
-        'css/cafebara-theme.css',
+        'css/site.css',
     ];
     public $js = [
         'js/color-mode.js',

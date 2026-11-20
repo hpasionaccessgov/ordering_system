@@ -31,6 +31,7 @@ final class NotificationCest
             $user->setPassword('TestPassword123!');
             $user->generateAuthKey();
             $I->assertTrue($user->save(), json_encode($user->getErrors()));
+            Yii::$app->authManager->assign(Yii::$app->authManager->getRole('customer'), $user->id);
             $users[] = $user;
         }
         $category = new Category(['name' => 'Notification ' . $suffix, 'status' => Category::STATUS_ACTIVE]);
@@ -63,6 +64,41 @@ final class NotificationCest
         $I->sendAjaxPostRequest('/index.php?r=notification%2Fread&id=' . $otherNotification->id);
         $I->seeResponseCodeIs(404);
         $I->assertNull(OrderNotification::findOne($otherNotification->id)->read_at);
+
+        for ($i = 0; $i < 10; $i++) {
+            $notification = new OrderNotification([
+                'user_id' => $users[0]->id,
+                'order_id' => $orders[0]->id,
+                'status' => 'processing',
+                'created_at' => time(),
+            ]);
+            $I->assertTrue($notification->save(false));
+        }
+        $I->amOnRoute('notification/index', ['per-page' => 100]);
+        $I->seeNumberOfElements('.list-group-item', 9);
+
+        $auth = Yii::$app->authManager;
+        $indexOnly = $auth->createRole('notification_index_' . $suffix);
+        $auth->add($indexOnly);
+        $auth->addChild($indexOnly, $auth->getPermission('notification.index'));
+        $auth->revoke($auth->getRole('customer'), $users[0]->id);
+        $auth->assign($indexOnly, $users[0]->id);
+        $I->amLoggedInAs($users[0]);
+        $I->amOnRoute('notification/index');
+        $I->seeResponseCodeIs(200);
+        $I->dontSee('Mark as read');
+        $ownNotification = OrderNotification::findOne(['order_id' => $orders[0]->id, 'user_id' => $users[0]->id]);
+        $I->sendAjaxPostRequest('/index.php?r=notification%2Fread&id=' . $ownNotification->id);
+        $I->seeResponseCodeIs(403);
+
+        $auth->revoke($indexOnly, $users[0]->id);
+        $I->amLoggedInAs($users[0]);
+        $I->amOnRoute('site/profile');
+        $I->dontSeeElement('[data-notification-link]');
+        $I->amOnRoute('notification/index');
+        $I->seeResponseCodeIs(403);
+        $I->amOnRoute('notification/unread-count');
+        $I->seeResponseCodeIs(403);
     }
 
     public function managersReceiveNewAndCancelledOrderAlerts(FunctionalTester $I): void
@@ -155,11 +191,11 @@ final class NotificationCest
         $auth->revoke($inheritedStaff, $users['staff']->id);
         $I->amLoggedInAs($users['staff']);
         $I->amOnRoute('notification/index');
-        $I->dontSee($order->order_number);
+        $I->seeResponseCodeIs(403);
         $I->amOnRoute('notification/unread-count');
-        $I->see('"count":0');
+        $I->seeResponseCodeIs(403);
         $I->sendAjaxPostRequest('/index.php?r=notification%2Fread&id=' . $notification->id);
-        $I->seeResponseCodeIs(404);
+        $I->seeResponseCodeIs(403);
     }
 
     public function guestsCannotAccessInbox(FunctionalTester $I): void

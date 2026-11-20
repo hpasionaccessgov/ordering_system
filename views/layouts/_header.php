@@ -36,9 +36,11 @@ $user = Yii::$app->user->identity;
                     <?= Html::a('Login', ['/site/login'], ['class' => 'nav-link']) ?>
                 </li>
             <?php else: ?>
-                <li class="nav-item">
-                    <?= $this->render('_notifications_link', ['class' => 'nav-link']) ?>
-                </li>
+                <?php if (Yii::$app->user->can('notification.index')): ?>
+                    <li class="nav-item">
+                        <?= $this->render('_notifications_link', ['class' => 'nav-link']) ?>
+                    </li>
+                <?php endif ?>
                 <li class="nav-item d-flex align-items-center me-2">
                     <?= $this->render('_theme_toggle') ?>
                 </li>

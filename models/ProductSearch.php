@@ -65,8 +65,8 @@ class ProductSearch extends Product
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
-                'pageSize' => $publicMenu ? 8 : 6,
-                'pageSizeLimit' => $publicMenu ? [8, 8] : [6, 6],
+                'pageSize' => 6,
+                'pageSizeLimit' => [6, 6],
             ],
             'sort' => [
                 'attributes' => ['name', 'price', 'id'],

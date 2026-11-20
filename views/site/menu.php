@@ -94,9 +94,11 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
         </div>
     <?php endif; ?>
 
+    <div class="d-flex justify-content-center mt-4"></div></div>
     <?= LinkPager::widget([
         'pagination' => $dataProvider->pagination,
         'prevPageLabel' => 'Previous',
         'nextPageLabel' => 'Next',
     ]) ?>
+    </div>
 </section>

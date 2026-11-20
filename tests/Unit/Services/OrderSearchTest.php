@@ -77,7 +77,7 @@ final class OrderSearchTest extends Unit
                     $params['dataProvider']->query->where[3],
                 );
                 self::assertSame('pending', $params['status']);
-                self::assertSame(8, $params['dataProvider']->pagination->getPageSize());
+                self::assertSame(9, $params['dataProvider']->pagination->getPageSize());
                 self::assertSame(
                     ['created_at' => SORT_DESC, 'id' => SORT_DESC],
                     $params['dataProvider']->sort->getOrders(),

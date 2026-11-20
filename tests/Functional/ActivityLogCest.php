@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\tests\Functional;
 
 use app\models\ActivityLog;
+use app\models\ActivityLogSearch;
 use app\models\User;
 use app\services\ActivityLogger;
 use app\tests\Support\FunctionalTester;
@@ -87,6 +88,8 @@ final class ActivityLogCest
         $I->seeElement('.sidebar-menu > .nav-item.menu-open');
         $I->see('Categories');
         $I->see('Roles');
+        $I->amOnRoute('admin/activity', ['event' => 'logout']);
+        $I->seeElement('select[name="event"] option[value="logout"][selected]');
         $I->submitForm('form[role="search"]', ['event' => 'logout']);
         $I->dontSee('Login', 'td');
     }
@@ -101,6 +104,116 @@ final class ActivityLogCest
         $I->assertSame(1, $user->delete());
         $log->refresh();
         $I->assertNull($log->user_id);
+    }
+
+    public function searchPaginationAndGranularPermissions(FunctionalTester $I): void
+    {
+        $admin = $this->user($I, 'admin');
+        $staff = $this->user($I, 'staff');
+        $suffix = bin2hex(random_bytes(4));
+        $route = 'fixture-' . $suffix;
+        $timestamp = (new \DateTimeImmutable('2024-01-15 12:00:00', new \DateTimeZone(Yii::$app->formatter->timeZone ?: Yii::$app->timeZone)))->getTimestamp();
+        $logs = [];
+        for ($i = 0; $i < 12; $i++) {
+            $log = new ActivityLog([
+                'user_id' => $staff->id,
+                'event' => ActivityLog::VISIT,
+                'route' => $route,
+                'created_at' => $timestamp,
+            ]);
+            $I->assertTrue($log->save(false));
+            $logs[] = $log;
+        }
+
+        $I->amLoggedInAs($admin);
+        $I->amOnRoute('activity-log/index', [
+            'ActivityLogSearch' => ['username' => $staff->username, 'route' => $route, 'user_id' => $staff->id],
+            'event' => 'visit',
+            'created_from' => '2024-01-15',
+            'created_to' => '2024-01-15',
+            'per-page' => 100,
+        ]);
+        $I->seeResponseCodeIs(200);
+        $I->seeNumberOfElements('tbody tr[data-key]', 9);
+        $I->see('1-9 of 12');
+        $I->amOnRoute('activity-log/index', ['ActivityLogSearch' => ['id' => $logs[0]->id]]);
+        $I->seeNumberOfElements('tbody tr[data-key]', 1);
+        $I->amOnRoute('activity-log/view', ['id' => $logs[0]->id]);
+        $I->seeResponseCodeIs(200);
+        $I->see($staff->username);
+        $I->see($route);
+        $I->amOnRoute('admin-role/index');
+        foreach (['activityLog.index', 'activityLog.view', 'notification.index', 'notification.read'] as $permission) {
+            $I->seeElement('input[data-role="admin"][data-permission="' . $permission . '"]');
+        }
+
+        $I->amOnRoute('activity-log/index', ['ActivityLogSearch' => ['username' => ['invalid']]]);
+        $I->seeResponseCodeIs(200);
+        $I->see('Username must be a string');
+        $I->dontSee($route);
+        $I->amOnRoute('activity-log/index', ['created_from' => ['invalid']]);
+        $I->seeResponseCodeIs(200);
+        $I->dontSee($route);
+        $search = new ActivityLogSearch();
+        $provider = $search->search(['created_from' => '2024-02-01', 'created_to' => '2024-01-01']);
+        $I->assertSame(0, $provider->getTotalCount());
+        $I->assertTrue($search->filters->hasErrors('created_to'));
+
+        $extra = new ActivityLog([
+            'user_id' => $admin->id,
+            'event' => ActivityLog::VISIT,
+            'route' => $route,
+            'created_at' => $timestamp,
+        ]);
+        $I->assertTrue($extra->save(false));
+        foreach (['username' => $admin->id, '-username' => $staff->id] as $sort => $expectedUser) {
+            $provider = (new ActivityLogSearch())->search(['ActivityLogSearch' => ['route' => $route]]);
+            $provider->getSort()->params = ['sort' => $sort];
+            $I->assertEquals($expectedUser, $provider->getModels()[0]->user_id);
+        }
+
+        $auth = Yii::$app->authManager;
+        $role = $auth->createRole('activity_index_' . $suffix);
+        $auth->add($role);
+        $auth->addChild($role, $auth->getPermission('activityLog.index'));
+        $auth->assign($role, $staff->id);
+        $I->amLoggedInAs($staff);
+        $I->amOnRoute('activity-log/index');
+        $I->seeResponseCodeIs(200);
+        $I->see('Activity logs');
+        $I->dontSeeElement('tbody a.btn');
+        $I->amOnRoute('activity-log/view', ['id' => $logs[0]->id]);
+        $I->seeResponseCodeIs(403);
+        $auth->addChild($role, $auth->getPermission('activityLog.view'));
+        $I->amLoggedInAs($staff);
+        $I->amOnRoute('activity-log/view', ['id' => $logs[0]->id]);
+        $I->seeResponseCodeIs(200);
+    }
+
+    public function permissionMigrationGrantsExistingAndInheritedRoles(FunctionalTester $I): void
+    {
+        require_once Yii::getAlias('@app/migrations/m261120_150000_add_activity_notification_permissions.php');
+        $auth = Yii::$app->authManager;
+        $suffix = bin2hex(random_bytes(4));
+        foreach (['admin', 'staff'] as $name) {
+            $role = $auth->createRole('migration_' . $name . '_' . $suffix);
+            $auth->add($role);
+            $auth->addChild($role, $auth->getRole($name));
+        }
+        $migration = new \m261120_150000_add_activity_notification_permissions();
+        $migration->safeUp();
+        $migration->safeUp();
+
+        foreach ($auth->getRoles() as $role) {
+            $permissions = $auth->getPermissionsByRole($role->name);
+            $I->assertArrayHasKey('notification.index', $permissions);
+            $I->assertArrayHasKey('notification.read', $permissions);
+        }
+        foreach (['admin' => true, 'staff' => false] as $name => $expected) {
+            $permissions = $auth->getPermissionsByRole('migration_' . $name . '_' . $suffix);
+            $I->assertSame($expected, isset($permissions['activityLog.index']));
+            $I->assertSame($expected, isset($permissions['activityLog.view']));
+        }
     }
 
     private function user(FunctionalTester $I, string $role): User

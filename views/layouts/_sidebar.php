@@ -79,9 +79,9 @@ $navGroups = [
             [
                 'label' => 'Activity logs',
                 'icon' => 'bi-clock-history',
-                'visible' => $can('admin.access'),
-                'route' => ['/admin/activity'],
-                'active' => $currentRoute === 'admin/activity',
+                'visible' => $can('activityLog.index'),
+                'route' => ['/activity-log/index'],
+                'active' => str_starts_with($currentRoute, 'activity-log/'),
             ],
         ]
 

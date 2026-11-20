@@ -1,10 +1,11 @@
 <?php
 
 /** @var yii\web\View $this */
-/** @var app\models\Product[] $featuredProducts */
+/** @var yii\data\ActiveDataProvider $featuredDataProvider */
 /** @var int $orderCount */
 
 use app\models\User;
+use yii\bootstrap5\LinkPager;
 use yii\helpers\Html;
 
 $this->title = 'Customer dashboard';
@@ -55,28 +56,35 @@ $displayName = $identity instanceof User
 </section>
 
 <?php if (Yii::$app->user->can('product.view')) : ?>
-<section class="mb-4">
-    <div class="d-flex justify-content-between align-items-end mb-3">
-        <div>
-            <p class="text-body-secondary mb-1">From the menu</p>
-            <h2 class="h4 mb-0">Featured drinks and bites</h2>
-        </div>
-        <?php if (Yii::$app->user->can('product.index')) : ?>
-            <?= Html::a('Browse all products', ['/product/index'], ['class' => 'link-primary fw-semibold']) ?>
-        <?php endif; ?>
-    </div>
-    <?php if ($batchFormId !== null && $featuredProducts !== []) : ?>
-        <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
-    <?php endif; ?>
-    <div class="row g-3">
-        <?php foreach ($featuredProducts as $product) : ?>
-            <div class="col-12 col-sm-6 col-xl-3">
-                <?= $this->render('../shared/_product_card', [
-                    'product' => $product,
-                    'batchFormId' => $batchFormId,
-                ]) ?>
+    <section class="mb-4">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <div>
+                <p class="text-body-secondary mb-1">From the menu</p>
+                <h2 class="h4 mb-0">Featured drinks and bites</h2>
             </div>
-        <?php endforeach; ?>
-    </div>
-</section>
+            <?php if (Yii::$app->user->can('product.index')) : ?>
+                <?= Html::a('Browse all products', ['/product/index'], ['class' => 'link-primary fw-semibold']) ?>
+            <?php endif; ?>
+        </div>
+        <?php if ($batchFormId !== null && $featuredDataProvider->getCount() > 0) : ?>
+            <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
+        <?php endif; ?>
+        <div class="row g-3">
+            <?php foreach ($featuredDataProvider->getModels() as $product) : ?>
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <?= $this->render('../shared/_product_card', [
+                        'product' => $product,
+                        'batchFormId' => $batchFormId,
+                    ]) ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <div class="d-flex justify-content-center mt-4">
+            <?= LinkPager::widget([
+                'pagination' => $featuredDataProvider->pagination,
+                'prevPageLabel' => 'Previous',
+                'nextPageLabel' => 'Next',
+            ]) ?>
+        </div>
+    </section>
 <?php endif; ?>

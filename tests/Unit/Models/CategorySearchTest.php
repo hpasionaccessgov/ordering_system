@@ -27,7 +27,7 @@ final class CategorySearchTest extends Unit
             ['like', 'description', '12'],
             ['id' => '12'],
         ], $provider->query->where);
-        self::assertSame(8, $provider->pagination->getPageSize());
+        self::assertSame(9, $provider->pagination->getPageSize());
     }
 
     public function testSearchHandlesInvalidInputWithoutThrowing(): void
