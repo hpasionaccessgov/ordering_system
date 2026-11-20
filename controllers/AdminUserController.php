@@ -7,9 +7,9 @@ namespace app\controllers;
 use app\models\AdminUserCreateForm;
 use app\models\Order;
 use app\models\User;
+use app\models\UserSearch;
 use app\services\AdminAccessRecovery;
 use Yii;
-use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
@@ -79,42 +79,13 @@ class AdminUserController extends Controller
     public function actionList(): string
     {
         $this->layout = 'admin';
-        $requestedSearch = $this->request->get('q', '');
-        $search = is_string($requestedSearch) ? trim($requestedSearch) : '';
-        $query = User::find()->with(['createdBy', 'updatedBy']);
-
-        if ($search !== '') {
-            $query->andWhere(['or',
-                ['like', 'username', $search],
-                ['like', 'full_name', $search],
-                ['like', 'email', $search],
-            ]);
-        }
+        $searchModel = new UserSearch();
+        $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
-            'dataProvider' => new ActiveDataProvider([
-                'query' => $query,
-                'pagination' => ['pageSize' => 8, 'pageSizeLimit' => [8, 8]],
-                'sort' => [
-                    'attributes' => [
-                        'id',
-                        'username',
-                        'full_name',
-                        'email',
-                        'created_by' => [
-                            'asc' => [User::usernameSortExpression('{{%users}}', 'created_by', SORT_ASC)],
-                            'desc' => [User::usernameSortExpression('{{%users}}', 'created_by', SORT_DESC)],
-                        ],
-                        'updated_by' => [
-                            'asc' => [User::usernameSortExpression('{{%users}}', 'updated_by', SORT_ASC)],
-                            'desc' => [User::usernameSortExpression('{{%users}}', 'updated_by', SORT_DESC)],
-                        ],
-                    ],
-                    'defaultOrder' => ['id' => SORT_ASC],
-                ],
-            ]),
+            'dataProvider' => $dataProvider,
             'roles' => Yii::$app->authManager->getRoles(),
-            'search' => $search,
+            'search' => $searchModel->q,
         ]);
     }
 

@@ -76,6 +76,11 @@ body.confirm-modal-open .modal-backdrop {
     color: rgba(255, 255, 255, .84);
 }
 
+.cafebara-menu-logo {
+    width: min(100%, 210px);
+    filter: drop-shadow(0 .75rem 1rem rgba(0, 0, 0, .24));
+}
+
 .cafebara-about-logo {
     width: min(100%, 210px);
     filter: drop-shadow(0 .75rem 1rem rgba(0, 0, 0, .24));

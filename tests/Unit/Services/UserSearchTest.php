@@ -35,7 +35,7 @@ final class UserSearchTest extends Unit
                     ['like', 'full_name', 'Ada'],
                     ['like', 'email', 'Ada'],
                 ], $params['dataProvider']->query->where);
-                self::assertSame(10, $params['dataProvider']->pagination->getPageSize());
+                self::assertSame(8, $params['dataProvider']->pagination->getPageSize());
 
                 return 'rendered';
             });

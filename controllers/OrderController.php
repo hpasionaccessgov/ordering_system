@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\models\Order;
-use app\models\User;
+use app\models\OrderSearch;
 use app\services\ShoppingCart;
 use app\services\OrderAccessPolicy;
 use app\services\OrderService;
 use app\services\OrderStatusService;
 use Yii;
-use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\ForbiddenHttpException;
@@ -102,70 +101,17 @@ class OrderController extends Controller
     {
         $this->layout = 'admin';
 
-        $query = OrderAccessPolicy::scopeToOwner(
-            Order::find()->with(['user', 'createdBy', 'updatedBy']),
+        $searchModel = new OrderSearch();
+        $dataProvider = $searchModel->search(
+            $this->request->queryParams,
             Yii::$app->user->id,
             $this->canViewAllOrders(),
         );
-        $requestedSearch = $this->request->get('q', '');
-        $search = is_string($requestedSearch) ? trim($requestedSearch) : '';
-        if ($search !== '') {
-            $conditions = [
-                'or',
-                ['like', 'status', $search],
-                ['like', 'order_number', $search],
-                [
-                    'user_id' => User::find()
-                        ->select('id')
-                        ->andWhere([
-                            'or',
-                            ['like', 'username', $search],
-                            ['like', 'full_name', $search],
-                            ['like', 'email', $search],
-                        ]),
-                ],
-            ];
-            if (ctype_digit($search)) {
-                $conditions[] = ['id' => $search];
-            }
-            $query->andWhere($conditions);
-        }
-        $requestedStatus = $this->request->get('status');
-        $status = is_string($requestedStatus)
-            ? $requestedStatus
-            : '';
-        if (in_array($status, Order::statusValues(), true)) {
-            $query->andWhere(['status' => $status]);
-        } else {
-            $status = '';
-        }
 
         return $this->render('index', [
-            'dataProvider' => new ActiveDataProvider([
-                'query' => $query,
-                'pagination' => ['pageSize' => 8, 'pageSizeLimit' => [8, 8]],
-                'sort' => [
-                    'attributes' => [
-                        'id',
-                        'order_number',
-                        'status',
-                        'total_amount',
-                        'created_at',
-                        'updated_at',
-                        'created_by' => [
-                            'asc' => [User::usernameSortExpression('{{%orders}}', 'created_by', SORT_ASC)],
-                            'desc' => [User::usernameSortExpression('{{%orders}}', 'created_by', SORT_DESC)],
-                        ],
-                        'updated_by' => [
-                            'asc' => [User::usernameSortExpression('{{%orders}}', 'updated_by', SORT_ASC)],
-                            'desc' => [User::usernameSortExpression('{{%orders}}', 'updated_by', SORT_DESC)],
-                        ],
-                    ],
-                    'defaultOrder' => ['created_at' => SORT_DESC, 'id' => SORT_DESC],
-                ],
-            ]),
-            'search' => $search,
-            'status' => $status,
+            'dataProvider' => $dataProvider,
+            'search' => $searchModel->q,
+            'status' => $searchModel->statusFilter,
         ]);
     }
 

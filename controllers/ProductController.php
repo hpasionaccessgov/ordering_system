@@ -7,9 +7,8 @@ namespace app\controllers;
 use app\models\Category;
 use app\models\OrderItem;
 use app\models\Product;
-use app\services\ProductCatalogPolicy;
+use app\models\ProductSearch;
 use Yii;
-use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
@@ -91,64 +90,11 @@ class ProductController extends Controller
         $this->layout = 'admin';
         $canViewProducts = Yii::$app->user->can('product.view');
         $canManageProducts = $this->canManageArchivedProducts();
-        $requestedStatus = $this->request->get('status', 'all');
-        $status = ProductCatalogPolicy::normalizeStatus(
-            $canManageProducts,
-            is_string($requestedStatus) ? $requestedStatus : 'all',
-        );
-
-        $query = ProductCatalogPolicy::applyStatusFilter(
-            Product::find()->with(['categoryRecord', 'createdBy', 'updatedBy']),
-            $status,
-        );
-        if (!$canViewProducts) {
-            $query->andWhere(['id' => null]);
-        }
-
-        $requestedSearch = $this->request->get('q', '');
-        $search = is_string($requestedSearch) ? trim($requestedSearch) : '';
-        $requestedCategoryId = $this->request->get('category_id', '');
-        $categoryId = is_scalar($requestedCategoryId)
-            ? trim((string) $requestedCategoryId)
-            : '';
-        $minPrice = $this->request->get('min_price');
-        $maxPrice = $this->request->get('max_price');
-
-        if ($search !== '') {
-            $query->andWhere([
-                'or',
-                ['like', 'name', $search],
-                ['like', 'description', $search],
-                [
-                    'category_id' => Category::find()
-                        ->select('id')
-                        ->andWhere(['like', 'name', $search]),
-                ],
-            ]);
-        }
-        if ($categoryId !== '') {
-            if (ctype_digit($categoryId)) {
-                $query->andWhere(['category_id' => (int) $categoryId]);
-            } else {
-                $query->andWhere(['id' => null]);
-            }
-        }
-        if (is_numeric($minPrice)) {
-            $query->andWhere(['>=', 'price', (float) $minPrice]);
-        }
-        if (is_numeric($maxPrice)) {
-            $query->andWhere(['<=', 'price', (float) $maxPrice]);
-        }
+        $searchModel = new ProductSearch();
+        $dataProvider = $searchModel->search($this->request->queryParams, $canViewProducts, $canManageProducts);
 
         return $this->render('index', [
-            'dataProvider' => new ActiveDataProvider([
-                'query' => $query,
-                'pagination' => ['pageSize' => 8, 'pageSizeLimit' => [8, 8]],
-                'sort' => [
-                    'attributes' => ['name', 'price', 'id'],
-                    'defaultOrder' => ['name' => SORT_ASC, 'id' => SORT_ASC],
-                ],
-            ]),
+            'dataProvider' => $dataProvider,
             'categories' => ArrayHelper::map(
                 Category::find()->orderBy('name')->all(),
                 'id',
@@ -156,8 +102,8 @@ class ProductController extends Controller
             ),
             'canManageProducts' => $canManageProducts,
             'canViewProducts' => $canViewProducts,
-            'status' => $status,
-            'search' => $search,
+            'status' => $searchModel->catalogStatus,
+            'search' => $searchModel->q,
         ]);
     }
 

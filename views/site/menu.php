@@ -29,6 +29,12 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
                     ]) ?>
                 </div>
             <?php endif; ?>
+            <div class="col-lg-4 text-center">
+                <?= Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
+                    'class' => 'cafebara-menu-logo',
+                    'alt' => 'Cafébara capybara mascot',
+                ]) ?> 
+                </div>
         </div>
     </div>
 
