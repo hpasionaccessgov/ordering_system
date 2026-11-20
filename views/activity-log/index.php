@@ -11,9 +11,11 @@ $this->title = 'Activity logs';
 $sort = Yii::$app->request->get('sort');
 $value = static fn($value): string => is_scalar($value) ? (string) $value : '';
 ?>
-<div class="mb-4">
-    <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Administration</p>
-    <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+        <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Administration</p>
+        <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
+    </div>
 </div>
 <?= Html::beginForm(['/activity-log/index'], 'get', ['class' => 'catalog-filter p-3 mb-4', 'role' => 'search']) ?>
 <div class="row g-2">
@@ -54,6 +56,9 @@ $value = static fn($value): string => is_scalar($value) ? (string) $value : '';
 <?= Html::errorSummary([$searchModel, $searchModel->filters], ['class' => 'alert alert-danger mt-2']) ?>
 <?= Html::endForm() ?>
 <section class="card admin-panel">
+    <div class="card-header">
+        <p class="text-body-secondary mb-0">Review sign-in, sign-out, and page visit activity.</p>
+    </div>
     <?= AdminGridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [

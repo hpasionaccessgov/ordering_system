@@ -37,6 +37,7 @@ final class RbacPermissionPolicy
         ],
         'activityLog.index' => ['activityLog.view'],
         'notification.index' => ['notification.read'],
+        'settings.index' => ['settings.update'],
     ];
 
     /**

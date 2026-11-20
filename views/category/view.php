@@ -2,6 +2,7 @@
 
 use app\models\Category;
 use yii\helpers\Html;
+use yii\widgets\DetailView;
 
 /** @var Category $model */
 
@@ -25,26 +26,22 @@ $this->title = $model->name;
 
 <section class="card admin-panel">
     <div class="card-body">
-        <dl class="row mb-0">
-            <dt class="col-sm-3">ID</dt>
-            <dd class="col-sm-9"><?= Html::encode($model->id) ?></dd>
-            <dt class="col-sm-3">Name</dt>
-            <dd class="col-sm-9"><?= Html::encode($model->name) ?></dd>
-            <dt class="col-sm-3">Description</dt>
-            <dd class="col-sm-9"><?= nl2br(Html::encode($model->description ?? '')) ?></dd>
-            <dt class="col-sm-3">Status</dt>
-            <dd class="col-sm-9">
-                <?= (int) $model->status === Category::STATUS_ACTIVE ? 'Active' : 'Inactive' ?>
-            </dd>
-            <dt class="col-sm-3">Created</dt>
-            <dd class="col-sm-9"><?= Yii::$app->formatter->asDatetime($model->created_at) ?></dd>
-            <dt class="col-sm-3">Updated</dt>
-            <dd class="col-sm-9"><?= Yii::$app->formatter->asDatetime($model->updated_at) ?></dd>
-            <dt class="col-sm-3">Created by</dt>
-            <dd class="col-sm-9"><?= Html::encode($model->createdBy->username ?? '—') ?></dd>
-            <dt class="col-sm-3">Updated by</dt>
-            <dd class="col-sm-9"><?= Html::encode($model->updatedBy->username ?? '—') ?></dd>
-        </dl>
+        <?= DetailView::widget([
+            'model' => $model,
+            'attributes' => [
+                'id',
+                'name',
+                ['attribute' => 'description', 'value' => $model->description ?? '', 'format' => 'ntext'],
+                [
+                    'attribute' => 'status',
+                    'value' => (int) $model->status === Category::STATUS_ACTIVE ? 'Active' : 'Inactive',
+                ],
+                ['attribute' => 'created_at', 'format' => 'datetime'],
+                ['attribute' => 'updated_at', 'format' => 'datetime'],
+                ['label' => 'Created by', 'value' => $model->createdBy->username ?? '—'],
+                ['label' => 'Updated by', 'value' => $model->updatedBy->username ?? '—'],
+            ],
+        ]) ?>
         <?php if (Yii::$app->user->can('category.delete')) : ?>
             <?= Html::beginForm(['delete', 'id' => $model->id], 'post', ['class' => 'mt-3']) ?>
             <?= Html::submitButton('Delete category', [

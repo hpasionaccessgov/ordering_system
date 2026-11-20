@@ -38,6 +38,7 @@ $this->render('_head');
 <?= $this->render('_footer') ?>
 
 <?= ConfirmModal::widget() ?>
+<?= $this->render('_session_monitor') ?>
 
 <?php $this->endBody() ?>
 </body>

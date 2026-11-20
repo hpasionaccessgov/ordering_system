@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\tests\Unit\Models;
 
 use app\models\Category;
+use app\models\ApplicationSettings;
 use app\models\Product;
 use app\models\ProductSearch;
 use Codeception\Test\Unit;
@@ -39,7 +40,7 @@ final class ProductSearchTest extends Unit
         $managerProvider = $manager->search($filters, true, true);
         self::assertSame($suffix, $manager->q);
         self::assertSame([(int) $products[2]->id], array_map(static fn(Product $product): int => (int) $product->id, $managerProvider->getModels()));
-        self::assertSame(6, $managerProvider->pagination->getPageSize());
+        self::assertSame((int) ApplicationSettings::current()->card_page_size, $managerProvider->pagination->getPageSize());
 
         $customer = new ProductSearch();
         $customerProvider = $customer->search($filters + ['min_price' => '10'], true, false);
@@ -53,6 +54,6 @@ final class ProductSearchTest extends Unit
             [(int) $products[0]->id, (int) $products[1]->id],
             array_map(static fn(Product $product): int => (int) $product->id, $public->getModels()),
         );
-        self::assertSame(9, $public->pagination->getPageSize());
+        self::assertSame((int) ApplicationSettings::current()->card_page_size, $public->pagination->getPageSize());
     }
 }

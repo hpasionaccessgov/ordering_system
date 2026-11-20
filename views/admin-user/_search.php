@@ -2,7 +2,9 @@
 
 use yii\helpers\Html;
 
+/** @var \app\models\AdminUser $model */
 /** @var string $search */
+/** @var array $roles */
 
 $sort = Yii::$app->request->get('sort');
 ?>
@@ -17,12 +19,16 @@ $sort = Yii::$app->request->get('sort');
     </div>
     <div class="col-12 col-md-auto">
         <?= Html::dropDownList('status', $model->statusFilter, [
-            '' => 'All statuses', '10' => 'Active', '0' => 'Inactive', '20' => 'Disabled',
+            '' => 'All statuses',
+            '10' => 'Active',
+            '0' => 'Inactive',
+            '20' => 'Disabled',
         ], ['class' => 'form-select', 'aria-label' => 'User status']) ?>
     </div>
     <div class="col-12 col-md-auto">
         <?= Html::dropDownList('role', $model->roleFilter, ['' => 'All roles'] + \yii\helpers\ArrayHelper::map($roles, 'name', 'name'), [
-            'class' => 'form-select', 'aria-label' => 'User role',
+            'class' => 'form-select',
+            'aria-label' => 'User role',
         ]) ?>
     </div>
     <?php if (is_string($sort) && $sort !== '') : ?>
@@ -33,7 +39,10 @@ $sort = Yii::$app->request->get('sort');
 </div>
 <?= Html::errorSummary($model, ['class' => 'alert alert-danger mt-2']) ?>
 <?= $this->render('../shared/_listing_filters', [
-    'filters' => $model->filters, 'showAudit' => true, 'showDates' => true,
-    'showAmount' => false, 'amountLabel' => '',
+    'filters' => $model->filters,
+    'showAudit' => true,
+    'showDates' => true,
+    'showAmount' => false,
+    'amountLabel' => '',
 ]) ?>
 <?= Html::endForm() ?>

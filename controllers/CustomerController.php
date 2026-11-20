@@ -6,6 +6,7 @@ namespace app\controllers;
 
 use app\models\Order;
 use app\models\Product;
+use app\models\ApplicationSettings;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -40,7 +41,7 @@ class CustomerController extends Controller
                         'is_featured' => true,
                     ])
                     ->orderBy(['name' => SORT_ASC]),
-                'pagination' => ['pageSize' => 6, 'pageSizeLimit' => [6, 6]],
+                'pagination' => ApplicationSettings::pagination(true),
                 'sort' => false,
             ]),
             'orderCount' => (int) Order::find()

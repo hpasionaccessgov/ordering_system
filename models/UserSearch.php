@@ -35,7 +35,7 @@ class UserSearch extends User
         $this->filters->loadFilters($params, true, true, false);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => ['pageSize' => 9, 'pageSizeLimit' => [9, 9]],
+            'pagination' => ApplicationSettings::pagination(),
             'sort' => [
                 'attributes' => [
                     'id', 'username', 'full_name', 'email',

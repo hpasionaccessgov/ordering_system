@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\tests\Unit\Models;
 
 use app\models\CategorySearch;
+use app\models\ApplicationSettings;
 use Codeception\Test\Unit;
 
 final class CategorySearchTest extends Unit
@@ -27,7 +28,7 @@ final class CategorySearchTest extends Unit
             ['like', 'description', '12'],
             ['id' => '12'],
         ], $provider->query->where);
-        self::assertSame(9, $provider->pagination->getPageSize());
+        self::assertSame((int) ApplicationSettings::current()->table_page_size, $provider->pagination->getPageSize());
     }
 
     public function testSearchHandlesInvalidInputWithoutThrowing(): void

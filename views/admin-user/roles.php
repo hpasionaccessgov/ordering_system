@@ -149,6 +149,7 @@ $permissionModuleLabels = [
     'cart' => 'Cart & checkout',
     'activityLog' => 'Activity logs',
     'notification' => 'Notifications',
+    'settings' => 'Settings',
 ];
 $permissionDescriptions = [
     'admin.access' => 'Access the administrator dashboard.',
@@ -187,6 +188,8 @@ $permissionDescriptions = [
     'activityLog.view' => 'View an individual activity log.',
     'notification.index' => 'View personal notifications and unread count.',
     'notification.read' => 'Mark personal notifications as read.',
+    'settings.index' => 'View application settings.',
+    'settings.update' => 'Change application settings.',
 ];
 $permissionGroups = [];
 foreach ($permissions as $permission) {

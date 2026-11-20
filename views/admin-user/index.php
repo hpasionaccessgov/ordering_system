@@ -4,6 +4,7 @@
 /** @var yii\data\ActiveDataProvider $dataProvider */
 /** @var yii\rbac\Role[] $roles */
 /** @var string $search */
+/** @var \app\models\UserSearch $searchModel */
 
 use app\models\User;
 use app\widgets\AdminGridView;

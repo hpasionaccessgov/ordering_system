@@ -39,7 +39,7 @@ class ActivityLogSearch extends ActivityLog
         );
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => ['pageSize' => 9, 'pageSizeLimit' => [9, 9]],
+            'pagination' => ApplicationSettings::pagination(),
             'sort' => [
                 'attributes' => [
                     'id', 'user_id', 'event', 'route', 'created_at',

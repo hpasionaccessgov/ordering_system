@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\models\OrderNotification;
+use app\models\ApplicationSettings;
 use app\services\OrderAccessPolicy;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -42,7 +43,7 @@ class NotificationController extends Controller
                 'query' => $this->visibleNotifications()
                     ->with('order')
                     ->orderBy(['id' => SORT_DESC]),
-                'pagination' => ['pageSize' => 9, 'pageSizeLimit' => [9, 9]],
+                'pagination' => ApplicationSettings::pagination(),
                 'sort' => false,
             ]),
         ]);

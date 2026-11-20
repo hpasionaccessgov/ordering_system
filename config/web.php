@@ -47,6 +47,7 @@ $config = [
             'datetimeFormat' => 'php:M j, Y g:i A',
         ],
         'user' => [
+            'class' => \app\services\SessionUser::class,
             'identityClass' => \app\models\User::class,
             'enableAutoLogin' => true,
         ],

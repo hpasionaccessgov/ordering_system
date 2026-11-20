@@ -37,6 +37,7 @@ return [
             'showScriptName' => true,
         ],
         'user' => [
+            'class' => \app\services\SessionUser::class,
             'identityClass' => \app\models\User::class,
         ],
         'request' => [

@@ -83,6 +83,13 @@ $navGroups = [
                 'route' => ['/activity-log/index'],
                 'active' => str_starts_with($currentRoute, 'activity-log/'),
             ],
+            [
+                'label' => 'Settings',
+                'icon' => 'bi-sliders',
+                'visible' => $can('settings.index'),
+                'route' => ['/settings/index'],
+                'active' => str_starts_with($currentRoute, 'settings/'),
+            ],
         ]
 
     ],

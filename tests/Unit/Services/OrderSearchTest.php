@@ -6,6 +6,7 @@ namespace app\tests\Unit\Services;
 
 use app\controllers\OrderController;
 use app\models\Order;
+use app\models\ApplicationSettings;
 use app\models\OrderSearch;
 use app\models\User as Account;
 use Codeception\Test\Unit;
@@ -77,7 +78,7 @@ final class OrderSearchTest extends Unit
                     $params['dataProvider']->query->where[3],
                 );
                 self::assertSame('pending', $params['status']);
-                self::assertSame(9, $params['dataProvider']->pagination->getPageSize());
+                self::assertSame((int) ApplicationSettings::current()->table_page_size, $params['dataProvider']->pagination->getPageSize());
                 self::assertSame(
                     ['created_at' => SORT_DESC, 'id' => SORT_DESC],
                     $params['dataProvider']->sort->getOrders(),

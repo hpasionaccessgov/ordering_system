@@ -64,10 +64,7 @@ class ProductSearch extends Product
         }
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => [
-                'pageSize' => 6,
-                'pageSizeLimit' => [6, 6],
-            ],
+            'pagination' => ApplicationSettings::pagination(true),
             'sort' => [
                 'attributes' => ['name', 'price', 'id'],
                 'defaultOrder' => ['name' => SORT_ASC, 'id' => SORT_ASC],

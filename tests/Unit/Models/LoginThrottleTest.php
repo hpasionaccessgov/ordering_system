@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace app\tests\Unit\Models;
 
 use app\models\LoginForm;
+use app\models\ApplicationSettings;
 use app\models\User;
 use Codeception\Test\Unit;
 use Yii;
+use yii\caching\ArrayCache;
 
 final class LoginThrottleTest extends Unit
 {
     protected function _before(): void
     {
         parent::_before();
-        Yii::$app->cache->flush();
+        Yii::$app->set('cache', TrackingLoginCache::class);
     }
 
     public function testInactiveAccountUsesSpecificMessageAfterCorrectPassword(): void
@@ -52,6 +54,28 @@ final class LoginThrottleTest extends Unit
         );
     }
 
+    public function testConfiguredAttemptWindowAndLockDuration(): void
+    {
+        $settings = ApplicationSettings::current();
+        $settings->login_max_attempts = 2;
+        $settings->login_reset_minutes = 3;
+        $settings->login_lock_minutes = 2;
+        self::assertTrue($settings->save());
+        $user = $this->createUser('configured-login', User::STATUS_ACTIVE);
+        for ($i = 0; $i < 2; $i++) {
+            $form = Yii::createObject(LoginForm::class);
+            $form->username = $user->username;
+            $form->password = 'wrong-password';
+            self::assertFalse($form->login());
+        }
+        self::assertSame([180, 120], Yii::$app->cache->durations);
+        $form = Yii::createObject(LoginForm::class);
+        $form->username = $user->username;
+        $form->password = 'LoginThrottle123!';
+        self::assertFalse($form->login());
+        self::assertStringContainsString('Too many login attempts.', (string) $form->getFirstError('password'));
+    }
+
     private function createUser(string $username, int $status): User
     {
         $user = new User([
@@ -65,5 +89,17 @@ final class LoginThrottleTest extends Unit
         self::assertTrue($user->save(), json_encode($user->getErrors()));
 
         return $user;
+    }
+
+}
+
+final class TrackingLoginCache extends ArrayCache
+{
+    public array $durations = [];
+
+    protected function setValue($key, $value, $duration)
+    {
+        $this->durations[] = $duration;
+        return parent::setValue($key, $value, $duration);
     }
 }

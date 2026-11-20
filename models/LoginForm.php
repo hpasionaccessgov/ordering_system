@@ -16,9 +16,6 @@ use yii\base\Security;
  */
 class LoginForm extends Model
 {
-    private const MAX_ATTEMPTS = 5;
-    private const THROTTLE_SECONDS = 60;
-
     public string $username = '';
     public string $password = '';
     public bool $rememberMe = true;
@@ -93,7 +90,8 @@ class LoginForm extends Model
     {
         if ($this->validate()) {
             Yii::$app->cache->delete($this->attemptKey());
-            return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
+            $duration = $this->rememberMe ? (int) ApplicationSettings::current()->idle_minutes * 60 : 0;
+            return Yii::$app->user->login($this->getUser(), $duration);
         }
 
         return false;
@@ -138,15 +136,18 @@ class LoginForm extends Model
      */
     private function recordFailedAttempt(array $attempt): void
     {
+        $settings = ApplicationSettings::current();
         $attempt['failures']++;
-        if ($attempt['failures'] >= self::MAX_ATTEMPTS) {
-            $attempt['blocked_until'] = time() + self::THROTTLE_SECONDS;
+        $duration = (int) $settings->login_reset_minutes * 60;
+        if ($attempt['failures'] >= (int) $settings->login_max_attempts) {
+            $duration = (int) $settings->login_lock_minutes * 60;
+            $attempt['blocked_until'] = time() + $duration;
             $attempt['failures'] = 0;
         }
         Yii::$app->cache->set(
             $this->attemptKey(),
             $attempt,
-            self::THROTTLE_SECONDS,
+            $duration,
         );
     }
 

@@ -57,6 +57,7 @@ $this->render('_favicon');
 </div>
 
 <?= ConfirmModal::widget() ?>
+<?= $this->render('_session_monitor') ?>
 
 <?php $this->endBody() ?>
 </body>

@@ -56,7 +56,7 @@ class CategorySearch extends Category
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => ['pageSize' => 9, 'pageSizeLimit' => [9, 9]],
+            'pagination' => ApplicationSettings::pagination(),
             'sort' => [
                 'attributes' => [
                     'id',
