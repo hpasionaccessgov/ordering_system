@@ -69,6 +69,7 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                             'class' => 'btn btn-primary',
                         ]) ?>
                     <?php else: ?>
+                        <?= $this->render('_notifications_link', ['class' => 'btn btn-outline-primary']) ?>
                         <?= Html::a(
                             $hasDashboardAccess ? 'Dashboard' : 'Home',
                             $hasDashboardAccess ? ['/site/dashboard'] : ['/site/index'],

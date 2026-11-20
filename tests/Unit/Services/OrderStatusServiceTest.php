@@ -6,6 +6,7 @@ namespace app\tests\Unit\Services;
 
 use app\models\Category;
 use app\models\Order;
+use app\models\OrderNotification;
 use app\models\Product;
 use app\models\User;
 use app\services\OrderService;
@@ -30,7 +31,13 @@ final class OrderStatusServiceTest extends Unit
 
         $statusService = new OrderStatusService();
         $order = $statusService->process($order, (int) $user->id);
-        $this->tester->seeEmailIsSent(1);
+        $notification = OrderNotification::findOne([
+            'user_id' => $user->id,
+            'order_id' => $order->id,
+            'status' => Order::STATUS_CONFIRMED,
+        ]);
+        self::assertNotNull($notification);
+        self::assertNull($notification->read_at);
         $order = $statusService->process($order, (int) $user->id);
         $order = $statusService->process($order, (int) $user->id);
 
@@ -40,6 +47,7 @@ final class OrderStatusServiceTest extends Unit
             ['pending', 'confirmed', 'processing', 'completed'],
             array_column($order->statusHistory, 'to_status'),
         );
+        self::assertSame(3, (int) OrderNotification::find()->where(['order_id' => $order->id])->count());
 
         $this->expectException(BadRequestHttpException::class);
         $statusService->process($order, (int) $user->id);
@@ -55,6 +63,11 @@ final class OrderStatusServiceTest extends Unit
         );
         $customerOrder = $service->cancel($customerOrder, (int) $customer->id, false);
         self::assertSame(Order::STATUS_CANCELLED, $customerOrder->status);
+        self::assertNotNull(OrderNotification::findOne([
+            'order_id' => $customerOrder->id,
+            'user_id' => $customer->id,
+            'status' => Order::STATUS_CANCELLED,
+        ]));
         self::assertSame(
             ['pending', 'cancelled'],
             array_column($customerOrder->statusHistory, 'to_status'),
@@ -70,6 +83,25 @@ final class OrderStatusServiceTest extends Unit
 
         $this->expectException(BadRequestHttpException::class);
         $service->cancel($staffOrder, (int) $customer->id, false);
+    }
+
+    public function testStatusNotificationRollsBackWithOrderChange(): void
+    {
+        [$user, $product] = $this->records();
+        $order = (new OrderService())->create(
+            (int) $user->id,
+            [['product_id' => $product->id, 'quantity' => 1]],
+        );
+        $transaction = \Yii::$app->db->beginTransaction();
+        try {
+            (new OrderStatusService())->process($order, (int) $user->id);
+            self::assertSame(1, (int) OrderNotification::find()->where(['order_id' => $order->id])->count());
+        } finally {
+            $transaction->rollBack();
+        }
+
+        self::assertSame(0, (int) OrderNotification::find()->where(['order_id' => $order->id])->count());
+        self::assertSame(Order::STATUS_PENDING, Order::findOne($order->id)->status);
     }
 
     /**

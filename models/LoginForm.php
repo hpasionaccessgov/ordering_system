@@ -17,7 +17,7 @@ use yii\base\Security;
 class LoginForm extends Model
 {
     private const MAX_ATTEMPTS = 5;
-    private const THROTTLE_SECONDS = 300;
+    private const THROTTLE_SECONDS = 60;
 
     public string $username = '';
     public string $password = '';

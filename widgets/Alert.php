@@ -64,7 +64,7 @@ class Alert extends \yii\bootstrap5\Widget
      * @var int number of seconds before each alert fades out and removes itself.
      * Set to 0 to keep alerts open until the user dismisses them.
      */
-    public int $autoDismiss = 5;
+    public int $autoDismiss = 3;
 
     /**
      * {@inheritdoc}
