@@ -135,6 +135,7 @@ class SiteController extends Controller
             ),
             'search' => $searchModel->q,
             'categoryId' => $searchModel->categoryId,
+            'filters' => $searchModel->filters,
         ]);
     }
 

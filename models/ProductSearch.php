@@ -13,15 +13,13 @@ class ProductSearch extends Product
     public $q = '';
     public $categoryId = '';
     public $catalogStatus = 'all';
-    public $minPrice;
-    public $maxPrice;
+    public $filters;
 
     public function rules(): array
     {
         return [
             [['q', 'categoryId', 'catalogStatus'], 'string'],
             [['q'], 'trim'],
-            [['minPrice', 'maxPrice'], 'safe'],
         ];
     }
 
@@ -44,6 +42,10 @@ class ProductSearch extends Product
     {
         $categoryId = $params['category_id'] ?? '';
         $requestedStatus = $params['status'] ?? 'all';
+        $this->filters = new ListingFilters();
+        $params['min_amount'] = $params['min_amount'] ?? $params['min_price'] ?? '';
+        $params['max_amount'] = $params['max_amount'] ?? $params['max_price'] ?? '';
+        $this->filters->loadFilters($params, !$publicMenu && $canManageProducts, !$publicMenu && $canManageProducts, true);
         $this->load([
             'q' => is_string($params['q'] ?? null) ? $params['q'] : '',
             'categoryId' => is_scalar($categoryId) ? trim((string) $categoryId) : '',
@@ -51,8 +53,6 @@ class ProductSearch extends Product
                 $canManageProducts,
                 is_string($requestedStatus) ? $requestedStatus : 'all',
             ),
-            'minPrice' => $params['min_price'] ?? null,
-            'maxPrice' => $params['max_price'] ?? null,
         ], '');
 
         $query = ProductCatalogPolicy::applyStatusFilter(
@@ -73,9 +73,11 @@ class ProductSearch extends Product
                 'defaultOrder' => ['name' => SORT_ASC, 'id' => SORT_ASC],
             ],
         ]);
-        if (!$this->validate()) {
+        if (!$this->validate() || !$this->filters->validate()) {
+            $query->andWhere('0=1');
             return $dataProvider;
         }
+        $this->filters->apply($query, 'price');
         if ($this->q !== '') {
             $conditions = ['or', ['like', 'name', $this->q], ['like', 'description', $this->q]];
             if (!$publicMenu) {
@@ -88,13 +90,6 @@ class ProductSearch extends Product
                 ? ['category_id' => (int) $this->categoryId]
                 : ['id' => null]);
         }
-        if (!$publicMenu && is_numeric($this->minPrice)) {
-            $query->andWhere(['>=', 'price', (float) $this->minPrice]);
-        }
-        if (!$publicMenu && is_numeric($this->maxPrice)) {
-            $query->andWhere(['<=', 'price', (float) $this->maxPrice]);
-        }
-
         return $dataProvider;
     }
 }

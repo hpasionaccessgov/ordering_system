@@ -9,6 +9,7 @@ use yii\helpers\Html;
 /** @var bool $canViewProducts */
 /** @var string $status */
 /** @var string $search */
+/** @var string $filters */
 
 $this->title = 'Product';
 $batchFormId = Yii::$app->user->can('cart.add') ? 'product-batch-cart' : null;
@@ -34,6 +35,7 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'product-batch-cart' : null;
         'canManageProducts' => $canManageProducts,
         'status' => $status,
         'search' => $search,
+        'filters' => $filters,
     ]) ?>
 <?php else : ?>
     <div class="alert alert-warning mb-4" role="alert">

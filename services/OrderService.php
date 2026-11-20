@@ -95,6 +95,7 @@ class OrderService
                 );
             }
 
+            (new OrderStatusService())->notifyOrderManagers($order, $userId);
             $transaction->commit();
 
             return $order;

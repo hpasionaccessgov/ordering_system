@@ -70,7 +70,9 @@ if (Yii::$app->user->can('order.view')) {
     <?php endif; ?>
 </div>
 
-<?= $this->render('_search', ['search' => $search, 'status' => $status]) ?>
+<?= $this->render('_search', [
+    'search' => $search, 'status' => $status, 'filters' => $filters, 'canViewAudit' => $canViewAudit,
+]) ?>
 
 <div class="order-table-card">
     <div class="card-header">

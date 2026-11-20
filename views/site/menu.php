@@ -7,6 +7,7 @@ use yii\helpers\Html;
 /** @var array<int, string> $categories */
 /** @var string $search */
 /** @var string $categoryId */
+/** @var string $filters */
 
 $this->title = 'Menu';
 $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
@@ -63,6 +64,10 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
             <?= Html::a('Clear', ['/site/menu'], ['class' => 'btn btn-outline-secondary']) ?>
         </div>
     </div>
+    <?= $this->render('../shared/_listing_filters', [
+        'filters' => $filters, 'showAudit' => false, 'showDates' => false,
+        'showAmount' => true, 'amountLabel' => 'price',
+    ]) ?>
     <?= Html::endForm() ?>
 
     <?php if ($batchFormId !== null && $dataProvider->getCount() > 0) : ?>

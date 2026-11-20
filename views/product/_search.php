@@ -6,6 +6,8 @@ use yii\helpers\Html;
 /** @var bool $canManageProducts */
 /** @var string $status */
 /** @var string $search */
+/** @var \app\models\ListingFilters $filters */
+
 ?>
 <?= Html::beginForm(['/product/index'], 'get', ['class' => 'catalog-filter p-3 mb-4', 'role' => 'search']) ?>
 <div class="row g-2">
@@ -30,24 +32,6 @@ use yii\helpers\Html;
             ], ['class' => 'form-select', 'aria-label' => 'Product status']) ?>
         </div>
     <?php endif; ?>
-    <div class="col-6 col-md-1">
-        <?= Html::input('number', 'min_price', Yii::$app->request->get('min_price'), [
-            'class' => 'form-control',
-            'min' => 0,
-            'step' => '0.01',
-            'placeholder' => 'Min ₱',
-            'aria-label' => 'Minimum price',
-        ]) ?>
-    </div>
-    <div class="col-6 col-md-1">
-        <?= Html::input('number', 'max_price', Yii::$app->request->get('max_price'), [
-            'class' => 'form-control',
-            'min' => 0,
-            'step' => '0.01',
-            'placeholder' => 'Max ₱',
-            'aria-label' => 'Maximum price',
-        ]) ?>
-    </div>
     <div class="col-12 col-md-2">
         <?= Html::dropDownList('sort', Yii::$app->request->get('sort', 'name'), [
             'name' => 'Name: A to Z',
@@ -59,5 +43,13 @@ use yii\helpers\Html;
     <div class="col-12 col-md-1">
         <?= Html::submitButton('Filter', ['class' => 'btn btn-primary w-100']) ?>
     </div>
+    <div class="col-auto"><?= Html::a('Clear', ['/product/index'], ['class' => 'btn btn-outline-secondary']) ?></div>
 </div>
+<?= $this->render('../shared/_listing_filters', [
+    'filters' => $filters,
+    'showAudit' => $canManageProducts,
+    'showDates' => $canManageProducts,
+    'showAmount' => true,
+    'amountLabel' => 'price',
+]) ?>
 <?= Html::endForm() ?>

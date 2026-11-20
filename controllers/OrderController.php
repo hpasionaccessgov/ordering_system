@@ -112,6 +112,8 @@ class OrderController extends Controller
             'dataProvider' => $dataProvider,
             'search' => $searchModel->q,
             'status' => $searchModel->statusFilter,
+            'filters' => $searchModel->filters,
+            'canViewAudit' => $this->canViewAllOrders(),
         ]);
     }
 

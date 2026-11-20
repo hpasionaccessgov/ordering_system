@@ -5,7 +5,7 @@ declare(strict_types=1);
 use yii\helpers\Html;
 
 $currentRoute = Yii::$app->controller->route;
-$can = static fn (string $permission): bool => Yii::$app->user->can($permission);
+$can = static fn(string $permission): bool => Yii::$app->user->can($permission);
 
 $hasDashboardAccess = $can('admin.access') || $can('staff.access') || $can('customer.access');
 $dashboardRoute = match (true) {
@@ -76,7 +76,8 @@ $navGroups = [
                 'route' => ['/admin-role/index'],
                 'active' => $currentRoute === 'admin-role/index',
             ],
-        ],
+        ]
+
     ],
 ];
 ?>
@@ -109,7 +110,7 @@ $navGroups = [
                     <?php
                     $visibleItems = array_values(array_filter(
                         $group['items'],
-                        static fn (array $item): bool => $item['visible'],
+                        static fn(array $item): bool => $item['visible'],
                     ));
                     if ($visibleItems === []) {
                         continue;
@@ -126,7 +127,7 @@ $navGroups = [
                             ) ?>
                         </li>
                     <?php else : ?>
-                        <?php $groupActive = array_filter($visibleItems, static fn (array $item): bool => $item['active']) !== []; ?>
+                        <?php $groupActive = array_filter($visibleItems, static fn(array $item): bool => $item['active']) !== []; ?>
                         <li class="nav-item<?= $groupActive ? ' menu-open' : '' ?>">
                             <?= Html::a(
                                 '<i class="nav-icon bi ' . $group['icon'] . '"></i><p>'
@@ -150,14 +151,17 @@ $navGroups = [
                         </li>
                     <?php endif; ?>
                 <?php endforeach; ?>
-
-                <li class="nav-item">
+                <!-- <li class="menu-section">
+                    <h4 class="menu-text">System</h4>
+                    <i class="menu-icon bi bi-list"></i>
+                </li> -->
+                <!-- <li class="nav-item">
                     <?= Html::a(
                         '<i class="nav-icon bi bi-person"></i><p>Profile</p>',
                         ['/site/profile'],
                         ['class' => 'nav-link' . ($currentRoute === 'site/profile' ? ' active' : '')],
                     ) ?>
-                </li>
+                </li> -->
                 <!-- <li class="nav-item">
                     <?= Html::a(
                         '<i class="nav-icon bi bi-key"></i><p>Change password</p>',

@@ -86,6 +86,7 @@ class AdminUserController extends Controller
             'dataProvider' => $dataProvider,
             'roles' => Yii::$app->authManager->getRoles(),
             'search' => $searchModel->q,
+            'searchModel' => $searchModel,
         ]);
     }
 

@@ -9,6 +9,7 @@ use app\models\Product;
 use app\models\User;
 use app\tests\Support\FunctionalTester;
 use Yii;
+use yii\rbac\DbManager;
 
 final class CheckoutCest
 {
@@ -16,6 +17,7 @@ final class CheckoutCest
 
     public function _before(FunctionalTester $I): void
     {
+        Yii::$app->set('authManager', DbManager::class);
         $suffix = substr(bin2hex(random_bytes(4)), 0, 8);
         $user = new User([
             'username' => 'checkout_' . $suffix,
@@ -50,7 +52,7 @@ final class CheckoutCest
     public function customerCanCheckoutAndSeeConfirmation(FunctionalTester $I): void
     {
         $I->amOnRoute('product/view', ['id' => $this->productId]);
-        $I->submitForm('form[action*="cart/add"]', ['quantity' => 2]);
+        $I->submitForm('form[action*="cart%2Fadd"]', ['quantity' => 2]);
         $I->see('Shopping cart', 'h1');
         $I->see('50.00');
 

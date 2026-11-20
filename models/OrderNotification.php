@@ -14,6 +14,16 @@ class OrderNotification extends ActiveRecord
         return '{{%order_notifications}}';
     }
 
+    public static function visibleTo(int|string $userId, bool $canViewAll): ActiveQuery
+    {
+        $query = self::find()->where(['user_id' => $userId]);
+        if (!$canViewAll) {
+            $query->andWhere(['order_id' => Order::find()->select('id')->where(['user_id' => $userId])]);
+        }
+
+        return $query;
+    }
+
     public function getOrder(): ActiveQuery
     {
         return $this->hasOne(Order::class, ['id' => 'order_id']);

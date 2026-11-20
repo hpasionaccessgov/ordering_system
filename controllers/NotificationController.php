@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\models\OrderNotification;
+use app\services\OrderAccessPolicy;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -35,8 +36,7 @@ class NotificationController extends Controller
 
         return $this->render('index', [
             'dataProvider' => new ActiveDataProvider([
-                'query' => OrderNotification::find()
-                    ->where(['user_id' => Yii::$app->user->id])
+                'query' => $this->visibleNotifications()
                     ->with('order')
                     ->orderBy(['id' => SORT_DESC]),
                 'pagination' => ['pageSize' => 20],
@@ -47,7 +47,7 @@ class NotificationController extends Controller
 
     public function actionRead(int $id): Response
     {
-        $notification = OrderNotification::findOne(['id' => $id, 'user_id' => Yii::$app->user->id]);
+        $notification = $this->visibleNotifications()->andWhere(['id' => $id])->one();
         if ($notification === null) {
             throw new NotFoundHttpException('Notification not found.');
         }
@@ -59,5 +59,23 @@ class NotificationController extends Controller
         }
 
         return $this->redirect(['index']);
+    }
+
+    public function actionUnreadCount(): array
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        Yii::$app->response->headers->set('Cache-Control', 'no-store');
+
+        return ['count' => (int) $this->visibleNotifications()->andWhere(['read_at' => null])->count()];
+    }
+
+    private function visibleNotifications(): \yii\db\ActiveQuery
+    {
+        $canViewAll = Yii::$app->user->can('order.view') && OrderAccessPolicy::canViewAllOrders(
+            Yii::$app->user->can('admin.access'),
+            Yii::$app->user->can('staff.access'),
+        );
+
+        return OrderNotification::visibleTo(Yii::$app->user->id, $canViewAll);
     }
 }

@@ -19,7 +19,9 @@ $this->title = 'Notifications';
                         <span class="badge text-bg-primary">Unread</span>
                     <?php endif ?>
                     <span>
-                        <?= Html::encode('Order ' . $notification->order->order_number . ' is ' . $notification->status . '.') ?>
+                        <?= Html::encode($notification->status === \app\models\Order::STATUS_PENDING
+                            ? 'New order ' . $notification->order->order_number . ' received.'
+                            : 'Order ' . $notification->order->order_number . ' is ' . $notification->status . '.') ?>
                     </span>
                     <div class="small text-body-secondary">
                         <?= Html::encode(Yii::$app->formatter->asDatetime($notification->created_at)) ?>

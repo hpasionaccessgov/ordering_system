@@ -28,7 +28,7 @@ foreach ($roles as $role) {
     <?php endif; ?>
 </div>
 
-<?= $this->render('_search', ['search' => $search]) ?>
+<?= $this->render('_search', ['search' => $search, 'model' => $searchModel, 'roles' => $roles]) ?>
 
 <section class="card admin-panel">
     <div class="card-header">

@@ -12,6 +12,7 @@ class OrderSearch extends Order
 {
     public $q = '';
     public $statusFilter = '';
+    public $filters;
 
     public function rules(): array
     {
@@ -34,6 +35,8 @@ class OrderSearch extends Order
             $userId,
             $canViewAllOrders,
         );
+        $this->filters = new ListingFilters();
+        $this->filters->loadFilters($params, $canViewAllOrders, true, true);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => ['pageSize' => 8, 'pageSizeLimit' => [8, 8]],
@@ -57,9 +60,11 @@ class OrderSearch extends Order
             'q' => is_string($params['q'] ?? null) ? $params['q'] : '',
             'statusFilter' => is_string($status) && in_array($status, Order::statusValues(), true) ? $status : '',
         ], '');
-        if (!$this->validate()) {
+        if (!$this->validate() || !$this->filters->validate()) {
+            $query->andWhere('0=1');
             return $dataProvider;
         }
+        $this->filters->apply($query, 'total_amount');
         if ($this->q !== '') {
             $conditions = [
                 'or',

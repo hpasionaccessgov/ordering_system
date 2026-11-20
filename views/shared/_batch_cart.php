@@ -8,6 +8,6 @@ use yii\helpers\Html;
 ?>
 <div class="cafebara-batch-cart">
     <?= Html::beginForm(['/cart/add-batch'], 'post', ['id' => $batchFormId]) ?>
-    <?= Html::submitButton('Add selected to cart', ['class' => 'btn btn-primary btn-lg font-monospace']) ?>
+    <?= Html::submitButton('Add selected to cart', ['class' => 'btn btn-primary font-monospace']) ?>
     <?= Html::endForm() ?>
 </div>

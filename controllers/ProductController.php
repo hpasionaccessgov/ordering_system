@@ -104,6 +104,7 @@ class ProductController extends Controller
             'canViewProducts' => $canViewProducts,
             'status' => $searchModel->catalogStatus,
             'search' => $searchModel->q,
+            'filters' => $searchModel->filters,
         ]);
     }
 
