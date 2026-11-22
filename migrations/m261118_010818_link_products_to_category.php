@@ -30,10 +30,21 @@ class m261118_010818_link_products_to_category extends Migration
                 ->limit(2)
                 ->column($this->db);
 
-            if (count($matches) !== 1) {
+            if (count($matches) > 1) {
                 throw new RuntimeException(
-                    "Expected exactly one category matching: {$name}",
+                    "Expected at most one category matching: {$name}",
                 );
+            }
+
+            if ($matches === []) {
+                $now = time();
+                $this->insert('{{%category}}', [
+                    'name' => $name,
+                    'status' => 10,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
+                $matches = [$this->db->getLastInsertID()];
             }
 
             $categoryIds[$name] = $matches[0];
