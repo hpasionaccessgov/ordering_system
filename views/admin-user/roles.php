@@ -4,8 +4,8 @@ use app\models\RoleForm;
 use app\models\User;
 use app\services\RbacPermissionPolicy;
 use app\widgets\AdminActiveForm;
+use app\widgets\ToolTip;
 use yii\helpers\Html;
-use yii\widgets\Tooltip;
 
 /** @var yii\web\View $this */
 /** @var RoleForm $roleForm */
@@ -35,12 +35,6 @@ $this->registerJs(<<<JS
     const indexDependencies = {$indexDependenciesJson};
     const viewDependencies = {$viewDependenciesJson};
     const defaultRolePermissions = {$defaultRolePermissionsJson};
-    if (window.bootstrap && window.bootstrap.Tooltip) {
-        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(element => {
-            new window.bootstrap.Tooltip(element);
-        });
-    }
-
     const form = document.querySelector('form[data-role-matrix-form]');
     if (!form) {
         return;
@@ -437,12 +431,15 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
                                                     'style' => 'cursor: pointer;',
                                                 ],
                                             ) ?>
-                                            <label class="form-check-label small" for="<?= Html::encode($permissionId) ?>"
-                                                title="<?= Html::encode($permissionDescriptions[$permission->name] ?? $permission->name) ?>"
-                                                data-bs-toggle="tooltip" data-bs-placement="top"
-                                                style="cursor: pointer;">
-                                                <code><?= Html::encode($permission->name) ?></code>
-                                            </label>
+                                            <?= Html::tag(
+                                                'label',
+                                                '<code>' . Html::encode($permission->name) . '</code>',
+                                                ToolTip::options($permissionDescriptions[$permission->name] ?? $permission->name, [
+                                                    'class' => 'form-check-label small',
+                                                    'for' => $permissionId,
+                                                    'style' => 'cursor: pointer;',
+                                                ]),
+                                            ) ?>
                                         </div>
                                     <?php endforeach; ?>
                                 </div>

@@ -35,6 +35,7 @@
     const label = isDark ? "Switch to light mode" : "Switch to dark mode";
     toggle.setAttribute("aria-label", label);
     toggle.setAttribute("title", label);
+    window.bootstrap?.Tooltip?.getInstance(toggle)?.setContent({ ".tooltip-inner": label });
   };
 
   setTheme(getPreferredTheme());

@@ -1,35 +1,39 @@
 <?php
-use yii\helpers\Html;
-use yii\web\JsExpression;
 
-/* @var $this yii\web\View */
+declare(strict_types=1);
 
-$this->title = 'Tooltip Example';
-$this->params['breadcrumbs'][] = $this->title;
+namespace app\widgets;
 
-// Register Bootstrap tooltip initialization
-$this->registerJs(
-    new JsExpression('
-        $(function () {
-            $("[data-toggle=\'tooltip\']").tooltip();
-        });
-    ')
-);
-?>
+use Yii;
+use yii\web\View;
 
-<div class="site-tooltip">
-    <h1><?= Html::encode($this->title) ?></h1>
+/**
+ * Bootstrap 5 tooltip attributes for any element via ToolTip::options().
+ */
+final class ToolTip
+{
+    /**
+     * @param array<string, mixed> $options
+     * @return array<string, mixed>
+     */
+    public static function options(string $text, array $options = [], string $placement = 'top'): array
+    {
+        Yii::$app->view->registerJs(
+            <<<'JS'
+if (window.bootstrap && window.bootstrap.Tooltip) {
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (element) {
+        new window.bootstrap.Tooltip(element);
+    });
+}
+JS,
+            View::POS_READY,
+            'cafebara-tooltip-init',
+        );
 
-    <!-- Simple tooltip -->
-    <?= Html::tag('p', 
-        'Hover over this text to see a tooltip.', 
-        ['data-toggle' => 'tooltip', 'title' => 'This is a tooltip message!']
-    ) ?>
-
-    <!-- Tooltip on a button -->
-    <?= Html::button('Hover me', [
-        'class' => 'btn btn-primary',
-        'data-toggle' => 'tooltip',
-        'title' => 'Button tooltip text'
-    ]) ?>
-</div>
+        return array_merge($options, [
+            'data-bs-toggle' => 'tooltip',
+            'data-bs-placement' => $placement,
+            'title' => $text,
+        ]);
+    }
+}

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use app\widgets\ToolTip;
 use yii\helpers\Html;
 
 $user = Yii::$app->user->identity;
@@ -19,14 +20,16 @@ $user = Yii::$app->user->identity;
 
         <ul class="navbar-nav">
             <li class="nav-item">
-                <a
-                    class="nav-link"
-                    data-lte-toggle="sidebar"
-                    href="#"
-                    role="button"
-                    aria-label="Toggle sidebar">
-                    <i class="bi bi-list"></i>
-                </a>
+                <?= Html::a(
+                    Html::tag('i', '', ['class' => 'bi bi-list', 'aria-hidden' => 'true']),
+                    '#',
+                    ToolTip::options('Toggle sidebar', [
+                        'class' => 'nav-link',
+                        'data-lte-toggle' => 'sidebar',
+                        'role' => 'button',
+                        'aria-label' => 'Toggle sidebar',
+                    ]),
+                ) ?>
             </li>
         </ul>
 

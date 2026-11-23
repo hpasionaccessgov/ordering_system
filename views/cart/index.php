@@ -2,9 +2,12 @@
 
 use app\models\Product;
 use app\services\ShoppingCart;
+use app\widgets\ToolTip;
 use yii\helpers\Html;
 
 /** @var array{lines: list<array{product: Product, quantity: int, subtotal: string}>, total: string, count: int} $summary */
+
+$canViewProduct = Yii::$app->user->can("product.view");
 
 $this->title = 'Shopping cart';
 ?>
@@ -39,11 +42,22 @@ $this->title = 'Shopping cart';
                         <div class="card-body">
                             <div class="d-flex flex-wrap gap-3 align-items-center">
                                 <?php if ($product->getImageUrl() !== null) : ?>
-                                    <?= Html::img($product->getImageUrl(), [
+                                    <?php $image = Html::img($product->getImageUrl(), [
                                         'class' => 'cart-item-image',
                                         'alt' => $product->name,
                                         'loading' => 'lazy',
                                     ]) ?>
+                                    <div class="cart-item-media">
+                                        <?php if ($canViewProduct) : ?>
+                                            <?= Html::a($image, ['/product/view', 'id' => $product->id]) ?>
+                                            <div class="cart-item-overlay" aria-hidden="true">
+                                                <i class="bi bi-zoom-in cart-item-overlay-icon"></i>
+                                                <span class="cart-item-overlay-label">View</span>
+                                            </div>
+                                        <?php else : ?>
+                                            <?= $image ?>
+                                        <?php endif; ?>
+                                    </div>
                                 <?php else : ?>
                                     <div class="cart-item-placeholder" aria-hidden="true">
                                         <i class="bi bi-cup-hot"></i>

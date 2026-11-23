@@ -345,17 +345,77 @@ body.confirm-modal-open .modal-backdrop {
     opacity: 1;
 }
 
-.cart-item-image,
-.cart-item-placeholder {
+.cart-item-media {
+    position: relative;
     width: 5rem;
     height: 5rem;
     flex: 0 0 5rem;
     border-radius: .75rem;
-    object-fit: cover;
+    overflow: hidden;
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.cart-item-media:hover,
+.cart-item-media:focus-within {
+    z-index: 2;
+    transform: translateY(-3px) scale(1.06);
+    box-shadow: 0 .6rem 1.2rem rgba(48, 18, 6, .2);
+}
+
+.cart-item-image,
+.cart-item-placeholder {
+    width: 100%;
+    height: 100%;
 }
 
 .cart-item-image {
+    display: block;
+    object-fit: cover;
     background: var(--cafebara-cream);
+    transition: transform .3s ease;
+}
+
+.cart-item-media:hover .cart-item-image,
+.cart-item-media:focus-within .cart-item-image {
+    transform: scale(1.12);
+}
+
+.cart-item-image-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.cart-item-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .35rem;
+    color: #fff;
+    background: rgba(48, 18, 6, .45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+}
+
+.cart-item-media:hover .cart-item-overlay,
+.cart-item-media:focus-within .cart-item-overlay {
+    opacity: 1;
+}
+
+.cart-item-overlay-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.cart-item-overlay-label {
+    font-size: .8rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
 }
 
 .cart-item-placeholder {

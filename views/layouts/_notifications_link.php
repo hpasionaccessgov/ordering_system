@@ -2,6 +2,7 @@
 
 use app\models\Notification;
 use app\services\OrderAccessPolicy;
+use app\widgets\ToolTip;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\helpers\Url;
@@ -55,7 +56,6 @@ function syncNotificationMenuMode() {
         notificationLink.removeAttribute('data-bs-toggle');
         notificationLink.removeAttribute('data-bs-auto-close');
         notificationLink.setAttribute('aria-haspopup', 'false');
-        notificationLink.title = 'View all notifications';
         if (window.bootstrap && window.bootstrap.Dropdown) {
             window.bootstrap.Dropdown.getInstance(notificationLink)?.hide();
         }
@@ -63,7 +63,6 @@ function syncNotificationMenuMode() {
         notificationLink.setAttribute('data-bs-toggle', 'dropdown');
         notificationLink.setAttribute('data-bs-auto-close', 'outside');
         notificationLink.setAttribute('aria-haspopup', 'true');
-        notificationLink.title = 'Notifications';
     }
 }
 if (notificationMobile.addEventListener) {
@@ -76,7 +75,10 @@ JS, View::POS_READY);
 ?>
 <div class="dropdown">
     <?= Html::a(
-        Html::tag('i', '', ['class' => 'bi bi-bell'])
+        Html::tag('i', '', ToolTip::options('Notifications', [
+            'class' => 'bi bi-bell',
+            'aria-hidden' => 'true',
+        ]))
             . ' ' . Html::tag('span', Html::encode($unreadCount), [
                 'class' => 'badge bg-danger',
                 'data-notification-count' => true,
@@ -86,7 +88,6 @@ JS, View::POS_READY);
         $inboxUrl,
         [
             'class' => $class . ' dropdown-toggle cafebara-notification-link',
-            'title' => 'Notifications',
             'aria-label' => $unreadCount ? "Notifications, $unreadCount unread" : 'Notifications',
             'aria-haspopup' => 'true',
             'aria-expanded' => 'false',

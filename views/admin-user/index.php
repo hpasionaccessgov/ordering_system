@@ -8,6 +8,7 @@
 
 use app\models\User;
 use app\widgets\AdminGridView;
+use app\widgets\ToolTip;
 use yii\helpers\Html;
 
 $this->title = 'User list';
@@ -105,20 +106,26 @@ foreach ($roles as $role) {
                 'value' => static function (User $user): string {
                     $actions = [];
                     if (Yii::$app->user->can('user.view')) {
-                        $actions[] = Html::a('View', ['/admin-user/view', 'id' => $user->id], [
-                            'class' => 'btn btn-sm btn-outline-secondary',
-                            'aria-label' => 'View account details for ' . $user->username,
-                        ]);
+                        $actions[] = Html::a('View', ['/admin-user/view', 'id' => $user->id], ToolTip::options(
+                            'View account details for ' . $user->username,
+                            [
+                                'class' => 'btn btn-sm btn-outline-secondary',
+                                'aria-label' => 'View account details for ' . $user->username,
+                            ],
+                        ));
                     }
 
                     if (
                         Yii::$app->user->can('user.update')
                         && Yii::$app->user->can('user.view')
                     ) {
-                        $actions[] = Html::a('Edit', ['/admin-user/update', 'id' => $user->id], [
-                            'class' => 'btn btn-sm btn-outline-primary',
-                            'aria-label' => 'Edit personal data for ' . $user->username,
-                        ]);
+                        $actions[] = Html::a('Edit', ['/admin-user/update', 'id' => $user->id], ToolTip::options(
+                            'Edit personal data for ' . $user->username,
+                            [
+                                'class' => 'btn btn-sm btn-outline-primary',
+                                'aria-label' => 'Edit personal data for ' . $user->username,
+                            ],
+                        ));
                     }
 
                     if (
@@ -130,10 +137,13 @@ foreach ($roles as $role) {
                             'post',
                             ['class' => 'd-inline'],
                         )
-                            . Html::submitButton('Delete', [
-                                'class' => 'btn btn-sm btn-outline-danger',
-                                'data-confirm-modal' => 'Permanently delete this account? Accounts with order history cannot be deleted.',
-                            ])
+                            . Html::submitButton('Delete', ToolTip::options(
+                                'Delete ' . $user->username,
+                                [
+                                    'class' => 'btn btn-sm btn-outline-danger',
+                                    'data-confirm-modal' => 'Permanently delete this account? Accounts with order history cannot be deleted.',
+                                ],
+                            ))
                             . Html::endForm();
                     }
 
