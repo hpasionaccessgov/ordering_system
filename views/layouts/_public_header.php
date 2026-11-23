@@ -35,8 +35,8 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                 'aria-label' => 'Cafébara home',
             ]) ?>
 
-            <?= Html::button('<span class="cafebara-menu-icon" aria-hidden="true"></span>', [
-                'class' => 'navbar-toggler',
+            <?= Html::button('<i class="bi bi-list" aria-hidden="true"></i>', [
+                'class' => 'navbar-toggler btn btn-outline-primary',
                 'type' => 'button',
                 'data-bs-toggle' => 'collapse',
                 'data-bs-target' => '#cafebara-public-nav',

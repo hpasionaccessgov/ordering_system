@@ -102,7 +102,7 @@ JS, View::POS_READY);
             <?php /** @var Notification $notification */ ?>
             <li class="border-bottom border-secondary-subtle">
                 <?= Html::a(
-                    '<span class="badge text-bg-primary me-2 ">Unread</span margin-right: 5px;">'
+                    Html::tag('span', 'Unread', ['class' => 'badge text-bg-primary me-2'])
                         . Html::tag('span', Html::encode($notification->label), ['class' => 'small'])
                         . Html::tag('span', Html::encode(\Yii::$app->formatter->asDatetime($notification->created_at)), [
                             'class' => 'd-block text-body-secondary small',
