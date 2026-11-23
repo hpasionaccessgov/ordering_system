@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\models\RoleForm;
+use app\models\User;
 use app\services\RbacPermissionPolicy;
 use Yii;
 use yii\filters\AccessControl;
@@ -31,6 +32,7 @@ class AdminRoleController extends Controller
                     'create' => ['post'],
                     'update' => ['post'],
                     'update-permissions' => ['post'],
+                    'update-matrix' => ['post'],
                     'delete' => ['post'],
                 ],
             ],
@@ -59,6 +61,7 @@ class AdminRoleController extends Controller
             }
 
             Yii::$app->session->setFlash('success', "Role '{$role->name}' was created.");
+            $this->stampRole($role->name, true);
 
             return $this->redirect(['index']);
         }
@@ -102,6 +105,7 @@ class AdminRoleController extends Controller
             $auth->update($role->name, $role);
 
             $this->syncRolePermissions($role, $permissionNames);
+            $this->stampRole($role->name);
 
             $transaction->commit();
         } catch (\Throwable $exception) {
@@ -148,6 +152,7 @@ class AdminRoleController extends Controller
         $transaction = Yii::$app->db->beginTransaction();
         try {
             $this->syncRolePermissions($role, $permissionNames);
+            $this->stampRole($name);
             $transaction->commit();
         } catch (\Throwable $exception) {
             if ($transaction->isActive) {
@@ -158,6 +163,60 @@ class AdminRoleController extends Controller
         }
 
         Yii::$app->session->setFlash('success', "Permissions for '{$name}' were updated.");
+
+        return $this->redirect(['index']);
+    }
+
+    public function actionUpdateMatrix(): Response
+    {
+        $auth = Yii::$app->authManager;
+        $submittedPermissions = $this->request->post('permissions', []);
+        $submittedDescriptions = $this->request->post('descriptions', []);
+
+        if (!is_array($submittedPermissions) || !is_array($submittedDescriptions)) {
+            throw new BadRequestHttpException('Role data is invalid.');
+        }
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            foreach ($auth->getRoles() as $name => $role) {
+                $permissionNames = $submittedPermissions[$name] ?? [];
+                if (!is_array($permissionNames)) {
+                    throw new BadRequestHttpException("Permissions for '{$name}' are invalid.");
+                }
+
+                $permissionNames = $this->normalizePermissionNames($permissionNames);
+
+                $currentPermissions = array_keys($auth->getChildren($name));
+                sort($currentPermissions);
+                $newPermissions = $permissionNames;
+                sort($newPermissions);
+                $changed = $currentPermissions !== $newPermissions;
+
+                if (array_key_exists($name, $submittedDescriptions)) {
+                    $description = trim((string) $submittedDescriptions[$name]);
+                    $changed = $changed || $description !== (string) $role->description;
+                    $role->description = $description;
+                    $auth->update($name, $role);
+                }
+
+                $this->syncRolePermissions($role, $permissionNames);
+
+                if ($changed) {
+                    $this->stampRole((string) $name);
+                }
+            }
+
+            $transaction->commit();
+        } catch (\Throwable $exception) {
+            if ($transaction->isActive) {
+                $transaction->rollBack();
+            }
+
+            throw $exception;
+        }
+
+        Yii::$app->session->setFlash('success', 'Roles were updated.');
 
         return $this->redirect(['index']);
     }
@@ -206,14 +265,59 @@ class AdminRoleController extends Controller
         }
     }
 
+    /**
+     * Records who created/updated a role. Yii's DbManager does not populate blame columns,
+     * so auth_item is updated directly.
+     *
+     * @param string $name the role name.
+     * @param bool $created true when the role is being created (also stamps created_by).
+     */
+    private function stampRole(string $name, bool $created = false): void
+    {
+        $columns = ['updated_by' => Yii::$app->user->id];
+        if ($created) {
+            $columns['created_by'] = Yii::$app->user->id;
+        }
+
+        Yii::$app->db->createCommand()
+            ->update('{{%auth_item}}', $columns, ['name' => $name])
+            ->execute();
+    }
+
     private function renderRoles(RoleForm $roleForm): string
     {
         $auth = Yii::$app->authManager;
+        $roles = $auth->getRoles();
+
+        $roleUserIds = [];
+        $userIds = [];
+        foreach ($roles as $name => $role) {
+            $ids = array_map('intval', $auth->getUserIdsByRole($name));
+            $roleUserIds[$name] = $ids;
+            $userIds = array_merge($userIds, $ids);
+        }
+
+        $usersById = [];
+        if ($userIds !== []) {
+            foreach (User::find()->where(['id' => array_unique($userIds)])->all() as $user) {
+                $usersById[(int) $user->id] = ($user->full_name ?? '') !== ''
+                    ? $user->full_name
+                    : $user->username;
+            }
+        }
+
+        $roleUsers = [];
+        foreach ($roleUserIds as $name => $ids) {
+            $roleUsers[$name] = array_values(array_filter(
+                array_map(static fn (int $id): ?string => $usersById[$id] ?? null, $ids),
+            ));
+        }
 
         return $this->render('../admin-user/roles', [
-            'roles' => $auth->getRoles(),
+            'roles' => $roles,
             'permissions' => $auth->getPermissions(),
             'roleForm' => $roleForm,
+            'roleUsers' => $roleUsers,
         ]);
     }
 }

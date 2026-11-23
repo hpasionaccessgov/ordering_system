@@ -24,6 +24,69 @@ class LoginForm extends Model
     public function __construct(private readonly Security $security, $config = [])
     {
         parent::__construct($config);
+
+        if (Yii::$app instanceof \yii\web\Application) {
+            Yii::$app->view->registerJs(<<<'JS'
+(() => {
+    const timers = new Map();
+    const message = /^\s*Too many login attempts\. Try again in (\d+) seconds\.\s*$/;
+
+    function inspect(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            const existing = timers.get(node);
+            if (existing && node.nodeValue === existing.rendered) {
+                return;
+            }
+            const match = node.nodeValue.match(message);
+            if (match) {
+                timers.set(node, {
+                    end: Date.now() + Number(match[1]) * 1000,
+                    rendered: node.nodeValue
+                });
+            } else {
+                timers.delete(node);
+            }
+            return;
+        }
+        const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+        while (walker.nextNode()) {
+            inspect(walker.currentNode);
+        }
+    }
+
+    inspect(document.body);
+    new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            if (mutation.type === 'characterData') {
+                inspect(mutation.target);
+            } else {
+                mutation.addedNodes.forEach(inspect);
+            }
+        });
+    }).observe(document.body, { childList: true, characterData: true, subtree: true });
+
+    setInterval(() => {
+        timers.forEach((timer, node) => {
+            if (!node.isConnected) {
+                timers.delete(node);
+                return;
+            }
+            const remaining = Math.max(0, Math.ceil((timer.end - Date.now()) / 1000));
+            const text = remaining > 0
+                ? `Too many login attempts. Try again in ${remaining} seconds.`
+                : 'You can try logging in again.';
+            timer.rendered = text;
+            if (node.nodeValue !== text) {
+                node.nodeValue = text;
+            }
+            if (remaining === 0) {
+                timers.delete(node);
+            }
+        });
+    }, 1000);
+})();
+JS, \yii\web\View::POS_READY, 'login-attempt-countdown');
+        }
     }
 
     /**
@@ -51,10 +114,33 @@ class LoginForm extends Model
     public function validatePassword(string $attribute, array|null $params): void
     {
         if (!$this->hasErrors()) {
-            $user = $this->getUser();
+            $attempt = $this->attemptState();
+            $remaining = $attempt['blocked_until'] - time();
+            if ($remaining > 0) {
+                $this->addError(
+                    $attribute,
+                    "Too many login attempts. Try again in {$remaining} seconds.",
+                );
 
+                return;
+            }
+
+            $user = $this->getUser();
             if (!$user || !$user->validatePassword($this->password)) {
+                $this->recordFailedAttempt($attempt);
                 $this->addError($attribute, 'Incorrect username or password.');
+
+                return;
+            }
+
+            if ((int) $user->status !== User::STATUS_ACTIVE) {
+                $this->recordFailedAttempt($attempt);
+                $this->addError(
+                    $attribute,
+                    (int) $user->status === User::STATUS_DISABLED
+                        ? 'This account has been disabled. Contact an administrator.'
+                        : 'This account is inactive. Contact an administrator.',
+                );
             }
         }
     }
@@ -66,7 +152,9 @@ class LoginForm extends Model
     public function login(): bool
     {
         if ($this->validate()) {
-            return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
+            Yii::$app->cache->delete($this->attemptKey());
+            $duration = $this->rememberMe ? (int) ApplicationSettings::current()->idle_minutes * 60 : 0;
+            return Yii::$app->user->login($this->getUser(), $duration);
         }
 
         return false;
@@ -85,5 +173,57 @@ class LoginForm extends Model
         }
 
         return $this->_user;
+    }
+
+    /**
+     * @return array{failures: int, blocked_until: int}
+     */
+    private function attemptState(): array
+    {
+        $state = Yii::$app->cache->get($this->attemptKey());
+        if (
+            !is_array($state)
+            || !isset($state['failures'], $state['blocked_until'])
+        ) {
+            return ['failures' => 0, 'blocked_until' => 0];
+        }
+
+        return [
+            'failures' => (int) $state['failures'],
+            'blocked_until' => (int) $state['blocked_until'],
+        ];
+    }
+
+    /**
+     * @param array{failures: int, blocked_until: int} $attempt
+     */
+    private function recordFailedAttempt(array $attempt): void
+    {
+        $settings = ApplicationSettings::current();
+        $attempt['failures']++;
+        $duration = (int) $settings->login_reset_minutes * 60;
+        if ($attempt['failures'] >= (int) $settings->login_max_attempts) {
+            $duration = (int) $settings->login_lock_minutes * 60;
+            $attempt['blocked_until'] = time() + $duration;
+            $attempt['failures'] = 0;
+        }
+        Yii::$app->cache->set(
+            $this->attemptKey(),
+            $attempt,
+            $duration,
+        );
+    }
+
+    private function attemptKey(): string
+    {
+        $request = Yii::$app->request;
+        $ip = method_exists($request, 'getUserIP')
+            ? (string) $request->getUserIP()
+            : '';
+
+        return 'login-attempt:' . hash(
+            'sha256',
+            mb_strtolower(trim($this->username)) . '|' . $ip,
+        );
     }
 }

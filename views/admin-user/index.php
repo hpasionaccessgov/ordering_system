@@ -4,6 +4,7 @@
 /** @var yii\data\ActiveDataProvider $dataProvider */
 /** @var yii\rbac\Role[] $roles */
 /** @var string $search */
+/** @var \app\models\UserSearch $searchModel */
 
 use app\models\User;
 use app\widgets\AdminGridView;
@@ -28,7 +29,7 @@ foreach ($roles as $role) {
     <?php endif; ?>
 </div>
 
-<?= $this->render('_search', ['search' => $search]) ?>
+<?= $this->render('_search', ['search' => $search, 'model' => $searchModel, 'roles' => $roles]) ?>
 
 <section class="card admin-panel">
     <div class="card-header">
@@ -54,6 +55,20 @@ foreach ($roles as $role) {
             ],
             'full_name',
             'email:email',
+            'created_at:datetime',
+            'updated_at:datetime',
+            [
+                'attribute' => 'created_by',
+                'label' => 'Created by',
+                'value' => static fn(User $user): string =>
+                $user->createdBy?->username ?? '—',
+            ],
+            [
+                'attribute' => 'updated_by',
+                'label' => 'Updated by',
+                'value' => static fn(User $user): string =>
+                $user->updatedBy?->username ?? '—',
+            ],
             [
                 'label' => 'Role',
                 'format' => 'raw',

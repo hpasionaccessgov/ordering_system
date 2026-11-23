@@ -76,6 +76,11 @@ body.confirm-modal-open .modal-backdrop {
     color: rgba(255, 255, 255, .84);
 }
 
+.cafebara-menu-logo {
+    width: min(100%, 210px);
+    filter: drop-shadow(0 .75rem 1rem rgba(0, 0, 0, .24));
+}
+
 .cafebara-about-logo {
     width: min(100%, 210px);
     filter: drop-shadow(0 .75rem 1rem rgba(0, 0, 0, .24));
@@ -102,7 +107,7 @@ body.confirm-modal-open .modal-backdrop {
     padding: clamp(1.25rem, 3vw, 2rem);
 }
 
-.cafebara-contact-aside li + li {
+.cafebara-contact-aside li+li {
     margin-top: 1rem;
 }
 
@@ -122,6 +127,32 @@ body.confirm-modal-open .modal-backdrop {
     border: 1px solid var(--bs-border-color);
     background: var(--bs-tertiary-bg);
     border-radius: 1rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+/* Scroll long admin card content inside the card instead of the whole page. */
+.admin-panel .card-body,
+.cart-items-panel {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.cafebara-notification-menu {
+    width: min(22rem, calc(100vw - 1.5rem));
+}
+
+.cafebara-notification-item {
+    white-space: normal;
+}
+
+@media (max-width: 575.98px) {
+    .cafebara-notification-menu {
+        display: none !important;
+    }
+
+    .cafebara-notification-link.dropdown-toggle::after {
+        display: none;
+    }
 }
 
 .order-receipt-logo {
@@ -147,20 +178,70 @@ body.confirm-modal-open .modal-backdrop {
 }
 
 .product-card {
-    overflow: hidden;
+    overflow: visible;
     transition: transform .2s ease, box-shadow .2s ease;
 }
 
-.product-card:hover {
+.product-card:hover,
+.product-card:focus-within {
+    z-index: 5;
     transform: translateY(-3px);
     box-shadow: 0 .75rem 1.5rem rgba(48, 18, 6, .12);
 }
 
+/* The media lifts and grows past the card edge on hover so the picture pops out. */
+.product-card-media {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1rem 1rem 0 0;
+    pointer-events: none;
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.product-card:hover .product-card-media,
+.product-card:focus-within .product-card-media {
+    transform: translateY(-8px) scale(1.06);
+    box-shadow: 0 .9rem 1.75rem rgba(48, 18, 6, .22);
+}
+
 .product-card-image {
+    display: block;
     width: 100%;
     height: 190px;
     object-fit: cover;
     background: var(--cafebara-cream);
+}
+
+/* Hover affordance: dim the picture and reveal a "View" cue on every product card. */
+.product-card-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .35rem;
+    color: #fff;
+    background: rgba(48, 18, 6, .45);
+    opacity: 0;
+    transition: opacity .3s ease;
+}
+
+.product-card:hover .product-card-overlay,
+.product-card:focus-within .product-card-overlay {
+    opacity: 1;
+}
+
+.product-card-overlay-icon {
+    font-size: 1.75rem;
+    line-height: 1;
+}
+
+.product-card-overlay-label {
+    font-size: .8rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
 }
 
 .product-card-placeholder,
@@ -190,6 +271,10 @@ body.confirm-modal-open .modal-backdrop {
     gap: .5rem;
 }
 
+.product-audit-summary {
+    border-top: 1px solid var(--bs-border-color);
+}
+
 .cafebara-menu-hero {
     color: #fff;
     background:
@@ -205,6 +290,16 @@ body.confirm-modal-open .modal-backdrop {
 
 .cafebara-menu-page .product-card {
     box-shadow: 0 .5rem 1.25rem rgba(48, 18, 6, .06);
+}
+
+.cafebara-batch-cart {
+    display: flex;
+    width: fit-content;
+    margin: 0 0 1.5rem auto;
+    padding: .75rem 1rem;
+    border-radius: .75rem;
+    background: var(--cafebara-surface-raised);
+    box-shadow: 0 .5rem 1.5rem rgba(48, 18, 6, .18);
 }
 
 .order-builder-summary {
@@ -233,11 +328,42 @@ body.confirm-modal-open .modal-backdrop {
     transform: translateY(-2px);
 }
 
+.order-product-media {
+    position: relative;
+    overflow: hidden;
+}
+
 .order-product-image {
     width: 100%;
     height: 160px;
     object-fit: cover;
     background: var(--cafebara-cream);
+}
+
+.order-product-card:hover .product-card-overlay,
+.order-product-card:focus-within .product-card-overlay {
+    opacity: 1;
+}
+
+.cart-item-image,
+.cart-item-placeholder {
+    width: 5rem;
+    height: 5rem;
+    flex: 0 0 5rem;
+    border-radius: .75rem;
+    object-fit: cover;
+}
+
+.cart-item-image {
+    background: var(--cafebara-cream);
+}
+
+.cart-item-placeholder {
+    display: grid;
+    place-items: center;
+    background: var(--bs-secondary-bg);
+    color: var(--cafebara-brown);
+    font-size: 1.75rem;
 }
 
 .order-quantity-input {
@@ -379,7 +505,7 @@ body.confirm-modal-open .modal-backdrop {
     margin-bottom: 0;
 }
 
-.order-table-card .table > :not(caption) > * > * {
+.order-table-card .table> :not(caption)>*>* {
     padding: .9rem 1rem;
     vertical-align: middle;
 }
@@ -549,6 +675,8 @@ body {
     --bs-table-bg: transparent;
     --bs-table-color: var(--bs-body-color);
     --bs-table-border-color: var(--bs-border-color);
+    --bs-table-striped-bg: rgba(var(--cafebara-brown-rgb), .05);
+    --bs-table-striped-color: var(--bs-body-color);
 }
 
 .site-about,
@@ -602,6 +730,46 @@ body {
     font-weight: 700;
 }
 
+/* Parent links follow their group state, not hover, so collapsing clears the tint at once. */
+.app-sidebar .sidebar-menu>.nav-item>.nav-link:hover,
+.app-sidebar .sidebar-menu>.nav-item>.nav-link:focus-visible {
+    background-color: transparent;
+    color: inherit;
+}
+
+.app-sidebar .sidebar-menu>.nav-item.menu-open:not(.has-active-child)>.nav-link {
+    background-color: transparent;
+    color: inherit;
+    font-weight: 400;
+    border-left-color: transparent;
+}
+
+.app-sidebar .sidebar-menu>.nav-item.menu-open.has-active-child>.nav-link,
+.app-sidebar .sidebar-menu>.nav-item.menu-open.has-active-child>.nav-link:hover,
+.app-sidebar .sidebar-menu>.nav-item.menu-open.has-active-child>.nav-link:focus-visible {
+    border-left-color: var(--cafebara-cream);
+    background-color: rgba(137, 67, 28, .48);
+    color: #fff;
+    font-weight: 700;
+}
+
+/* Tree-style grouping: separator per menu, indented submenu with a guide line. */
+.app-sidebar .sidebar-menu>.nav-item {
+    border-bottom: 1px solid rgba(248, 230, 203, .12);
+}
+
+.app-sidebar .sidebar-menu>.nav-item>.nav-treeview {
+    margin: 0 .65rem .35rem 1.5rem;
+    padding-left: .55rem;
+    border-left: 1px solid rgba(248, 230, 203, .28);
+}
+
+.app-sidebar .sidebar-menu .nav-treeview .nav-link {
+    margin: .1rem 0;
+    padding-left: .85rem;
+    border-left: 0;
+}
+
 .app-sidebar .nav-link:hover,
 .app-sidebar .nav-link:focus-visible {
     background-color: rgba(137, 67, 28, .3);
@@ -617,7 +785,7 @@ body {
 }
 
 @media (max-width: 575.98px) {
-    .order-table-card .table > :not(caption) > * > * {
+    .order-table-card .table> :not(caption)>*>* {
         padding: .75rem .65rem;
     }
 
@@ -930,7 +1098,8 @@ body {
 }
 
 .cafebara-hero-logo {
-    width: min(100%, 340px);
+    width: min(100%, clamp(260px, 32vw, 400px));
+    height: auto;
     filter: drop-shadow(0 1rem 1.5rem rgba(0, 0, 0, .28));
 }
 
@@ -978,6 +1147,34 @@ body {
 .cafebara-hero-note small {
     margin-top: .15rem;
     color: #74523d;
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+    .cafebara-hero-art {
+        min-height: 240px;
+    }
+
+    .cafebara-hero-logo {
+        width: min(60%, 300px);
+    }
+}
+
+@media (max-width: 575.98px) {
+    .cafebara-hero-art {
+        flex-direction: column;
+        gap: 1rem;
+        min-height: 0;
+        margin-top: .5rem;
+    }
+
+    .cafebara-hero-logo {
+        width: min(75%, 260px);
+    }
+
+    .cafebara-hero-note {
+        position: static;
+        max-width: 100%;
+    }
 }
 
 .cafebara-section-kicker {
@@ -1156,16 +1353,86 @@ body {
 
 .cafebara-admin-grid .table thead th,
 .cafebara-data-table thead th {
+    position: relative;
     background-color: var(--cafebara-cream);
     color: var(--cafebara-dark);
     white-space: nowrap;
     font-size: .75rem;
     letter-spacing: .06em;
     text-transform: uppercase;
+    border-bottom: 2px solid rgba(var(--cafebara-brown-rgb), .22);
 }
 
-.cafebara-admin-grid .table > :not(caption) > * > *,
-.cafebara-data-table > :not(caption) > * > * {
+.cafebara-data-table .cafebara-table-group th {
+    background-color: rgba(var(--cafebara-brown-rgb), .07);
+    color: var(--bs-secondary-color);
+    font-size: .7rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+/* Scroll inside the table instead of the page; keep the header (and optional first column) in view. */
+.cafebara-table-scroll {
+    max-height: 70vh;
+    overflow: auto;
+}
+
+.cafebara-table-scroll .table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    box-shadow: inset 0 -2px 0 rgba(var(--cafebara-brown-rgb), .22);
+}
+
+.cafebara-table-scroll .cafebara-sticky-col {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background-color: var(--bs-body-bg);
+}
+
+.cafebara-table-scroll thead .cafebara-sticky-col {
+    z-index: 3;
+    background-color: var(--cafebara-cream);
+}
+
+.cafebara-data-table.table-bordered> :not(caption)>*>* {
+    border-color: rgba(var(--cafebara-brown-rgb), .2);
+}
+
+.cafebara-admin-grid .table thead th a {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    color: inherit;
+    text-decoration: none;
+}
+
+.cafebara-admin-grid .table thead th a::after {
+    content: "\2195";
+    opacity: .45;
+    font-size: .85rem;
+    line-height: 1;
+}
+
+.cafebara-admin-grid .table thead th a.asc::after {
+    content: "\2191";
+    opacity: 1;
+}
+
+.cafebara-admin-grid .table thead th a.desc::after {
+    content: "\2193";
+    opacity: 1;
+}
+
+.cafebara-admin-grid .table thead th a:focus-visible {
+    border-radius: .25rem;
+    outline: 2px solid var(--bs-primary);
+    outline-offset: 3px;
+}
+
+.cafebara-admin-grid .table> :not(caption)>*>*,
+.cafebara-data-table> :not(caption)>*>* {
     padding: .8rem 1rem;
     vertical-align: middle;
 }
@@ -1352,20 +1619,6 @@ body {
         --bs-btn-padding-x: .6rem;
         font-size: .875rem;
     }
-
-    .cafebara-hero-art {
-        min-height: 230px;
-        margin-top: .5rem;
-    }
-
-    .cafebara-hero-logo {
-        width: min(75%, 260px);
-    }
-
-    .cafebara-hero-note {
-        right: 0;
-        bottom: 0;
-    }
 }
 
 @media (max-width: 991.98px) {
@@ -1475,6 +1728,18 @@ body {
     border-color: rgba(248, 230, 203, .35);
     background-color: rgba(248, 230, 203, .1);
     color: var(--cafebara-cream);
+}
+
+.cafebara-notification-item:focus-visible {
+    background-color: var(--bs-secondary-bg);
+    color: var(--bs-body-color);
+}
+
+@media (hover: hover) {
+    .cafebara-notification-item:hover {
+        background-color: var(--bs-secondary-bg);
+        color: var(--bs-body-color);
+    }
 }
 
 @media print {

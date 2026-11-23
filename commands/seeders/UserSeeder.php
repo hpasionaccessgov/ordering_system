@@ -28,29 +28,31 @@ class UserSeeder
 
         foreach ($records as [$username, $email, $fullName, $roleName]) {
             $user = User::find()->where(['or', ['username' => $username], ['email' => $email]])->one();
-            if ($user !== null) {
-                continue;
-            }
+            if ($user === null) {
+                $user = new User([
+                    'username' => $username,
+                    'email' => $email,
+                    'full_name' => $fullName,
+                    'status' => User::STATUS_ACTIVE,
+                ]);
+                $user->setPassword('CafebaraTest123!');
+                $user->generateAuthKey();
 
-            $user = new User([
-                'username' => $username,
-                'email' => $email,
-                'full_name' => $fullName,
-                'status' => User::STATUS_ACTIVE,
-            ]);
-            $user->setPassword('CafebaraTest123!');
-            $user->generateAuthKey();
-
-            if (!$user->save()) {
-                throw new \RuntimeException("Could not seed user {$username}: " . json_encode($user->getErrors()));
+                if (!$user->save()) {
+                    throw new \RuntimeException("Could not seed user {$username}: " . json_encode($user->getErrors()));
+                }
+                $added++;
             }
 
             $role = $auth->getRole($roleName);
             if ($role === null) {
                 throw new \RuntimeException("RBAC role {$roleName} does not exist. Run migrations first.");
             }
-            $auth->assign($role, $user->getId());
-            $added++;
+
+            // Repair accounts left over from an earlier seed run with no RBAC assignment.
+            if ($auth->getRolesByUser($user->getId()) === []) {
+                $auth->assign($role, $user->getId());
+            }
         }
 
         return $added;

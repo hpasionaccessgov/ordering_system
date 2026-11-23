@@ -15,10 +15,22 @@ $sort = Yii::$app->request->get('sort');
             'aria-label' => 'Search categories',
         ]) ?>
     </div>
+    <div class="col-12 col-md-auto">
+        <?= Html::dropDownList('CategorySearch[status]', $model->status, [
+            '' => 'All statuses',
+            \app\models\Category::STATUS_ACTIVE => 'Active',
+            \app\models\Category::STATUS_INACTIVE => 'Inactive',
+        ], ['class' => 'form-select', 'aria-label' => 'Category status']) ?>
+    </div>
     <?php if (is_string($sort) && $sort !== '') : ?>
         <?= Html::hiddenInput('sort', $sort) ?>
     <?php endif; ?>
     <div class="col-auto"><?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?></div>
     <div class="col-auto"><?= Html::a('Clear', ['/category/index'], ['class' => 'btn btn-outline-secondary']) ?></div>
 </div>
+<?= Html::errorSummary($model, ['class' => 'alert alert-danger mt-2']) ?>
+<?= $this->render('../shared/_listing_filters', [
+    'filters' => $model->filters, 'showAudit' => true, 'showDates' => true,
+    'showAmount' => false, 'amountLabel' => '',
+]) ?>
 <?= Html::endForm() ?>

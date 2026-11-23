@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 
@@ -14,6 +15,8 @@ use yii\db\ActiveQuery;
  * @property int $status
  * @property int $created_at
  * @property int $updated_at
+ * @property User|null $createdBy
+ * @property User|null $updatedBy
  */
 class Category extends \yii\db\ActiveRecord
 {
@@ -25,6 +28,7 @@ class Category extends \yii\db\ActiveRecord
     {
         return [
             TimestampBehavior::class,
+            BlameableBehavior::class,
         ];
     }
 
@@ -39,6 +43,16 @@ class Category extends \yii\db\ActiveRecord
     public function getProducts(): ActiveQuery
     {
         return $this->hasMany(Product::class, ['category_id' => 'id']);
+    }
+
+    public function getCreatedBy(): ActiveQuery
+    {
+        return $this->hasOne(User::class, ['id' => 'created_by']);
+    }
+
+    public function getUpdatedBy(): ActiveQuery
+    {
+        return $this->hasOne(User::class, ['id' => 'updated_by']);
     }
 
     /**

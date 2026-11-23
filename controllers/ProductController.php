@@ -7,9 +7,9 @@ namespace app\controllers;
 use app\models\Category;
 use app\models\OrderItem;
 use app\models\Product;
-use app\services\ProductCatalogPolicy;
+use app\models\ProductSearch;
+use app\services\NotificationService;
 use Yii;
-use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
@@ -91,63 +91,11 @@ class ProductController extends Controller
         $this->layout = 'admin';
         $canViewProducts = Yii::$app->user->can('product.view');
         $canManageProducts = $this->canManageArchivedProducts();
-        $requestedStatus = $this->request->get('status', 'all');
-        $status = ProductCatalogPolicy::normalizeStatus(
-            $canManageProducts,
-            is_string($requestedStatus) ? $requestedStatus : 'all',
-        );
-
-        $query = ProductCatalogPolicy::applyStatusFilter(
-            Product::find()->with('categoryRecord'),
-            $status,
-        );
-        if (!$canViewProducts) {
-            $query->andWhere(['id' => null]);
-        }
-
-        $requestedSearch = $this->request->get('q', '');
-        $search = is_string($requestedSearch) ? trim($requestedSearch) : '';
-        $requestedCategoryId = $this->request->get('category_id', '');
-        $categoryId = is_scalar($requestedCategoryId)
-            ? trim((string) $requestedCategoryId)
-            : '';
-        $minPrice = $this->request->get('min_price');
-        $maxPrice = $this->request->get('max_price');
-
-        if ($search !== '') {
-            $query->andWhere(['or',
-                ['like', 'name', $search],
-                ['like', 'description', $search],
-                [
-                    'category_id' => Category::find()
-                        ->select('id')
-                        ->andWhere(['like', 'name', $search]),
-                ],
-            ]);
-        }
-        if ($categoryId !== '') {
-            if (ctype_digit($categoryId)) {
-                $query->andWhere(['category_id' => (int) $categoryId]);
-            } else {
-                $query->andWhere(['id' => null]);
-            }
-        }
-        if (is_numeric($minPrice)) {
-            $query->andWhere(['>=', 'price', (float) $minPrice]);
-        }
-        if (is_numeric($maxPrice)) {
-            $query->andWhere(['<=', 'price', (float) $maxPrice]);
-        }
+        $searchModel = new ProductSearch();
+        $dataProvider = $searchModel->search($this->request->queryParams, $canViewProducts, $canManageProducts);
 
         return $this->render('index', [
-            'dataProvider' => new ActiveDataProvider([
-                'query' => $query,
-                'pagination' => ['pageSize' => 10, 'pageSizeLimit' => [10, 10]],
-                'sort' => [
-                    'attributes' => ['name', 'price', 'id'],
-                    'defaultOrder' => ['name' => SORT_ASC, 'id' => SORT_ASC],
-                ],
-            ]),
+            'dataProvider' => $dataProvider,
             'categories' => ArrayHelper::map(
                 Category::find()->orderBy('name')->all(),
                 'id',
@@ -155,8 +103,9 @@ class ProductController extends Controller
             ),
             'canManageProducts' => $canManageProducts,
             'canViewProducts' => $canViewProducts,
-            'status' => $status,
-            'search' => $search,
+            'status' => $searchModel->catalogStatus,
+            'search' => $searchModel->q,
+            'filters' => $searchModel->filters,
         ]);
     }
 
@@ -248,10 +197,16 @@ class ProductController extends Controller
         $model = $this->findProduct($id);
         $model->status = Product::STATUS_ARCHIVED;
 
-        if (!$model->save(false, ['status', 'updated_at'])) {
+        if (!$model->save(false, ['status', 'updated_at', 'updated_by'])) {
             throw new BadRequestHttpException('Product could not be archived.');
         }
 
+        NotificationService::notifyManagers(
+            NotificationService::TYPE_PRODUCT_ARCHIVED,
+            'Product ' . $model->name . ' archived.',
+            '/product/view',
+            (int) $model->id,
+        );
         Yii::$app->session->setFlash('success', 'Product archived.');
 
         return $this->redirect($this->getProductListReturnRoute());
@@ -265,10 +220,16 @@ class ProductController extends Controller
         }
 
         $model->status = Product::STATUS_ACTIVE;
-        if (!$model->save(false, ['status', 'updated_at'])) {
+        if (!$model->save(false, ['status', 'updated_at', 'updated_by'])) {
             throw new BadRequestHttpException('Product could not be restored.');
         }
 
+        NotificationService::notifyManagers(
+            NotificationService::TYPE_PRODUCT_RESTORED,
+            'Product ' . $model->name . ' restored.',
+            '/product/view',
+            (int) $model->id,
+        );
         Yii::$app->session->setFlash('success', 'Product restored.');
 
         return $this->redirect($this->getProductListReturnRoute());
@@ -303,6 +264,7 @@ class ProductController extends Controller
                 return $this->redirect($this->getProductListReturnRoute());
             }
 
+            $productName = $model->name;
             if ($model->delete() === false) {
                 throw new BadRequestHttpException('Product could not be permanently deleted.');
             }
@@ -316,6 +278,11 @@ class ProductController extends Controller
             throw $exception;
         }
 
+        NotificationService::notifyManagers(
+            NotificationService::TYPE_PRODUCT_DELETED,
+            'Product ' . $productName . ' deleted.',
+            '/product/index',
+        );
         Yii::$app->session->setFlash('success', 'Product permanently deleted.');
 
         return $this->redirect($this->getProductListReturnRoute());
@@ -384,6 +351,7 @@ class ProductController extends Controller
 
     private function saveProduct(Product $model): bool
     {
+        $isNew = $model->isNewRecord;
         if (!$model->validate()) {
             return false;
         }
@@ -407,6 +375,22 @@ class ProductController extends Controller
 
         if (!$model->save(false)) {
             return false;
+        }
+
+        if ($isNew) {
+            NotificationService::notifyAll(
+                NotificationService::TYPE_PRODUCT_CREATED,
+                'New product ' . $model->name . ' added.',
+                '/product/view',
+                (int) $model->id,
+            );
+        } else {
+            NotificationService::notifyManagers(
+                NotificationService::TYPE_PRODUCT_UPDATED,
+                'Product ' . $model->name . ' updated.',
+                '/product/view',
+                (int) $model->id,
+            );
         }
 
         return true;

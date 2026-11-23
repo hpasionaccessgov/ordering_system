@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\ActiveQuery;
@@ -18,6 +19,8 @@ use yii\db\ActiveQuery;
  * @property int $quantity
  * @property float $unit_price
  * @property float $subtotal
+ * @property User|null $createdBy
+ * @property User|null $updatedBy
  */
 class OrderItem extends ActiveRecord
 {
@@ -33,6 +36,7 @@ class OrderItem extends ActiveRecord
                 'class' => TimestampBehavior::class,
                 'updatedAtAttribute' => false,
             ],
+            BlameableBehavior::class,
         ];
     }
 
@@ -56,5 +60,15 @@ class OrderItem extends ActiveRecord
     public function getProduct(): ActiveQuery
     {
         return $this->hasOne(Product::class, ['id' => 'product_id']);
+    }
+
+    public function getCreatedBy(): ActiveQuery
+    {
+        return $this->hasOne(User::class, ['id' => 'created_by']);
+    }
+
+    public function getUpdatedBy(): ActiveQuery
+    {
+        return $this->hasOne(User::class, ['id' => 'updated_by']);
     }
 }

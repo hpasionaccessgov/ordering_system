@@ -2,19 +2,25 @@
 
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
+$mailDsn = trim((string) ($_ENV['MAIL_DSN'] ?? $_SERVER['MAIL_DSN'] ?? ''));
+$mailer = [
+    'class' => \yii\symfonymailer\Mailer::class,
+    'viewPath' => '@app/mail',
+    'useFileTransport' => $mailDsn === '',
+];
+if ($mailDsn !== '') {
+    $mailer['transport'] = ['dsn' => $mailDsn];
+}
 
 $config = [
     'id' => 'basic',
     'name' => 'Cafébara',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log', \app\services\ActivityLogger::class],
     'container' => [
         'singletons' => [
             \yii\mail\MailerInterface::class => [
-                'class' => \yii\symfonymailer\Mailer::class,
-                // send all mails to a file by default.
-                'useFileTransport' => true,
-                'viewPath' => '@app/mail',
+                ...$mailer,
             ],
         ],
     ],
@@ -37,15 +43,18 @@ $config = [
             'class' => \yii\i18n\Formatter::class,
             'locale' => 'en_PH',
             'currencyCode' => 'PHP',
+            'timeZone' => 'Asia/Manila',
+            'datetimeFormat' => 'php:M j, Y g:i A',
         ],
         'user' => [
+            'class' => \app\services\SessionUser::class,
             'identityClass' => \app\models\User::class,
             'enableAutoLogin' => true,
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        'mailer' => \yii\mail\MailerInterface::class,
+        'mailer' => $mailer,
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
@@ -56,14 +65,13 @@ $config = [
             ],
         ],
         'db' => $db,
-        /*
+
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'rules' => [
-            ],
+            'rules' => [],
         ],
-        */
+
     ],
     'params' => $params,
 ];

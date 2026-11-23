@@ -10,6 +10,7 @@ use app\models\User;
 use app\services\OrderStatistics;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\Response;
 
 class AdminController extends Controller
 {
@@ -39,5 +40,13 @@ class AdminController extends Controller
             'pendingOrderCount' => (int) Order::find()->where(['status' => Order::STATUS_PENDING])->count(),
             'orderStatusCounts' => OrderStatistics::statusCounts(),
         ]);
+    }
+
+    public function actionActivity(): Response
+    {
+        $params = $this->request->queryParams;
+        unset($params['r']);
+
+        return $this->redirect(['/activity-log/index'] + $params);
     }
 }

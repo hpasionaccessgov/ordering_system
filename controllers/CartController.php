@@ -31,7 +31,7 @@ final class CartController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     ['actions' => ['index'], 'allow' => true, 'roles' => ['cart.index']],
-                    ['actions' => ['add'], 'allow' => true, 'roles' => ['cart.add']],
+                    ['actions' => ['add', 'add-batch'], 'allow' => true, 'roles' => ['cart.add']],
                     ['actions' => ['update'], 'allow' => true, 'roles' => ['cart.update']],
                     ['actions' => ['remove'], 'allow' => true, 'roles' => ['cart.remove']],
                     ['actions' => ['checkout'], 'allow' => true, 'roles' => ['cart.checkout']],
@@ -41,6 +41,7 @@ final class CartController extends Controller
                 'class' => VerbFilter::class,
                 'actions' => [
                     'add' => ['post'],
+                    'add-batch' => ['post'],
                     'update' => ['post'],
                     'remove' => ['post'],
                     'checkout' => ['get', 'post'],
@@ -63,6 +64,47 @@ final class CartController extends Controller
     {
         (new ShoppingCart())->add($id, $this->postedQuantity());
         Yii::$app->session->setFlash('success', 'Product added to your cart.');
+
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * Adds every posted product quantity (quantities[<id>]) to the cart in one request.
+     */
+    public function actionAddBatch(): Response
+    {
+        $quantities = $this->request->post('quantities', []);
+        if (!is_array($quantities)) {
+            throw new BadRequestHttpException('Quantities are invalid.');
+        }
+
+        $cart = new ShoppingCart();
+        $added = 0;
+        $skipped = 0;
+        foreach ($quantities as $productId => $quantity) {
+            $quantity = filter_var($quantity, FILTER_VALIDATE_INT);
+            if ($quantity === false || $quantity < 1) {
+                continue;
+            }
+
+            try {
+                $cart->add((int) $productId, $quantity);
+                $added++;
+            } catch (BadRequestHttpException) {
+                $skipped++;
+            }
+        }
+
+        if ($added === 0) {
+            Yii::$app->session->setFlash('warning', 'Choose at least one product to add.');
+        } elseif ($skipped > 0) {
+            Yii::$app->session->setFlash(
+                'success',
+                "{$added} product(s) added to your cart; {$skipped} unavailable product(s) were skipped.",
+            );
+        } else {
+            Yii::$app->session->setFlash('success', 'Products added to your cart.');
+        }
 
         return $this->redirect(['index']);
     }

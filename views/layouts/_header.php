@@ -6,7 +6,7 @@ use yii\helpers\Html;
 
 $user = Yii::$app->user->identity;
 ?>
-<nav class="app-header navbar navbar-expand bg-body">
+<nav class="navbar navbar-expand bg-body app-header">
     <div class="container-fluid">
         <?= Html::a(
             Html::tag('span', 'Cafébara', ['class' => 'cafebara-brand-name d-none d-sm-inline']),
@@ -36,7 +36,12 @@ $user = Yii::$app->user->identity;
                     <?= Html::a('Login', ['/site/login'], ['class' => 'nav-link']) ?>
                 </li>
             <?php else: ?>
-                <li class="nav-item d-flex align-items-center me-2">
+                <?php if (Yii::$app->user->can('notification.index')): ?>
+                    <li class="nav-item">
+                        <?= $this->render('_notifications_link', ['class' => 'nav-link']) ?>
+                    </li>
+                <?php endif ?>
+                <li class="d-flex me-2 nav-item align-items-center">
                     <?= $this->render('_theme_toggle') ?>
                 </li>
                 <li class="nav-item dropdown">

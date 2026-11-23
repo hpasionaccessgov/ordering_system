@@ -89,12 +89,13 @@ class OrderService
 
             $order->total_amount = number_format($total, 2, '.', '');
 
-            if (!$order->save(false, ['total_amount', 'updated_at'])) {
+            if (!$order->save(false, ['total_amount', 'updated_at', 'updated_by'])) {
                 throw new BadRequestHttpException(
                     'Order total could not be saved.',
                 );
             }
 
+            (new OrderStatusService())->notifyOrderManagers($order, $userId);
             $transaction->commit();
 
             return $order;
@@ -172,7 +173,7 @@ class OrderService
             }
 
             $order->total_amount = number_format($total, 2, '.', '');
-            if (!$order->save(false, ['total_amount', 'updated_at'])) {
+            if (!$order->save(false, ['total_amount', 'updated_at', 'updated_by'])) {
                 throw new BadRequestHttpException('Order total could not be saved.');
             }
 

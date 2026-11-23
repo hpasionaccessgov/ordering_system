@@ -35,10 +35,4 @@ if (!empty($this->params['meta_keywords'])) {
         ],
     );
 }
-$this->registerLinkTag(
-    [
-        'rel' => 'icon',
-        'type' => 'image/png',
-        'href' => Yii::getAlias('@web/Cafebara_logo.png'),
-    ],
-);
+$this->render('_favicon');

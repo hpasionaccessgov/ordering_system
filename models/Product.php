@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use yii\web\UploadedFile;
+use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -24,6 +25,8 @@ use yii\helpers\Url;
  * @property string|null $image_name
  * @property bool $is_featured
  * @property Category $categoryRecord
+ * @property User|null $createdBy
+ * @property User|null $updatedBy
  */
 class Product extends ActiveRecord
 {
@@ -39,6 +42,7 @@ class Product extends ActiveRecord
     {
         return [
             TimestampBehavior::class,
+            BlameableBehavior::class,
         ];
     }
 
@@ -88,6 +92,16 @@ class Product extends ActiveRecord
     public function getCategoryRecord(): ActiveQuery
     {
         return $this->hasOne(Category::class, ['id' => 'category_id']);
+    }
+
+    public function getCreatedBy(): ActiveQuery
+    {
+        return $this->hasOne(User::class, ['id' => 'created_by']);
+    }
+
+    public function getUpdatedBy(): ActiveQuery
+    {
+        return $this->hasOne(User::class, ['id' => 'updated_by']);
     }
 
     public function validateCategoryStatus(string $attribute): void

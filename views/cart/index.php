@@ -10,10 +10,10 @@ $this->title = 'Shopping cart';
 ?>
 
 <section class="shopping-cart-page">
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-center">
         <div>
-            <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Your selection</p>
-            <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
+            <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Your selection</p>
+            <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
         </div>
         <?php if (Yii::$app->user->can('product.index')) : ?>
             <?= Html::a('Continue shopping', ['/product/index'], ['class' => 'btn btn-outline-primary']) ?>
@@ -22,7 +22,7 @@ $this->title = 'Shopping cart';
 
     <?php if ($summary['lines'] === []): ?>
         <div class="card admin-panel">
-            <div class="card-body text-center py-5">
+            <div class="py-5 card-body text-center">
                 <h2 class="h5">Your cart is empty</h2>
                 <p class="text-body-secondary">Choose active products from the catalog.</p>
                 <?php if (Yii::$app->user->can('product.index')) : ?>
@@ -32,15 +32,26 @@ $this->title = 'Shopping cart';
         </div>
     <?php else: ?>
         <div class="row g-4">
-            <div class="col-12 col-lg-8">
+            <div class="col-12 col-lg-8 card admin-panel cart-items-panel">
                 <?php foreach ($summary['lines'] as $line): ?>
                     <?php $product = $line['product']; ?>
-                    <article class="card admin-panel mb-3">
+                    <article class="mb-3 card admin-panel">
                         <div class="card-body">
-                            <div class="d-flex flex-wrap align-items-center gap-3">
+                            <div class="d-flex flex-wrap gap-3 align-items-center">
+                                <?php if ($product->getImageUrl() !== null) : ?>
+                                    <?= Html::img($product->getImageUrl(), [
+                                        'class' => 'cart-item-image',
+                                        'alt' => $product->name,
+                                        'loading' => 'lazy',
+                                    ]) ?>
+                                <?php else : ?>
+                                    <div class="cart-item-placeholder" aria-hidden="true">
+                                        <i class="bi bi-cup-hot"></i>
+                                    </div>
+                                <?php endif; ?>
                                 <div class="flex-grow-1">
-                                    <h2 class="h5 mb-1"><?= Html::encode($product->name) ?></h2>
-                                    <p class="text-body-secondary mb-1">
+                                    <h2 class="mb-1 h5"><?= Html::encode($product->name) ?></h2>
+                                    <p class="mb-1 text-body-secondary">
                                         <?= Html::encode($product->categoryRecord?->name ?? 'Cafébara menu') ?>
                                     </p>
                                     <strong><?= Yii::$app->formatter->asCurrency($product->price) ?> each</strong>
@@ -82,11 +93,11 @@ $this->title = 'Shopping cart';
                 <section class="card admin-panel">
                     <div class="card-body">
                         <h2 class="h5">Order summary</h2>
-                        <div class="d-flex justify-content-between my-3">
+                        <div class="d-flex my-3 justify-content-between">
                             <span>Items</span>
                             <strong><?= Html::encode((string) $summary['count']) ?></strong>
                         </div>
-                        <div class="d-flex justify-content-between border-top pt-3 mb-4">
+                        <div class="d-flex pt-3 mb-4 justify-content-between border-top">
                             <span>Total</span>
                             <strong><?= Yii::$app->formatter->asCurrency($summary['total']) ?></strong>
                         </div>

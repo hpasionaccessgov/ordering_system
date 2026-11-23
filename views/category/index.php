@@ -40,10 +40,20 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => static fn(Category $category): string =>
                 (int) $category->status === Category::STATUS_ACTIVE ? 'Active' : 'Inactive',
             ],
-            // [
-            //     'attribute' => 'created_at',
-            //     'format' => ['date', 'php:Y-m-d H:i'],
-            // ],
+            'created_at:datetime',
+            'updated_at:datetime',
+            [
+                'attribute' => 'created_by',
+                'label' => 'Created by',
+                'value' => static fn(Category $category): string =>
+                $category->createdBy?->username ?? '—',
+            ],
+            [
+                'attribute' => 'updated_by',
+                'label' => 'Updated by',
+                'value' => static fn(Category $category): string =>
+                $category->updatedBy?->username ?? '—',
+            ],
             [
                 'label' => 'Actions',
                 'format' => 'raw',

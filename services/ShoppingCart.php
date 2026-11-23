@@ -51,6 +51,11 @@ final class ShoppingCart
 
     public function clear(): void
     {
+        if (!Yii::$app->user->isGuest) {
+            Yii::$app->db->createCommand()
+                ->delete('{{%cart_items}}', ['user_id' => Yii::$app->user->id])
+                ->execute();
+        }
         $this->session()->remove(self::SESSION_KEY);
     }
 
@@ -84,13 +89,20 @@ final class ShoppingCart
      */
     public function items(): array
     {
-        $stored = $this->session()->get(self::SESSION_KEY, []);
-        if (!is_array($stored) || !is_array($stored['items'] ?? null)) {
-            return [];
-        }
+        $items = Yii::$app->user->isGuest
+            ? $this->sessionItems()
+            : array_column(
+                (new \yii\db\Query())
+                    ->select(['product_id', 'quantity'])
+                    ->from('{{%cart_items}}')
+                    ->where(['user_id' => Yii::$app->user->id])
+                    ->all(),
+                'quantity',
+                'product_id',
+            );
 
-        $items = [];
-        foreach ($stored['items'] as $productId => $quantity) {
+        $validated = [];
+        foreach ($items as $productId => $quantity) {
             if (
                 filter_var($productId, FILTER_VALIDATE_INT) !== false
                 && filter_var($quantity, FILTER_VALIDATE_INT) !== false
@@ -98,11 +110,11 @@ final class ShoppingCart
                 && (int) $quantity > 0
                 && (int) $quantity <= self::MAX_QUANTITY
             ) {
-                $items[(int) $productId] = (int) $quantity;
+                $validated[(int) $productId] = (int) $quantity;
             }
         }
 
-        return $items;
+        return $validated;
     }
 
     /**
@@ -148,7 +160,7 @@ final class ShoppingCart
         $token = is_array($stored) ? ($stored['checkout_token'] ?? null) : null;
         if (!is_string($token) || $token === '') {
             $token = bin2hex(random_bytes(24));
-            $this->storeItems($this->items(), $token);
+            $this->storeToken($token);
         }
 
         return $token;
@@ -185,9 +197,91 @@ final class ShoppingCart
      */
     private function storeItems(array $items, ?string $token = null): void
     {
+        if (!Yii::$app->user->isGuest) {
+            $this->storeDatabaseItems($items);
+            if ($token !== null) {
+                $this->storeToken($token);
+            }
+
+            return;
+        }
         $this->session()->set(self::SESSION_KEY, [
             'items' => $items,
             'checkout_token' => $token ?? bin2hex(random_bytes(24)),
+        ]);
+    }
+
+    public function mergeSessionIntoAccount(): void
+    {
+        if (Yii::$app->user->isGuest) {
+            return;
+        }
+
+        $sessionItems = $this->sessionItems();
+        if ($sessionItems === []) {
+            return;
+        }
+        $accountItems = $this->items();
+        foreach ($sessionItems as $productId => $quantity) {
+            $accountItems[$productId] = min(
+                self::MAX_QUANTITY,
+                ($accountItems[$productId] ?? 0) + $quantity,
+            );
+        }
+        $this->storeItems($accountItems);
+        $this->session()->remove(self::SESSION_KEY);
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function sessionItems(): array
+    {
+        $stored = $this->session()->get(self::SESSION_KEY, []);
+        $items = is_array($stored) && is_array($stored['items'] ?? null)
+            ? $stored['items']
+            : [];
+
+        return array_map('intval', $items);
+    }
+
+    /**
+     * @param array<int, int> $items
+     */
+    private function storeDatabaseItems(array $items): void
+    {
+        $db = Yii::$app->db;
+        $transaction = $db->beginTransaction();
+        try {
+            $db->createCommand()
+                ->delete('{{%cart_items}}', ['user_id' => Yii::$app->user->id])
+                ->execute();
+            $now = time();
+            foreach ($items as $productId => $quantity) {
+                $db->createCommand()->insert('{{%cart_items}}', [
+                    'user_id' => Yii::$app->user->id,
+                    'product_id' => $productId,
+                    'quantity' => $quantity,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ])->execute();
+            }
+            $transaction->commit();
+        } catch (\Throwable $exception) {
+            if ($transaction->isActive) {
+                $transaction->rollBack();
+            }
+
+            throw $exception;
+        }
+    }
+
+    private function storeToken(string $token): void
+    {
+        $stored = $this->session()->get(self::SESSION_KEY, []);
+        $this->session()->set(self::SESSION_KEY, [
+            'items' => is_array($stored) ? ($stored['items'] ?? []) : [],
+            'checkout_token' => $token,
         ]);
     }
 

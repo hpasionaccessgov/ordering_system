@@ -105,4 +105,15 @@ final class RbacPermissionPolicyTest extends Unit
             ]),
         );
     }
+
+    public function testActivityAndNotificationIndexControlTheirActions(): void
+    {
+        foreach (['activityLog' => 'view', 'notification' => 'read', 'settings' => 'update'] as $module => $action) {
+            $index = $module . '.index';
+            $dependent = $module . '.' . $action;
+            self::assertSame([$index, $dependent], RbacPermissionPolicy::expandIndexPermission($index, []));
+            self::assertSame([$index], RbacPermissionPolicy::normalizeRolePermissions([$index]));
+            self::assertSame([], RbacPermissionPolicy::normalizeRolePermissions([$dependent]));
+        }
+    }
 }

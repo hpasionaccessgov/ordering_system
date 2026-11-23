@@ -11,7 +11,10 @@ use app\models\Category;
  */
 class CategorySearch extends Category
 {
+    /** @var string|null */
     public $q;
+    /** @var \app\models\ListingFilters $filters */
+    public $filters;
 
     /**
      * {@inheritdoc}
@@ -45,15 +48,32 @@ class CategorySearch extends Category
      */
     public function search($params, $formName = null)
     {
-        $query = Category::find();
+        $query = Category::find()->with(['createdBy', 'updatedBy']);
+        $this->filters = new ListingFilters();
+        $this->filters->loadFilters($params, true, true, false);
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => ['pageSize' => 10, 'pageSizeLimit' => [10, 10]],
+            'pagination' => ApplicationSettings::pagination(),
             'sort' => [
-                'attributes' => ['id', 'name', 'description', 'status', 'created_at', 'updated_at'],
+                'attributes' => [
+                    'id',
+                    'name',
+                    'description',
+                    'status',
+                    'created_at',
+                    'updated_at',
+                    'created_by' => [
+                        'asc' => [User::usernameSortExpression('{{%category}}', 'created_by', SORT_ASC)],
+                        'desc' => [User::usernameSortExpression('{{%category}}', 'created_by', SORT_DESC)],
+                    ],
+                    'updated_by' => [
+                        'asc' => [User::usernameSortExpression('{{%category}}', 'updated_by', SORT_ASC)],
+                        'desc' => [User::usernameSortExpression('{{%category}}', 'updated_by', SORT_DESC)],
+                    ],
+                ],
                 'defaultOrder' => ['name' => SORT_ASC, 'id' => SORT_ASC],
             ],
         ]);
@@ -63,9 +83,10 @@ class CategorySearch extends Category
             $this->q = $params['q'];
         }
 
-        if (!$this->validate()) {
+        if (!$this->validate() || !$this->filters->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
+            $query->andWhere('0=1');
             return $dataProvider;
         }
 
@@ -79,9 +100,11 @@ class CategorySearch extends Category
 
         $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'description', $this->description]);
+        $this->filters->apply($query);
 
         if ($this->q !== null && $this->q !== '') {
-            $conditions = ['or',
+            $conditions = [
+                'or',
                 ['like', 'name', $this->q],
                 ['like', 'description', $this->q],
             ];

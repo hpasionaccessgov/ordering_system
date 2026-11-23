@@ -16,11 +16,21 @@ $labelOptions = ['class' => 'form-label fw-semibold'];
 
 <div class="container py-4 site-contact">
     <section class="cafebara-contact-hero p-4 p-lg-5 mb-4">
-        <p class="cafebara-dashboard-kicker mb-2">We are here to help</p>
-        <h1 class="display-6 fw-bold mb-2">Contact Cafébara</h1>
-        <p class="lead mb-0">
-            Send a note about the menu, your account, or an order.
-        </p>
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <p class="cafebara-dashboard-kicker mb-2">We are here to help</p>
+                <h1 class="display-6 fw-bold mb-2">Contact Cafébara</h1>
+                <p class="lead mb-0">
+                    Send a note about the menu, your account, or an order.
+                </p>
+            </div>
+            <div class="col-lg-4 text-center">
+                <?= Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
+                    'class' => 'cafebara-about-logo mb-3',
+                    'alt' => 'Cafébara capybara mascot',
+                ]) ?>
+            </div>
+        </div>
     </section>
 
     <?php if (Yii::$app->session->hasFlash('success')) : ?>
@@ -37,7 +47,7 @@ $labelOptions = ['class' => 'form-label fw-semibold'];
                 YII_DEBUG
                 && Yii::$app->mailer instanceof \yii\mail\BaseMailer
                 && Yii::$app->mailer->useFileTransport
-) : ?>
+            ) : ?>
                 <p class="text-body-secondary small mb-4">
                     Development mode: the email was saved under
                     <code><?= Html::encode(Yii::getAlias(Yii::$app->mailer->fileTransportPath)) ?></code>.
@@ -49,10 +59,10 @@ $labelOptions = ['class' => 'form-label fw-semibold'];
         <div class="row g-4 align-items-stretch">
             <div class="col-12 col-lg-4">
                 <aside class="cafebara-contact-aside">
-                    <?= Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
-                        'class' => 'cafebara-about-logo mb-4',
-                        'alt' => '',
-                    ]) ?>
+                    <!-- <?= Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
+                                'class' => 'cafebara-about-logo mb-4',
+                                'alt' => '',
+                            ]) ?> -->
                     <h2 class="h4 fw-bold">How can we help?</h2>
                     <p class="text-body-secondary">
                         A little context helps us understand what you need.

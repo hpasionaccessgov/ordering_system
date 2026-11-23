@@ -18,13 +18,13 @@ $htmlIcon = <<<HTML
 HTML;
 $labelOptions = ['class' => 'form-label fw-semibold small'];
 ?>
-<div class="site-login d-flex align-items-center justify-content-center py-5">
+<div class="d-flex py-5 align-items-center justify-content-center site-login">
     <div class="card border-0 overflow-hidden login-split-card">
         <div class="row g-0">
 
             <!-- Brand panel -->
-            <div class="col-md-5 d-none d-md-flex login-brand-panel text-white">
-                <div class="d-flex flex-column justify-content-between p-4 p-lg-5 w-100">
+            <div class="col-md-5 d-none d-md-flex text-white login-brand-panel">
+                <div class="d-flex flex-column p-4 p-lg-5 justify-content-between w-100">
                     <div>
                         <?= Html::img(
                             Yii::getAlias('@web/Cafebara_logo.png'),
@@ -35,10 +35,10 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                         ) ?>
                     </div>
                     <div>
-                        <h2 class="fw-bold mb-3 login-brand-title">
+                        <h2 class="mb-3 fw-bold login-brand-title">
                             Welcome<br>to Cafébara
                         </h2>
-                        <p class="opacity-75 mb-0 login-brand-text">
+                        <p class="mb-0 opacity-75 login-brand-text">
                             Log in to access the application
                         </p>
                     </div>
@@ -48,7 +48,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
             <!-- Form panel -->
             <div class="col-md-7">
                 <div class="p-4 p-lg-5">
-                    <div class="text-center mb-4">
+                    <div class="mb-4 text-center">
                         <!-- Mobile-only logo -->
                         <div class="d-md-none mb-3">
                             <?= Html::img(
@@ -59,7 +59,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                                 ],
                             ) ?>
                         </div>
-                        <h1 class="h3 fw-bold mb-1"><?= Html::encode($this->title) ?></h1>
+                        <h1 class="mb-1 fw-bold h3"><?= Html::encode($this->title) ?></h1>
                         <p class="text-body-secondary small">Enter your credentials to access</p>
                     </div>
 
@@ -68,7 +68,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                     <div class="mb-3">
                         <?= $form->field($model, 'username', [
                             'options' => ['class' => 'mb-0'],
-                            'template' => sprintf($htmlIcon, '&#128100;'),
+                            'template' => sprintf($htmlIcon, '<i class="nav-icon bi bi-people "></i>'),
                             'inputOptions' => [
                                 'class' => 'form-control',
                                 'placeholder' => 'Username or email',
@@ -80,7 +80,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                     <div class="mb-3">
                         <?= $form->field($model, 'password', [
                             'options' => ['class' => 'mb-0'],
-                            'template' => sprintf($htmlIcon, '&#128274;'),
+                            'template' => sprintf($htmlIcon, '<i class="nav-icon bi bi-lock"></i>'),
                             'inputOptions' => [
                                 'class' => 'form-control',
                                 'placeholder' => 'Password',
@@ -104,7 +104,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
 
                     <?php ActiveForm::end(); ?>
 
-                    <div class="text-body-secondary text-center mt-3 small">
+                    <div class="mt-3 text-body-secondary text-center small">
                         Don't have account yet? <?= Html::a('Register Here', ['site/register']) ?>
                     </div>
 

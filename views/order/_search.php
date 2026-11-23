@@ -4,6 +4,8 @@ use yii\helpers\Html;
 
 /** @var string $search */
 /** @var string $status */
+/** @var array $filters */
+/** @var bool $canViewAudit */
 
 $sort = Yii::$app->request->get('sort');
 ?>
@@ -35,4 +37,11 @@ $sort = Yii::$app->request->get('sort');
     <div class="col-auto"><?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?></div>
     <div class="col-auto"><?= Html::a('Clear', ['/order/index'], ['class' => 'btn btn-outline-secondary']) ?></div>
 </div>
+<?= $this->render('../shared/_listing_filters', [
+    'filters' => $filters,
+    'showAudit' => $canViewAudit,
+    'showDates' => true,
+    'showAmount' => true,
+    'amountLabel' => 'order total',
+]) ?>
 <?= Html::endForm() ?>

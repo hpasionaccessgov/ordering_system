@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use Yii;
+use app\models\ApplicationSettings;
 use app\models\ContactForm;
 use app\models\LoginForm;
 use app\models\RegisterForm;
@@ -13,7 +14,10 @@ use app\models\ChangePasswordForm;
 use app\models\ProfileForm;
 use app\models\DeactivateForm;
 use app\models\Product;
+use app\models\ProductSearch;
+use app\services\ShoppingCart;
 use app\models\Category;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\ErrorAction;
 use yii\web\Response;
@@ -23,7 +27,6 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\base\Security;
 use yii\mail\MailerInterface;
-use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 
 class SiteController extends Controller
@@ -103,53 +106,26 @@ class SiteController extends Controller
     public function actionIndex(): string
     {
         return $this->render('index', [
-            'featuredProducts' => Product::find()
-                ->where([
-                    'status' => Product::STATUS_ACTIVE,
-                    'is_featured' => true,
-                ])
-                ->orderBy(['name' => SORT_ASC])
-                ->limit(6)
-                ->all(),
+            'featuredDataProvider' => new ActiveDataProvider([
+                'query' => Product::find()
+                    ->where([
+                        'status' => Product::STATUS_ACTIVE,
+                        'is_featured' => true,
+                    ])
+                    ->orderBy(['name' => SORT_ASC]),
+                'pagination' => ApplicationSettings::pagination(true),
+                'sort' => false,
+            ]),
         ]);
     }
 
     public function actionMenu(): string
     {
-        $requestedSearch = $this->request->get('q', '');
-        $search = is_string($requestedSearch) ? trim($requestedSearch) : '';
-        $requestedCategory = $this->request->get('category_id', '');
-        $categoryId = is_scalar($requestedCategory)
-            ? trim((string) $requestedCategory)
-            : '';
-
-        $query = Product::find()
-            ->with('categoryRecord')
-            ->where(['status' => Product::STATUS_ACTIVE]);
-        if ($search !== '') {
-            $query->andWhere([
-                'or',
-                ['like', 'name', $search],
-                ['like', 'description', $search],
-            ]);
-        }
-        if ($categoryId !== '') {
-            if (ctype_digit($categoryId)) {
-                $query->andWhere(['category_id' => (int) $categoryId]);
-            } else {
-                $query->andWhere(['id' => null]);
-            }
-        }
+        $searchModel = new ProductSearch();
+        $dataProvider = $searchModel->searchMenu($this->request->queryParams);
 
         return $this->render('menu', [
-            'dataProvider' => new ActiveDataProvider([
-                'query' => $query,
-                'pagination' => ['pageSize' => 9, 'pageSizeLimit' => [9, 9]],
-                'sort' => [
-                    'attributes' => ['name', 'price', 'id'],
-                    'defaultOrder' => ['name' => SORT_ASC, 'id' => SORT_ASC],
-                ],
-            ]),
+            'dataProvider' => $dataProvider,
             'categories' => ArrayHelper::map(
                 Category::find()
                     ->where(['status' => Category::STATUS_ACTIVE])
@@ -161,8 +137,9 @@ class SiteController extends Controller
                 'id',
                 'name',
             ),
-            'search' => $search,
-            'categoryId' => $categoryId,
+            'search' => $searchModel->q,
+            'categoryId' => $searchModel->categoryId,
+            'filters' => $searchModel->filters,
         ]);
     }
 
@@ -198,6 +175,12 @@ class SiteController extends Controller
                 $registrationSaved = $user->save();
 
                 if ($registrationSaved) {
+                    // Guest registration: no logged-in user for BlameableBehavior,
+                    // so credit the account to itself.
+                    $user->updateAttributes([
+                        'created_by' => $user->id,
+                        'updated_by' => $user->id,
+                    ]);
                     Yii::$app->authManager->assign($customerRole, $user->getId());
                     $transaction->commit();
                 } else {
@@ -263,6 +246,8 @@ class SiteController extends Controller
         $model = new LoginForm($this->security);
 
         if ($model->load($this->request->post()) && $model->login()) {
+            (new ShoppingCart())->mergeSessionIntoAccount();
+
             return $this->redirect(['site/dashboard']);
         }
 
@@ -293,7 +278,7 @@ class SiteController extends Controller
 
         Yii::$app->session->setFlash(
             'warning',
-            'No dashboard is enabled for your account. You were returned to the public home page.',
+            'No dashboard is enabled for your account. Ask an administrator to assign your role and dashboard permission.',
         );
 
         return $this->redirect(['/site/index']);
@@ -308,12 +293,18 @@ class SiteController extends Controller
     {
         $this->layout = 'admin';
         $user = $this->getCurrentUser();
-        $model = new ProfileForm(['fullName' => $user->full_name]);
+        $model = new ProfileForm([
+            'fullName' => $user->full_name,
+            'username' => $user->username,
+            'email' => $user->email,
+        ]);
 
         if ($model->load($this->request->post()) && $model->validate()) {
             $user->full_name = $model->fullName;
+            $user->username = $model->username;
+            $user->email = $model->email;
 
-            if ($user->save(false, ['full_name', 'updated_at'])) {
+            if ($user->save(false, ['full_name', 'username', 'email', 'updated_at', 'updated_by'])) {
                 Yii::$app->session->setFlash('success', 'Your profile was updated.');
 
                 return $this->redirect(['profile']);
@@ -344,7 +335,7 @@ class SiteController extends Controller
             $user->setPassword($model->newPassword);
             $user->generateAuthKey();
 
-            if ($user->save(false, ['password_hash', 'auth_key', 'updated_at'])) {
+            if ($user->save(false, ['password_hash', 'auth_key', 'updated_at', 'updated_by'])) {
                 Yii::$app->user->logout();
                 Yii::$app->session->setFlash(
                     'success',
@@ -374,7 +365,7 @@ class SiteController extends Controller
         if ($model->load($this->request->post()) && $model->validate()) {
             $user->status = User::STATUS_DISABLED;
 
-            if ($user->save(false, ['status', 'updated_at'])) {
+            if ($user->save(false, ['status', 'updated_at', 'updated_by'])) {
                 Yii::$app->user->logout();
                 Yii::$app->session->setFlash(
                     'success',

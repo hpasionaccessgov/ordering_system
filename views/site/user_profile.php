@@ -20,16 +20,26 @@ $this->title = 'My Profile';
 
             <div class="card-body">
                 <dl class="row mb-4">
+
+                    <dt class="col-sm-3">Full Name</dt>
+                    <dd class="col-sm-9"><?= Html::encode($user->full_name) ?></dd>
+
                     <dt class="col-sm-3">Username</dt>
                     <dd class="col-sm-9"><?= Html::encode($user->username) ?></dd>
 
                     <dt class="col-sm-3">Email</dt>
                     <dd class="col-sm-9"><?= Html::encode($user->email) ?></dd>
+
                 </dl>
 
-                <?php $form = AdminActiveForm::begin(); ?>
+                <?php $form = AdminActiveForm::begin(['id' => 'profile-form']); ?>
 
                 <?= $form->field($model, 'fullName')->textInput(['maxlength' => true]) ?>
+
+                <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
+
+                <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
+
 
                 <?= Html::submitButton('Save profile', ['class' => 'btn btn-primary']) ?>
 

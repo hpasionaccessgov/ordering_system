@@ -5,16 +5,95 @@ declare(strict_types=1);
 use yii\helpers\Html;
 
 $currentRoute = Yii::$app->controller->route;
-$hasDashboardAccess = Yii::$app->user->can('admin.access')
-    || Yii::$app->user->can('staff.access')
-    || Yii::$app->user->can('customer.access');
+$can = static fn(string $permission): bool => Yii::$app->user->can($permission);
+
+$hasDashboardAccess = $can('admin.access') || $can('staff.access') || $can('customer.access');
 $dashboardRoute = match (true) {
-    Yii::$app->user->can('admin.access') => ['/admin/dashboard'],
-    Yii::$app->user->can('staff.access') => ['/staff/dashboard'],
-    Yii::$app->user->can('customer.access') => ['/customer/dashboard'],
+    $can('admin.access') => ['/admin/dashboard'],
+    $can('staff.access') => ['/staff/dashboard'],
+    $can('customer.access') => ['/customer/dashboard'],
     default => ['/site/index'],
 };
 $dashboardRouteName = ltrim($dashboardRoute[0], '/');
+
+// Categorizable menus. A group renders only when at least one of its items is visible.
+$navGroups = [
+    [
+        'label' => 'Catalog',
+        'icon' => 'bi-collection',
+        'items' => [
+            [
+                'label' => 'Product',
+                'icon' => 'bi-cup-hot',
+                'visible' => $can('product.index') || $can('product.create'),
+                'route' => $can('product.index') ? ['/product/index'] : ['/product/create'],
+                'active' => str_starts_with($currentRoute, 'product/'),
+            ],
+            [
+                'label' => 'Categories',
+                'icon' => 'bi-tags',
+                'visible' => $can('category.index') || $can('category.create'),
+                'route' => $can('category.index') ? ['/category/index'] : ['/category/create'],
+                'active' => str_starts_with($currentRoute, 'category/'),
+            ],
+        ],
+    ],
+    [
+        'label' => 'Sales',
+        'icon' => 'bi-cash-stack',
+        'items' => [
+            [
+                'label' => 'Orders',
+                'icon' => 'bi-receipt',
+                'visible' => $can('order.index'),
+                'route' => ['/order/index'],
+                'active' => str_starts_with($currentRoute, 'order/'),
+            ],
+            [
+                'label' => 'Cart',
+                'icon' => 'bi-cart',
+                'visible' => $can('cart.index'),
+                'route' => ['/cart/index'],
+                'active' => str_starts_with($currentRoute, 'cart/'),
+            ],
+        ],
+    ],
+    [
+        'label' => 'Administration',
+        'icon' => 'bi-gear',
+        'items' => [
+            [
+                'label' => 'User list',
+                'icon' => 'bi-person-lines-fill',
+                'visible' => $can('user.index') || $can('user.create'),
+                'route' => $can('user.index') ? ['/admin-user/list'] : ['/admin-user/create'],
+                'active' => $currentRoute === 'admin-user/list',
+            ],
+            [
+                'label' => 'Roles',
+                'icon' => 'bi-shield-lock',
+                'visible' => $can('user.assignRole'),
+                'route' => ['/admin-role/index'],
+                'active' => $currentRoute === 'admin-role/index',
+            ],
+            [
+                'label' => 'Activity logs',
+                'icon' => 'bi-clock-history',
+                'visible' => $can('activityLog.index'),
+                'route' => ['/activity-log/index'],
+                'active' => str_starts_with($currentRoute, 'activity-log/'),
+            ],
+            [
+                'label' => 'Settings',
+                'icon' => 'bi-sliders',
+                'visible' => $can('settings.index'),
+                'route' => ['/settings/index'],
+                'active' => str_starts_with($currentRoute, 'settings/'),
+            ],
+        ]
+
+    ],
+];
 ?>
 <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
     <div class="sidebar-brand">
@@ -41,94 +120,51 @@ $dashboardRouteName = ltrim($dashboardRoute[0], '/');
                     ) ?>
                 </li>
 
-
-                <?php if (
-                    Yii::$app->user->can('product.index')
-                    || Yii::$app->user->can('product.create')
-                ): ?>
-                    <li class="nav-item">
-                        <?= Html::a(
-                            '<i class="nav-icon bi bi-cup-hot"></i><p>Product</p>',
-                            Yii::$app->user->can('product.index')
-                                ? ['/product/index']
-                                : ['/product/create'],
-                            ['class' => 'nav-link' . (str_starts_with($currentRoute, 'product/') ? ' active' : '')],
-                        ) ?>
-                    </li>
-                <?php endif; ?>
-
-                <?php if (
-                    Yii::$app->user->can('category.index')
-                    || Yii::$app->user->can('category.create')
-                ): ?>
-                    <li class="nav-item">
-                        <?= Html::a(
-                            '<i class="nav-icon bi bi-tags"></i><p>Categories</p>',
-                            Yii::$app->user->can('category.index')
-                                ? ['/category/index']
-                                : ['/category/create'],
-                            ['class' => 'nav-link' . (str_starts_with($currentRoute, 'category/') ? ' active' : '')],
-                        ) ?>
-                    </li>
-                <?php endif; ?>
-
-                <?php if (Yii::$app->user->can('order.index')): ?>
-                    <li class="nav-item">
-                        <?= Html::a(
-                            '<i class="nav-icon bi bi-receipt"></i><p>Orders</p>',
-                            ['/order/index'],
-                            ['class' => 'nav-link' . (str_starts_with($currentRoute, 'order/') ? ' active' : '')],
-                        ) ?>
-                    </li>
-                <?php endif; ?>
-                <?php if (Yii::$app->user->can('cart.index')): ?>
-                    <li class="nav-item">
-                        <?= Html::a(
-                            '<i class="nav-icon bi bi-cart"></i><p>Cart</p>',
-                            ['/cart/index'],
-                            ['class' => 'nav-link' . (str_starts_with($currentRoute, 'cart/') ? ' active' : '')],
-                        ) ?>
-                    </li>
-                <?php endif; ?>
-
-                <?php if (
-                    Yii::$app->user->can('user.index')
-                    || Yii::$app->user->can('user.create')
-                ): ?>
-                    <li class="nav-item">
-                        <?= Html::a(
-                            '<i class="nav-icon bi bi-person-lines-fill"></i><p>User list</p>',
-                            Yii::$app->user->can('user.index')
-                                ? ['/admin-user/list']
-                                : ['/admin-user/create'],
-                            ['class' => 'nav-link' . ($currentRoute === 'admin-user/list' ? ' active' : '')],
-                        ) ?>
-                    </li>
-                <?php endif; ?>
-                <?php if (Yii::$app->user->can('user.assignRole')): ?>
-                    <li class="nav-item">
-                        <?= Html::a(
-                            '<i class="nav-icon bi bi-shield-lock"></i><p>Roles</p>',
-                            ['/admin-role/index'],
-                            ['class' => 'nav-link' . ($currentRoute === 'admin-role/index' ? ' active' : '')],
-                        ) ?>
-                    </li>
-                <?php endif; ?>
-
-                <li class="nav-item">
-                    <?= Html::a(
-                        '<i class="nav-icon bi bi-person"></i><p>Profile</p>',
-                        ['/site/profile'],
-                        ['class' => 'nav-link' . ($currentRoute === 'site/profile' ? ' active' : '')],
-                    ) ?>
-                </li>
-                <!-- <li class="nav-item">
-                    <?= Html::a(
-                        '<i class="nav-icon bi bi-key"></i><p>Change password</p>',
-                        ['/site/change-password'],
-                        ['class' => 'nav-link' . ($currentRoute === 'site/change-password' ? ' active' : '')],
-                    ) ?>
-                </li> -->
+                <?php foreach ($navGroups as $group) : ?>
+                    <?php
+                    $visibleItems = array_values(array_filter(
+                        $group['items'],
+                        static fn(array $item): bool => $item['visible'],
+                    ));
+                    if ($visibleItems === []) {
+                        continue;
+                    }
+                    ?>
+                    <?php if (count($visibleItems) === 1) : ?>
+                        <?php $item = $visibleItems[0]; ?>
+                        <li class="nav-item">
+                            <?= Html::a(
+                                '<i class="nav-icon bi ' . $item['icon'] . '"></i><p>'
+                                    . Html::encode($item['label']) . '</p>',
+                                $item['route'],
+                                ['class' => 'nav-link' . ($item['active'] ? ' active' : '')],
+                            ) ?>
+                        </li>
+                    <?php else : ?>
+                        <?php $groupActive = array_filter($visibleItems, static fn(array $item): bool => $item['active']) !== []; ?>
+                        <li class="nav-item menu-open<?= $groupActive ? ' has-active-child' : '' ?>">
+                            <?= Html::a(
+                                '<i class="nav-icon bi ' . $group['icon'] . '"></i><p>'
+                                    . Html::encode($group['label'])
+                                    . '<i class="nav-arrow bi bi-chevron-right"></i></p>',
+                                '#',
+                                ['class' => 'nav-link'],
+                            ) ?>
+                            <ul class="nav nav-treeview">
+                                <?php foreach ($visibleItems as $item) : ?>
+                                    <li class="nav-item">
+                                        <?= Html::a(
+                                            '<i class="nav-icon bi ' . $item['icon'] . '"></i><p>'
+                                                . Html::encode($item['label']) . '</p>',
+                                            $item['route'],
+                                            ['class' => 'nav-link' . ($item['active'] ? ' active' : '')],
+                                        ) ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </li>
+                    <?php endif; ?>
+                <?php endforeach; ?>
             </ul>
         </nav>
     </div>

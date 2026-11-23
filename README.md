@@ -35,7 +35,7 @@ Alternatively, you can start the development server via cli:
     php yii serve
     ```
 
-5. Create the database:
+1. Create the database:
     ```bash
     mysql -u root -p -e "CREATE DATABASE ordering_system;"
     ```
@@ -45,14 +45,14 @@ Alternatively, you can start the development server via cli:
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
     ```
-6. Configure the database in `.env`. For Laragon, a typical local configuration is:
+2. Configure the database in `.env`. For Laragon, a typical local configuration is:
     ```dotenv
     DB_DSN="mysql:host=127.0.0.1;port=3306;dbname=ordering_system"
     DB_USERNAME=root
     DB_PASSWORD=
     ```
     If your MySQL root account has a password, set it in `DB_PASSWORD`.
-7. Run the application migrations:
+3. Run the application migrations:
     ```bash
     php yii migrate
     ```
@@ -62,14 +62,17 @@ Alternatively, you can start the development server via cli:
     php yii migrate/mark m261112_000000_create_rbac_tables
     ```
     New databases do not need the `migrate/mark` step.
-8. Seed local test data:
+    Order status changes create in-app notifications for the customer.
+    Sign in and open Notifications to view them or mark them as read.
+    Notifications are created for future status changes, not past history.
+4. Seed local test data:
     ```bash
     php yii seed/test-data
     ```
     The seeder is additive and idempotent. It adds only missing users and
     products and does not archive, update, delete, or reassign existing data.
     OR use the laragon GUI to start the server.
-9.  Sign in or reload the page.
+5.  Sign in or reload the page.
 
 Seed credentials:
 

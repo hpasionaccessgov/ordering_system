@@ -24,10 +24,10 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
 ?>
 
 <section class="order-detail-page">
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-center">
         <div>
-            <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Order details</p>
-            <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
+            <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Order details</p>
+            <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
         </div>
         <div class="d-flex flex-wrap gap-2">
             <?php if (
@@ -50,12 +50,12 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
         </div>
     </div>
 
-    <section class="card admin-panel order-detail-panel mb-4">
+    <section class="order-detail-panel mb-4 card admin-panel">
         <div class="card-body">
             <div class="row g-3">
                 <div class="col-6 col-lg-3">
                     <span class="d-block text-body-secondary small">Status</span>
-                    <span class="badge order-status">
+                    <span class="order-status badge">
                         <?= Html::encode($statusLabels[$model->status] ?? $model->status) ?>
                     </span>
                 </div>
@@ -75,18 +75,22 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
         </div>
     </section>
 
-    <section class="card admin-panel order-detail-panel">
+    <section class="order-detail-panel mb-4 card admin">
         <div class="card-header bg-transparent">
-            <h2 class="h5 mb-0">Items in this order</h2>
+            <h2 class="mb-0 h5">Items in this order</h2>
         </div>
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle mb-0 cafebara-data-table">
+        <div class="table-responsive cafebara-table-scroll">
+            <table class="mb-0 table table-striped table-hover table-bordered align-middle cafebara-data-table">
                 <thead>
                     <tr>
                         <th>Product</th>
                         <th>Quantity</th>
                         <th>Unit price</th>
                         <th>Subtotal</th>
+                        <?php if ($canViewCustomerInformation) : ?>
+                            <th>Created by</th>
+                            <th>Updated by</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -100,19 +104,23 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
                                     $item->subtotal,
                                 ) ?>
                             </td>
+                            <?php if ($canViewCustomerInformation) : ?>
+                                <td><?= Html::encode($item->createdBy?->username ?? 'System') ?></td>
+                                <td><?= Html::encode($item->updatedBy?->username ?? 'System') ?></td>
+                            <?php endif; ?>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="3" class="text-end">Total</th>
+                        <th colspan="<?= $canViewCustomerInformation ? 5 : 3 ?>" class="text-end">Total</th>
                         <th><?= Yii::$app->formatter->asCurrency($model->total_amount) ?></th>
                     </tr>
                 </tfoot>
             </table>
         </div>
         <div class="card-body">
-            <p class="small text-body-secondary mb-3">
+            <p class="mb-3 text-body-secondary small">
                 This is an order summary. Payment is not recorded by this system.
             </p>
             <div class="d-flex flex-wrap gap-2">
@@ -136,14 +144,14 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
 
     <section class="card admin-panel">
         <div class="card-header bg-transparent">
-            <h2 class="h5 mb-0">Status history</h2>
+            <h2 class="mb-0 h5">Status history</h2>
         </div>
         <?php if ($model->statusHistory === []) : ?>
             <div class="card-body text-body-secondary">No status changes have been recorded.</div>
         <?php else : ?>
             <div class="list-group list-group-flush">
                 <?php foreach ($model->statusHistory as $history) : ?>
-                    <div class="list-group-item d-flex flex-wrap justify-content-between gap-2">
+                    <div class="d-flex flex-wrap gap-2 list-group-item justify-content-between">
                         <div>
                             <strong>
                                 <?= Html::encode($statusLabels[$history->to_status] ?? $history->to_status) ?>
@@ -154,7 +162,7 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
                                 </span>
                             <?php endif; ?>
                         </div>
-                        <div class="text-end small text-body-secondary">
+                        <div class="text-end text-body-secondary small">
                             <div><?= Yii::$app->formatter->asDatetime($history->created_at) ?></div>
                             <?php if (Yii::$app->user->can('order.process')) : ?>
                                 <div>

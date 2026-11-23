@@ -10,22 +10,27 @@ use yii\grid\GridView;
 class AdminGridView extends GridView
 {
     public $options = [
-        'class' => 'grid-view cafebara-admin-grid table-responsive',
+        'class' => 'grid-view cafebara-admin-grid table-responsive cafebara-table-scroll',
     ];
 
     public $tableOptions = [
-        'class' => 'table table-striped table-hover align-middle mb-0 cafebara-data-table',
+        'class' => 'table table-striped table-hover table-bordered align-middle mb-0 cafebara-data-table',
     ];
 
-    public $layout = "{summary}\n{items}\n<div class=\"d-flex justify-content-end p-3\">{pager}</div>";
+    public $headerRowOptions = [
+        'class' => 'cafebara-table-header',
+    ];
+
+    public $layout = "{items}\n<div class=\"d-flex flex-wrap justify-content-between align-items-center gap-2 px-3 py-3\">{summary}{pager}</div>";
 
     public $summaryOptions = [
-        'class' => 'px-3 pt-3 mb-0 text-body-secondary small',
+        'class' => 'mb-0 text-body-secondary small',
     ];
 
     public $pager = [
         'class' => LinkPager::class,
         'prevPageLabel' => 'Previous',
         'nextPageLabel' => 'Next',
+        'options' => ['class' => 'pagination mb-0'],
     ];
 }

@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\models\Order;
-use app\models\User;
+use app\models\Notification;
+use app\models\OrderSearch;
 use app\services\ShoppingCart;
 use app\services\OrderAccessPolicy;
 use app\services\OrderService;
 use app\services\OrderStatusService;
 use Yii;
-use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\ForbiddenHttpException;
@@ -102,55 +102,19 @@ class OrderController extends Controller
     {
         $this->layout = 'admin';
 
-        $query = OrderAccessPolicy::scopeToOwner(
-            Order::find()->with('user'),
+        $searchModel = new OrderSearch();
+        $dataProvider = $searchModel->search(
+            $this->request->queryParams,
             Yii::$app->user->id,
             $this->canViewAllOrders(),
         );
-        $requestedSearch = $this->request->get('q', '');
-        $search = is_string($requestedSearch) ? trim($requestedSearch) : '';
-        if ($search !== '') {
-            $conditions = [
-                'or',
-                ['like', 'status', $search],
-                ['like', 'order_number', $search],
-                [
-                    'user_id' => User::find()
-                        ->select('id')
-                        ->andWhere([
-                            'or',
-                            ['like', 'username', $search],
-                            ['like', 'full_name', $search],
-                            ['like', 'email', $search],
-                        ]),
-                ],
-            ];
-            if (ctype_digit($search)) {
-                $conditions[] = ['id' => $search];
-            }
-            $query->andWhere($conditions);
-        }
-        $requestedStatus = $this->request->get('status');
-        $status = is_string($requestedStatus)
-            ? $requestedStatus
-            : '';
-        if (in_array($status, Order::statusValues(), true)) {
-            $query->andWhere(['status' => $status]);
-        } else {
-            $status = '';
-        }
 
         return $this->render('index', [
-            'dataProvider' => new ActiveDataProvider([
-                'query' => $query,
-                'pagination' => ['pageSize' => 10, 'pageSizeLimit' => [10, 10]],
-                'sort' => [
-                    'attributes' => ['id', 'order_number', 'status', 'total_amount', 'created_at'],
-                    'defaultOrder' => ['created_at' => SORT_DESC, 'id' => SORT_DESC],
-                ],
-            ]),
-            'search' => $search,
-            'status' => $status,
+            'dataProvider' => $dataProvider,
+            'search' => $searchModel->q,
+            'status' => $searchModel->statusFilter,
+            'filters' => $searchModel->filters,
+            'canViewAudit' => $this->canViewAllOrders(),
         ]);
     }
 
@@ -158,6 +122,10 @@ class OrderController extends Controller
     {
         $this->layout = 'admin';
         $order = $this->findAccessibleOrder($id);
+        Notification::updateAll(
+            ['read_at' => time()],
+            ['order_id' => $order->id, 'user_id' => Yii::$app->user->id, 'read_at' => null],
+        );
 
         return $this->render('view', [
             'model' => $order,
@@ -309,7 +277,13 @@ class OrderController extends Controller
             $this->canViewAllOrders(),
         );
 
-        $order = $query->with(['items.product', 'user', 'statusHistory.changedBy'])->one();
+        $order = $query->with([
+            'items.product',
+            'items.createdBy',
+            'items.updatedBy',
+            'user',
+            'statusHistory.changedBy',
+        ])->one();
 
         if ($order === null) {
             throw new NotFoundHttpException('Order not found.');
