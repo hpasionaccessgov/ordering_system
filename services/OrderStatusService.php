@@ -91,10 +91,12 @@ final class OrderStatusService
                 throw new BadRequestHttpException('Order status could not be updated.');
             }
             $this->record($fresh, $fromStatus, $toStatus, $changedBy);
-            Yii::$app->db->createCommand()->insert('{{%order_notifications}}', [
+            Yii::$app->db->createCommand()->insert('{{%notifications}}', [
                 'user_id' => $fresh->user_id,
                 'order_id' => $fresh->id,
                 'status' => $toStatus,
+                'target_route' => '/order/view',
+                'target_id' => $fresh->id,
                 'created_at' => time(),
             ])->execute();
             if (!$isProcessing && $changedBy === (int) $fresh->user_id) {
@@ -124,13 +126,13 @@ final class OrderStatusService
             }
             if (($auth->checkAccess($userId, 'admin.access') || $auth->checkAccess($userId, 'staff.access'))
                 && $auth->checkAccess($userId, 'order.view')) {
-                $rows[] = [$userId, $order->id, $order->status, $createdAt];
+                $rows[] = [$userId, $order->id, $order->status, '/order/view', $order->id, $createdAt];
             }
         }
         if ($rows !== []) {
             Yii::$app->db->createCommand()->batchInsert(
-                '{{%order_notifications}}',
-                ['user_id', 'order_id', 'status', 'created_at'],
+                '{{%notifications}}',
+                ['user_id', 'order_id', 'status', 'target_route', 'target_id', 'created_at'],
                 $rows,
             )->execute();
         }

@@ -79,28 +79,45 @@ JS);
 <div class="row g-3">
     <?php foreach ($products as $product) : ?>
         <?php $quantity = max(0, (int) ($quantities[$product->id] ?? 0)); ?>
+        <?php $canViewProduct = Yii::$app->user->can('product.view'); ?>
         <div class="col-12 col-md-6 col-xl-4">
             <article
-                class="card order-product-card h-100"
+                class="card order-product-card h-100<?= $canViewProduct ? ' position-relative' : '' ?>"
                 data-order-product
                 data-price="<?= Html::encode((string) $product->price) ?>">
-                <?php if ($product->getImageUrl() !== null) : ?>
-                    <?= Html::img($product->getImageUrl(), [
-                        'class' => 'order-product-image',
-                        'alt' => $product->name,
-                        'loading' => 'lazy',
-                    ]) ?>
-                <?php else : ?>
-                    <div class="order-product-placeholder" aria-hidden="true">
-                        <i class="bi bi-cup-hot"></i>
-                    </div>
-                <?php endif; ?>
+                <div class="order-product-media">
+                    <?php if ($product->getImageUrl() !== null) : ?>
+                        <?= Html::img($product->getImageUrl(), [
+                            'class' => 'order-product-image',
+                            'alt' => $product->name,
+                            'loading' => 'lazy',
+                        ]) ?>
+                    <?php else : ?>
+                        <div class="order-product-placeholder" aria-hidden="true">
+                            <i class="bi bi-cup-hot"></i>
+                        </div>
+                    <?php endif; ?>
+                    <?php if ($canViewProduct) : ?>
+                        <div class="product-card-overlay" aria-hidden="true">
+                            <i class="bi bi-zoom-in product-card-overlay-icon"></i>
+                            <span class="product-card-overlay-label">View</span>
+                        </div>
+                    <?php endif; ?>
+                </div>
 
                 <div class="card-body d-flex flex-column">
                     <p class="product-category mb-2">
                         <?= Html::encode($product->categoryRecord?->name ?? 'Cafébara menu') ?>
                     </p>
-                    <h2 class="h5"><?= Html::encode($product->name) ?></h2>
+                    <h2 class="h5">
+                        <?php if ($canViewProduct) : ?>
+                            <?= Html::a(Html::encode($product->name), ['/product/view', 'id' => $product->id], [
+                                'class' => 'stretched-link link-body-emphasis text-decoration-none',
+                            ]) ?>
+                        <?php else : ?>
+                            <?= Html::encode($product->name) ?>
+                        <?php endif; ?>
+                    </h2>
                     <p class="text-body-secondary small flex-grow-1">
                         <?= Html::encode($product->description ?? '') ?>
                     </p>
@@ -113,7 +130,7 @@ JS);
                         "items[{$product->id}][product_id]",
                         (string) $product->id,
                     ) ?>
-                    <div class="d-flex justify-content-between align-items-end gap-3">
+                    <div class="d-flex justify-content-between align-items-end gap-3 position-relative z-2">
                         <?= Html::label(
                             'Quantity',
                             "quantity-{$product->id}",

@@ -24,5 +24,6 @@ Do not rewrite the application or introduce a new framework without explicit app
 - Local development: Laragon on Windows
 - MySQL client:
   `C:\laragon\bin\mysql\mysql-8.0.30-winx64\bin\mysql.exe`
+- Web and mobile responsiveness: Bootstrap with custom Cafébara theme ensures the application is responsive across different devices and screen sizes.
 
 Use Windows paths for commands. Use `/` path separators only inside Markdown link targets.

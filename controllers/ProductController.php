@@ -8,6 +8,7 @@ use app\models\Category;
 use app\models\OrderItem;
 use app\models\Product;
 use app\models\ProductSearch;
+use app\services\NotificationService;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -200,6 +201,12 @@ class ProductController extends Controller
             throw new BadRequestHttpException('Product could not be archived.');
         }
 
+        NotificationService::notifyManagers(
+            NotificationService::TYPE_PRODUCT_ARCHIVED,
+            'Product ' . $model->name . ' archived.',
+            '/product/view',
+            (int) $model->id,
+        );
         Yii::$app->session->setFlash('success', 'Product archived.');
 
         return $this->redirect($this->getProductListReturnRoute());
@@ -217,6 +224,12 @@ class ProductController extends Controller
             throw new BadRequestHttpException('Product could not be restored.');
         }
 
+        NotificationService::notifyManagers(
+            NotificationService::TYPE_PRODUCT_RESTORED,
+            'Product ' . $model->name . ' restored.',
+            '/product/view',
+            (int) $model->id,
+        );
         Yii::$app->session->setFlash('success', 'Product restored.');
 
         return $this->redirect($this->getProductListReturnRoute());
@@ -251,6 +264,7 @@ class ProductController extends Controller
                 return $this->redirect($this->getProductListReturnRoute());
             }
 
+            $productName = $model->name;
             if ($model->delete() === false) {
                 throw new BadRequestHttpException('Product could not be permanently deleted.');
             }
@@ -264,6 +278,11 @@ class ProductController extends Controller
             throw $exception;
         }
 
+        NotificationService::notifyManagers(
+            NotificationService::TYPE_PRODUCT_DELETED,
+            'Product ' . $productName . ' deleted.',
+            '/product/index',
+        );
         Yii::$app->session->setFlash('success', 'Product permanently deleted.');
 
         return $this->redirect($this->getProductListReturnRoute());
@@ -332,6 +351,7 @@ class ProductController extends Controller
 
     private function saveProduct(Product $model): bool
     {
+        $isNew = $model->isNewRecord;
         if (!$model->validate()) {
             return false;
         }
@@ -355,6 +375,22 @@ class ProductController extends Controller
 
         if (!$model->save(false)) {
             return false;
+        }
+
+        if ($isNew) {
+            NotificationService::notifyAll(
+                NotificationService::TYPE_PRODUCT_CREATED,
+                'New product ' . $model->name . ' added.',
+                '/product/view',
+                (int) $model->id,
+            );
+        } else {
+            NotificationService::notifyManagers(
+                NotificationService::TYPE_PRODUCT_UPDATED,
+                'Product ' . $model->name . ' updated.',
+                '/product/view',
+                (int) $model->id,
+            );
         }
 
         return true;

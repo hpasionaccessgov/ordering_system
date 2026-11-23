@@ -5,6 +5,7 @@ use app\models\User;
 use app\services\RbacPermissionPolicy;
 use app\widgets\AdminActiveForm;
 use yii\helpers\Html;
+use yii\widgets\Tooltip;
 
 /** @var yii\web\View $this */
 /** @var RoleForm $roleForm */
@@ -34,6 +35,12 @@ $this->registerJs(<<<JS
     const indexDependencies = {$indexDependenciesJson};
     const viewDependencies = {$viewDependenciesJson};
     const defaultRolePermissions = {$defaultRolePermissionsJson};
+    if (window.bootstrap && window.bootstrap.Tooltip) {
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(element => {
+            new window.bootstrap.Tooltip(element);
+        });
+    }
+
     const form = document.querySelector('form[data-role-matrix-form]');
     if (!form) {
         return;
@@ -188,6 +195,7 @@ $permissionDescriptions = [
     'activityLog.view' => 'View an individual activity log.',
     'notification.index' => 'View personal notifications and unread count.',
     'notification.read' => 'Mark personal notifications as read.',
+    'notification.delete' => 'Delete notifications from the inbox.',
     'settings.index' => 'View application settings.',
     'settings.update' => 'Change application settings.',
 ];
@@ -431,6 +439,7 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
                                             ) ?>
                                             <label class="form-check-label small" for="<?= Html::encode($permissionId) ?>"
                                                 title="<?= Html::encode($permissionDescriptions[$permission->name] ?? $permission->name) ?>"
+                                                data-bs-toggle="tooltip" data-bs-placement="top"
                                                 style="cursor: pointer;">
                                                 <code><?= Html::encode($permission->name) ?></code>
                                             </label>

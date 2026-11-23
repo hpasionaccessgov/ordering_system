@@ -24,6 +24,69 @@ class LoginForm extends Model
     public function __construct(private readonly Security $security, $config = [])
     {
         parent::__construct($config);
+
+        if (Yii::$app instanceof \yii\web\Application) {
+            Yii::$app->view->registerJs(<<<'JS'
+(() => {
+    const timers = new Map();
+    const message = /^\s*Too many login attempts\. Try again in (\d+) seconds\.\s*$/;
+
+    function inspect(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            const existing = timers.get(node);
+            if (existing && node.nodeValue === existing.rendered) {
+                return;
+            }
+            const match = node.nodeValue.match(message);
+            if (match) {
+                timers.set(node, {
+                    end: Date.now() + Number(match[1]) * 1000,
+                    rendered: node.nodeValue
+                });
+            } else {
+                timers.delete(node);
+            }
+            return;
+        }
+        const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+        while (walker.nextNode()) {
+            inspect(walker.currentNode);
+        }
+    }
+
+    inspect(document.body);
+    new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            if (mutation.type === 'characterData') {
+                inspect(mutation.target);
+            } else {
+                mutation.addedNodes.forEach(inspect);
+            }
+        });
+    }).observe(document.body, { childList: true, characterData: true, subtree: true });
+
+    setInterval(() => {
+        timers.forEach((timer, node) => {
+            if (!node.isConnected) {
+                timers.delete(node);
+                return;
+            }
+            const remaining = Math.max(0, Math.ceil((timer.end - Date.now()) / 1000));
+            const text = remaining > 0
+                ? `Too many login attempts. Try again in ${remaining} seconds.`
+                : 'You can try logging in again.';
+            timer.rendered = text;
+            if (node.nodeValue !== text) {
+                node.nodeValue = text;
+            }
+            if (remaining === 0) {
+                timers.delete(node);
+            }
+        });
+    }, 1000);
+})();
+JS, \yii\web\View::POS_READY, 'login-attempt-countdown');
+        }
     }
 
     /**

@@ -6,6 +6,7 @@ namespace app\tests\Functional;
 
 use app\models\ActivityLog;
 use app\models\ActivityLogSearch;
+use app\models\ApplicationSettings;
 use app\models\User;
 use app\services\ActivityLogger;
 use app\tests\Support\FunctionalTester;
@@ -106,13 +107,69 @@ final class ActivityLogCest
         $I->assertNull($log->user_id);
     }
 
+    public function expiredLogsAreDeletedDuringRequests(FunctionalTester $I): void
+    {
+        $settings = ApplicationSettings::current();
+        $settings->logs_expiration_days = 90;
+        $I->assertTrue($settings->save());
+        $suffix = bin2hex(random_bytes(4));
+        $expired = [];
+        foreach ([ActivityLog::VISIT, ActivityLog::LOGIN, ActivityLog::LOGOUT] as $event) {
+            $log = new ActivityLog([
+                'event' => $event,
+                'route' => 'expired-' . $suffix,
+                'created_at' => time() - 90 * 86400 - 10,
+            ]);
+            $I->assertTrue($log->save(false));
+            $expired[] = $log->id;
+        }
+        $retained = new ActivityLog([
+            'event' => ActivityLog::VISIT,
+            'route' => 'retained-' . $suffix,
+            'created_at' => time() - 90 * 86400 + 30,
+        ]);
+        $I->assertTrue($retained->save(false));
+        $I->amOnRoute('site/index');
+        foreach ($expired as $id) {
+            $I->assertNull(ActivityLog::findOne($id));
+        }
+        $I->assertNotNull(ActivityLog::findOne($retained->id));
+
+        $later = new ActivityLog([
+            'event' => ActivityLog::VISIT,
+            'route' => 'later-' . $suffix,
+            'created_at' => time() - 91 * 86400,
+        ]);
+        $I->assertTrue($later->save(false));
+        $I->amOnRoute('site/index');
+        $I->assertNotNull(ActivityLog::findOne($later->id));
+        $settings->logs_expiration_days = 30;
+        $I->assertTrue($settings->save());
+        $I->amOnRoute('site/index');
+        $I->assertNull(ActivityLog::findOne($later->id));
+        $I->assertNull(ActivityLog::findOne($retained->id));
+    }
+
+    public function retentionMigrationCanBeRetriedWithoutLosingSettings(FunctionalTester $I): void
+    {
+        require_once Yii::getAlias('@app/migrations/m261120_170000_add_activity_log_retention.php');
+        $settings = ApplicationSettings::current();
+        $settings->logs_expiration_days = 37;
+        $I->assertTrue($settings->save());
+        $migration = new \m261120_170000_add_activity_log_retention();
+        $migration->safeUp();
+        $migration->safeUp();
+        $I->assertEquals(37, ApplicationSettings::current()->logs_expiration_days);
+    }
+
     public function searchPaginationAndGranularPermissions(FunctionalTester $I): void
     {
         $admin = $this->user($I, 'admin');
         $staff = $this->user($I, 'staff');
         $suffix = bin2hex(random_bytes(4));
         $route = 'fixture-' . $suffix;
-        $timestamp = (new \DateTimeImmutable('2024-01-15 12:00:00', new \DateTimeZone(Yii::$app->formatter->timeZone ?: Yii::$app->timeZone)))->getTimestamp();
+        $date = new \DateTimeImmutable('today', new \DateTimeZone(Yii::$app->formatter->timeZone ?: Yii::$app->timeZone));
+        $timestamp = $date->setTime(12, 0)->getTimestamp();
         $logs = [];
         for ($i = 0; $i < 12; $i++) {
             $log = new ActivityLog([
@@ -129,8 +186,8 @@ final class ActivityLogCest
         $I->amOnRoute('activity-log/index', [
             'ActivityLogSearch' => ['username' => $staff->username, 'route' => $route, 'user_id' => $staff->id],
             'event' => 'visit',
-            'created_from' => '2024-01-15',
-            'created_to' => '2024-01-15',
+            'created_from' => $date->format('Y-m-d'),
+            'created_to' => $date->format('Y-m-d'),
             'per-page' => 100,
         ]);
         $I->seeResponseCodeIs(200);

@@ -2,9 +2,9 @@
 
 use yii\helpers\Html;
 
-/** @var \app\models\AdminUser $model */
 /** @var string $search */
 /** @var array $roles */
+/** @var mixed $model */
 
 $sort = Yii::$app->request->get('sort');
 ?>

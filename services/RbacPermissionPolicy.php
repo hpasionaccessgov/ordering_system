@@ -36,7 +36,7 @@ final class RbacPermissionPolicy
             'cart.checkout',
         ],
         'activityLog.index' => ['activityLog.view'],
-        'notification.index' => ['notification.read'],
+        'notification.index' => ['notification.read', 'notification.delete'],
         'settings.index' => ['settings.update'],
     ];
 

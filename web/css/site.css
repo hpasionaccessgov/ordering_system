@@ -1,4 +1,4 @@
-main > .container {
+main>.container {
     padding: 2rem 15px 3rem;
     display: flex;
     flex-direction: column;
@@ -11,7 +11,8 @@ main > .container {
 }
 
 /* add sorting icons to gridview sort links */
-a.asc:after, a.desc:after {
+a.asc:after,
+a.desc:after {
     content: '';
     left: 3px;
     display: inline-block;
@@ -51,7 +52,7 @@ a.desc:after {
 }
 
 /* align the logout "link" (button in form) of the navbar */
-.nav li > form > button.logout {
+.nav li>form>button.logout {
     color: var(--bs-navbar-color);
 }
 
@@ -70,10 +71,17 @@ a.desc:after {
 }
 
 /* footer logo: light logo by default (light bg-body-tertiary), dark logo for dark theme */
-.footer-logo-dark { display: none; }
+.footer-logo-dark {
+    display: none;
+}
 
-[data-bs-theme="dark"] .footer-logo-light { display: none; }
-[data-bs-theme="dark"] .footer-logo-dark  { display: inline-block; }
+[data-bs-theme="dark"] .footer-logo-light {
+    display: none;
+}
+
+[data-bs-theme="dark"] .footer-logo-dark {
+    display: inline-block;
+}
 
 /* login inputs: seamless icon inside input (Volt style) */
 .login-split-card .input-group {
@@ -109,7 +117,7 @@ a.desc:after {
 
 /* validation styles for login split card (browsers with :has()) */
 @supports selector(.input-group:has(.is-invalid)) {
-    .login-split-card .input-group:has(.is-invalid) ~ .invalid-feedback {
+    .login-split-card .input-group:has(.is-invalid)~.invalid-feedback {
         display: block;
         margin-top: .35rem;
         margin-bottom: .5rem;
@@ -181,8 +189,8 @@ a.desc:after {
 
 .login-brand-logo,
 .login-mobile-logo {
-    width: 64px;
-    height: 64px;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
 }
 
@@ -244,6 +252,7 @@ a.desc:after {
 }
 
 @media (min-width: 576px) {
+
     .site-error .site-error-content,
     .site-about .site-about-content,
     .site-contact-success .site-contact-success-content {
@@ -252,6 +261,7 @@ a.desc:after {
 }
 
 @media (min-width: 768px) {
+
     .site-error .site-error-content,
     .site-about .site-about-content,
     .site-contact-success .site-contact-success-content {
@@ -260,6 +270,7 @@ a.desc:after {
 }
 
 @media (min-width: 992px) {
+
     .site-error .site-error-content,
     .site-about .site-about-content,
     .site-contact-success .site-contact-success-content {

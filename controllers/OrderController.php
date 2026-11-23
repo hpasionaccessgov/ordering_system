@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\models\Order;
-use app\models\OrderNotification;
+use app\models\Notification;
 use app\models\OrderSearch;
 use app\services\ShoppingCart;
 use app\services\OrderAccessPolicy;
@@ -122,7 +122,7 @@ class OrderController extends Controller
     {
         $this->layout = 'admin';
         $order = $this->findAccessibleOrder($id);
-        OrderNotification::updateAll(
+        Notification::updateAll(
             ['read_at' => time()],
             ['order_id' => $order->id, 'user_id' => Yii::$app->user->id, 'read_at' => null],
         );

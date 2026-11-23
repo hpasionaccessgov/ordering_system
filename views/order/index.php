@@ -7,6 +7,8 @@ use yii\helpers\Html;
 /** @var yii\data\ActiveDataProvider $dataProvider */
 /** @var string $search */
 /** @var string $status */
+/** @var array $filters */
+/** @var bool $canViewAudit */
 
 $this->title = 'Orders';
 $this->params['breadcrumbs'][] = $this->title;
@@ -60,10 +62,10 @@ if (Yii::$app->user->can('order.view')) {
 }
 ?>
 
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+<div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-center">
     <div>
-        <p class="text-uppercase small fw-semibold text-body-secondary mb-1">CUSTOMER ORDERS</p>
-        <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
+        <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">CUSTOMER ORDERS</p>
+        <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
     </div>
     <?php if (Yii::$app->user->can('cart.index')) : ?>
         <?= Html::a('Open cart', ['/cart/index'], ['class' => 'btn btn-primary']) ?>
@@ -71,12 +73,15 @@ if (Yii::$app->user->can('order.view')) {
 </div>
 
 <?= $this->render('_search', [
-    'search' => $search, 'status' => $status, 'filters' => $filters, 'canViewAudit' => $canViewAudit,
+    'search' => $search,
+    'status' => $status,
+    'filters' => $filters,
+    'canViewAudit' => $canViewAudit,
 ]) ?>
 
 <div class="order-table-card">
     <div class="card-header">
-        <p class="text-body-secondary mb-0">Review order details.</p>
+        <p class="mb-0 text-body-secondary">Review order details.</p>
     </div>
     <?= AdminGridView::widget([
         'dataProvider' => $dataProvider,

@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
-use app\models\OrderNotification;
-use app\models\ApplicationSettings;
+use app\models\Notification;
+use app\models\NotificationSearch;
 use app\services\OrderAccessPolicy;
 use Yii;
-use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
@@ -24,12 +23,13 @@ class NotificationController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     ['allow' => true, 'actions' => ['index', 'unread-count'], 'roles' => ['notification.index']],
-                    ['allow' => true, 'actions' => ['read'], 'roles' => ['notification.read']],
+                    ['allow' => true, 'actions' => ['view', 'read'], 'roles' => ['notification.read']],
+                    ['allow' => true, 'actions' => ['delete'], 'roles' => ['notification.delete']],
                 ],
             ],
             'verbs' => [
                 'class' => VerbFilter::class,
-                'actions' => ['read' => ['post']],
+                'actions' => ['read' => ['post'], 'delete' => ['post']],
             ],
         ];
     }
@@ -38,15 +38,35 @@ class NotificationController extends Controller
     {
         $this->layout = 'admin';
 
+        $searchModel = new NotificationSearch();
+        $dataProvider = $searchModel->search(
+            $this->request->queryParams,
+            Yii::$app->user->id,
+            $this->canViewAllNotifications(),
+        );
+
         return $this->render('index', [
-            'dataProvider' => new ActiveDataProvider([
-                'query' => $this->visibleNotifications()
-                    ->with('order')
-                    ->orderBy(['id' => SORT_DESC]),
-                'pagination' => ApplicationSettings::pagination(),
-                'sort' => false,
-            ]),
+            'dataProvider' => $dataProvider,
+            'search' => $searchModel->q,
+            'status' => $searchModel->status,
+            'read' => $searchModel->readFilter,
         ]);
+    }
+
+    public function actionView(int $id): Response
+    {
+        $notification = $this->visibleNotifications()->andWhere(['id' => $id])->one();
+        if ($notification === null) {
+            throw new NotFoundHttpException('Notification not found.');
+        }
+        if ($notification->read_at === null) {
+            $notification->read_at = time();
+            if (!$notification->save(false, ['read_at'])) {
+                throw new \RuntimeException('Notification could not be marked as read.');
+            }
+        }
+
+        return $this->redirect($notification->targetUrl);
     }
 
     public function actionRead(int $id): Response
@@ -65,6 +85,19 @@ class NotificationController extends Controller
         return $this->redirect(['index']);
     }
 
+    public function actionDelete(int $id): Response
+    {
+        $notification = $this->visibleNotifications()->andWhere(['id' => $id])->one();
+        if ($notification === null) {
+            throw new NotFoundHttpException('Notification not found.');
+        }
+        if ($notification->delete() === false) {
+            throw new \RuntimeException('Notification could not be deleted.');
+        }
+
+        return $this->redirect(['index']);
+    }
+
     public function actionUnreadCount(): array
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
@@ -75,11 +108,14 @@ class NotificationController extends Controller
 
     private function visibleNotifications(): \yii\db\ActiveQuery
     {
-        $canViewAll = Yii::$app->user->can('order.view') && OrderAccessPolicy::canViewAllOrders(
+        return Notification::visibleTo(Yii::$app->user->id, $this->canViewAllNotifications());
+    }
+
+    private function canViewAllNotifications(): bool
+    {
+        return Yii::$app->user->can('order.view') && OrderAccessPolicy::canViewAllOrders(
             Yii::$app->user->can('admin.access'),
             Yii::$app->user->can('staff.access'),
         );
-
-        return OrderNotification::visibleTo(Yii::$app->user->id, $canViewAll);
     }
 }

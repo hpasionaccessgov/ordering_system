@@ -10,7 +10,7 @@ $currentRoute = Yii::$app->controller->route;
 $navigationItems = [
     ['label' => 'Home', 'route' => 'site/index', 'url' => ['/site/index']],
     ['label' => 'Menu', 'route' => 'site/menu', 'url' => ['/site/menu']],
-    ['label' => 'About', 'route' => 'site/about', 'url' => ['/site/about']],
+    // ['label' => 'About', 'route' => 'site/about', 'url' => ['/site/about']],
     ['label' => 'Contact', 'route' => 'site/contact', 'url' => ['/site/contact']],
 ];
 $user = Yii::$app->user->identity;
@@ -58,7 +58,7 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                     <?php endforeach ?>
                 </ul>
 
-                <div class="cafebara-nav-actions d-flex align-items-center gap-2">
+                <div class="d-flex gap-2 align-items-center cafebara-nav-actions">
                     <?= $this->render('_theme_toggle') ?>
 
                     <?php if (Yii::$app->user->isGuest): ?>

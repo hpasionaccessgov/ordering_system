@@ -15,27 +15,25 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
     : null;
 ?>
 
-<section class="cafebara-menu-page py-4 py-lg-5">
-    <div class="cafebara-menu-hero rounded-4 p-4 p-lg-5 mb-4">
-        <div class="row align-items-center g-4">
+<section class="py-4 py-lg-5 cafebara-menu-page">
+    <div class="p-4 p-lg-5 mb-4 rounded-4 cafebara-menu-hero">
+        <div class="row g-4 align-items-center">
             <div class="col-lg-8">
-                <p class="cafebara-section-kicker mb-2">Cafébara menu</p>
-                <h1 class="display-6 fw-bold mb-2">Find your next favorite.</h1>
-                <p class="mb-0">Browse active drinks and bites. Sign in to add items to your cart.</p>
-            </div>
-            <?php if (Yii::$app->user->isGuest) : ?>
-                <div class="col-lg-4 text-lg-end">
+                <p class="mb-2 cafebara-section-kicker">Cafébara menu</p>
+                <h1 class="mb-2 fw-bold display-6">Find your next favorite.</h1>
+                <p class="mb-4">Browse active drinks and bites. Sign in to add items to your cart.</p>
+                <?php if (Yii::$app->user->isGuest) : ?>
                     <?= Html::a('Sign in to order', ['/site/login'], [
                         'class' => 'btn btn-cafebara-light',
                     ]) ?>
-                </div>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
             <div class="col-lg-4 text-center">
                 <?= Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                     'class' => 'cafebara-menu-logo',
                     'alt' => 'Cafébara capybara mascot',
-                ]) ?> 
-                </div>
+                ]) ?>
+            </div>
         </div>
     </div>
 
@@ -87,18 +85,18 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
 
     <?php if ($dataProvider->getCount() === 0) : ?>
         <div class="card admin-panel">
-            <div class="card-body text-center py-5">
+            <div class="py-5 card-body text-center">
                 <h2 class="h5">No products match your search</h2>
-                <p class="text-body-secondary mb-0">Try another name or category.</p>
+                <p class="mb-0 text-body-secondary">Try another name or category.</p>
             </div>
         </div>
     <?php endif; ?>
 
-    <div class="d-flex justify-content-center mt-4"></div></div>
-    <?= LinkPager::widget([
-        'pagination' => $dataProvider->pagination,
-        'prevPageLabel' => 'Previous',
-        'nextPageLabel' => 'Next',
-    ]) ?>
+    <div class="d-flex mt-4 justify-content-center">
+        <?= LinkPager::widget([
+            'pagination' => $dataProvider->pagination,
+            'prevPageLabel' => 'Previous',
+            'nextPageLabel' => 'Next',
+        ]) ?>
     </div>
 </section>

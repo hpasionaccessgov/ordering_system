@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use Yii;
+use app\models\ApplicationSettings;
 use app\models\ContactForm;
 use app\models\LoginForm;
 use app\models\RegisterForm;
@@ -16,6 +17,7 @@ use app\models\Product;
 use app\models\ProductSearch;
 use app\services\ShoppingCart;
 use app\models\Category;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\ErrorAction;
 use yii\web\Response;
@@ -104,14 +106,16 @@ class SiteController extends Controller
     public function actionIndex(): string
     {
         return $this->render('index', [
-            'featuredProducts' => Product::find()
-                ->where([
-                    'status' => Product::STATUS_ACTIVE,
-                    'is_featured' => true,
-                ])
-                ->orderBy(['name' => SORT_ASC])
-                ->limit(6)
-                ->all(),
+            'featuredDataProvider' => new ActiveDataProvider([
+                'query' => Product::find()
+                    ->where([
+                        'status' => Product::STATUS_ACTIVE,
+                        'is_featured' => true,
+                    ])
+                    ->orderBy(['name' => SORT_ASC]),
+                'pagination' => ApplicationSettings::pagination(true),
+                'sort' => false,
+            ]),
         ]);
     }
 

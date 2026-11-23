@@ -2,10 +2,10 @@
 
 /** @var yii\web\View $this */
 
+use yii\bootstrap5\LinkPager;
 use yii\helpers\Html;
-use app\models\Product;
 
-/** @var Product[] $featuredProducts */
+/** @var yii\data\ActiveDataProvider $featuredDataProvider */
 
 $this->title = 'Cafébara | Cafe ordering';
 $canViewFeaturedProducts = Yii::$app->user->isGuest || Yii::$app->user->can('product.view');
@@ -65,7 +65,7 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'home-batch-cart' : null;
         </div>
     </section>
 
-    <?php if ($canViewFeaturedProducts && $featuredProducts !== []) : ?>
+    <?php if ($canViewFeaturedProducts && $featuredDataProvider->getTotalCount() > 0) : ?>
         <section class="cafebara-featured mb-5">
             <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
                 <div>
@@ -82,7 +82,7 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'home-batch-cart' : null;
                 <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
             <?php endif; ?>
             <div class="row g-4">
-                <?php foreach ($featuredProducts as $product) : ?>
+                <?php foreach ($featuredDataProvider->getModels() as $product) : ?>
                     <div class="col-12 col-sm-6 col-lg-4">
                         <?= $this->render('../shared/_product_card', [
                             'product' => $product,
@@ -90,6 +90,14 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'home-batch-cart' : null;
                         ]) ?>
                     </div>
                 <?php endforeach; ?>
+            </div>
+
+            <div class="d-flex mt-4 justify-content-center">
+                <?= LinkPager::widget([
+                    'pagination' => $featuredDataProvider->getPagination(),
+                    'prevPageLabel' => 'Previous',
+                    'nextPageLabel' => 'Next',
+                ]) ?>
             </div>
         </section>
     <?php endif; ?>

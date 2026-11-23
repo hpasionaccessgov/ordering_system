@@ -17,27 +17,27 @@ $htmlIcon = <<<HTML
 HTML;
 $labelOptions = ['class' => 'form-label fw-semibold small'];
 ?>
-<div class="site-registration d-flex align-items-center justify-content-center py-5">
+<div class="d-flex py-5 align-items-center justify-content-center site-registration">
     <div class="card border-0 overflow-hidden login-split-card">
         <div class="row g-0">
 
             <!-- Brand panel -->
-            <div class="col-md-5 d-none d-md-flex login-brand-panel text-white">
-                <div class="d-flex flex-column justify-content-between p-4 p-lg-5 w-100">
+            <div class="col-md-5 d-none d-md-flex text-white login-brand-panel">
+                <div class="d-flex flex-column p-4 justify-content-between w-100">
                     <div>
                         <?= Html::img(
                             Yii::getAlias('@web/Cafebara_logo.png'),
                             [
                                 'alt' => 'Cafébara',
-                                'class' => 'login-brand-logo mb-4',
+                                'class' => 'login-brand-logo',
                             ],
                         ) ?>
                     </div>
                     <div>
-                        <h2 class="fw-bold mb-3 login-brand-title">
+                        <h2 class="mb-3 fw-bold login-brand-title">
                             Welcome<br>to Cafébara
                         </h2>
-                        <p class="opacity-75 mb-0 login-brand-text">
+                        <p class="mb-0 opacity-75 login-brand-text">
                             Create an account to access the application
                         </p>
                     </div>
@@ -47,7 +47,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
             <!-- Form panel -->
             <div class="col-md-7">
                 <div class="p-4 p-lg-5">
-                    <div class="text-center mb-4">
+                    <div class="mb-4 text-center">
                         <!-- Mobile-only logo -->
                         <div class="d-md-none mb-3">
                             <?= Html::img(
@@ -58,8 +58,8 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                                 ],
                             ) ?>
                         </div>
-                        <h1 class="h3 fw-semibold mb-1"><?= Html::encode($this->title) ?></h1>
-                        <p class="text-muted small mb-0">Create your account to access</p>
+                        <h1 class="mb-1 fw-semibold h3"><?= Html::encode($this->title) ?></h1>
+                        <p class="mb-0 text-muted small">Create your account to access</p>
                     </div>
 
                     <?php $form = ActiveForm::begin(
@@ -90,7 +90,7 @@ $labelOptions = ['class' => 'form-label fw-semibold small'];
                     </div>
 
                     <div class="text-center">
-                        <p class="small text-muted mb-0">
+                        <p class="mb-0 text-muted small">
                             Already have an account?
                             <?= Html::a('Log in', ['site/login'], ['class' => 'fw-semibold']) ?>
                         </p>

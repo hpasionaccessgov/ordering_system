@@ -12,7 +12,7 @@ class OrderSearch extends Order
 {
     public $q = '';
     public $statusFilter = '';
-    public $filters;
+    public ?ListingFilters $filters = null;
 
     public function rules(): array
     {

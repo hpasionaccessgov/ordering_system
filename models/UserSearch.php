@@ -12,7 +12,7 @@ class UserSearch extends User
     public $q = '';
     public $statusFilter = '';
     public $roleFilter = '';
-    public $filters;
+    public ?ListingFilters $filters = null;
 
     public function rules(): array
     {

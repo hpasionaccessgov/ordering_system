@@ -11,12 +11,12 @@ $this->params['meta_keywords'] = 'yii, yii2, about, php, framework';
 ?>
 <div class="site-about">
     <div class="container py-4">
-        <section class="cafebara-about-hero p-4 p-lg-5 mb-5">
-            <div class="row align-items-center g-4">
+        <section class="p-4 p-lg-5 mb-5 cafebara-about-hero">
+            <div class="row g-4 align-items-center">
                 <div class="col-lg-8">
-                    <p class="cafebara-dashboard-kicker mb-2">A little about our workspace</p>
-                    <h1 class="display-5 fw-bold mb-3">Welcome to Cafébara</h1>
-                    <p class="lead mb-4">
+                    <p class="mb-2 cafebara-dashboard-kicker">A little about our workspace</p>
+                    <h1 class="mb-3 fw-bold display-5">Welcome to Cafébara</h1>
+                    <p class="mb-4 lead">
                         Cafébara is a cafe ordering workspace for discovering drinks and bites,
                         placing orders, and keeping track of every order's progress.
                     </p>
@@ -25,7 +25,7 @@ $this->params['meta_keywords'] = 'yii, yii2, about, php, framework';
                             'class' => 'btn btn-cafebara-light',
                         ]) ?> -->
                         <?= Html::a('Get in touch', ['/site/contact'], [
-                            'class' => 'btn btn-cafebara-outline-light',
+                            'class' => 'btn btn-cafebara-light',
                         ]) ?>
                     </div>
                 </div>

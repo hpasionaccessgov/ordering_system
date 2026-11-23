@@ -6,7 +6,7 @@ namespace app\tests\Unit\Services;
 
 use app\models\Category;
 use app\models\Order;
-use app\models\OrderNotification;
+use app\models\Notification;
 use app\models\Product;
 use app\models\User;
 use app\services\OrderService;
@@ -31,7 +31,7 @@ final class OrderStatusServiceTest extends Unit
 
         $statusService = new OrderStatusService();
         $order = $statusService->process($order, (int) $user->id);
-        $notification = OrderNotification::findOne([
+        $notification = Notification::findOne([
             'user_id' => $user->id,
             'order_id' => $order->id,
             'status' => Order::STATUS_CONFIRMED,
@@ -47,7 +47,7 @@ final class OrderStatusServiceTest extends Unit
             ['pending', 'confirmed', 'processing', 'completed'],
             array_column($order->statusHistory, 'to_status'),
         );
-        self::assertSame(3, (int) OrderNotification::find()->where(['order_id' => $order->id])->count());
+        self::assertSame(3, (int) Notification::find()->where(['order_id' => $order->id])->count());
 
         $this->expectException(BadRequestHttpException::class);
         $statusService->process($order, (int) $user->id);
@@ -63,7 +63,7 @@ final class OrderStatusServiceTest extends Unit
         );
         $customerOrder = $service->cancel($customerOrder, (int) $customer->id, false);
         self::assertSame(Order::STATUS_CANCELLED, $customerOrder->status);
-        self::assertNotNull(OrderNotification::findOne([
+        self::assertNotNull(Notification::findOne([
             'order_id' => $customerOrder->id,
             'user_id' => $customer->id,
             'status' => Order::STATUS_CANCELLED,
@@ -95,12 +95,12 @@ final class OrderStatusServiceTest extends Unit
         $transaction = \Yii::$app->db->beginTransaction();
         try {
             (new OrderStatusService())->process($order, (int) $user->id);
-            self::assertSame(1, (int) OrderNotification::find()->where(['order_id' => $order->id])->count());
+            self::assertSame(1, (int) Notification::find()->where(['order_id' => $order->id])->count());
         } finally {
             $transaction->rollBack();
         }
 
-        self::assertSame(0, (int) OrderNotification::find()->where(['order_id' => $order->id])->count());
+        self::assertSame(0, (int) Notification::find()->where(['order_id' => $order->id])->count());
         self::assertSame(Order::STATUS_PENDING, Order::findOne($order->id)->status);
     }
 

@@ -127,6 +127,32 @@ body.confirm-modal-open .modal-backdrop {
     border: 1px solid var(--bs-border-color);
     background: var(--bs-tertiary-bg);
     border-radius: 1rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+/* Scroll long admin card content inside the card instead of the whole page. */
+.admin-panel .card-body,
+.cart-items-panel {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.cafebara-notification-menu {
+    width: min(22rem, calc(100vw - 1.5rem));
+}
+
+.cafebara-notification-item {
+    white-space: normal;
+}
+
+@media (max-width: 575.98px) {
+    .cafebara-notification-menu {
+        display: none !important;
+    }
+
+    .cafebara-notification-link.dropdown-toggle::after {
+        display: none;
+    }
 }
 
 .order-receipt-logo {
@@ -302,11 +328,42 @@ body.confirm-modal-open .modal-backdrop {
     transform: translateY(-2px);
 }
 
+.order-product-media {
+    position: relative;
+    overflow: hidden;
+}
+
 .order-product-image {
     width: 100%;
     height: 160px;
     object-fit: cover;
     background: var(--cafebara-cream);
+}
+
+.order-product-card:hover .product-card-overlay,
+.order-product-card:focus-within .product-card-overlay {
+    opacity: 1;
+}
+
+.cart-item-image,
+.cart-item-placeholder {
+    width: 5rem;
+    height: 5rem;
+    flex: 0 0 5rem;
+    border-radius: .75rem;
+    object-fit: cover;
+}
+
+.cart-item-image {
+    background: var(--cafebara-cream);
+}
+
+.cart-item-placeholder {
+    display: grid;
+    place-items: center;
+    background: var(--bs-secondary-bg);
+    color: var(--cafebara-brown);
+    font-size: 1.75rem;
 }
 
 .order-quantity-input {
@@ -674,22 +731,22 @@ body {
 }
 
 /* Parent links follow their group state, not hover, so collapsing clears the tint at once. */
-.app-sidebar .sidebar-menu > .nav-item > .nav-link:hover,
-.app-sidebar .sidebar-menu > .nav-item > .nav-link:focus-visible {
+.app-sidebar .sidebar-menu>.nav-item>.nav-link:hover,
+.app-sidebar .sidebar-menu>.nav-item>.nav-link:focus-visible {
     background-color: transparent;
     color: inherit;
 }
 
-.app-sidebar .sidebar-menu > .nav-item.menu-open:not(.has-active-child) > .nav-link {
+.app-sidebar .sidebar-menu>.nav-item.menu-open:not(.has-active-child)>.nav-link {
     background-color: transparent;
     color: inherit;
     font-weight: 400;
     border-left-color: transparent;
 }
 
-.app-sidebar .sidebar-menu > .nav-item.menu-open.has-active-child > .nav-link,
-.app-sidebar .sidebar-menu > .nav-item.menu-open.has-active-child > .nav-link:hover,
-.app-sidebar .sidebar-menu > .nav-item.menu-open.has-active-child > .nav-link:focus-visible {
+.app-sidebar .sidebar-menu>.nav-item.menu-open.has-active-child>.nav-link,
+.app-sidebar .sidebar-menu>.nav-item.menu-open.has-active-child>.nav-link:hover,
+.app-sidebar .sidebar-menu>.nav-item.menu-open.has-active-child>.nav-link:focus-visible {
     border-left-color: var(--cafebara-cream);
     background-color: rgba(137, 67, 28, .48);
     color: #fff;
@@ -1671,6 +1728,18 @@ body {
     border-color: rgba(248, 230, 203, .35);
     background-color: rgba(248, 230, 203, .1);
     color: var(--cafebara-cream);
+}
+
+.cafebara-notification-item:focus-visible {
+    background-color: var(--bs-secondary-bg);
+    color: var(--bs-body-color);
+}
+
+@media (hover: hover) {
+    .cafebara-notification-item:hover {
+        background-color: var(--bs-secondary-bg);
+        color: var(--bs-body-color);
+    }
 }
 
 @media print {

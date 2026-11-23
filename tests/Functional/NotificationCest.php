@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace app\tests\Functional;
 
+use app\models\ApplicationSettings;
 use app\models\Category;
-use app\models\OrderNotification;
+use app\models\Notification;
 use app\models\Product;
 use app\models\User;
 use app\services\OrderService;
@@ -49,24 +50,29 @@ final class NotificationCest
             $order = (new OrderService())->create((int) $user->id, [['product_id' => $product->id, 'quantity' => 1]]);
             $orders[] = (new OrderStatusService())->process($order, (int) $user->id);
         }
-        $otherNotification = OrderNotification::findOne(['order_id' => $orders[1]->id, 'user_id' => $users[1]->id]);
+        $otherNotification = Notification::findOne(['order_id' => $orders[1]->id, 'user_id' => $users[1]->id]);
         $I->assertNotNull($otherNotification);
         $I->amLoggedInAs($users[0]);
         $I->amOnRoute('notification/index');
         $I->see($orders[0]->order_number);
         $I->dontSee($orders[1]->order_number);
-        $I->seeElement('[data-notification-link][aria-label="Notifications, 1 unread"]');
+        $I->seeElement('[data-notification-link][aria-label="Notifications, 1 unread"][data-bs-toggle="dropdown"]');
+        $I->seeElement('.cafebara-notification-menu');
+        $I->see($orders[0]->order_number, '[data-notification-item]');
+        $I->seeElement('[data-notification-item][href*="notification%2Fview"]');
+        $I->see('View all notifications', '.cafebara-notification-menu');
         $I->click('Mark as read');
         $I->seeElement('[data-notification-link][aria-label="Notifications"]');
         $I->dontSee('Unread');
+        $I->dontSee($orders[0]->order_number, '[data-notification-item]');
         $I->amOnRoute('notification/read', ['id' => $otherNotification->id]);
         $I->seeResponseCodeIs(405);
         $I->sendAjaxPostRequest('/index.php?r=notification%2Fread&id=' . $otherNotification->id);
         $I->seeResponseCodeIs(404);
-        $I->assertNull(OrderNotification::findOne($otherNotification->id)->read_at);
+        $I->assertNull(Notification::findOne($otherNotification->id)->read_at);
 
         for ($i = 0; $i < 10; $i++) {
-            $notification = new OrderNotification([
+            $notification = new Notification([
                 'user_id' => $users[0]->id,
                 'order_id' => $orders[0]->id,
                 'status' => 'processing',
@@ -76,6 +82,7 @@ final class NotificationCest
         }
         $I->amOnRoute('notification/index', ['per-page' => 100]);
         $I->seeNumberOfElements('.list-group-item', 9);
+        $I->seeNumberOfElements('[data-notification-item]', 5);
 
         $auth = Yii::$app->authManager;
         $indexOnly = $auth->createRole('notification_index_' . $suffix);
@@ -87,7 +94,7 @@ final class NotificationCest
         $I->amOnRoute('notification/index');
         $I->seeResponseCodeIs(200);
         $I->dontSee('Mark as read');
-        $ownNotification = OrderNotification::findOne(['order_id' => $orders[0]->id, 'user_id' => $users[0]->id]);
+        $ownNotification = Notification::findOne(['order_id' => $orders[0]->id, 'user_id' => $users[0]->id]);
         $I->sendAjaxPostRequest('/index.php?r=notification%2Fread&id=' . $ownNotification->id);
         $I->seeResponseCodeIs(403);
 
@@ -141,20 +148,20 @@ final class NotificationCest
         $items = [['product_id' => $product->id, 'quantity' => 1]];
         $transaction = Yii::$app->db->beginTransaction();
         $rolledBack = $service->create((int) $users['customer']->id, $items, $token);
-        $I->assertSame(1, (int) OrderNotification::find()->where([
+        $I->assertSame(1, (int) Notification::find()->where([
             'user_id' => $users['staff']->id, 'order_id' => $rolledBack->id,
         ])->count());
         $transaction->rollBack();
-        $I->assertSame(0, (int) OrderNotification::find()->where(['order_id' => $rolledBack->id])->count());
+        $I->assertSame(0, (int) Notification::find()->where(['order_id' => $rolledBack->id])->count());
         $order = $service->create((int) $users['customer']->id, $items, $token);
         $service->create((int) $users['customer']->id, $items, $token);
         foreach (['admin', 'staff'] as $name) {
-            $I->assertSame(1, (int) OrderNotification::find()->where([
+            $I->assertSame(1, (int) Notification::find()->where([
                 'user_id' => $users[$name]->id, 'order_id' => $order->id, 'status' => 'pending',
             ])->count());
         }
         foreach (['customer', 'other', 'inactive', 'restricted'] as $name) {
-            $I->assertSame(0, (int) OrderNotification::find()->where([
+            $I->assertSame(0, (int) Notification::find()->where([
                 'user_id' => $users[$name]->id, 'order_id' => $order->id,
             ])->count());
         }
@@ -170,16 +177,16 @@ final class NotificationCest
 
         $transaction = Yii::$app->db->beginTransaction();
         (new OrderStatusService())->cancel($order, (int) $users['customer']->id, false);
-        $I->assertSame(1, (int) OrderNotification::find()->where([
+        $I->assertSame(1, (int) Notification::find()->where([
             'user_id' => $users['staff']->id, 'order_id' => $order->id, 'status' => 'cancelled',
         ])->count());
         $transaction->rollBack();
-        $I->assertSame(0, (int) OrderNotification::find()->where([
+        $I->assertSame(0, (int) Notification::find()->where([
             'user_id' => $users['staff']->id, 'order_id' => $order->id, 'status' => 'cancelled',
         ])->count());
         (new OrderStatusService())->cancel($order, (int) $users['customer']->id, false);
         foreach (['admin', 'staff'] as $name) {
-            $I->assertSame(1, (int) OrderNotification::find()->where([
+            $I->assertSame(1, (int) Notification::find()->where([
                 'user_id' => $users[$name]->id, 'order_id' => $order->id, 'status' => 'cancelled',
             ])->count());
         }
@@ -187,7 +194,7 @@ final class NotificationCest
         $I->amOnRoute('notification/index');
         $I->see('Order ' . $order->order_number . ' is cancelled.');
 
-        $notification = OrderNotification::findOne(['user_id' => $users['staff']->id, 'order_id' => $order->id]);
+        $notification = Notification::findOne(['user_id' => $users['staff']->id, 'order_id' => $order->id]);
         $auth->revoke($inheritedStaff, $users['staff']->id);
         $I->amLoggedInAs($users['staff']);
         $I->amOnRoute('notification/index');
@@ -196,6 +203,79 @@ final class NotificationCest
         $I->seeResponseCodeIs(403);
         $I->sendAjaxPostRequest('/index.php?r=notification%2Fread&id=' . $notification->id);
         $I->seeResponseCodeIs(403);
+    }
+
+    public function notificationsCanBeDeletedAndExpire(FunctionalTester $I): void
+    {
+        Yii::$app->set('authManager', DbManager::class);
+        $auth = Yii::$app->authManager;
+        $suffix = bin2hex(random_bytes(4));
+        $users = [];
+        foreach (['mine', 'theirs'] as $name) {
+            $user = new User([
+                'username' => $name . '_' . $suffix,
+                'email' => $name . '_' . $suffix . '@example.test',
+                'full_name' => 'Notification deletion',
+                'status' => User::STATUS_ACTIVE,
+            ]);
+            $user->setPassword('TestPassword123!');
+            $user->generateAuthKey();
+            $I->assertTrue($user->save(), json_encode($user->getErrors()));
+            $auth->assign($auth->getRole('customer'), $user->id);
+            $users[$name] = $user;
+        }
+        $category = new Category(['name' => 'Delete ' . $suffix, 'status' => Category::STATUS_ACTIVE]);
+        $I->assertTrue($category->save(), json_encode($category->getErrors()));
+        $product = new Product([
+            'name' => 'Delete product',
+            'category_id' => $category->id,
+            'price' => '25.00',
+            'status' => Product::STATUS_ACTIVE,
+        ]);
+        $I->assertTrue($product->save(), json_encode($product->getErrors()));
+        $order = (new OrderService())->create((int) $users['mine']->id, [
+            ['product_id' => $product->id, 'quantity' => 1],
+        ]);
+
+        $mine = new Notification([
+            'user_id' => $users['mine']->id,
+            'order_id' => $order->id,
+            'status' => 'pending',
+            'created_at' => time(),
+        ]);
+        $theirs = new Notification([
+            'user_id' => $users['theirs']->id,
+            'order_id' => $order->id,
+            'status' => 'pending',
+            'created_at' => time(),
+        ]);
+        $I->assertTrue($mine->save(false));
+        $I->assertTrue($theirs->save(false));
+
+        $I->amLoggedInAs($users['mine']);
+        $I->amOnRoute('notification/index');
+        $I->see('Delete');
+        $I->amOnRoute('notification/delete', ['id' => $mine->id]);
+        $I->seeResponseCodeIs(405);
+        $I->sendAjaxPostRequest('/index.php?r=notification%2Fdelete&id=' . $theirs->id);
+        $I->seeResponseCodeIs(404);
+        $I->assertNotNull(Notification::findOne($theirs->id));
+        $I->sendAjaxPostRequest('/index.php?r=notification%2Fdelete&id=' . $mine->id);
+        $I->assertNull(Notification::findOne($mine->id));
+
+        $settings = ApplicationSettings::current();
+        $settings->notifications_expiration_days = 17;
+        $I->assertTrue($settings->save());
+        $expired = new Notification([
+            'user_id' => $users['mine']->id,
+            'order_id' => $order->id,
+            'status' => 'pending',
+            'created_at' => time() - 18 * 86400,
+        ]);
+        $I->assertTrue($expired->save(false));
+        $I->amOnRoute('site/index');
+        $I->assertNull(Notification::findOne($expired->id));
+        $I->assertNotNull(Notification::findOne($theirs->id));
     }
 
     public function guestsCannotAccessInbox(FunctionalTester $I): void

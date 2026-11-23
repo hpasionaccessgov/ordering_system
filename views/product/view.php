@@ -16,11 +16,11 @@ $canViewAudit = $canManageProducts
 $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
 ?>
 
-<section class="product-detail-page mx-auto">
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+<section class="mx-auto product-detail-page">
+    <div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-center">
         <div>
-            <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Cafébara menu</p>
-            <h1 class="h3 mb-0"><?= Html::encode($model->name) ?></h1>
+            <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Cafébara menu</p>
+            <h1 class="mb-0 h3"><?= Html::encode($model->name) ?></h1>
         </div>
         <?php if ($canViewProducts) : ?>
             <?= Html::a(
@@ -33,11 +33,12 @@ $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
 
     <div class="row g-4 align-items-stretch">
         <div class="col-12 col-lg-7">
-            <figure class="product-detail-media mb-0">
+            <figure class="mb-0 product-detail-media">
                 <?php if ($model->getImageUrl() !== null) : ?>
                     <?= Html::img($model->getImageUrl(), [
                         'class' => 'product-detail-image',
                         'alt' => $model->name,
+                        'loading' => 'lazy',
                     ]) ?>
                 <?php else : ?>
                     <div class="product-detail-placeholder" aria-hidden="true">
@@ -48,8 +49,8 @@ $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
         </div>
 
         <div class="col-12 col-lg-5">
-            <section class="card admin-panel product-detail-info h-100">
-                <div class="card-body d-flex flex-column p-4 p-xl-5">
+            <section class="card h-100 admin-panel product-detail-info">
+                <div class="d-flex flex-column p-4 p-xl-5 card-body">
                     <div class="d-flex flex-wrap gap-2 mb-3">
                         <span class="badge rounded-pill text-bg-secondary">
                             <?= Html::encode($model->categoryRecord?->name ?? 'Cafébara menu') ?>
@@ -64,23 +65,23 @@ $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
                         <?php endif; ?>
                     </div>
 
-                    <h2 class="h3 fw-bold"><?= Html::encode($model->name) ?></h2>
+                    <h2 class="fw-bold h3"><?= Html::encode($model->name) ?></h2>
                     <p class="text-body-secondary product-detail-description">
                         <?= nl2br(Html::encode($model->description ?? '')) ?>
                     </p>
 
-                    <div class="product-detail-price mt-auto">
+                    <div class="mt-auto product-detail-price">
                         <span class="text-body-secondary small">Price</span>
                         <strong><?= Yii::$app->formatter->asCurrency($model->price) ?></strong>
                     </div>
 
                     <div class="d-flex flex-wrap gap-2 mt-4">
                         <?php if ($canOrder) : ?>
-                            <div class="product-order-panel mt-4">
-                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                            <div class="mt-4 product-order-panel">
+                                <div class="d-flex flex-wrap gap-2 mb-3 justify-content-between align-items-center">
                                     <div>
-                                        <h3 class="h6 fw-bold mb-1">Order this item</h3>
-                                        <p class="small text-body-secondary mb-0">
+                                        <h3 class="mb-1 fw-bold h6">Order this item</h3>
+                                        <p class="mb-0 text-body-secondary small">
                                             Choose a quantity; only <?= Html::encode($model->name) ?> will be added.
                                         </p>
                                     </div>
@@ -148,7 +149,7 @@ $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
                         <?php endif; ?>
                     </div>
                     <?php if ($canViewAudit) : ?>
-                        <div class="product-audit-summary mt-4 pt-4 small text-body-secondary">
+                        <div class="mt-4 pt-4 text-body-secondary product-audit-summary small">
                             <div class="row g-3">
                                 <div class="col-6">
                                     <span class="d-block">Created by</span>

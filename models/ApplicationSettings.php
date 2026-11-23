@@ -13,6 +13,8 @@ use yii\db\ActiveRecord;
  * @property int|string $login_max_attempts
  * @property int|string $login_reset_minutes
  * @property int|string $login_lock_minutes
+ * @property int|string|array<mixed> $logs_expiration_days
+ * @property int|string|array<mixed> $notifications_expiration_days
  */
 class ApplicationSettings extends ActiveRecord
 {
@@ -29,10 +31,11 @@ class ApplicationSettings extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['card_page_size', 'table_page_size', 'idle_minutes', 'login_max_attempts', 'login_reset_minutes', 'login_lock_minutes'], 'required'],
+            [['card_page_size', 'table_page_size', 'idle_minutes', 'login_max_attempts', 'login_reset_minutes', 'login_lock_minutes', 'logs_expiration_days', 'notifications_expiration_days'], 'required'],
             [['card_page_size', 'table_page_size'], 'integer', 'min' => 1, 'max' => 100],
             [['idle_minutes', 'login_reset_minutes', 'login_lock_minutes'], 'integer', 'min' => 1, 'max' => 1440],
             [['login_max_attempts'], 'integer', 'min' => 1, 'max' => 100],
+            [['logs_expiration_days', 'notifications_expiration_days'], 'integer', 'min' => 1, 'max' => 3650],
         ];
     }
 
@@ -45,6 +48,8 @@ class ApplicationSettings extends ActiveRecord
             'login_max_attempts' => 'Maximum failed login attempts',
             'login_reset_minutes' => 'Failed-attempt reset window (minutes)',
             'login_lock_minutes' => 'Login lockout duration (minutes)',
+            'logs_expiration_days' => 'Activity log retention (days)',
+            'notifications_expiration_days' => 'Notification retention (days)',
         ];
     }
 

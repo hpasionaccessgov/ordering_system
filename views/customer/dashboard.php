@@ -16,13 +16,13 @@ $displayName = $identity instanceof User
     : 'there';
 ?>
 
-<section class="card dashboard-welcome-card dashboard-welcome-customer border-0 mb-4">
-    <div class="card-body row align-items-center g-4">
+<section class="mb-4 card border-0 dashboard-welcome-card dashboard-welcome-customer">
+    <div class="row g-4 card-body align-items-center">
         <div class="col">
-            <span class="dashboard-welcome-role mb-3">
+            <span class="mb-3 dashboard-welcome-role">
                 <i class="bi bi-person-heart" aria-hidden="true"></i> Customer
             </span>
-            <h1 class="h3 mt-2 mb-2">Welcome, <?= Html::encode($displayName) ?>!</h1>
+            <h1 class="mt-2 mb-2 h3">Welcome, <?= Html::encode($displayName) ?>!</h1>
             <p class="mb-3">Find a favorite, place an order, and follow its progress.</p>
             <div class="d-flex flex-wrap gap-2">
                 <?php if (Yii::$app->user->can('product.index')) : ?>
@@ -43,11 +43,11 @@ $displayName = $identity instanceof User
     </div>
 </section>
 
-<section class="customer-summary card border-0 mb-4">
-    <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+<section class="mb-4 card border-0 customer-summary">
+    <div class="d-flex flex-wrap gap-3 card-body justify-content-between align-items-center">
         <div>
-            <p class="text-body-secondary mb-1">Your order history</p>
-            <h2 class="h4 mb-0"><?= Html::encode((string) $orderCount) ?> orders placed</h2>
+            <p class="mb-1 text-body-secondary">Your order history</p>
+            <h2 class="mb-0 h4"><?= Html::encode((string) $orderCount) ?> orders placed</h2>
         </div>
         <?php if (Yii::$app->user->can('order.index')) : ?>
             <?= Html::a('View your orders', ['/order/index'], ['class' => 'btn btn-outline-primary ms-auto']) ?>
@@ -57,10 +57,10 @@ $displayName = $identity instanceof User
 
 <?php if (Yii::$app->user->can('product.view')) : ?>
     <section class="mb-4">
-        <div class="d-flex justify-content-between align-items-end mb-3">
+        <div class="d-flex mb-3 justify-content-between align-items-end">
             <div>
-                <p class="text-body-secondary mb-1">From the menu</p>
-                <h2 class="h4 mb-0">Featured drinks and bites</h2>
+                <p class="mb-1 text-body-secondary">From the menu</p>
+                <h2 class="mb-0 h4">Featured drinks and bites</h2>
             </div>
             <?php if (Yii::$app->user->can('product.index')) : ?>
                 <?= Html::a('Browse all products', ['/product/index'], ['class' => 'link-primary fw-semibold']) ?>
@@ -79,7 +79,7 @@ $displayName = $identity instanceof User
                 </div>
             <?php endforeach; ?>
         </div>
-        <div class="d-flex justify-content-center mt-4">
+        <div class="d-flex mt-4 justify-content-center">
             <?= LinkPager::widget([
                 'pagination' => $featuredDataProvider->pagination,
                 'prevPageLabel' => 'Previous',

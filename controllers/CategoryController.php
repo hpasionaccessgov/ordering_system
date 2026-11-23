@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\Category;
 use app\models\CategorySearch;
 use app\models\Product;
+use app\services\NotificationService;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -93,6 +94,13 @@ class CategoryController extends Controller
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
+                NotificationService::notifyManagers(
+                    NotificationService::TYPE_CATEGORY_CREATED,
+                    'New category ' . $model->name . ' added.',
+                    '/category/view',
+                    (int) $model->id,
+                );
+
                 return $this->redirect($this->getCategoryReturnRoute($model->id));
             }
         } else {
@@ -120,6 +128,13 @@ class CategoryController extends Controller
         $model = $this->findModel($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            NotificationService::notifyManagers(
+                NotificationService::TYPE_CATEGORY_UPDATED,
+                'Category ' . $model->name . ' updated.',
+                '/category/view',
+                (int) $model->id,
+            );
+
             return $this->redirect($this->getCategoryReturnRoute($model->id));
         }
 
@@ -147,7 +162,13 @@ class CategoryController extends Controller
             return $this->redirect($this->getCategoryListReturnRoute());
         }
 
+        $categoryName = $model->name;
         $model->delete();
+        NotificationService::notifyManagers(
+            NotificationService::TYPE_CATEGORY_DELETED,
+            'Category ' . $categoryName . ' deleted.',
+            '/category/index',
+        );
 
         return $this->redirect($this->getCategoryListReturnRoute());
     }
