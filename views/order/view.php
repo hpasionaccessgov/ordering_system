@@ -31,6 +31,16 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
         </div>
         <div class="d-flex flex-wrap gap-2">
             <?php if (
+                !Yii::$app->user->can('admin.access')
+                && !Yii::$app->user->can('staff.access')
+                && Yii::$app->user->can('cart.add')
+                && $model->status === Order::STATUS_COMPLETED
+            ) : ?>
+                <?= Html::beginForm(['/order/order-again', 'id' => $model->id], 'POST', ['class' => 'd-inline']) ?>
+                <?= Html::submitButton('Order Again', ['class' => 'btn btn-outline-success']) ?>
+                <?= Html::endForm() ?>
+            <?php endif; ?>
+            <?php if (
                 Yii::$app->user->can('order.view')
                 && Yii::$app->user->can('order.receipt.print')
             ) : ?>
@@ -75,7 +85,7 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
         </div>
     </section>
 
-    <section class="order-detail-panel mb-4 card admin">
+    <section class="order-detail-panel mb-4 card admin-panel">
         <div class="card-header bg-transparent">
             <h2 class="mb-0 h5">Items in this order</h2>
         </div>
@@ -129,7 +139,7 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
                 <?php if (Yii::$app->user->can('order.process') && $nextStatus !== null) : ?>
                     <?= Html::beginForm(
                         ['/order/process', 'id' => $model->id],
-                        'post',
+                        'POST',
                         ['class' => 'd-inline'],
                     ) ?>
                     <?= Html::submitButton(

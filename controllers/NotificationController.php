@@ -29,7 +29,7 @@ class NotificationController extends Controller
             ],
             'verbs' => [
                 'class' => VerbFilter::class,
-                'actions' => ['read' => ['post'], 'delete' => ['post']],
+                'actions' => ['read' => ['POST'], 'delete' => ['POST']],
             ],
         ];
     }

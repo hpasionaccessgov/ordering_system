@@ -6,6 +6,9 @@ use yii\bootstrap5\LinkPager;
 use yii\helpers\Html;
 
 /** @var yii\data\ActiveDataProvider $featuredDataProvider */
+/** @var array<int, int> $favoriteIds */
+/** @var array<int, array{average: float, count: int}> $ratingSummaries */
+/** @var list<array{product_id: int, product_name: string, quantity: int}> $bestSellers */
 
 $this->title = 'Cafébara | Cafe ordering';
 $canViewFeaturedProducts = Yii::$app->user->isGuest || Yii::$app->user->can('product.view');
@@ -87,6 +90,8 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'home-batch-cart' : null;
                         <?= $this->render('../shared/_product_card', [
                             'product' => $product,
                             'batchFormId' => $batchFormId,
+                            'favoriteIds' => $favoriteIds ?? [],
+                            'ratingSummaries' => $ratingSummaries ?? [],
                         ]) ?>
                     </div>
                 <?php endforeach; ?>
@@ -101,6 +106,8 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'home-batch-cart' : null;
             </div>
         </section>
     <?php endif; ?>
+
+    <?= $this->render('../shared/_best_sellers', ['bestSellers' => $bestSellers ?? []]) ?>
 
     <section class="cafebara-intro pb-4">
         <div class="row align-items-end g-3 mb-4">

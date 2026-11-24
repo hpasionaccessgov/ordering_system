@@ -10,6 +10,9 @@ use yii\helpers\Html;
 /** @var string $status */
 /** @var string $search */
 /** @var string $filters */
+/** @var array<int, int> $favoriteIds */
+/** @var array<int, array{average: float, count: int}> $ratingSummaries */
+/** @var list<array{product_id: int, product_name: string, quantity: int}> $bestSellers */
 
 $this->title = 'Product';
 $batchFormId = Yii::$app->user->can('cart.add') ? 'product-batch-cart' : null;
@@ -43,6 +46,8 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'product-batch-cart' : null;
     </div>
 <?php endif; ?>
 
+<?= $this->render('../shared/_best_sellers', ['bestSellers' => $bestSellers ?? []]) ?>
+
 <?php if ($canViewProducts) : ?>
     <?php if ($batchFormId !== null && $dataProvider->getCount() > 0) : ?>
         <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
@@ -54,6 +59,8 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'product-batch-cart' : null;
                 <?= $this->render('../shared/_product_card', [
                     'product' => $product,
                     'batchFormId' => $batchFormId,
+                    'favoriteIds' => $favoriteIds ?? [],
+                    'ratingSummaries' => $ratingSummaries ?? [],
                 ]) ?>
             </div>
         <?php endforeach; ?>

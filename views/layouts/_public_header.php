@@ -35,8 +35,8 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                 'aria-label' => 'Cafébara home',
             ]) ?>
 
-            <?= Html::button('<span class="cafebara-menu-icon" aria-hidden="true"></span>', [
-                'class' => 'navbar-toggler',
+            <?= Html::button('<i class="bi bi-list" aria-hidden="true"></i>', [
+                'class' => 'navbar-toggler btn btn-outline-primary',
                 'type' => 'button',
                 'data-bs-toggle' => 'collapse',
                 'data-bs-target' => '#cafebara-public-nav',
@@ -69,6 +69,13 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                             'class' => 'btn btn-primary',
                         ]) ?>
                     <?php else: ?>
+                        <?php if (Yii::$app->user->can('favorite.index')): ?>
+                            <?= Html::a('<i class="bi bi-heart" aria-hidden="true"></i><span class="ms-1 d-none d-xl-inline">Favorites</span>', ['/favorite/index'], [
+                                'class' => 'btn btn-outline-primary',
+                                'encode' => false,
+                                'aria-label' => 'Favorites',
+                            ]) ?>
+                        <?php endif; ?>
                         <?php if (Yii::$app->user->can('notification.index')): ?>
                             <?= $this->render('_notifications_link', ['class' => 'btn btn-outline-primary']) ?>
                         <?php endif ?>
@@ -81,7 +88,7 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                         <?= Html::a('Profile', ['/site/profile'], [
                             'class' => 'btn btn-outline-primary',
                         ]) ?>
-                        <?= Html::beginForm(['/site/logout'], 'post', ['class' => 'm-0']) ?>
+                        <?= Html::beginForm(['/site/logout'], 'POST', ['class' => 'm-0']) ?>
                         <?= Html::submitButton('Sign out', ['class' => 'btn btn-link cafebara-sign-out']) ?>
                         <?= Html::endForm() ?>
                     <?php endif ?>

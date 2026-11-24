@@ -4,6 +4,8 @@ use yii\helpers\Html;
 
 /** @var app\models\Product $model */
 /** @var array<int, string> $categories */
+/** @var array<int, string> $inventoryItems */
+/** @var list<array{inventory_id: mixed, quantity_required: mixed}> $ingredientRows */
 
 $this->title = 'Update product';
 ?>
@@ -23,4 +25,9 @@ $this->title = 'Update product';
     ) ?>
 </div>
 
-<?= $this->render('_form', ['model' => $model, 'categories' => $categories]) ?>
+<?= $this->render('_form', [
+    'model' => $model,
+    'categories' => $categories,
+    'inventoryItems' => $inventoryItems,
+    'ingredientRows' => $ingredientRows,
+]) ?>

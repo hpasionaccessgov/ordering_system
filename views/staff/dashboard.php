@@ -4,7 +4,12 @@
 /** @var int $activeProductCount */
 /** @var int $pendingOrderCount */
 /** @var int $processingOrderCount */
+/** @var int $inventoryCount */
+/** @var int $lowStockCount */
+/** @var int $outOfStockCount */
+/** @var \app\models\Inventory[] $lowStockItems */
 /** @var array<string, int> $orderStatusCounts */
+/** @var array{revenue: float, orders: int, completed: int, cancelled: int, aov: float} $todaySales */
 
 use app\models\User;
 use yii\helpers\Html;
@@ -47,19 +52,27 @@ $displayName = $identity instanceof User
     </div>
 </section>
 
+<?= $this->render('../shared/_inventory_alert', ['lowStockItems' => $lowStockItems]) ?>
+
 <div class="row g-3 mb-4">
     <?php foreach (
         [
+            ["Today's revenue", Yii::$app->formatter->asCurrency($todaySales['revenue']), 'bi-cash-coin'],
+            ["Today's orders", $todaySales['orders'], 'bi-receipt'],
+            ['Average order value', Yii::$app->formatter->asCurrency($todaySales['aov']), 'bi-graph-up'],
+            ['Current low stock', $lowStockCount, 'bi-exclamation-triangle'],
             ['Active products', $activeProductCount, 'bi-cup-hot'],
             ['Pending orders', $pendingOrderCount, 'bi-hourglass-split'],
             ['Processing orders', $processingOrderCount, 'bi-arrow-repeat'],
+            ['Inventory items', $inventoryCount, 'bi-box-seam'],
+            ['Out of stock', $outOfStockCount, 'bi-x-circle'],
         ] as [$label, $value, $icon]
     ) : ?>
         <div class="col-12 col-md-4">
             <section class="small-box cafebara-stat-card h-100">
                 <div class="inner">
                     <p><?= Html::encode($label) ?></p>
-                    <h3><?= Html::encode((string) $value) ?></h3>
+                    <h3 class="cafebara-stat-value"><?= Html::encode((string) $value) ?></h3>
                 </div>
                 <i class="small-box-icon bi <?= Html::encode($icon) ?>" aria-hidden="true"></i>
             </section>

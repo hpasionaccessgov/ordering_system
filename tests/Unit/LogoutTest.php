@@ -46,7 +46,7 @@ final class LogoutTest extends \Codeception\Test\Unit
             'Failed asserting that the logout link is rendered for a logged-in user.',
         );
         self::assertStringContainsString(
-            'data-method="post"',
+            'data-method="POST"',
             $html,
             'Failed asserting that the logout link uses POST method.',
         );

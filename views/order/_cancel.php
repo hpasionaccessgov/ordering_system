@@ -16,7 +16,7 @@ $canCancel = Yii::$app->user->can('order.cancel')
 <?php if ($canCancel): ?>
     <?= Html::beginForm(
         ['/order/cancel', 'id' => $model->id],
-        'post',
+        'POST',
         ['class' => 'd-inline'],
     ) ?>
 

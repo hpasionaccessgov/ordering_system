@@ -2,9 +2,12 @@
 
 use app\models\Product;
 use app\services\ShoppingCart;
+use app\widgets\ToolTip;
 use yii\helpers\Html;
 
 /** @var array{lines: list<array{product: Product, quantity: int, subtotal: string}>, total: string, count: int} $summary */
+
+$canViewProduct = Yii::$app->user->can("product.view");
 
 $this->title = 'Shopping cart';
 ?>
@@ -32,18 +35,29 @@ $this->title = 'Shopping cart';
         </div>
     <?php else: ?>
         <div class="row g-4">
-            <div class="col-12 col-lg-8 card admin-panel cart-items-panel">
+            <div class="col-12 col-lg-8 p-3 card admin-panel cart-items-panel">
                 <?php foreach ($summary['lines'] as $line): ?>
                     <?php $product = $line['product']; ?>
                     <article class="mb-3 card admin-panel">
                         <div class="card-body">
                             <div class="d-flex flex-wrap gap-3 align-items-center">
                                 <?php if ($product->getImageUrl() !== null) : ?>
-                                    <?= Html::img($product->getImageUrl(), [
+                                    <?php $image = Html::img($product->getImageUrl(), [
                                         'class' => 'cart-item-image',
                                         'alt' => $product->name,
                                         'loading' => 'lazy',
                                     ]) ?>
+                                    <div class="cart-item-media">
+                                        <?php if ($canViewProduct) : ?>
+                                            <?= Html::a($image, ['/product/view', 'id' => $product->id]) ?>
+                                            <div class="cart-item-overlay" aria-hidden="true">
+                                                <i class="bi bi-zoom-in cart-item-overlay-icon"></i>
+                                                <span class="cart-item-overlay-label">View</span>
+                                            </div>
+                                        <?php else : ?>
+                                            <?= $image ?>
+                                        <?php endif; ?>
+                                    </div>
                                 <?php else : ?>
                                     <div class="cart-item-placeholder" aria-hidden="true">
                                         <i class="bi bi-cup-hot"></i>
@@ -57,7 +71,7 @@ $this->title = 'Shopping cart';
                                     <strong><?= Yii::$app->formatter->asCurrency($product->price) ?> each</strong>
                                 </div>
                                 <?php if (Yii::$app->user->can('cart.update')) : ?>
-                                    <?= Html::beginForm(['/cart/update', 'id' => $product->id], 'post', [
+                                    <?= Html::beginForm(['/cart/update', 'id' => $product->id], 'POST', [
                                         'class' => 'd-flex align-items-end gap-2',
                                     ]) ?>
                                     <?= Html::input('number', 'quantity', $line['quantity'], [
@@ -75,7 +89,7 @@ $this->title = 'Shopping cart';
                                     <strong><?= Yii::$app->formatter->asCurrency($line['subtotal']) ?></strong>
                                 </div>
                                 <?php if (Yii::$app->user->can('cart.remove')) : ?>
-                                    <?= Html::beginForm(['/cart/remove', 'id' => $product->id], 'post', [
+                                    <?= Html::beginForm(['/cart/remove', 'id' => $product->id], 'POST', [
                                         'class' => 'ms-lg-2',
                                     ]) ?>
                                     <?= Html::submitButton('Remove', [

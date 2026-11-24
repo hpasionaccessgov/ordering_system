@@ -8,6 +8,9 @@ use yii\helpers\Html;
 /** @var string $search */
 /** @var string $categoryId */
 /** @var string $filters */
+/** @var array<int, int> $favoriteIds */
+/** @var array<int, array{average: float, count: int}> $ratingSummaries */
+/** @var list<array{product_id: int, product_name: string, quantity: int}> $bestSellers */
 
 $this->title = 'Menu';
 $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
@@ -63,8 +66,11 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
         </div>
     </div>
     <?= $this->render('../shared/_listing_filters', [
-        'filters' => $filters, 'showAudit' => false, 'showDates' => false,
-        'showAmount' => true, 'amountLabel' => 'price',
+        'filters' => $filters,
+        'showAudit' => false,
+        'showDates' => false,
+        'showAmount' => true,
+        'amountLabel' => '',
     ]) ?>
     <?= Html::endForm() ?>
 
@@ -78,10 +84,14 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
                 <?= $this->render('../shared/_product_card', [
                     'product' => $product,
                     'batchFormId' => $batchFormId,
+                    'favoriteIds' => $favoriteIds ?? [],
+                    'ratingSummaries' => $ratingSummaries ?? [],
                 ]) ?>
             </div>
         <?php endforeach; ?>
     </div>
+
+    <?= $this->render('../shared/_best_sellers', ['bestSellers' => $bestSellers ?? []]) ?>
 
     <?php if ($dataProvider->getCount() === 0) : ?>
         <div class="card admin-panel">

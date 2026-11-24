@@ -40,11 +40,11 @@ final class CartController extends Controller
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
-                    'add' => ['post'],
-                    'add-batch' => ['post'],
-                    'update' => ['post'],
-                    'remove' => ['post'],
-                    'checkout' => ['get', 'post'],
+                    'add' => ['POST'],
+                    'add-batch' => ['POST'],
+                    'update' => ['POST'],
+                    'remove' => ['POST'],
+                    'checkout' => ['GET', 'POST'],
                 ],
             ],
         ];

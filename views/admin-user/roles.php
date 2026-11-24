@@ -4,8 +4,8 @@ use app\models\RoleForm;
 use app\models\User;
 use app\services\RbacPermissionPolicy;
 use app\widgets\AdminActiveForm;
+use app\widgets\ToolTip;
 use yii\helpers\Html;
-use yii\widgets\Tooltip;
 
 /** @var yii\web\View $this */
 /** @var RoleForm $roleForm */
@@ -35,12 +35,6 @@ $this->registerJs(<<<JS
     const indexDependencies = {$indexDependenciesJson};
     const viewDependencies = {$viewDependenciesJson};
     const defaultRolePermissions = {$defaultRolePermissionsJson};
-    if (window.bootstrap && window.bootstrap.Tooltip) {
-        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(element => {
-            new window.bootstrap.Tooltip(element);
-        });
-    }
-
     const form = document.querySelector('form[data-role-matrix-form]');
     if (!form) {
         return;
@@ -151,9 +145,12 @@ $permissionModuleLabels = [
     'customer' => 'Customers',
     'user' => 'Users',
     'category' => 'Categories',
+    'inventory' => 'Inventory',
     'product' => 'Products',
     'order' => 'Orders',
     'cart' => 'Cart & checkout',
+    'favorite' => 'Favorites',
+    'review' => 'Reviews',
     'activityLog' => 'Activity logs',
     'notification' => 'Notifications',
     'settings' => 'Settings',
@@ -173,6 +170,11 @@ $permissionDescriptions = [
     'category.create' => 'Create a category.',
     'category.update' => 'Edit a category.',
     'category.delete' => 'Delete a category not assigned to products.',
+    'inventory.index' => 'View the inventory list and stock levels.',
+    'inventory.view' => 'View an inventory item and its stock movements.',
+    'inventory.create' => 'Create an inventory item.',
+    'inventory.update' => 'Edit stock levels and item details.',
+    'inventory.delete' => 'Delete an inventory item with no stock history.',
     'product.index' => 'View the page and product list.',
     'product.view' => 'View an individual product.',
     'product.create' => 'Create a new product.',
@@ -191,6 +193,10 @@ $permissionDescriptions = [
     'cart.update' => 'Change quantities in a cart.',
     'cart.remove' => 'Remove products from a cart.',
     'cart.checkout' => 'Place an order from a cart and view its confirmation.',
+    'favorite.index' => 'View the list of favorite products.',
+    'favorite.add' => 'Add products to favorites.',
+    'favorite.remove' => 'Remove products from favorites.',
+    'review.create' => 'Review a product from a completed order.',
     'activityLog.index' => 'Search and list activity logs.',
     'activityLog.view' => 'View an individual activity log.',
     'notification.index' => 'View personal notifications and unread count.',
@@ -251,19 +257,19 @@ if ($auditUserIds !== []) {
 $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[$id] ?? '—');
 ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex mb-4 justify-content-between align-items-center">
     <div>
-        <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Access control</p>
-        <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
+        <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Access control</p>
+        <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
     </div>
 </div>
 
-<section class="card admin-panel mb-4">
+<section class="mb-4 card admin-panel">
     <div class="card-body">
         <h2 class="h5">Create role</h2>
         <?php $form = AdminActiveForm::begin([
             'action' => ['/admin-role/create'],
-            'method' => 'post',
+            'method' => 'POST',
             'options' => ['class' => 'row g-2'],
         ]); ?>
 
@@ -291,13 +297,13 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
             ]) ?>
         </div>
         <div class="col-12 col-md-3 d-flex flex-column">
-            <label class="form-label invisible d-none d-md-block" aria-hidden="true">Action</label>
+            <label class="d-none d-md-block form-label invisible" aria-hidden="true">Action</label>
             <?= Html::submitButton('Create role', ['class' => 'btn btn-primary w-100']) ?>
         </div>
         <div class="col-12">
             <?php AdminActiveForm::end(); ?>
         </div>
-        <p class="small text-body-secondary mt-2 mb-0">
+        <p class="mt-2 mb-0 text-body-secondary small">
             Create a new role to assign permissions to users. Role names must be unique and use lowercase letters,
             numbers, dots, dashes, or underscores.
         </p>
@@ -305,10 +311,10 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
 </section>
 
 <section class="card admin-panel">
-    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <div class="d-flex flex-wrap gap-2 card-header justify-content-between align-items-center">
         <div>
-            <h2 class="h5 mb-1">Roles &amp; permissions</h2>
-            <p class="text-body-secondary mb-0">
+            <h2 class="mb-1 h5">Roles &amp; permissions</h2>
+            <p class="mb-0 text-body-secondary">
                 Tick the permissions a role needs, then save changes.
             </p>
         </div>
@@ -317,52 +323,52 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
             'class' => 'btn btn-primary ms-auto',
         ]) ?>
     </div>
-    <?= Html::beginForm(['/admin-role/update-matrix'], 'post', [
+    <?= Html::beginForm(['/admin-role/update-matrix'], 'POST', [
         'id' => 'role-matrix-form',
         'data-role-matrix-form' => 'true',
     ]) ?>
     <div class="card-body">
         <div class="overflow-x-auto horizontal-scroll" style="-webkit-overflow-scrolling: touch;"
             onwheel="if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) { const delta = event.deltaY; const max = this.scrollWidth - this.clientWidth; if ((delta > 0 && this.scrollLeft < max) || (delta < 0 && this.scrollLeft > 0)) { event.preventDefault(); this.scrollLeft += delta; } }">
-            <ul class="nav nav-tabs flex-nowrap mb-0" role="tablist"
+            <ul class="flex-nowrap mb-0 nav nav-tabs" role="tablist"
                 style="width: max-content; min-width: 100%;">
                 <?php foreach ($roleList as $index => $role) : ?>
-                    <li class="nav-item flex-shrink-0" role="presentation">
+                    <li class="flex-shrink-0 nav-item" role="presentation">
                         <button class="nav-link text-nowrap<?= $index === 0 ? ' active' : '' ?>"
                             id="role-tab-<?= $index ?>" data-bs-toggle="tab"
                             data-bs-target="#role-pane-<?= $index ?>" type="button"
                             role="tab" aria-controls="role-pane-<?= $index ?>"
                             aria-selected="<?= $index === 0 ? 'true' : 'false' ?>">
                             <?= Html::encode($role->name) ?>
-                            <span class="badge text-bg-secondary ms-1"><?= $roleUserCounts[$role->name] ?></span>
+                            <span class="ms-1 badge text-bg-secondary"><?= $roleUserCounts[$role->name] ?></span>
                         </button>
                     </li>
                 <?php endforeach; ?>
             </ul>
         </div>
-        <div class="tab-content pt-3">
+        <div class="pt-3 tab-content">
             <?php foreach ($roleList as $index => $role) : ?>
                 <?php $isBuiltIn = in_array($role->name, $builtInRoles, true); ?>
                 <div class="tab-pane fade<?= $index === 0 ? ' show active' : '' ?>" id="role-pane-<?= $index ?>"
                     role="tabpanel" aria-labelledby="role-tab-<?= $index ?>" tabindex="0"
                     data-role-card data-role="<?= Html::encode($role->name) ?>">
-                    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                    <div class="d-flex flex-wrap gap-3 justify-content-between align-items-start">
                         <div>
-                            <p class="small text-body-secondary mb-0">
+                            <p class="mb-0 text-body-secondary small">
                                 <strong><?= $roleUserCounts[$role->name] ?></strong>
                                 user<?= $roleUserCounts[$role->name] === 1 ? '' : 's' ?>:
                                 <strong><?= $roleUsers[$role->name] === []
                                             ? 'none assigned'
                                             : Html::encode(implode(', ', $roleUsers[$role->name])) ?></strong>
                             </p>
-                            <p class="small text-body-secondary mb-0">
+                            <p class="mb-0 text-body-secondary small">
                                 Created by: <strong><?= Html::encode($auditName($roleAudit[$role->name]['created_by'])) ?> </strong>
                                 <br>
                                 Updated by: <strong><?= Html::encode($auditName($roleAudit[$role->name]['updated_by'])) ?></strong>
                             </p>
                         </div>
-                        <div class="d-flex flex-wrap align-items-center gap-3">
-                            <div class="form-check form-switch mb-0">
+                        <div class="d-flex flex-wrap gap-3 align-items-center">
+                            <div class="mb-0 form-check form-switch">
                                 <input type="checkbox" class="form-check-input" role="switch"
                                     id="grant-all-<?= $index ?>" data-grant-all
                                     aria-label="Grant all permissions to <?= Html::encode($role->name) ?>">
@@ -371,10 +377,10 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
                                 </label>
                             </div>
                             <?php if ($defaultRolePermissions !== []) : ?>
-                                <div class="d-flex flex-wrap align-items-center gap-2">
-                                    <span class="small text-body-secondary">Apply defaults:</span>
+                                <div class="d-flex flex-wrap gap-2 align-items-center">
+                                    <span class="text-body-secondary small">Apply defaults:</span>
                                     <?php foreach (array_keys($defaultRolePermissions) as $defaultName) : ?>
-                                        <div class="form-check form-check-inline mb-0">
+                                        <div class="mb-0 form-check form-check-inline">
                                             <input type="checkbox" class="form-check-input"
                                                 id="preset-<?= $index ?>-<?= $defaultName ?>"
                                                 data-preset="<?= Html::encode($defaultName) ?>">
@@ -397,7 +403,7 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
                     </div>
 
                     <div class="mt-3">
-                        <label class="form-label small fw-semibold" for="role-desc-<?= $index ?>">
+                        <label class="form-label fw-semibold small" for="role-desc-<?= $index ?>">
                             Description
                         </label>
                         <?= Html::input('text', 'descriptions[' . $role->name . ']', $role->description, [
@@ -411,13 +417,13 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
                     <div class="row g-2 mt-1">
                         <?php foreach ($permissionGroups as $module => $modulePermissions) : ?>
                             <div class="col-12 col-lg-6 col-xxl-4" data-permission-group>
-                                <div class="border rounded-2 p-2 h-100">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="small text-uppercase fw-semibold text-body-secondary">
+                                <div class="p-2 border rounded-2 h-100">
+                                    <div class="d-flex mb-2 justify-content-between align-items-center">
+                                        <span class="text-uppercase fw-semibold text-body-secondary small">
                                             <?= Html::encode($permissionModuleLabels[$module] ?? ucfirst($module)) ?>
                                         </span>
-                                        <label class="small text-body-secondary mb-0">
-                                            <input type="checkbox" class="form-check-input me-1" data-module-toggle>
+                                        <label class="mb-0 text-body-secondary small">
+                                            <input type="checkbox" class="me-1 form-check-input" data-module-toggle>
                                             All
                                         </label>
                                     </div>
@@ -437,12 +443,15 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
                                                     'style' => 'cursor: pointer;',
                                                 ],
                                             ) ?>
-                                            <label class="form-check-label small" for="<?= Html::encode($permissionId) ?>"
-                                                title="<?= Html::encode($permissionDescriptions[$permission->name] ?? $permission->name) ?>"
-                                                data-bs-toggle="tooltip" data-bs-placement="top"
-                                                style="cursor: pointer;">
-                                                <code><?= Html::encode($permission->name) ?></code>
-                                            </label>
+                                            <?= Html::tag(
+                                                'label',
+                                                '<code>' . Html::encode($permission->name) . '</code>',
+                                                ToolTip::options($permissionDescriptions[$permission->name] ?? $permission->name, [
+                                                    'class' => 'form-check-label small',
+                                                    'for' => $permissionId,
+                                                    'style' => 'cursor: pointer;',
+                                                ]),
+                                            ) ?>
                                         </div>
                                     <?php endforeach; ?>
                                 </div>
@@ -458,7 +467,7 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
 
 <?php foreach ($roleList as $role) : ?>
     <?php if (!in_array($role->name, $builtInRoles, true)) : ?>
-        <?= Html::beginForm(['/admin-role/delete', 'name' => $role->name], 'post', [
+        <?= Html::beginForm(['/admin-role/delete', 'name' => $role->name], 'POST', [
             'id' => 'delete-role-' . $role->name,
         ]) ?>
         <?= Html::endForm() ?>

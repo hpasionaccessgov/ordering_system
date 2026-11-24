@@ -8,6 +8,7 @@
 
 use app\models\User;
 use app\widgets\AdminGridView;
+use app\widgets\ToolTip;
 use yii\helpers\Html;
 
 $this->title = 'User list';
@@ -19,10 +20,10 @@ foreach ($roles as $role) {
 }
 ?>
 
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+<div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-center">
     <div>
-        <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Administration</p>
-        <h1 class="h3 mb-0">User list</h1>
+        <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Administration</p>
+        <h1 class="mb-0 h3">User list</h1>
     </div>
     <?php if (Yii::$app->user->can('user.create')) : ?>
         <?= Html::a('Create account', ['/admin-user/create'], ['class' => 'btn btn-primary']) ?>
@@ -33,7 +34,7 @@ foreach ($roles as $role) {
 
 <section class="card admin-panel">
     <div class="card-header">
-        <p class="text-body-secondary mb-0">Review account details, roles, and access.</p>
+        <p class="mb-0 text-body-secondary">Review account details, roles, and access.</p>
     </div>
     <?= AdminGridView::widget([
         'dataProvider' => $dataProvider,
@@ -87,7 +88,7 @@ foreach ($roles as $role) {
 
                     return Html::beginForm(
                         ['/admin-user/assign-role', 'id' => $user->id],
-                        'post',
+                        'POST',
                         ['class' => 'd-flex flex-wrap gap-2 role-assignment-form'],
                     )
                         . Html::dropDownList('role', $selected, $roleOptions, [
@@ -105,20 +106,26 @@ foreach ($roles as $role) {
                 'value' => static function (User $user): string {
                     $actions = [];
                     if (Yii::$app->user->can('user.view')) {
-                        $actions[] = Html::a('View', ['/admin-user/view', 'id' => $user->id], [
-                            'class' => 'btn btn-sm btn-outline-secondary',
-                            'aria-label' => 'View account details for ' . $user->username,
-                        ]);
+                        $actions[] = Html::a('View', ['/admin-user/view', 'id' => $user->id], ToolTip::options(
+                            'View account details for ' . $user->username,
+                            [
+                                'class' => 'btn btn-sm btn-outline-secondary',
+                                'aria-label' => 'View account details for ' . $user->username,
+                            ],
+                        ));
                     }
 
                     if (
                         Yii::$app->user->can('user.update')
                         && Yii::$app->user->can('user.view')
                     ) {
-                        $actions[] = Html::a('Edit', ['/admin-user/update', 'id' => $user->id], [
-                            'class' => 'btn btn-sm btn-outline-primary',
-                            'aria-label' => 'Edit personal data for ' . $user->username,
-                        ]);
+                        $actions[] = Html::a('Edit', ['/admin-user/update', 'id' => $user->id], ToolTip::options(
+                            'Edit personal data for ' . $user->username,
+                            [
+                                'class' => 'btn btn-sm btn-outline-primary',
+                                'aria-label' => 'Edit personal data for ' . $user->username,
+                            ],
+                        ));
                     }
 
                     if (
@@ -127,13 +134,16 @@ foreach ($roles as $role) {
                     ) {
                         $actions[] = Html::beginForm(
                             ['/admin-user/delete', 'id' => $user->id],
-                            'post',
+                            'POST',
                             ['class' => 'd-inline'],
                         )
-                            . Html::submitButton('Delete', [
-                                'class' => 'btn btn-sm btn-outline-danger',
-                                'data-confirm-modal' => 'Permanently delete this account? Accounts with order history cannot be deleted.',
-                            ])
+                            . Html::submitButton('Delete', ToolTip::options(
+                                'Delete ' . $user->username,
+                                [
+                                    'class' => 'btn btn-sm btn-outline-danger',
+                                    'data-confirm-modal' => 'Permanently delete this account? Accounts with order history cannot be deleted.',
+                                ],
+                            ))
                             . Html::endForm();
                     }
 

@@ -47,16 +47,24 @@ if (Yii::$app->user->can('admin.access') || Yii::$app->user->can('staff.access')
 }
 
 if (Yii::$app->user->can('order.view')) {
+    $canOrderAgain = !Yii::$app->user->can('admin.access')
+        && !Yii::$app->user->can('staff.access')
+        && Yii::$app->user->can('cart.add');
     $columns[] = [
         'class' => 'yii\grid\ActionColumn',
         'header' => 'Action',
-        'template' => '{view}',
+        'template' => $canOrderAgain ? '{view} {order-again}' : '{view}',
         'buttons' => [
             'view' => static fn($url, Order $model): string => Html::a(
                 'View',
                 ['/order/view', 'id' => $model->id],
                 ['class' => 'btn btn-sm btn-outline-primary'],
             ),
+            'order-again' => static fn($url, Order $model): string => $model->status === Order::STATUS_COMPLETED
+                ? Html::beginForm(['/order/order-again', 'id' => $model->id], 'POST', ['class' => 'd-inline'])
+                    . Html::submitButton('Order Again', ['class' => 'btn btn-sm btn-outline-success'])
+                    . Html::endForm()
+                : '',
         ],
     ];
 }
@@ -79,7 +87,7 @@ if (Yii::$app->user->can('order.view')) {
     'canViewAudit' => $canViewAudit,
 ]) ?>
 
-<div class="order-table-card">
+<section class="card admin-panel">
     <div class="card-header">
         <p class="mb-0 text-body-secondary">Review order details.</p>
     </div>
@@ -87,5 +95,4 @@ if (Yii::$app->user->can('order.view')) {
         'dataProvider' => $dataProvider,
         'columns' => $columns,
     ]) ?>
-
-</div>
+</section>

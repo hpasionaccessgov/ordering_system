@@ -4,6 +4,10 @@ use app\models\Product;
 use yii\helpers\Html;
 
 /** @var Product $model */
+/** @var array<int, int> $favoriteIds */
+/** @var array{average: float, count: int}|null $ratingSummary */
+/** @var list<app\models\ProductReview> $reviews */
+/** @var list<app\models\Order> $eligibleOrders */
 
 $this->title = $model->name;
 $canViewProducts = Yii::$app->user->can('product.index');
@@ -14,6 +18,8 @@ $canViewAudit = $canManageProducts
     || Yii::$app->user->can('product.archive')
     || $canDeleteProducts;
 $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
+$canFavorite = !Yii::$app->user->isGuest && Yii::$app->user->can('favorite.index');
+$isFavorite = isset(($favoriteIds ?? [])[(int) $model->id]);
 ?>
 
 <section class="mx-auto product-detail-page">
@@ -65,6 +71,10 @@ $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
                         <?php endif; ?>
                     </div>
 
+                    <div class="mb-3">
+                        <?= $this->render('../shared/_rating_stars', ['summary' => $ratingSummary ?? null]) ?>
+                    </div>
+
                     <h2 class="fw-bold h3"><?= Html::encode($model->name) ?></h2>
                     <p class="text-body-secondary product-detail-description">
                         <?= nl2br(Html::encode($model->description ?? '')) ?>
@@ -91,7 +101,7 @@ $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
                                 </div>
                                 <?= Html::beginForm(
                                     ['/cart/add', 'id' => $model->id],
-                                    'post',
+                                    'POST',
                                     ['class' => 'd-flex flex-wrap align-items-end gap-3'],
                                 ) ?>
                                 <div>
@@ -113,6 +123,19 @@ $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
                             </div>
                         <?php endif; ?>
 
+                        <?php if ($canFavorite && $model->isActive()) : ?>
+                            <?= Html::beginForm(
+                                [$isFavorite ? '/favorite/remove' : '/favorite/add', 'id' => $model->id],
+                                'POST',
+                            ) ?>
+                            <?= Html::submitButton(
+                                '<i class="bi ' . ($isFavorite ? 'bi-heart-fill' : 'bi-heart') . ' me-1" aria-hidden="true"></i>'
+                                . ($isFavorite ? 'Remove from favorites' : 'Add to favorites'),
+                                ['class' => 'btn btn-outline-primary', 'encode' => false],
+                            ) ?>
+                            <?= Html::endForm() ?>
+                        <?php endif; ?>
+
                         <?php if ($canManageProducts) : ?>
                             <?= Html::a('Edit product', ['/product/update', 'id' => $model->id], [
                                 'class' => 'btn btn-outline-primary',
@@ -125,7 +148,7 @@ $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
                         ) : ?>
                             <?= Html::beginForm(
                                 ['/product/archive', 'id' => $model->id],
-                                'post',
+                                'POST',
                                 ['class' => 'd-inline'],
                             ) ?>
                             <?= Html::submitButton('Archive product', [
@@ -138,7 +161,7 @@ $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
                         <?php if ($canDeleteProducts) : ?>
                             <?= Html::beginForm(
                                 ['/product/delete', 'id' => $model->id],
-                                'post',
+                                'POST',
                                 ['class' => 'd-inline'],
                             ) ?>
                             <?= Html::submitButton('Delete permanently', [
@@ -175,5 +198,28 @@ $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
                 </div>
             </section>
         </div>
+    </div>
+</section>
+
+<section class="mt-4 card admin-panel product-reviews-panel">
+    <div class="card-header bg-transparent">
+        <h2 class="mb-0 h5">Customer reviews</h2>
+    </div>
+    <div class="card-body">
+        <?php $reviews = $reviews ?? []; ?>
+        <?php if ($reviews === []) : ?>
+            <p class="mb-0 text-body-secondary">No reviews yet.</p>
+        <?php else : ?>
+            <?php foreach ($reviews as $review) : ?>
+                <?= $this->render('../shared/_review_item', ['review' => $review]) ?>
+            <?php endforeach; ?>
+        <?php endif; ?>
+
+        <?php if (($eligibleOrders ?? []) !== []) : ?>
+            <?= $this->render('../shared/_review_form', [
+                'model' => $model,
+                'eligibleOrders' => $eligibleOrders,
+            ]) ?>
+        <?php endif; ?>
     </div>
 </section>

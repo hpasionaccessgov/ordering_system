@@ -42,6 +42,6 @@ $sort = Yii::$app->request->get('sort');
     'showAudit' => $canViewAudit,
     'showDates' => true,
     'showAmount' => true,
-    'amountLabel' => 'order total',
+    'amountLabel' => '',
 ]) ?>
 <?= Html::endForm() ?>

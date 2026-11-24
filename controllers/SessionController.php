@@ -14,7 +14,7 @@ class SessionController extends Controller
     public function behaviors(): array
     {
         return [
-            'verbs' => ['class' => VerbFilter::class, 'actions' => ['status' => ['get'], 'activity' => ['post']]],
+            'verbs' => ['class' => VerbFilter::class, 'actions' => ['status' => ['GET'], 'activity' => ['POST']]],
         ];
     }
 

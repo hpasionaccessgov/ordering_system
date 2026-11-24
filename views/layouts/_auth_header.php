@@ -7,21 +7,23 @@ use yii\helpers\Html;
 $actionId = Yii::$app->controller->action->id;
 $otherAuthRoute = $actionId === 'login' ? ['/site/register'] : ['/site/login'];
 $otherAuthLabel = $actionId === 'login' ? 'Create account' : 'Sign in';
+$brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
+    'alt' => '',
+    'class' => 'cafebara-brand-logo',
+]) . Html::tag(
+    'span',
+    Html::tag('span', 'Cafébara', ['class' => 'cafebara-brand-name'])
+        . Html::tag('span', 'CAFE & ORDERING', ['class' => 'cafebara-brand-caption']),
+    ['class' => 'cafebara-brand-copy'],
+);
 ?>
 <header class="cafebara-auth-header">
-    <nav class="navbar">
+    <nav class="navbar" aria-label="Account navigation">
         <div class="container">
-            <?= Html::a(
-                Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
-                    'alt' => '',
-                    'class' => 'cafebara-brand-logo',
-                ]) . Html::tag('span', 'Cafébara', ['class' => 'cafebara-brand-name']),
-                ['/site/index'],
-                [
-                    'class' => 'navbar-brand d-flex align-items-center gap-2',
-                    'aria-label' => 'Cafébara home',
-                ],
-            ) ?>
+            <?= Html::a($brand, ['/site/index'], [
+                'class' => 'navbar-brand cafebara-brand-lockup d-flex align-items-center gap-2',
+                'aria-label' => 'Cafébara home',
+            ]) ?>
 
             <div class="d-flex align-items-center gap-2 ms-auto">
                 <?= $this->render('_theme_toggle') ?>

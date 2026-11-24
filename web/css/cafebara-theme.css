@@ -127,7 +127,6 @@ body.confirm-modal-open .modal-backdrop {
     border: 1px solid var(--bs-border-color);
     background: var(--bs-tertiary-bg);
     border-radius: 1rem;
-    padding: clamp(1.25rem, 3vw, 2rem);
 }
 
 /* Scroll long admin card content inside the card instead of the whole page. */
@@ -265,6 +264,30 @@ body.confirm-modal-open .modal-backdrop {
     font-variant-numeric: tabular-nums;
 }
 
+.product-card-favorite {
+    position: absolute;
+    top: .75rem;
+    right: .75rem;
+    z-index: 6;
+    pointer-events: auto;
+}
+
+.product-card-favorite .btn {
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    color: var(--cafebara-brown);
+    border: 1px solid var(--cafebara-border);
+}
+
+.product-rating {
+    min-height: 1.25rem;
+}
+
+.product-review-form textarea {
+    resize: vertical;
+}
+
 .product-card-actions {
     display: flex;
     flex-wrap: wrap;
@@ -345,17 +368,77 @@ body.confirm-modal-open .modal-backdrop {
     opacity: 1;
 }
 
-.cart-item-image,
-.cart-item-placeholder {
+.cart-item-media {
+    position: relative;
     width: 5rem;
     height: 5rem;
     flex: 0 0 5rem;
     border-radius: .75rem;
-    object-fit: cover;
+    overflow: hidden;
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.cart-item-media:hover,
+.cart-item-media:focus-within {
+    z-index: 2;
+    transform: translateY(-3px) scale(1.06);
+    box-shadow: 0 .6rem 1.2rem rgba(48, 18, 6, .2);
+}
+
+.cart-item-image,
+.cart-item-placeholder {
+    width: 100%;
+    height: 100%;
 }
 
 .cart-item-image {
+    display: block;
+    object-fit: cover;
     background: var(--cafebara-cream);
+    transition: transform .3s ease;
+}
+
+.cart-item-media:hover .cart-item-image,
+.cart-item-media:focus-within .cart-item-image {
+    transform: scale(1.12);
+}
+
+.cart-item-image-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.cart-item-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .35rem;
+    color: #fff;
+    background: rgba(48, 18, 6, .45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+}
+
+.cart-item-media:hover .cart-item-overlay,
+.cart-item-media:focus-within .cart-item-overlay {
+    opacity: 1;
+}
+
+.cart-item-overlay-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.cart-item-overlay-label {
+    font-size: .8rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
 }
 
 .cart-item-placeholder {
@@ -494,38 +577,6 @@ body.confirm-modal-open .modal-backdrop {
 
 
 
-.order-table-card {
-    border: 1px solid var(--bs-border-color);
-    border-radius: 1rem;
-    background: var(--bs-tertiary-bg);
-    overflow: hidden;
-}
-
-.order-table-card .table {
-    margin-bottom: 0;
-}
-
-.order-table-card .table> :not(caption)>*>* {
-    padding: .9rem 1rem;
-    vertical-align: middle;
-}
-
-.order-table-card .table thead th {
-    color: var(--bs-secondary-color);
-    background: var(--bs-secondary-bg);
-    font-size: .75rem;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-}
-
-.order-table-card .table tbody tr {
-    transition: background-color .18s ease;
-}
-
-.order-table-card .table tbody tr:hover {
-    --bs-table-bg-state: color-mix(in srgb, var(--cafebara-brown) 8%, transparent);
-}
-
 .order-status {
     border: 1px solid var(--bs-border-color);
     border-radius: .5rem;
@@ -579,6 +630,20 @@ body.confirm-modal-open .modal-backdrop {
     font-variant-numeric: tabular-nums;
     font-size: 2rem;
     letter-spacing: -.04em;
+}
+
+.cafebara-stat-card .inner {
+    padding-right: 2.25rem;
+}
+
+.small-box.cafebara-stat-card .cafebara-stat-value {
+    margin: 0;
+    font-size: clamp(1.25rem, 1.15rem + .5vw, 1.5rem);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: normal;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .cafebara-stat-card span {
@@ -785,12 +850,8 @@ body {
 }
 
 @media (max-width: 575.98px) {
-    .order-table-card .table> :not(caption)>*>* {
+    .cafebara-admin-grid .table> :not(caption)>*>* {
         padding: .75rem .65rem;
-    }
-
-    .order-table-card .table {
-        min-width: 640px;
     }
 }
 
@@ -866,8 +927,9 @@ body {
 }
 
 .cafebara-auth-header {
-    background-color: var(--cafebara-cream);
+    background-color: rgba(248, 230, 203, .97);
     border-bottom: 1px solid #e8d2b4;
+    box-shadow: 0 4px 20px rgba(48, 18, 6, .08);
 }
 
 .cafebara-site-header {
@@ -881,6 +943,11 @@ body {
 }
 
 .cafebara-site-header .navbar {
+    padding: .55rem 0;
+}
+
+.cafebara-auth-header .navbar {
+    min-height: 70px;
     padding: .55rem 0;
 }
 
@@ -908,13 +975,14 @@ body {
 
 .cafebara-main-nav {
     align-items: center;
+    gap: .6rem;
 }
 
 .cafebara-main-nav .nav-link {
-    border-radius: 999px;
+    border-radius: 10px;
     color: var(--cafebara-dark);
     font-weight: 600;
-    padding: .6rem .9rem;
+    padding: 5px;
     transition: background-color .15s ease-in-out, color .15s ease-in-out;
 }
 
@@ -925,38 +993,16 @@ body {
     color: var(--cafebara-brown);
 }
 
-.cafebara-site-header .navbar-toggler {
-    border-color: rgba(48, 18, 6, .2);
-    padding: .45rem .6rem;
-}
-
-.cafebara-menu-icon,
-.cafebara-menu-icon::before,
-.cafebara-menu-icon::after {
-    display: block;
-    width: 1.25rem;
-    height: 2px;
-    border-radius: 2px;
-    background-color: var(--cafebara-dark);
-}
-
-.cafebara-menu-icon {
-    position: relative;
-}
-
-.cafebara-menu-icon::before,
-.cafebara-menu-icon::after {
-    position: absolute;
-    left: 0;
-    content: "";
-}
-
-.cafebara-menu-icon::before {
-    top: -.4rem;
-}
-
-.cafebara-menu-icon::after {
-    top: .4rem;
+/* Keep navbar-toggler for Bootstrap's responsive display, but style it like the admin sidebar toggle. */
+.cafebara-site-header .navbar-toggler.btn-outline-primary {
+    padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
+    font-size: var(--bs-btn-font-size);
+    line-height: var(--bs-btn-line-height);
+    color: var(--bs-btn-color);
+    background-color: var(--bs-btn-bg);
+    border-color: var(--bs-btn-border-color);
+    border-radius: var(--bs-btn-border-radius);
+    overflow: visible;
 }
 
 .cafebara-theme-toggle {
@@ -1466,11 +1512,42 @@ body {
     height: 280px;
 }
 
+@media (max-width: 575.98px) {
+    .cafebara-report-chart {
+        height: 240px;
+    }
+}
+
 [data-bs-theme="dark"] .cafebara-admin-grid .table thead th,
 [data-bs-theme="dark"] .cafebara-data-table thead th {
     border-bottom-color: var(--bs-border-color);
     background-color: var(--cafebara-surface-raised);
     color: var(--bs-body-color);
+}
+
+/* Bootstrap's .table-danger uses a fixed light palette; keep contextual rows theme-aware. */
+.cafebara-data-table tbody tr.table-danger,
+.cafebara-admin-grid .table tbody tr.table-danger {
+    --bs-table-bg: rgba(var(--bs-danger-rgb), .1);
+    --bs-table-hover-bg: rgba(var(--bs-danger-rgb), .18);
+    --bs-table-color: var(--bs-body-color);
+    --bs-table-striped-color: var(--bs-body-color);
+}
+
+.cafebara-data-table.table-striped tbody tr.table-danger>*,
+.cafebara-admin-grid .table.table-striped tbody tr.table-danger>* {
+    --bs-table-bg-type: rgba(var(--bs-danger-rgb), .1);
+}
+
+[data-bs-theme="dark"] .cafebara-data-table tbody tr.table-danger,
+[data-bs-theme="dark"] .cafebara-admin-grid .table tbody tr.table-danger {
+    --bs-table-bg: rgba(var(--bs-danger-rgb), .2);
+    --bs-table-hover-bg: rgba(var(--bs-danger-rgb), .3);
+}
+
+[data-bs-theme="dark"] .cafebara-data-table.table-striped tbody tr.table-danger>*,
+[data-bs-theme="dark"] .cafebara-admin-grid .table.table-striped tbody tr.table-danger>* {
+    --bs-table-bg-type: rgba(var(--bs-danger-rgb), .2);
 }
 
 .cafebara-empty-state {
@@ -1489,7 +1566,7 @@ body {
 }
 
 .cafebara-auth-header .navbar {
-    min-height: 68px;
+    min-height: 70px;
 }
 
 .cafebara-admin-brand {
@@ -1499,6 +1576,15 @@ body {
 .app-header,
 .app-sidebar .sidebar-brand {
     min-height: 70px;
+}
+
+.cafebara-admin-actions .nav-item {
+    display: flex;
+    align-items: center;
+}
+
+.cafebara-sidebar-toggle {
+    margin-right: .25rem;
 }
 
 .app-sidebar .sidebar-brand .brand-link {
@@ -1560,8 +1646,13 @@ body {
 }
 
 .app-header {
+    position: sticky;
+    top: 0;
+    z-index: 1034;
     background-color: var(--cafebara-cream) !important;
     border-bottom: 1px solid #e8d2b4;
+    box-shadow: 0 4px 20px rgba(48, 18, 6, .08);
+    backdrop-filter: blur(12px);
 }
 
 .app-header .navbar-brand,
@@ -1614,10 +1705,23 @@ body {
         height: 38px;
     }
 
+    .cafebara-brand-caption {
+        display: none;
+    }
+
     .cafebara-auth-header .btn {
         --bs-btn-padding-y: .375rem;
         --bs-btn-padding-x: .6rem;
         font-size: .875rem;
+    }
+
+    .cafebara-admin-actions {
+        gap: .25rem !important;
+    }
+
+    .cafebara-admin-actions .btn,
+    .cafebara-sidebar-toggle {
+        --bs-btn-padding-x: .55rem;
     }
 }
 
@@ -1665,16 +1769,6 @@ body {
     color: #fff !important;
 }
 
-[data-bs-theme="dark"] .cafebara-site-header .navbar-toggler {
-    border-color: rgba(248, 230, 203, .35);
-}
-
-[data-bs-theme="dark"] .cafebara-menu-icon,
-[data-bs-theme="dark"] .cafebara-menu-icon::before,
-[data-bs-theme="dark"] .cafebara-menu-icon::after {
-    background-color: var(--cafebara-cream);
-}
-
 [data-bs-theme="dark"] .cafebara-site-header .btn-outline-primary {
     --bs-btn-color: var(--cafebara-cream);
     --bs-btn-border-color: #d7b897;
@@ -1697,13 +1791,14 @@ body {
 }
 
 [data-bs-theme="dark"] .cafebara-auth-header {
-    background-color: var(--cafebara-dark);
-    border-bottom-color: rgba(248, 230, 203, .14);
+    background-color: var(--cafebara-surface);
+    border-bottom-color: var(--cafebara-border);
 }
 
 [data-bs-theme="dark"] .cafebara-auth-header .navbar-brand,
-[data-bs-theme="dark"] .cafebara-auth-header .cafebara-brand-name {
-    color: var(--cafebara-cream);
+[data-bs-theme="dark"] .cafebara-auth-header .cafebara-brand-name,
+[data-bs-theme="dark"] .cafebara-auth-header .cafebara-brand-caption {
+    color: var(--bs-body-color);
 }
 
 [data-bs-theme="dark"] .app-header {

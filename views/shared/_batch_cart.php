@@ -7,7 +7,7 @@ use yii\helpers\Html;
 /** @var string $batchFormId */
 ?>
 <div class="cafebara-batch-cart">
-    <?= Html::beginForm(['/cart/add-batch'], 'post', ['id' => $batchFormId]) ?>
+    <?= Html::beginForm(['/cart/add-batch'], 'POST', ['id' => $batchFormId]) ?>
     <?= Html::submitButton('Add selected to cart', ['class' => 'btn btn-primary font-monospace']) ?>
     <?= Html::endForm() ?>
 </div>

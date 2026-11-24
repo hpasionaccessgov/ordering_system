@@ -13,14 +13,14 @@ $this->title = 'Deactivate account';
     <div class="col-12 col-lg-7">
         <div class="card border-danger">
             <div class="card-header text-bg-danger">
-                <h2 class="card-title mb-0">Deactivate account</h2>
+                <h2 class="mb-0 card-title">Deactivate account</h2>
             </div>
             <div class="card-body">
                 <p>
                     Deactivating your account will sign you out and prevent future logins.
                 </p>
 
-                <?php $form = AdminActiveForm::begin(['method' => 'post']); ?>
+                <?php $form = AdminActiveForm::begin(['method' => 'POST']); ?>
 
                 <?= $form->errorSummary($model) ?>
 

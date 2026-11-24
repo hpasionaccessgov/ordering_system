@@ -14,12 +14,12 @@ $this->render('_head');
 ?>
 <?php $this->beginPage() ?>
 <!doctype html>
-<html lang="<?= Html::encode(Yii::$app->language) ?>" class="h-100" data-bs-theme="light">
+<html lang="<?= Html::encode(Yii::$app->language) ?>" data-bs-theme="light">
 <head>
     <title><?= Html::encode($this->title ?: Yii::$app->name) ?></title>
     <?php $this->head() ?>
 </head>
-<body class="d-flex flex-column h-100">
+<body class="d-flex flex-column min-vh-100">
 <?php $this->beginBody() ?>
 
 <?= $this->render('_public_header') ?>

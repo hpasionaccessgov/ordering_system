@@ -150,6 +150,16 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->hasOne(self::class, ['id' => 'updated_by']);
     }
 
+    public function getFavorites(): ActiveQuery
+    {
+        return $this->hasMany(Favorite::class, ['user_id' => 'id']);
+    }
+
+    public function getReviews(): ActiveQuery
+    {
+        return $this->hasMany(ProductReview::class, ['user_id' => 'id']);
+    }
+
     /**
      * ORDER BY expression that sorts a table by the username of its created_by/updated_by user,
      * without joining (a self-join would make unqualified columns ambiguous).

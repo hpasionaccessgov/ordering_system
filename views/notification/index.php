@@ -38,12 +38,12 @@ $this->title = 'Notifications';
                         <?= Html::a('View order', ['/order/view', 'id' => $notification->order_id], ['class' => 'btn btn-sm btn-outline-primary']) ?>
                     <?php endif ?>
                     <?php if ($notification->read_at === null && Yii::$app->user->can('notification.read')): ?>
-                        <?= Html::beginForm(['/notification/read', 'id' => $notification->id], 'post') ?>
+                        <?= Html::beginForm(['/notification/read', 'id' => $notification->id], 'POST') ?>
                         <?= Html::submitButton('Mark as read', ['class' => 'btn btn-sm btn-outline-secondary']) ?>
                         <?= Html::endForm() ?>
                     <?php endif ?>
                     <?php if (Yii::$app->user->can('notification.delete')): ?>
-                        <?= Html::beginForm(['/notification/delete', 'id' => $notification->id], 'post') ?>
+                        <?= Html::beginForm(['/notification/delete', 'id' => $notification->id], 'POST') ?>
                         <?= Html::submitButton('Delete', [
                             'class' => 'btn btn-sm btn-outline-danger',
                             'data-confirm-modal' => 'Delete this notification? This cannot be undone.',

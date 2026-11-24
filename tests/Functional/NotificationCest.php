@@ -59,6 +59,8 @@ final class NotificationCest
         $I->seeElement('[data-notification-link][aria-label="Notifications, 1 unread"][data-bs-toggle="dropdown"]');
         $I->seeElement('.cafebara-notification-menu');
         $I->see($orders[0]->order_number, '[data-notification-item]');
+        $I->seeElement('[data-notification-item] .badge.text-bg-primary');
+        $I->dontSee('margin-right: 5px');
         $I->seeElement('[data-notification-item][href*="notification%2Fview"]');
         $I->see('View all notifications', '.cafebara-notification-menu');
         $I->click('Mark as read');

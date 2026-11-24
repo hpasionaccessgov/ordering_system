@@ -50,6 +50,6 @@ use yii\helpers\Html;
     'showAudit' => $canManageProducts,
     'showDates' => $canManageProducts,
     'showAmount' => true,
-    'amountLabel' => 'price',
+    'amountLabel' => '',
 ]) ?>
 <?= Html::endForm() ?>

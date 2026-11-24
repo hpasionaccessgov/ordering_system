@@ -27,6 +27,8 @@ use yii\helpers\Url;
  * @property Category $categoryRecord
  * @property User|null $createdBy
  * @property User|null $updatedBy
+ * @property-read ProductIngredient[] $productIngredients
+ * @property-read Inventory[] $ingredients
  */
 class Product extends ActiveRecord
 {
@@ -102,6 +104,28 @@ class Product extends ActiveRecord
     public function getUpdatedBy(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'updated_by']);
+    }
+
+    public function getProductIngredients(): ActiveQuery
+    {
+        return $this->hasMany(ProductIngredient::class, ['product_id' => 'id']);
+    }
+
+    public function getIngredients(): ActiveQuery
+    {
+        return $this->hasMany(Inventory::class, ['id' => 'inventory_id'])->via('productIngredients');
+    }
+
+    public function getFavorites(): ActiveQuery
+    {
+        return $this->hasMany(Favorite::class, ['product_id' => 'id']);
+    }
+
+    public function getReviews(): ActiveQuery
+    {
+        return $this->hasMany(ProductReview::class, ['product_id' => 'id'])
+            ->with('user')
+            ->orderBy(['created_at' => SORT_DESC, 'id' => SORT_DESC]);
     }
 
     public function validateCategoryStatus(string $attribute): void
