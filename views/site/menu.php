@@ -63,8 +63,11 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
         </div>
     </div>
     <?= $this->render('../shared/_listing_filters', [
-        'filters' => $filters, 'showAudit' => false, 'showDates' => false,
-        'showAmount' => true, 'amountLabel' => 'price',
+        'filters' => $filters,
+        'showAudit' => false,
+        'showDates' => false,
+        'showAmount' => true,
+        'amountLabel' => '',
     ]) ?>
     <?= Html::endForm() ?>
 

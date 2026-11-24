@@ -553,38 +553,6 @@ body.confirm-modal-open .modal-backdrop {
 
 
 
-.order-table-card {
-    border: 1px solid var(--bs-border-color);
-    border-radius: 1rem;
-    background: var(--bs-tertiary-bg);
-    overflow: hidden;
-}
-
-.order-table-card .table {
-    margin-bottom: 0;
-}
-
-.order-table-card .table> :not(caption)>*>* {
-    padding: .9rem 1rem;
-    vertical-align: middle;
-}
-
-.order-table-card .table thead th {
-    color: var(--bs-secondary-color);
-    background: var(--bs-secondary-bg);
-    font-size: .75rem;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-}
-
-.order-table-card .table tbody tr {
-    transition: background-color .18s ease;
-}
-
-.order-table-card .table tbody tr:hover {
-    --bs-table-bg-state: color-mix(in srgb, var(--cafebara-brown) 8%, transparent);
-}
-
 .order-status {
     border: 1px solid var(--bs-border-color);
     border-radius: .5rem;
@@ -844,12 +812,8 @@ body {
 }
 
 @media (max-width: 575.98px) {
-    .order-table-card .table> :not(caption)>*>* {
+    .cafebara-admin-grid .table> :not(caption)>*>* {
         padding: .75rem .65rem;
-    }
-
-    .order-table-card .table {
-        min-width: 640px;
     }
 }
 
@@ -1515,6 +1479,31 @@ body {
     border-bottom-color: var(--bs-border-color);
     background-color: var(--cafebara-surface-raised);
     color: var(--bs-body-color);
+}
+
+/* Bootstrap's .table-danger uses a fixed light palette; keep contextual rows theme-aware. */
+.cafebara-data-table tbody tr.table-danger,
+.cafebara-admin-grid .table tbody tr.table-danger {
+    --bs-table-bg: rgba(var(--bs-danger-rgb), .1);
+    --bs-table-hover-bg: rgba(var(--bs-danger-rgb), .18);
+    --bs-table-color: var(--bs-body-color);
+    --bs-table-striped-color: var(--bs-body-color);
+}
+
+.cafebara-data-table.table-striped tbody tr.table-danger>*,
+.cafebara-admin-grid .table.table-striped tbody tr.table-danger>* {
+    --bs-table-bg-type: rgba(var(--bs-danger-rgb), .1);
+}
+
+[data-bs-theme="dark"] .cafebara-data-table tbody tr.table-danger,
+[data-bs-theme="dark"] .cafebara-admin-grid .table tbody tr.table-danger {
+    --bs-table-bg: rgba(var(--bs-danger-rgb), .2);
+    --bs-table-hover-bg: rgba(var(--bs-danger-rgb), .3);
+}
+
+[data-bs-theme="dark"] .cafebara-data-table.table-striped tbody tr.table-danger>*,
+[data-bs-theme="dark"] .cafebara-admin-grid .table.table-striped tbody tr.table-danger>* {
+    --bs-table-bg-type: rgba(var(--bs-danger-rgb), .2);
 }
 
 .cafebara-empty-state {

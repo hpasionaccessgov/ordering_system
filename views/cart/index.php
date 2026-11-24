@@ -35,7 +35,7 @@ $this->title = 'Shopping cart';
         </div>
     <?php else: ?>
         <div class="row g-4">
-            <div class="col-12 col-lg-8 card admin-panel cart-items-panel">
+            <div class="col-12 col-lg-8 p-3 card admin-panel cart-items-panel">
                 <?php foreach ($summary['lines'] as $line): ?>
                     <?php $product = $line['product']; ?>
                     <article class="mb-3 card admin-panel">

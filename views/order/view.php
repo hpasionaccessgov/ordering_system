@@ -75,7 +75,7 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
         </div>
     </section>
 
-    <section class="order-detail-panel mb-4 card admin">
+    <section class="order-detail-panel mb-4 card admin-panel">
         <div class="card-header bg-transparent">
             <h2 class="mb-0 h5">Items in this order</h2>
         </div>

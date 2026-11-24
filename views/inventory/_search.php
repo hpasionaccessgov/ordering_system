@@ -29,4 +29,11 @@ $sort = Yii::$app->request->get('sort');
     <div class="col-auto"><?= Html::a('Clear', ['/inventory/index'], ['class' => 'btn btn-outline-secondary']) ?></div>
 </div>
 <?= Html::errorSummary($model, ['class' => 'alert alert-danger mt-2']) ?>
+<?= $this->render('../shared/_listing_filters', [
+    'filters' => $model->filters,
+    'showAudit' => true,
+    'showDates' => true,
+    'showAmount' => false,
+    'amountLabel' => '',
+]) ?>
 <?= Html::endForm() ?>

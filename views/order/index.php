@@ -79,7 +79,7 @@ if (Yii::$app->user->can('order.view')) {
     'canViewAudit' => $canViewAudit,
 ]) ?>
 
-<div class="order-table-card">
+<section class="card admin-panel">
     <div class="card-header">
         <p class="mb-0 text-body-secondary">Review order details.</p>
     </div>
@@ -87,5 +87,4 @@ if (Yii::$app->user->can('order.view')) {
         'dataProvider' => $dataProvider,
         'columns' => $columns,
     ]) ?>
-
-</div>
+</section>

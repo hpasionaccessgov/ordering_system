@@ -17,27 +17,29 @@ $this->title = 'Checkout';
     <div class="row g-4">
         <div class="col-12 col-lg-8">
             <section class="card admin-panel">
-                <div class="table-responsive cafebara-table-scroll">
-                    <table class="mb-0 table table-striped table-bordered align-middle cafebara-data-table">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th>Quantity</th>
-                                <th>Unit price</th>
-                                <th class="text-end">Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($summary['lines'] as $line): ?>
+                <div class="card-body">
+                    <div class="table-responsive cafebara-table-scroll">
+                        <table class="mb-0 table table-striped table-bordered align-middle cafebara-data-table">
+                            <thead>
                                 <tr>
-                                    <td><?= Html::encode($line['product']->name) ?></td>
-                                    <td><?= Html::encode((string) $line['quantity']) ?></td>
-                                    <td><?= Yii::$app->formatter->asCurrency($line['product']->price) ?></td>
-                                    <td class="text-end"><?= Yii::$app->formatter->asCurrency($line['subtotal']) ?></td>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Unit price</th>
+                                    <th class="text-end">Subtotal</th>
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($summary['lines'] as $line): ?>
+                                    <tr>
+                                        <td><?= Html::encode($line['product']->name) ?></td>
+                                        <td><?= Html::encode((string) $line['quantity']) ?></td>
+                                        <td><?= Yii::$app->formatter->asCurrency($line['product']->price) ?></td>
+                                        <td class="text-end"><?= Yii::$app->formatter->asCurrency($line['subtotal']) ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
         </div>
