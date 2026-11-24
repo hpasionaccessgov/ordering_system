@@ -6,6 +6,8 @@ use yii\helpers\Html;
 
 /** @var Product $model */
 /** @var array<int, string> $categories */
+/** @var array<int, string> $inventoryItems */
+/** @var list<array{inventory_id: mixed, quantity_required: mixed}> $ingredientRows */
 
 $initialImageUrl = $model->getImageUrl();
 $cancelRoute = Yii::$app->user->can('product.index')
@@ -128,6 +130,12 @@ $form = AdminActiveForm::begin([
         </section>
     </div>
 </div>
+
+<?= $this->render('_ingredients', [
+    'model' => $model,
+    'inventoryItems' => $inventoryItems,
+    'ingredientRows' => $ingredientRows,
+]) ?>
 
 <div class="d-flex flex-wrap justify-content-end gap-2 mt-4">
     <?= Html::a('Cancel', $cancelRoute, ['class' => 'btn btn-outline-secondary']) ?>

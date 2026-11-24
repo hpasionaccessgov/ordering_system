@@ -18,9 +18,11 @@ use yii\db\ActiveRecord;
  * @property string|null $remarks
  * @property int|null $created_by
  * @property int $created_at
+ * @property int|null $order_id
  *
  * @property-read Inventory $inventory
  * @property-read User|null $createdBy
+ * @property-read Order|null $order
  */
 class InventoryTransaction extends ActiveRecord
 {
@@ -58,12 +60,13 @@ class InventoryTransaction extends ActiveRecord
     {
         return [
             [['inventory_id', 'quantity', 'transaction_type'], 'required'],
-            [['inventory_id', 'quantity', 'created_by'], 'integer'],
+            [['inventory_id', 'quantity', 'created_by', 'order_id'], 'integer'],
             [['quantity'], 'compare', 'compareValue' => 0, 'operator' => '!='],
             [['transaction_type'], 'string', 'max' => 30],
             [['transaction_type'], 'in', 'range' => array_keys(self::typeList())],
             [['remarks'], 'string', 'max' => 500],
             [['inventory_id'], 'exist', 'skipOnError' => true, 'targetClass' => Inventory::class, 'targetAttribute' => ['inventory_id' => 'id']],
+            [['order_id'], 'exist', 'skipOnError' => true, 'targetClass' => Order::class, 'targetAttribute' => ['order_id' => 'id']],
         ];
     }
 
@@ -77,6 +80,7 @@ class InventoryTransaction extends ActiveRecord
             'remarks' => 'Remarks',
             'created_by' => 'Created by',
             'created_at' => 'Created at',
+            'order_id' => 'Order',
         ];
     }
 
@@ -88,6 +92,11 @@ class InventoryTransaction extends ActiveRecord
     public function getCreatedBy(): ActiveQuery
     {
         return $this->hasOne(User::class, ['id' => 'created_by']);
+    }
+
+    public function getOrder(): ActiveQuery
+    {
+        return $this->hasOne(Order::class, ['id' => 'order_id']);
     }
 
     public function getTypeLabel(): string

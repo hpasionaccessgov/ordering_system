@@ -85,6 +85,10 @@ final class OrderStatusService
                 }
             }
 
+            if ($toStatus === Order::STATUS_COMPLETED) {
+                ProductIngredientService::validate($fresh);
+            }
+
             $fromStatus = (string) $fresh->status;
             $fresh->status = $toStatus;
             if (!$fresh->save(false, ['status', 'updated_at', 'updated_by'])) {
@@ -101,6 +105,9 @@ final class OrderStatusService
             ])->execute();
             if (!$isProcessing && $changedBy === (int) $fresh->user_id) {
                 $this->notifyOrderManagers($fresh, $changedBy);
+            }
+            if ($toStatus === Order::STATUS_COMPLETED) {
+                ProductIngredientService::deduct($fresh);
             }
             $transaction->commit();
 

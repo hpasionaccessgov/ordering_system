@@ -18,7 +18,7 @@ class InventoryQuery extends \yii\db\ActiveQuery
 
     public function lowStock(): self
     {
-        return $this->active()->andWhere('[[current_stock]] <= [[minimum_stock]]');
+        return $this->active()->andWhere('[[current_stock]] < [[minimum_stock]]');
     }
 
     public function outOfStock(): self

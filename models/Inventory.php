@@ -23,6 +23,8 @@ use yii\db\ActiveRecord;
  * @property int $updated_at
  *
  * @property-read InventoryTransaction[] $transactions
+ * @property-read ProductIngredient[] $productIngredients
+ * @property-read Product[] $products
  */
 class Inventory extends ActiveRecord
 {
@@ -86,9 +88,19 @@ class Inventory extends ActiveRecord
             ->orderBy(['created_at' => SORT_DESC, 'id' => SORT_DESC]);
     }
 
+    public function getProductIngredients(): ActiveQuery
+    {
+        return $this->hasMany(ProductIngredient::class, ['inventory_id' => 'id']);
+    }
+
+    public function getProducts(): ActiveQuery
+    {
+        return $this->hasMany(Product::class, ['id' => 'product_id'])->via('productIngredients');
+    }
+
     public function isLowStock(): bool
     {
-        return (int) $this->current_stock <= (int) $this->minimum_stock;
+        return (int) $this->current_stock < (int) $this->minimum_stock;
     }
 
     public function isOutOfStock(): bool

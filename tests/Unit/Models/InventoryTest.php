@@ -28,9 +28,13 @@ final class InventoryTest extends Unit
             InventoryService::lowStockMessage($milk),
         );
 
-        $cups = new Inventory(['current_stock' => 0, 'minimum_stock' => 0]);
+        $cups = new Inventory(['current_stock' => 0, 'minimum_stock' => 1]);
         self::assertTrue($cups->isLowStock());
         self::assertTrue($cups->isOutOfStock());
+
+        $atMinimum = new Inventory(['current_stock' => 100, 'minimum_stock' => 100]);
+        self::assertFalse($atMinimum->isLowStock());
+        self::assertFalse($atMinimum->isOutOfStock());
 
         $beans = new Inventory(['current_stock' => 20, 'minimum_stock' => 5]);
         self::assertFalse($beans->isLowStock());

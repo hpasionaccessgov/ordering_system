@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\exceptions\InsufficientInventoryException;
 use app\models\Order;
 use app\models\Notification;
 use app\models\OrderSearch;
@@ -14,6 +15,7 @@ use app\services\OrderStatusService;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\helpers\Html;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -259,10 +261,17 @@ class OrderController extends Controller
     public function actionProcess(int $id): Response
     {
         $order = $this->findAccessibleOrder($id);
-        (new OrderStatusService())->process(
-            $order,
-            (int) Yii::$app->user->id,
-        );
+
+        try {
+            (new OrderStatusService())->process(
+                $order,
+                (int) Yii::$app->user->id,
+            );
+        } catch (InsufficientInventoryException $exception) {
+            Yii::$app->session->setFlash('error', nl2br(Html::encode($exception->getMessage())));
+
+            return $this->redirect($this->getOrderReturnRoute((int) $order->id));
+        }
 
         Yii::$app->session->setFlash('success', 'Order status updated.');
 

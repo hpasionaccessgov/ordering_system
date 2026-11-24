@@ -121,6 +121,11 @@ class InventoryController extends Controller
 
             return $this->redirect(['view', 'id' => $model->id]);
         }
+        if ((int) $model->getProductIngredients()->count() > 0) {
+            Yii::$app->session->setFlash('error', 'This item is used in product recipes and cannot be deleted. Set it to Inactive instead.');
+
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
 
         $model->delete();
         Yii::$app->session->setFlash('success', 'Inventory item deleted.');

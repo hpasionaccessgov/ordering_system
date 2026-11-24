@@ -75,10 +75,10 @@ JS, View::POS_READY);
 ?>
 <div class="dropdown">
     <?= Html::a(
-        Html::tag('i', '', ToolTip::options('Notifications', [
+        Html::tag('i', '', [
             'class' => 'bi bi-bell',
             'aria-hidden' => 'true',
-        ]))
+        ])
             . ' ' . Html::tag('span', Html::encode($unreadCount), [
                 'class' => 'badge bg-danger',
                 'data-notification-count' => true,

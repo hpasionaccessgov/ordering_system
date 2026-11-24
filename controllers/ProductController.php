@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\models\Category;
+use app\models\Inventory;
 use app\models\OrderItem;
 use app\models\Product;
+use app\models\ProductIngredient;
 use app\models\ProductSearch;
 use app\services\NotificationService;
+use app\services\ProductIngredientService;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -154,7 +157,7 @@ class ProductController extends Controller
         if ($this->request->isPost && $model->load($this->postAttributes())) {
             $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
 
-            if ($this->saveProduct($model)) {
+            if ($this->saveWithIngredients($model)) {
                 Yii::$app->session->setFlash('success', 'Product created.');
 
                 return $this->redirect($this->getProductReturnRoute((int) $model->id));
@@ -164,6 +167,8 @@ class ProductController extends Controller
         return $this->render('create', [
             'model' => $model,
             'categories' => $this->getCategoryOptions($model),
+            'inventoryItems' => $this->getInventoryOptions($model),
+            'ingredientRows' => $this->ingredientRows($model),
         ]);
     }
 
@@ -179,7 +184,7 @@ class ProductController extends Controller
         if ($this->request->isPost && $model->load($this->postAttributes())) {
             $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
 
-            if ($this->saveProduct($model)) {
+            if ($this->saveWithIngredients($model)) {
                 Yii::$app->session->setFlash('success', 'Product updated.');
 
                 return $this->redirect(['view', 'id' => $model->id]);
@@ -189,6 +194,8 @@ class ProductController extends Controller
         return $this->render('update', [
             'model' => $model,
             'categories' => $this->getCategoryOptions($model),
+            'inventoryItems' => $this->getInventoryOptions($model),
+            'ingredientRows' => $this->ingredientRows($model),
         ]);
     }
 
@@ -325,6 +332,49 @@ class ProductController extends Controller
     }
 
     /**
+     * @return array<int, string>
+     */
+    private function getInventoryOptions(Product $product): array
+    {
+        $query = Inventory::find()->where(['status' => Inventory::STATUS_ACTIVE]);
+        $linkedIds = array_map(
+            static fn(ProductIngredient $ingredient): int => (int) $ingredient->inventory_id,
+            $product->productIngredients,
+        );
+        if ($linkedIds !== []) {
+            $query->orWhere(['id' => $linkedIds]);
+        }
+
+        return ArrayHelper::map(
+            $query->orderBy('name')->all(),
+            'id',
+            static fn(Inventory $item): string => $item->name . ' (' . $item->unit . ')',
+        );
+    }
+
+    /**
+     * @return list<array{inventory_id: mixed, quantity_required: mixed}>
+     */
+    private function ingredientRows(Product $product): array
+    {
+        $posted = $this->request->post('ingredients');
+        if (is_array($posted)) {
+            return array_values(array_filter(
+                $posted,
+                static fn($row): bool => is_array($row),
+            ));
+        }
+
+        return array_map(
+            static fn(ProductIngredient $ingredient): array => [
+                'inventory_id' => $ingredient->inventory_id,
+                'quantity_required' => $ingredient->quantity_required,
+            ],
+            $product->productIngredients,
+        );
+    }
+
+    /**
      * @return array|string
      */
     private function getProductReturnRoute(int $id): array|string
@@ -347,6 +397,32 @@ class ProductController extends Controller
         return Yii::$app->user->can('product.index')
             ? ['index']
             : ['/site/dashboard'];
+    }
+
+    private function saveWithIngredients(Product $model): bool
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $saved = $this->saveProduct($model)
+                && ProductIngredientService::sync(
+                    $model,
+                    (array) $this->request->post('ingredients', []),
+                );
+            if ($saved) {
+                $transaction->commit();
+
+                return true;
+            }
+            $transaction->rollBack();
+        } catch (\Throwable $exception) {
+            if ($transaction->isActive) {
+                $transaction->rollBack();
+            }
+
+            throw $exception;
+        }
+
+        return false;
     }
 
     private function saveProduct(Product $model): bool

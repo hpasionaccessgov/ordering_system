@@ -52,6 +52,7 @@ final class InventoryService
         int $quantity,
         string $type,
         ?string $remarks = null,
+        ?int $orderId = null,
     ): bool {
         if ($quantity === 0) {
             throw new \InvalidArgumentException('A stock movement quantity cannot be zero.');
@@ -60,13 +61,13 @@ final class InventoryService
             throw new \InvalidArgumentException('Unknown inventory transaction type.');
         }
 
-        return (bool) Yii::$app->db->transaction(static function () use ($inventory, $quantity, $type, $remarks): bool {
+        return (bool) Yii::$app->db->transaction(static function () use ($inventory, $quantity, $type, $remarks, $orderId): bool {
             $newStock = (int) $inventory->current_stock + $quantity;
             if ($newStock < 0) {
                 throw new \InvalidArgumentException('Stock cannot fall below zero.');
             }
             $inventory->updateAttributes(['current_stock' => $newStock, 'updated_at' => time()]);
-            self::addTransaction($inventory, $quantity, $type, $remarks);
+            self::addTransaction($inventory, $quantity, $type, $remarks, $orderId);
             self::syncLowStockNotification($inventory);
 
             return true;
@@ -89,6 +90,7 @@ final class InventoryService
         int $quantity,
         string $type,
         ?string $remarks,
+        ?int $orderId = null,
     ): void {
         $transaction = new InventoryTransaction([
             'inventory_id' => (int) $inventory->id,
@@ -96,6 +98,7 @@ final class InventoryService
             'transaction_type' => $type,
             'remarks' => $remarks,
             'created_by' => Yii::$app->has('user') ? Yii::$app->user->id : null,
+            'order_id' => $orderId,
         ]);
         if (!$transaction->save()) {
             throw new \RuntimeException('Could not record the inventory transaction: ' . json_encode($transaction->errors));

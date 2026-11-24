@@ -95,6 +95,12 @@ $this->params['breadcrumbs'][] = $this->title;
             'quantity',
             'remarks:ntext',
             [
+                'attribute' => 'order_id',
+                'label' => 'Order',
+                'value' => static fn(\app\models\InventoryTransaction $transaction): string =>
+                    $transaction->order?->order_number ?? '—',
+            ],
+            [
                 'attribute' => 'created_by',
                 'label' => 'Created by',
                 'value' => static fn(\app\models\InventoryTransaction $transaction): string => $transaction->createdBy?->username ?? '—',
