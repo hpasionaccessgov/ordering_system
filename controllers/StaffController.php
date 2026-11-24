@@ -8,6 +8,7 @@ use app\models\Inventory;
 use app\models\Order;
 use app\models\Product;
 use app\services\OrderStatistics;
+use app\services\SalesReportService;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 
@@ -43,6 +44,7 @@ class StaffController extends Controller
             'outOfStockCount' => (int) Inventory::find()->outOfStock()->count(),
             'lowStockItems' => Inventory::find()->lowStock()->orderBy(['current_stock' => SORT_ASC])->all(),
             'orderStatusCounts' => OrderStatistics::statusCounts(),
+            'todaySales' => (new SalesReportService())->todaySummary(),
         ]);
     }
 }

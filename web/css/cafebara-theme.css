@@ -608,6 +608,20 @@ body.confirm-modal-open .modal-backdrop {
     letter-spacing: -.04em;
 }
 
+.cafebara-stat-card .inner {
+    padding-right: 2.25rem;
+}
+
+.small-box.cafebara-stat-card .cafebara-stat-value {
+    margin: 0;
+    font-size: clamp(1.25rem, 1.15rem + .5vw, 1.5rem);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: normal;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
 .cafebara-stat-card span {
     color: var(--bs-secondary-color);
     font-size: .78rem;
@@ -1474,6 +1488,12 @@ body {
     height: 280px;
 }
 
+@media (max-width: 575.98px) {
+    .cafebara-report-chart {
+        height: 240px;
+    }
+}
+
 [data-bs-theme="dark"] .cafebara-admin-grid .table thead th,
 [data-bs-theme="dark"] .cafebara-data-table thead th {
     border-bottom-color: var(--bs-border-color);
@@ -1602,8 +1622,13 @@ body {
 }
 
 .app-header {
+    position: sticky;
+    top: 0;
+    z-index: 1034;
     background-color: var(--cafebara-cream) !important;
     border-bottom: 1px solid #e8d2b4;
+    box-shadow: 0 4px 20px rgba(48, 18, 6, .08);
+    backdrop-filter: blur(12px);
 }
 
 .app-header .navbar-brand,

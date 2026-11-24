@@ -9,6 +9,7 @@
 /** @var int $outOfStockCount */
 /** @var \app\models\Inventory[] $lowStockItems */
 /** @var array<string, int> $orderStatusCounts */
+/** @var array{revenue: float, orders: int, completed: int, cancelled: int, aov: float} $todaySales */
 
 use app\models\User;
 use yii\helpers\Html;
@@ -56,11 +57,14 @@ $displayName = $identity instanceof User
 <div class="row g-3 mb-4">
     <?php foreach (
         [
+            ["Today's revenue", Yii::$app->formatter->asCurrency($todaySales['revenue']), 'bi-cash-coin'],
+            ["Today's orders", $todaySales['orders'], 'bi-receipt'],
+            ['Average order value', Yii::$app->formatter->asCurrency($todaySales['aov']), 'bi-graph-up'],
+            ['Current low stock', $lowStockCount, 'bi-exclamation-triangle'],
             ['Active products', $activeProductCount, 'bi-cup-hot'],
             ['Pending orders', $pendingOrderCount, 'bi-hourglass-split'],
             ['Processing orders', $processingOrderCount, 'bi-arrow-repeat'],
             ['Inventory items', $inventoryCount, 'bi-box-seam'],
-            ['Low stock items', $lowStockCount, 'bi-exclamation-triangle'],
             ['Out of stock', $outOfStockCount, 'bi-x-circle'],
         ] as [$label, $value, $icon]
     ) : ?>
@@ -68,7 +72,7 @@ $displayName = $identity instanceof User
             <section class="small-box cafebara-stat-card h-100">
                 <div class="inner">
                     <p><?= Html::encode($label) ?></p>
-                    <h3><?= Html::encode((string) $value) ?></h3>
+                    <h3 class="cafebara-stat-value"><?= Html::encode((string) $value) ?></h3>
                 </div>
                 <i class="small-box-icon bi <?= Html::encode($icon) ?>" aria-hidden="true"></i>
             </section>

@@ -66,6 +66,40 @@ $navGroups = [
         ],
     ],
     [
+        'label' => 'Reports',
+        'icon' => 'bi-bar-chart-line',
+        'items' => [
+            [
+                'label' => 'Sales',
+                'icon' => 'bi-cash-coin',
+                'visible' => $can('reports.view'),
+                'route' => ['/report/sales'],
+                'active' => str_starts_with($currentRoute, 'report/sales'),
+            ],
+            [
+                'label' => 'Product performance',
+                'icon' => 'bi-graph-up',
+                'visible' => $can('reports.view'),
+                'route' => ['/report/product'],
+                'active' => str_starts_with($currentRoute, 'report/product'),
+            ],
+            [
+                'label' => 'Orders',
+                'icon' => 'bi-receipt',
+                'visible' => $can('reports.view'),
+                'route' => ['/report/orders'],
+                'active' => str_starts_with($currentRoute, 'report/orders'),
+            ],
+            [
+                'label' => 'Inventory',
+                'icon' => 'bi-box-seam',
+                'visible' => $can('reports.view'),
+                'route' => ['/report/inventory'],
+                'active' => str_starts_with($currentRoute, 'report/inventory'),
+            ],
+        ],
+    ],
+    [
         'label' => 'Administration',
         'icon' => 'bi-gear',
         'items' => [

@@ -10,6 +10,7 @@
 /** @var int $outOfStockCount */
 /** @var \app\models\Inventory[] $lowStockItems */
 /** @var array<string, int> $orderStatusCounts */
+/** @var array{revenue: float, orders: int, completed: int, cancelled: int, aov: float} $todaySales */
 
 use app\models\User;
 use yii\helpers\Html;
@@ -55,12 +56,15 @@ $displayName = $identity instanceof User
 <div class="row g-3 mb-4">
     <?php foreach (
         [
+            ["Today's revenue", Yii::$app->formatter->asCurrency($todaySales['revenue']), 'bi-cash-coin', 'Completed orders today'],
+            ["Today's orders", $todaySales['orders'], 'bi-receipt', 'All statuses today'],
+            ['Average order value', Yii::$app->formatter->asCurrency($todaySales['aov']), 'bi-graph-up', 'Completed orders today'],
+            ['Current low stock', $lowStockCount, 'bi-exclamation-triangle', 'Below minimum'],
             ['People with access', $userCount, 'bi-people', 'Total accounts'],
             ['Active accounts', $activeUserCount, 'bi-person-check', 'Allowed to sign in'],
             ['Active products', $productCount, 'bi-cup-hot', 'Visible in catalog'],
             ['Pending orders', $pendingOrderCount, 'bi-receipt', 'Need attention'],
             ['Inventory items', $inventoryCount, 'bi-box-seam', 'Active tracked items'],
-            ['Low stock items', $lowStockCount, 'bi-exclamation-triangle', 'At or below minimum'],
             ['Out of stock', $outOfStockCount, 'bi-x-circle', 'Need restocking'],
         ] as [$label, $value, $icon, $caption]
 ) : ?>
@@ -68,7 +72,7 @@ $displayName = $identity instanceof User
             <section class="small-box cafebara-stat-card h-100">
                 <div class="inner">
                     <p><?= Html::encode($label) ?></p>
-                    <h3><?= Html::encode((string) $value) ?></h3>
+                    <h3 class="cafebara-stat-value"><?= Html::encode((string) $value) ?></h3>
                     <span><?= Html::encode($caption) ?></span>
                 </div>
                 <i class="small-box-icon bi <?= Html::encode($icon) ?>" aria-hidden="true"></i>
