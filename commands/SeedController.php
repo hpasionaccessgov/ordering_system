@@ -54,6 +54,8 @@ class SeedController extends Controller
             foreach ([
                 'notifications',
                 'activity_log',
+                'product_review',
+                'favorite',
                 'cart_items',
                 'order_status_history',
                 'order_items',

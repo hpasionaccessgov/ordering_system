@@ -264,6 +264,30 @@ body.confirm-modal-open .modal-backdrop {
     font-variant-numeric: tabular-nums;
 }
 
+.product-card-favorite {
+    position: absolute;
+    top: .75rem;
+    right: .75rem;
+    z-index: 6;
+    pointer-events: auto;
+}
+
+.product-card-favorite .btn {
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    color: var(--cafebara-brown);
+    border: 1px solid var(--cafebara-border);
+}
+
+.product-rating {
+    min-height: 1.25rem;
+}
+
+.product-review-form textarea {
+    resize: vertical;
+}
+
 .product-card-actions {
     display: flex;
     flex-wrap: wrap;

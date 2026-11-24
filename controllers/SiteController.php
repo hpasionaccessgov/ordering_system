@@ -15,6 +15,9 @@ use app\models\ProfileForm;
 use app\models\DeactivateForm;
 use app\models\Product;
 use app\models\ProductSearch;
+use app\services\FavoriteService;
+use app\services\ProductReportService;
+use app\services\ReviewService;
 use app\services\ShoppingCart;
 use app\models\Category;
 use yii\data\ActiveDataProvider;
@@ -40,6 +43,23 @@ class SiteController extends Controller
         }
 
         return $user;
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function favoriteIds(): array
+    {
+        return Yii::$app->user->isGuest ? [] : FavoriteService::ids((int) Yii::$app->user->id);
+    }
+
+    /**
+     * @param list<Product> $products
+     * @return list<int>
+     */
+    private function productIds(array $products): array
+    {
+        return array_map(static fn(Product $product): int => (int) $product->id, $products);
     }
 
     public function __construct(
@@ -105,17 +125,22 @@ class SiteController extends Controller
      */
     public function actionIndex(): string
     {
+        $featuredDataProvider = new ActiveDataProvider([
+            'query' => Product::find()
+                ->where([
+                    'status' => Product::STATUS_ACTIVE,
+                    'is_featured' => true,
+                ])
+                ->orderBy(['name' => SORT_ASC]),
+            'pagination' => ApplicationSettings::pagination(true),
+            'sort' => false,
+        ]);
+
         return $this->render('index', [
-            'featuredDataProvider' => new ActiveDataProvider([
-                'query' => Product::find()
-                    ->where([
-                        'status' => Product::STATUS_ACTIVE,
-                        'is_featured' => true,
-                    ])
-                    ->orderBy(['name' => SORT_ASC]),
-                'pagination' => ApplicationSettings::pagination(true),
-                'sort' => false,
-            ]),
+            'featuredDataProvider' => $featuredDataProvider,
+            'favoriteIds' => $this->favoriteIds(),
+            'ratingSummaries' => ReviewService::summaries($this->productIds($featuredDataProvider->getModels())),
+            'bestSellers' => (new ProductReportService())->bestSellers(5),
         ]);
     }
 
@@ -140,6 +165,9 @@ class SiteController extends Controller
             'search' => $searchModel->q,
             'categoryId' => $searchModel->categoryId,
             'filters' => $searchModel->filters,
+            'favoriteIds' => $this->favoriteIds(),
+            'ratingSummaries' => ReviewService::summaries($this->productIds($dataProvider->getModels())),
+            'bestSellers' => (new ProductReportService())->bestSellers(5),
         ]);
     }
 

@@ -83,29 +83,17 @@ final class ProductIngredientService
      */
     public static function validate(Order $order): void
     {
-        $needs = self::requirements($order);
-        if ($needs === []) {
-            return;
-        }
+        self::assertStock(self::requirements($order));
+    }
 
-        $inventory = self::lockedInventory(array_keys($needs));
-        $shortages = [];
-        foreach ($needs as $inventoryId => $need) {
-            $available = isset($inventory[$inventoryId])
-                ? (int) $inventory[$inventoryId]->current_stock
-                : 0;
-            if ($available < $need['needed']) {
-                $shortages[] = [
-                    'name' => $need['name'],
-                    'needed' => $need['needed'],
-                    'available' => $available,
-                ];
-            }
-        }
-
-        if ($shortages !== []) {
-            throw new InsufficientInventoryException($shortages);
-        }
+    /**
+     * Checks stock for a proposed basket before it is written to the cart.
+     *
+     * @param array<int, int> $quantities product ID => quantity
+     */
+    public static function validateQuantities(array $quantities): void
+    {
+        self::assertStock(self::requirementsForQuantities($quantities));
     }
 
     /**
@@ -137,26 +125,75 @@ final class ProductIngredientService
     }
 
     /**
+     * @param array<int, array{name: string, needed: int}> $needs
+     */
+    private static function assertStock(array $needs): void
+    {
+        if ($needs === []) {
+            return;
+        }
+
+        $inventory = self::lockedInventory(array_keys($needs));
+        $shortages = [];
+        foreach ($needs as $inventoryId => $need) {
+            $available = isset($inventory[$inventoryId])
+                ? (int) $inventory[$inventoryId]->current_stock
+                : 0;
+            if ($available < $need['needed']) {
+                $shortages[] = [
+                    'name' => $need['name'],
+                    'needed' => $need['needed'],
+                    'available' => $available,
+                ];
+            }
+        }
+
+        if ($shortages !== []) {
+            throw new InsufficientInventoryException($shortages);
+        }
+    }
+
+    /**
      * @return array<int, array{name: string, needed: int}>
      */
     private static function requirements(Order $order): array
     {
+        $quantities = [];
+        $items = $order->getItems()->select(['product_id', 'quantity'])->asArray()->all();
+        foreach ($items as $item) {
+            $productId = (int) $item['product_id'];
+            $quantities[$productId] = ($quantities[$productId] ?? 0) + (int) $item['quantity'];
+        }
+
+        return self::requirementsForQuantities($quantities);
+    }
+
+    /**
+     * @param array<int, int> $quantities product ID => quantity
+     * @return array<int, array{name: string, needed: int}>
+     */
+    private static function requirementsForQuantities(array $quantities): array
+    {
         $needs = [];
-        $items = $order->getItems()
-            ->with('product.productIngredients.inventory')
+        $ingredients = ProductIngredient::find()
+            ->where(['product_id' => array_keys($quantities)])
+            ->with('inventory')
             ->all();
 
-        foreach ($items as $item) {
-            foreach ($item->product?->productIngredients ?? [] as $ingredient) {
-                $inventoryId = (int) $ingredient->inventory_id;
-                if (!isset($needs[$inventoryId])) {
-                    $needs[$inventoryId] = [
-                        'name' => $ingredient->inventory?->name ?? 'Inventory item #' . $inventoryId,
-                        'needed' => 0,
-                    ];
-                }
-                $needs[$inventoryId]['needed'] += (int) $ingredient->quantity_required * (int) $item->quantity;
+        foreach ($ingredients as $ingredient) {
+            $quantity = $quantities[(int) $ingredient->product_id] ?? 0;
+            if ($quantity <= 0) {
+                continue;
             }
+
+            $inventoryId = (int) $ingredient->inventory_id;
+            if (!isset($needs[$inventoryId])) {
+                $needs[$inventoryId] = [
+                    'name' => $ingredient->inventory?->name ?? 'Inventory item #' . $inventoryId,
+                    'needed' => 0,
+                ];
+            }
+            $needs[$inventoryId]['needed'] += (int) $ingredient->quantity_required * $quantity;
         }
 
         return $needs;

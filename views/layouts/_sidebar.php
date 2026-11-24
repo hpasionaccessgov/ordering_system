@@ -57,6 +57,13 @@ $navGroups = [
                 'active' => str_starts_with($currentRoute, 'cart/'),
             ],
             [
+                'label' => 'Favorites',
+                'icon' => 'bi-heart',
+                'visible' => $can('favorite.index'),
+                'route' => ['/favorite/index'],
+                'active' => str_starts_with($currentRoute, 'favorite/'),
+            ],
+            [
                 'label' => 'Inventory',
                 'icon' => 'bi-box-seam-fill',
                 'visible' => $can('inventory.index') || $can('inventory.create'),

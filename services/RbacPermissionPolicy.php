@@ -36,6 +36,7 @@ final class RbacPermissionPolicy
             'cart.remove',
             'cart.checkout',
         ],
+        'favorite.index' => ['favorite.add', 'favorite.remove'],
         'activityLog.index' => ['activityLog.view'],
         'notification.index' => ['notification.read', 'notification.delete'],
         'settings.index' => ['settings.update'],

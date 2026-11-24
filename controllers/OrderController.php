@@ -12,6 +12,7 @@ use app\services\ShoppingCart;
 use app\services\OrderAccessPolicy;
 use app\services\OrderService;
 use app\services\OrderStatusService;
+use app\services\ReorderService;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -44,6 +45,11 @@ class OrderController extends Controller
                     ],
                     [
                         'actions' => ['view'],
+                        'allow' => true,
+                        'roles' => ['order.view'],
+                    ],
+                    [
+                        'actions' => ['order-again'],
                         'allow' => true,
                         'roles' => ['order.view'],
                     ],
@@ -95,6 +101,7 @@ class OrderController extends Controller
                     'cancel' => ['POST'],
                     'process' => ['POST'],
                     'create-product' => ['POST'],
+                    'order-again' => ['POST'],
                 ],
             ],
         ];
@@ -132,6 +139,28 @@ class OrderController extends Controller
         return $this->render('view', [
             'model' => $order,
         ]);
+    }
+
+    public function actionOrderAgain(int $id): Response
+    {
+        if (!Yii::$app->user->can('cart.add')) {
+            throw new ForbiddenHttpException('You are not allowed to add items to your cart.');
+        }
+
+        try {
+            $result = (new ReorderService())->reorder((int) Yii::$app->user->id, $id);
+            $message = "{$result['added']} product(s) added to your cart.";
+            if ($result['skipped'] !== []) {
+                $message .= ' Skipped: ' . implode(', ', $result['skipped']) . '.';
+            }
+            Yii::$app->session->setFlash('success', $message);
+
+            return $this->redirect(['/cart/index']);
+        } catch (BadRequestHttpException $exception) {
+            Yii::$app->session->setFlash('error', $exception->getMessage());
+
+            return $this->redirect(['index']);
+        }
     }
 
     public function actionReceipt(int $id): string

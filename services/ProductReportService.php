@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\services;
 
+use app\models\Order;
 use app\models\OrderItem;
 use app\models\Product;
 use app\models\ReportFilter;
@@ -40,6 +41,42 @@ final class ProductReportService
     public function top(ReportFilter $filter, int $limit = 10): array
     {
         return array_slice($this->ranking($filter), 0, $limit);
+    }
+
+    /**
+     * All-time top sellers from completed orders; no date filter so it updates as orders complete.
+     *
+     * @return list<array{product_id: int, product_name: string, quantity: int}>
+     */
+    public function bestSellers(int $limit = 5): array
+    {
+        $rows = OrderItem::find()
+            ->alias('oi')
+            ->select([
+                'product_id' => 'oi.product_id',
+                'product_name' => 'p.name',
+                'quantity' => 'SUM(oi.quantity)',
+            ])
+            ->innerJoin(['o' => '{{%orders}}'], 'o.id = oi.order_id')
+            ->innerJoin(['p' => '{{%products}}'], 'p.id = oi.product_id')
+            ->where([
+                'o.status' => Order::STATUS_COMPLETED,
+                'p.status' => Product::STATUS_ACTIVE,
+            ])
+            ->groupBy(['oi.product_id', 'p.name'])
+            ->orderBy(['quantity' => SORT_DESC, 'p.name' => SORT_ASC])
+            ->limit($limit)
+            ->asArray()
+            ->all();
+
+        return array_map(
+            static fn(array $row): array => [
+                'product_id' => (int) $row['product_id'],
+                'product_name' => (string) $row['product_name'],
+                'quantity' => (int) $row['quantity'],
+            ],
+            $rows,
+        );
     }
 
     /**

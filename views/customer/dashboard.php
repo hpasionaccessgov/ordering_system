@@ -3,6 +3,13 @@
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $featuredDataProvider */
 /** @var int $orderCount */
+/** @var float $totalSpent */
+/** @var int $favoriteCount */
+/** @var app\models\Product|null $favoriteProduct */
+/** @var app\models\Order|null $recentOrder */
+/** @var array<int, int> $favoriteIds */
+/** @var array<int, array{average: float, count: int}> $ratingSummaries */
+/** @var list<array{product_id: int, product_name: string, quantity: int}> $bestSellers */
 
 use app\models\User;
 use yii\bootstrap5\LinkPager;
@@ -43,15 +50,65 @@ $displayName = $identity instanceof User
     </div>
 </section>
 
-<section class="mb-4 card border-0 customer-summary">
+<div class="row g-3 mb-4">
+    <?php foreach ([
+        ['Total orders', (string) ($orderCount ?? 0), 'bi-receipt'],
+        ['Total spent', Yii::$app->formatter->asCurrency($totalSpent ?? 0), 'bi-cash-coin'],
+        ['Favorites', (string) ($favoriteCount ?? 0), 'bi-heart'],
+    ] as [$label, $value, $icon]) : ?>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <section class="h-100 small-box cafebara-stat-card">
+                <div class="inner">
+                    <p><?= Html::encode($label) ?></p>
+                    <h3 class="cafebara-stat-value"><?= Html::encode($value) ?></h3>
+                </div>
+                <i class="small-box-icon bi <?= Html::encode($icon) ?>" aria-hidden="true"></i>
+            </section>
+        </div>
+    <?php endforeach; ?>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <section class="h-100 small-box cafebara-stat-card">
+            <div class="inner">
+                <p>Favorite product</p>
+                <?php if (($favoriteProduct ?? null) !== null) : ?>
+                    <h3 class="cafebara-stat-value">
+                        <?= Html::a(Html::encode($favoriteProduct->name), ['/product/view', 'id' => $favoriteProduct->id], [
+                            'class' => 'link-body-emphasis text-decoration-none',
+                        ]) ?>
+                    </h3>
+                <?php else : ?>
+                    <h3 class="cafebara-stat-value">No favorites yet</h3>
+                <?php endif; ?>
+            </div>
+            <i class="small-box-icon bi bi-star" aria-hidden="true"></i>
+        </section>
+    </div>
+</div>
+
+<section class="mb-4 card admin-panel">
     <div class="d-flex flex-wrap gap-3 card-body justify-content-between align-items-center">
         <div>
-            <p class="mb-1 text-body-secondary">Your order history</p>
-            <h2 class="mb-0 h4"><?= Html::encode((string) $orderCount) ?> orders placed</h2>
+            <p class="mb-1 text-body-secondary">Most recent order</p>
+            <?php if (($recentOrder ?? null) !== null) : ?>
+                <h2 class="mb-0 h5">
+                    <?= Html::encode($recentOrder->order_number) ?>
+                    <span class="text-body-secondary fw-normal">
+                        · <?= Html::encode(ucfirst((string) $recentOrder->status)) ?>
+                        · <?= Yii::$app->formatter->asDatetime($recentOrder->created_at) ?>
+                    </span>
+                </h2>
+            <?php else : ?>
+                <h2 class="mb-0 h5">No orders yet</h2>
+            <?php endif; ?>
         </div>
-        <?php if (Yii::$app->user->can('order.index')) : ?>
-            <?= Html::a('View your orders', ['/order/index'], ['class' => 'btn btn-outline-primary ms-auto']) ?>
-        <?php endif; ?>
+        <div class="d-flex flex-wrap gap-2 ms-auto">
+            <?php if (Yii::$app->user->can('favorite.index')) : ?>
+                <?= Html::a('My favorites', ['/favorite/index'], ['class' => 'btn btn-outline-primary']) ?>
+            <?php endif; ?>
+            <?php if (Yii::$app->user->can('order.index')) : ?>
+                <?= Html::a('View your orders', ['/order/index'], ['class' => 'btn btn-outline-primary']) ?>
+            <?php endif; ?>
+        </div>
     </div>
 </section>
 
@@ -75,6 +132,8 @@ $displayName = $identity instanceof User
                     <?= $this->render('../shared/_product_card', [
                         'product' => $product,
                         'batchFormId' => $batchFormId,
+                        'favoriteIds' => $favoriteIds ?? [],
+                        'ratingSummaries' => $ratingSummaries ?? [],
                     ]) ?>
                 </div>
             <?php endforeach; ?>
@@ -88,3 +147,5 @@ $displayName = $identity instanceof User
         </div>
     </section>
 <?php endif; ?>
+
+<?= $this->render('../shared/_best_sellers', ['bestSellers' => $bestSellers ?? []]) ?>

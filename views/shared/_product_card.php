@@ -5,13 +5,19 @@ use yii\helpers\Html;
 
 /** @var Product $product */
 /** @var string|null $batchFormId id of a shared batch cart form, or null for per-card add */
+/** @var array<int, int> $favoriteIds product ID => favorite ID */
+/** @var array<int, array{average: float, count: int}> $ratingSummaries */
 
 $batchFormId = $batchFormId ?? null;
+$favoriteIds = $favoriteIds ?? [];
+$ratingSummaries = $ratingSummaries ?? [];
 $canViewProduct = Yii::$app->user->isGuest || Yii::$app->user->can('product.view');
 $canUpdateProducts = $canViewProduct && Yii::$app->user->can('product.update');
 $canArchiveProducts = Yii::$app->user->can('product.archive');
 $canDeleteProducts = Yii::$app->user->can('product.delete');
 $canViewAudit = $canUpdateProducts || $canArchiveProducts || $canDeleteProducts;
+$canFavorite = !Yii::$app->user->isGuest && Yii::$app->user->can('favorite.index');
+$isFavorite = isset($favoriteIds[(int) $product->id]);
 ?>
 
 <article class="card h-100 position-relative product-card product-catalog-card">
@@ -33,12 +39,33 @@ $canViewAudit = $canUpdateProducts || $canArchiveProducts || $canDeleteProducts;
                 <i class="bi bi-cup-hot"></i>
             </div>
         <?php endif; ?>
+        <?php if ($canFavorite) : ?>
+            <?php
+            $favoriteLabel = $isFavorite ? 'Remove from favorites' : 'Add to favorites';
+            ?>
+            <?= Html::beginForm(
+                [$isFavorite ? '/favorite/remove' : '/favorite/add', 'id' => $product->id],
+                'POST',
+                ['class' => 'product-card-favorite'],
+            ) ?>
+            <?= Html::submitButton('<i class="bi ' . ($isFavorite ? 'bi-heart-fill' : 'bi-heart') . '" aria-hidden="true"></i>', [
+                'class' => 'btn btn-sm btn-light rounded-circle shadow-sm',
+                'encode' => false,
+                'aria-label' => $favoriteLabel,
+                'aria-pressed' => $isFavorite ? 'true' : 'false',
+                'title' => $favoriteLabel,
+            ]) ?>
+            <?= Html::endForm() ?>
+        <?php endif; ?>
     </div>
 
     <div class="d-flex flex-column card-body">
         <p class="mb-2 product-category">
             <?= Html::encode($product->categoryRecord?->name ?? 'Cafébara menu') ?>
         </p>
+        <?= $this->render('_rating_stars', [
+            'summary' => $ratingSummaries[(int) $product->id] ?? null,
+        ]) ?>
         <h2 class="mb-2 h5">
             <?php if ($canViewProduct) : ?>
                 <?= Html::a(Html::encode($product->name), ['/product/view', 'id' => $product->id], [

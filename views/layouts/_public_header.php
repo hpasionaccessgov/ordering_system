@@ -69,6 +69,13 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                             'class' => 'btn btn-primary',
                         ]) ?>
                     <?php else: ?>
+                        <?php if (Yii::$app->user->can('favorite.index')): ?>
+                            <?= Html::a('<i class="bi bi-heart" aria-hidden="true"></i><span class="ms-1 d-none d-xl-inline">Favorites</span>', ['/favorite/index'], [
+                                'class' => 'btn btn-outline-primary',
+                                'encode' => false,
+                                'aria-label' => 'Favorites',
+                            ]) ?>
+                        <?php endif; ?>
                         <?php if (Yii::$app->user->can('notification.index')): ?>
                             <?= $this->render('_notifications_link', ['class' => 'btn btn-outline-primary']) ?>
                         <?php endif ?>

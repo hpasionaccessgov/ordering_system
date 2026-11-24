@@ -116,6 +116,18 @@ class Product extends ActiveRecord
         return $this->hasMany(Inventory::class, ['id' => 'inventory_id'])->via('productIngredients');
     }
 
+    public function getFavorites(): ActiveQuery
+    {
+        return $this->hasMany(Favorite::class, ['product_id' => 'id']);
+    }
+
+    public function getReviews(): ActiveQuery
+    {
+        return $this->hasMany(ProductReview::class, ['product_id' => 'id'])
+            ->with('user')
+            ->orderBy(['created_at' => SORT_DESC, 'id' => SORT_DESC]);
+    }
+
     public function validateCategoryStatus(string $attribute): void
     {
         if ($this->hasErrors($attribute) || $this->$attribute === null) {

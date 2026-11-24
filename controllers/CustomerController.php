@@ -7,6 +7,9 @@ namespace app\controllers;
 use app\models\Order;
 use app\models\Product;
 use app\models\ApplicationSettings;
+use app\services\FavoriteService;
+use app\services\ProductReportService;
+use app\services\ReviewService;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
@@ -32,21 +35,39 @@ class CustomerController extends Controller
     public function actionDashboard(): string
     {
         $this->layout = 'admin';
+        $userId = (int) Yii::$app->user->id;
+        $featuredDataProvider = new ActiveDataProvider([
+            'query' => Product::find()
+                ->where([
+                    'status' => Product::STATUS_ACTIVE,
+                    'is_featured' => true,
+                ])
+                ->orderBy(['name' => SORT_ASC]),
+            'pagination' => ApplicationSettings::pagination(true),
+            'sort' => false,
+        ]);
+        $featuredProducts = $featuredDataProvider->getModels();
 
         return $this->render('dashboard', [
-            'featuredDataProvider' => new ActiveDataProvider([
-                'query' => Product::find()
-                    ->where([
-                        'status' => Product::STATUS_ACTIVE,
-                        'is_featured' => true,
-                    ])
-                    ->orderBy(['name' => SORT_ASC]),
-                'pagination' => ApplicationSettings::pagination(true),
-                'sort' => false,
-            ]),
+            'featuredDataProvider' => $featuredDataProvider,
             'orderCount' => (int) Order::find()
-                ->where(['user_id' => Yii::$app->user->id])
+                ->where(['user_id' => $userId])
                 ->count(),
+            'totalSpent' => (float) Order::find()
+                ->where(['user_id' => $userId, 'status' => Order::STATUS_COMPLETED])
+                ->sum('total_amount'),
+            'favoriteCount' => FavoriteService::countFor($userId),
+            'favoriteProduct' => FavoriteService::latestProduct($userId),
+            'recentOrder' => Order::find()
+                ->where(['user_id' => $userId])
+                ->orderBy(['created_at' => SORT_DESC, 'id' => SORT_DESC])
+                ->one(),
+            'favoriteIds' => FavoriteService::ids($userId),
+            'ratingSummaries' => ReviewService::summaries(array_map(
+                static fn(Product $product): int => (int) $product->id,
+                $featuredProducts,
+            )),
+            'bestSellers' => (new ProductReportService())->bestSellers(5),
         ]);
     }
 }

@@ -10,8 +10,11 @@ use app\models\OrderItem;
 use app\models\Product;
 use app\models\ProductIngredient;
 use app\models\ProductSearch;
+use app\services\FavoriteService;
 use app\services\NotificationService;
 use app\services\ProductIngredientService;
+use app\services\ProductReportService;
+use app\services\ReviewService;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -96,6 +99,7 @@ class ProductController extends Controller
         $canManageProducts = $this->canManageArchivedProducts();
         $searchModel = new ProductSearch();
         $dataProvider = $searchModel->search($this->request->queryParams, $canViewProducts, $canManageProducts);
+        $products = $dataProvider->getModels();
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
@@ -109,15 +113,26 @@ class ProductController extends Controller
             'status' => $searchModel->catalogStatus,
             'search' => $searchModel->q,
             'filters' => $searchModel->filters,
+            'favoriteIds' => $this->favoriteIds(),
+            'ratingSummaries' => ReviewService::summaries($this->productIds($products)),
+            'bestSellers' => (new ProductReportService())->bestSellers(5),
         ]);
     }
 
     public function actionView(int $id): string
     {
         $this->layout = Yii::$app->user->isGuest ? 'main' : 'admin';
+        $model = $this->findProduct($id);
+        $userId = (int) Yii::$app->user->id;
 
         return $this->render('view', [
-            'model' => $this->findProduct($id),
+            'model' => $model,
+            'favoriteIds' => $this->favoriteIds(),
+            'ratingSummary' => ReviewService::summaries([(int) $model->id])[(int) $model->id] ?? null,
+            'reviews' => ReviewService::forProduct((int) $model->id),
+            'eligibleOrders' => Yii::$app->user->isGuest
+                ? []
+                : ReviewService::eligibleOrders($userId, (int) $model->id),
         ]);
     }
 
@@ -293,6 +308,23 @@ class ProductController extends Controller
         Yii::$app->session->setFlash('success', 'Product permanently deleted.');
 
         return $this->redirect($this->getProductListReturnRoute());
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function favoriteIds(): array
+    {
+        return Yii::$app->user->isGuest ? [] : FavoriteService::ids((int) Yii::$app->user->id);
+    }
+
+    /**
+     * @param list<Product> $products
+     * @return list<int>
+     */
+    private function productIds(array $products): array
+    {
+        return array_map(static fn(Product $product): int => (int) $product->id, $products);
     }
 
     private function findProduct(int $id): Product
