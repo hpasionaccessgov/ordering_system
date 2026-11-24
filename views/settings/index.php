@@ -10,19 +10,19 @@ $this->title = 'Settings';
 $canUpdate = Yii::$app->user->can('settings.update');
 ?>
 <div class="mb-4">
-    <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Administration</p>
-    <h1 class="h3 mb-0">Settings</h1>
+    <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Administration</p>
+    <h1 class="mb-0 h3">Settings</h1>
 </div>
 <section class="card admin-panel">
     <div class="card-body">
-        <?php $form = ActiveForm::begin(['action' => ['update'], 'method' => 'post']); ?>
+        <?php $form = ActiveForm::begin(['action' => ['update'], 'method' => 'POST']); ?>
         <h2 class="h5">Pagination</h2>
         <div class="row">
             <div class="col-md-6"><?= $form->field($model, 'card_page_size')->input('number', ['min' => 1, 'max' => 100, 'readonly' => !$canUpdate]) ?></div>
             <div class="col-md-6"><?= $form->field($model, 'table_page_size')->input('number', ['min' => 1, 'max' => 100, 'readonly' => !$canUpdate]) ?></div>
         </div>
         <p class="text-body-secondary small">Cards cover products and featured products. Tables and lists include notifications and activity logs.</p>
-        <h2 class="h5 mt-3">Security</h2>
+        <h2 class="mt-3 h5">Security</h2>
         <div class="row">
             <?php foreach (['idle_minutes', 'login_max_attempts', 'login_reset_minutes', 'login_lock_minutes', 'logs_expiration_days'] as $field): ?>
                 <?php
@@ -36,7 +36,7 @@ $canUpdate = Yii::$app->user->can('settings.update');
         </div>
         <p class="text-body-secondary small">Inactive users must sign in again, even when Remember me is selected.</p>
         <p class="text-body-secondary small">Expired activity logs are permanently deleted during app use, checked daily. Changing the retention period can trigger an earlier cleanup. Order history is not deleted.</p>
-        <h2 class="h5 mt-3">Notifications</h2>
+        <h2 class="mt-3 h5">Notifications</h2>
         <div class="row">
             <div class="col-md-6"><?= $form->field($model, 'notifications_expiration_days')->input('number', [
                 'min' => 1,

@@ -14,7 +14,7 @@ $canDeleteProducts = Yii::$app->user->can('product.delete');
 $canViewAudit = $canUpdateProducts || $canArchiveProducts || $canDeleteProducts;
 ?>
 
-<article class="card product-card product-catalog-card h-100 position-relative">
+<article class="card h-100 position-relative product-card product-catalog-card">
     <div class="product-card-media">
         <?php if ($product->getImageUrl() !== null) : ?>
             <?= Html::img($product->getImageUrl(), [
@@ -35,11 +35,11 @@ $canViewAudit = $canUpdateProducts || $canArchiveProducts || $canDeleteProducts;
         <?php endif; ?>
     </div>
 
-    <div class="card-body d-flex flex-column">
-        <p class="product-category mb-2">
+    <div class="d-flex flex-column card-body">
+        <p class="mb-2 product-category">
             <?= Html::encode($product->categoryRecord?->name ?? 'Cafébara menu') ?>
         </p>
-        <h2 class="h5 mb-2">
+        <h2 class="mb-2 h5">
             <?php if ($canViewProduct) : ?>
                 <?= Html::a(Html::encode($product->name), ['/product/view', 'id' => $product->id], [
                     'class' => 'stretched-link link-body-emphasis text-decoration-none',
@@ -48,13 +48,13 @@ $canViewAudit = $canUpdateProducts || $canArchiveProducts || $canDeleteProducts;
                 <?= Html::encode($product->name) ?>
             <?php endif; ?>
         </h2>
-        <p class="text-body-secondary small mb-3">
+        <p class="mb-3 text-body-secondary small">
             <?= Html::encode($product->description ?? '') ?>
         </p>
-        <div class="mt-auto d-flex justify-content-between align-items-center gap-2">
+        <div class="d-flex mt-auto gap-2 justify-content-between align-items-center">
             <strong class="product-card-price"><?= Yii::$app->formatter->asCurrency($product->price) ?></strong>
             <?php if ($canViewProduct) : ?>
-                <span class="small text-primary fw-semibold">Click to view details</span>
+                <span class="text-primary fw-semibold small">Click to view details</span>
             <?php endif; ?>
         </div>
         <?php
@@ -62,8 +62,8 @@ $canViewAudit = $canUpdateProducts || $canArchiveProducts || $canDeleteProducts;
         ?>
         <?php if ($canAddToCart && $product->isActive()) : ?>
             <?php if ($batchFormId !== null) : ?>
-                <div class="d-flex align-items-center gap-2 position-relative z-2 mt-3">
-                    <label class="form-label small mb-0" for="qty-<?= $product->id ?>">Quantity</label>
+                <div class="d-flex gap-2 mt-3 align-items-center position-relative z-2">
+                    <label class="mb-0 form-label small" for="qty-<?= $product->id ?>">Quantity</label>
                     <?= Html::input('number', 'quantities[' . $product->id . ']', 0, [
                         'id' => 'qty-' . $product->id,
                         'class' => 'form-control',
@@ -75,7 +75,7 @@ $canViewAudit = $canUpdateProducts || $canArchiveProducts || $canDeleteProducts;
                     ]) ?>
                 </div>
             <?php endif; ?>
-            <?= Html::beginForm(['/cart/add', 'id' => $product->id], 'post', [
+            <?= Html::beginForm(['/cart/add', 'id' => $product->id], 'POST', [
                 'class' => 'position-relative z-2 mt-3',
             ]) ?>
             <?= Html::hiddenInput('quantity', '1') ?>
@@ -83,7 +83,7 @@ $canViewAudit = $canUpdateProducts || $canArchiveProducts || $canDeleteProducts;
             <?= Html::endForm() ?>
         <?php endif; ?>
         <?php if ($canUpdateProducts || $canArchiveProducts || $canDeleteProducts) : ?>
-            <div class="product-card-actions position-relative z-2 mt-3">
+            <div class="mt-3 position-relative z-2 product-card-actions">
                 <?php if ($canUpdateProducts) : ?>
                     <?= Html::a('Edit', ['/product/update', 'id' => $product->id], [
                         'class' => 'btn btn-sm btn-outline-primary',
@@ -92,7 +92,7 @@ $canViewAudit = $canUpdateProducts || $canArchiveProducts || $canDeleteProducts;
                 <?php if ($canArchiveProducts && $product->isActive()) : ?>
                     <?= Html::beginForm(
                         ['/product/archive', 'id' => $product->id],
-                        'post',
+                        'POST',
                         ['class' => 'd-inline'],
                     ) ?>
                     <?= Html::submitButton('Archive', [
@@ -103,7 +103,7 @@ $canViewAudit = $canUpdateProducts || $canArchiveProducts || $canDeleteProducts;
                 <?php elseif ($canUpdateProducts && !$product->isActive()) : ?>
                     <?= Html::beginForm(
                         ['/product/restore', 'id' => $product->id],
-                        'post',
+                        'POST',
                         ['class' => 'd-inline'],
                     ) ?>
                     <?= Html::submitButton('Restore', [
@@ -115,7 +115,7 @@ $canViewAudit = $canUpdateProducts || $canArchiveProducts || $canDeleteProducts;
                 <?php if ($canDeleteProducts) : ?>
                     <?= Html::beginForm(
                         ['/product/delete', 'id' => $product->id],
-                        'post',
+                        'POST',
                         ['class' => 'd-inline'],
                     ) ?>
                     <?= Html::submitButton('Delete permanently', [
@@ -127,14 +127,14 @@ $canViewAudit = $canUpdateProducts || $canArchiveProducts || $canDeleteProducts;
             </div>
         <?php endif; ?>
         <?php if ($canViewAudit) : ?>
-            <div class="product-audit-summary mt-3 pt-3 small text-body-secondary">
-                <div class="d-flex justify-content-between gap-3">
+            <div class="mt-3 pt-3 text-body-secondary product-audit-summary small">
+                <div class="d-flex gap-3 justify-content-between">
                     <span>Created by</span>
                     <strong class="text-end">
                         <?= Html::encode($product->createdBy?->username ?? '—') ?>
                     </strong>
                 </div>
-                <div class="d-flex justify-content-between gap-3 mt-1">
+                <div class="d-flex gap-3 mt-1 justify-content-between">
                     <span>Updated by</span>
                     <strong class="text-end">
                         <?= Html::encode($product->updatedBy?->username ?? '—') ?>

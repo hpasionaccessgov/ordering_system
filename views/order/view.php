@@ -129,7 +129,7 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
                 <?php if (Yii::$app->user->can('order.process') && $nextStatus !== null) : ?>
                     <?= Html::beginForm(
                         ['/order/process', 'id' => $model->id],
-                        'post',
+                        'POST',
                         ['class' => 'd-inline'],
                     ) ?>
                     <?= Html::submitButton(

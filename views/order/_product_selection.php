@@ -56,14 +56,14 @@ JS);
     'data-order-builder' => 'true',
 ]) ?>
 
-<div class="order-builder-summary card admin-panel mb-4">
-    <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+<div class="order-builder-summary mb-4 card admin-panel">
+    <div class="d-flex flex-wrap gap-3 card-body justify-content-between align-items-center">
         <div>
-            <p class="text-body-secondary small mb-1">Items selected</p>
+            <p class="mb-1 text-body-secondary small">Items selected</p>
             <strong><span data-order-count><?= $initialQuantity ?></span></strong>
         </div>
         <div class="text-end">
-            <p class="text-body-secondary small mb-1">Order total</p>
+            <p class="mb-1 text-body-secondary small">Order total</p>
             <strong class="order-builder-total" data-order-total>
                 <?= Yii::$app->formatter->asCurrency($initialTotal) ?>
             </strong>
@@ -82,7 +82,7 @@ JS);
         <?php $canViewProduct = Yii::$app->user->can('product.view'); ?>
         <div class="col-12 col-md-6 col-xl-4">
             <article
-                class="card order-product-card h-100<?= $canViewProduct ? ' position-relative' : '' ?>"
+                class="order-product-card card h-100<?= $canViewProduct ? 'position-relative ' : '' ?>"
                 data-order-product
                 data-price="<?= Html::encode((string) $product->price) ?>">
                 <div class="order-product-media">
@@ -105,8 +105,8 @@ JS);
                     <?php endif; ?>
                 </div>
 
-                <div class="card-body d-flex flex-column">
-                    <p class="product-category mb-2">
+                <div class="d-flex flex-column card-body">
+                    <p class="mb-2 product-category">
                         <?= Html::encode($product->categoryRecord?->name ?? 'Cafébara menu') ?>
                     </p>
                     <h2 class="h5">
@@ -118,10 +118,10 @@ JS);
                             <?= Html::encode($product->name) ?>
                         <?php endif; ?>
                     </h2>
-                    <p class="text-body-secondary small flex-grow-1">
+                    <p class="flex-grow-1 text-body-secondary small">
                         <?= Html::encode($product->description ?? '') ?>
                     </p>
-                    <div class="d-flex justify-content-between align-items-center gap-2 mb-3">
+                    <div class="d-flex gap-2 mb-3 justify-content-between align-items-center">
                         <span class="text-body-secondary">Unit price</span>
                         <strong><?= Yii::$app->formatter->asCurrency($product->price) ?></strong>
                     </div>
@@ -130,7 +130,7 @@ JS);
                         "items[{$product->id}][product_id]",
                         (string) $product->id,
                     ) ?>
-                    <div class="d-flex justify-content-between align-items-end gap-3 position-relative z-2">
+                    <div class="d-flex gap-3 justify-content-between align-items-end position-relative z-2">
                         <?= Html::label(
                             'Quantity',
                             "quantity-{$product->id}",
@@ -147,7 +147,7 @@ JS);
                             'aria-label' => 'Quantity of ' . $product->name,
                         ]) ?>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center border-top mt-3 pt-3">
+                    <div class="d-flex mt-3 pt-3 justify-content-between align-items-center border-top">
                         <span class="text-body-secondary small">Item subtotal</span>
                         <strong data-line-total>
                             <?= Yii::$app->formatter->asCurrency((float) $product->price * $quantity) ?>

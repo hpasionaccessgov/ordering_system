@@ -83,7 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         if (Yii::$app->user->can('category.delete')) {
                             $actions[] = Html::beginForm(
                                 ['delete', 'id' => $category->id],
-                                'post',
+                                'POST',
                                 ['class' => 'd-inline'],
                             )
                                 . Html::submitButton(

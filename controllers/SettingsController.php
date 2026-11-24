@@ -24,7 +24,7 @@ class SettingsController extends Controller
                     ['allow' => true, 'actions' => ['update'], 'roles' => ['settings.update']],
                 ],
             ],
-            'verbs' => ['class' => VerbFilter::class, 'actions' => ['update' => ['post']]],
+            'verbs' => ['class' => VerbFilter::class, 'actions' => ['update' => ['POST']]],
         ];
     }
 

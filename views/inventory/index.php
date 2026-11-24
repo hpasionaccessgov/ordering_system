@@ -1,52 +1,95 @@
 <?php
 
 use app\models\Inventory;
+use app\widgets\AdminGridView;
 use yii\helpers\Html;
-use yii\helpers\Url;
-use yii\grid\ActionColumn;
-use yii\grid\GridView;
-use yii\widgets\Pjax;
+
 /** @var yii\web\View $this */
 /** @var app\models\InventorySearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = Yii::t('app', 'Inventories');
+$this->title = 'Inventory';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="inventory-index">
+<div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-center">
+    <div>
+        <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Stock control</p>
+        <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
+    </div>
+    <?php if (Yii::$app->user->can('inventory.create')) : ?>
+        <?= Html::a('Create inventory item', ['create'], ['class' => 'btn btn-primary']) ?>
+    <?php endif; ?>
+</div>
 
-    <h1><?= Html::encode($this->title) ?></h1>
+<?= $this->render('_search', ['model' => $searchModel]) ?>
 
-    <p>
-        <?= Html::a(Yii::t('app', 'Create Inventory'), ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-
-    <?php Pjax::begin(); ?>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
-    <?= GridView::widget([
+<section class="card admin-panel">
+    <div class="card-header">
+        <p class="mb-0 text-body-secondary">Review stock levels and minimum thresholds.</p>
+    </div>
+    <?= AdminGridView::widget([
         'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
+        'rowOptions' => static fn(Inventory $inventory): array => $inventory->isLowStock()
+            ? ['class' => 'table-danger']
+            : [],
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
             'id',
             'name',
             'unit',
-            'current_stock',
-            'minimum_stock',
-            //'status',
-            //'created_at',
-            //'updated_at',
             [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Inventory $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
+                'attribute' => 'current_stock',
+                'format' => 'raw',
+                'value' => static function (Inventory $inventory): string {
+                    $value = Html::encode((string) $inventory->current_stock);
+                    if ($inventory->isOutOfStock()) {
+                        return $value . ' <span class="badge text-bg-danger">Out of stock</span>';
+                    }
+                    if ($inventory->isLowStock()) {
+                        return $value . ' <span class="badge text-bg-warning">Low stock</span>';
+                    }
+
+                    return $value;
+                },
+            ],
+            'minimum_stock',
+            [
+                'attribute' => 'status',
+                'value' => static fn(Inventory $inventory): string => $inventory->getStatusLabel(),
+            ],
+            'created_at:datetime',
+            'updated_at:datetime',
+            [
+                'label' => 'Actions',
+                'format' => 'raw',
+                'value' => static function (Inventory $inventory): string {
+                    $actions = [];
+                    if (Yii::$app->user->can('inventory.view')) {
+                        $actions[] = Html::a(
+                            'View',
+                            ['view', 'id' => $inventory->id],
+                            ['class' => 'btn btn-sm btn-outline-secondary', 'aria-label' => 'View ' . $inventory->name],
+                        );
+                    }
+                    if (Yii::$app->user->can('inventory.update') && Yii::$app->user->can('inventory.view')) {
+                        $actions[] = Html::a(
+                            'Edit',
+                            ['update', 'id' => $inventory->id],
+                            ['class' => 'btn btn-sm btn-outline-primary', 'aria-label' => 'Edit ' . $inventory->name],
+                        );
+                    }
+                    if (Yii::$app->user->can('inventory.delete')) {
+                        $actions[] = Html::beginForm(['delete', 'id' => $inventory->id], 'POST', ['class' => 'd-inline'])
+                            . Html::submitButton('Delete', [
+                                'class' => 'btn btn-sm btn-outline-danger',
+                                'aria-label' => 'Delete ' . $inventory->name,
+                                'data-confirm-modal' => 'Delete this item? Items with stock history cannot be deleted.',
+                            ])
+                            . Html::endForm();
+                    }
+
+                    return implode(' ', $actions);
+                },
             ],
         ],
-    ]); ?>
-
-    <?php Pjax::end(); ?>
-
-</div>
+    ]) ?>
+</section>

@@ -18,6 +18,7 @@ final class NotificationService
     public const TYPE_CATEGORY_CREATED = 'category_created';
     public const TYPE_CATEGORY_UPDATED = 'category_updated';
     public const TYPE_CATEGORY_DELETED = 'category_deleted';
+    public const TYPE_INVENTORY_LOW_STOCK = 'inventory_low_stock';
 
     public static function notifyAll(
         string $type,

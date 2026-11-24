@@ -81,7 +81,7 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                         <?= Html::a('Profile', ['/site/profile'], [
                             'class' => 'btn btn-outline-primary',
                         ]) ?>
-                        <?= Html::beginForm(['/site/logout'], 'post', ['class' => 'm-0']) ?>
+                        <?= Html::beginForm(['/site/logout'], 'POST', ['class' => 'm-0']) ?>
                         <?= Html::submitButton('Sign out', ['class' => 'btn btn-link cafebara-sign-out']) ?>
                         <?= Html::endForm() ?>
                     <?php endif ?>

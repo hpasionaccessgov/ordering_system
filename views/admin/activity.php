@@ -10,8 +10,8 @@ use yii\helpers\Html;
 $this->title = 'Activity logs';
 ?>
 <div class="mb-4">
-    <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Administration</p>
-    <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
+    <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Administration</p>
+    <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
 </div>
 <?= Html::beginForm(['/admin/activity'], 'get', ['class' => 'd-flex gap-2 mb-3', 'role' => 'search']) ?>
 <?= Html::label('Event', 'activity-event', ['class' => 'visually-hidden']) ?>

@@ -19,6 +19,7 @@ Handoff document describing what is implemented in this repository so far. Writt
 | Identity | `users`, RBAC `auth_*` tables (Yii `DbManager`) |
 | Catalog | `products`, `categories`; every product requires an active category; product images stored in DB (`image_data`) or as path, served by `/product/image?id=` |
 | Cart | Session cart plus `cart_items` persistence for logged-in users; max quantity 99 |
+| Inventory | `inventory` (name, description, unit string, current/minimum stock, status, `low_stock_notified` dedupe flag, timestamps) and `inventory_transactions` (signed quantity, type, remarks, `created_by`, `created_at`) |
 | Orders | `orders`, `order_items`, `order_status_history`; snapshots of `product_name`/`subtotal`; order numbers `CB-YYYYMMDD-000001`; `checkout_token` for confirmation |
 | Notifications | `notifications` (renamed from `order_notifications`) with `type`, `message`, `target_route`, `target_id`; `order_id`/`status` kept nullable for legacy rows |
 | Audit | `created_by`, `updated_by`, `created_at`, `updated_at` on user/category/order; sortable via `User::usernameSortExpression()` correlated expressions |
@@ -30,7 +31,8 @@ Order statuses: `pending → confirmed → processing → completed`, plus `canc
 ## 3. RBAC and permissions
 
 - Roles: `admin`, `staff`, `customer`, plus access flags `admin.access`, `staff.access`, `customer.access`.
-- Permission families: `user.*`, `category.*`, `product.*` (includes `archive`, `delete`), `order.*` (includes `receipt.print`, `process`, `cancel`), `cart.*`, `activityLog.*`, `notification.*`, `settings.*`, `user.assignRole`.
+- Permission families: `user.*`, `category.*`, `inventory.*`, `product.*` (includes `archive`, `delete`), `order.*` (includes `receipt.print`, `process`, `cancel`), `cart.*`, `activityLog.*`, `notification.*`, `settings.*`, `user.assignRole`.
+- Inventory: `inventory.index/view/create/update/delete` granted to `admin` + `seed`; only `index/view/update` to `staff`; none to `customer`. The sidebar item is hidden from customers.
 - `services/RbacPermissionPolicy.php` is the single source for permission dependencies:
   - Selecting `*.index` auto-selects that module's child permissions.
   - Removing `*.index` or `*.view` strips its dependents.
@@ -57,6 +59,13 @@ Order statuses: `pending → confirmed → processing → completed`, plus `canc
 ### Categories (`CategoryController`, `views/category`)
 - Index, view, create, update, delete with permission gates and audit columns.
 - Create/update notifications deep-link to `/category/view?id=…`; delete notifications point to `/category/index` because the record is gone.
+
+### Inventory (`InventoryController`, `views/inventory`, `services/InventoryService.php`)
+- CRUD for stock items: list with search/status filter, view with stock history, create (admin), update (staff/admin), delete (admin) with a guard: items with transactions cannot be deleted, set Inactive instead.
+- `low_stock_notified` flag prevents duplicate alerts; it is re-armed when stock recovers above the minimum. Alerts use `NotificationService::notifyManagers()` with type `inventory_low_stock`, target `/inventory/view?id=`, and text `Low stock alert: Milk has only 3 liters remaining.`
+- `InventoryService::create/update/recordMovement()` wrap stock changes and transaction inserts in a DB transaction. Recorded types: `STOCK_IN` (initial stock), `ADJUSTMENT` (CRUD stock change), `DEDUCT`, `WASTAGE` (via `recordMovement()` for future order/wastage integration).
+- Low stock is `current_stock <= minimum_stock`; flagged rows get a warning badge and `table-danger` row, and dashboards render `views/shared/_inventory_alert.php`.
+- `InventoryQuery` adds `active()`, `lowStock()`, `outOfStock()` scopes. No UI exists yet for posting DEDUCT/WASTAGE movements — call the service.
 
 ### Cart (`CartController`, `views/cart/index.php`)
 - Add, batch add, update quantity, remove, checkout; unavailable products pruned.
@@ -91,6 +100,7 @@ Order statuses: `pending → confirmed → processing → completed`, plus `canc
 
 ### Admin/staff dashboards
 - Role-specific dashboards with counts and Chart.js order-status chart (`views/shared/_order_status_chart.php`).
+- Admin/staff dashboards also show Inventory items, Low stock items and Out of stock cards plus the low-stock alert partial.
 
 ## 5. Notification producers and audiences
 
@@ -102,6 +112,7 @@ Order statuses: `pending → confirmed → processing → completed`, plus `canc
 | `product_updated`, `product_archived`, `product_restored`, `product_deleted` | staff/admin | `/product/view?id=` |
 | `category_created`, `category_updated` | staff/admin | `/category/view?id=` |
 | `category_deleted` | staff/admin | `/category/index` |
+| `inventory_low_stock` | staff/admin (actor excluded) | `/inventory/view?id=` |
 | order status events (from `OrderStatusService`) | order participants/managers | `/order/view?id=` |
 
 Legacy rows were backfilled with `type='order'`, `target_route='/order/view'`, `target_id=order_id`.
@@ -121,6 +132,7 @@ Legacy rows were backfilled with `type='order'`, `target_route='/order/view'`, `
 |---|---|
 | `ActivityLogger` | Login/logout/visit logging and daily cached cleanup of expired logs and notifications |
 | `AdminAccessRecovery` | Repairs admin role access after RBAC migrations |
+| `InventoryService` | Transactional stock changes, movement history, low-stock notification dedupe |
 | `NotificationService` | Recipient selection and batched notification inserts |
 | `OrderAccessPolicy` | Own-orders vs all-orders access |
 | `OrderItemSelection` | Product selection/validation for order forms |
@@ -137,22 +149,23 @@ Legacy rows were backfilled with `type='order'`, `target_route='/order/view'`, `
 - Index and FK names intentionally retain the **old** `order_notifications` prefix so rollback and retention migrations keep working.
 - `m261120_180000_add_notification_retention.php` detects the table dynamically; it is currently **untracked** in git.
 - `m261119_000536_add_staff_category_permissions.php` already intended the `category.view` grant; `m261120_200000_grant_staff_category_view.php` corrects live-role drift and is reversible.
-- Locally applied: schema migrated up/down/up successfully; DB currently has the `notifications` table with 27 backfilled order rows.
+- `m261123_083800_create_inventory_table.php` created the base table; `m261124_000000_refine_inventory_schema.php` changes `unit` to a string, adds `description`, `low_stock_notified`, and creates `inventory_transactions`; `m261124_010000_add_inventory_permissions.php` creates and revokes the `inventory.*` permissions. The pair is reversible (`migrate/down 2` → `migrate/up` verified).
+- Locally applied: schema migrated up/down/up successfully; DB currently has the `notifications` table with 27 backfilled order rows and an empty inventory catalog.
 
 ## 9. Tests
 
 - Acceptance: `AboutCest`, `ContactCest`, `HomeCest`, `LoginCest`.
 - Functional: `ActivityLogCest`, `CatalogNotificationCest` (product/category notification audience + deep-link assertions), `CheckoutCest`, `ContactFormCest`, `ListingFiltersCest`, `LoginFormCest`, `NotificationCest`, `ProfileCest`, `SettingsCest`.
 - Unit: extensive coverage under `tests/Unit/{Controllers,Functional,Models,Services,widgets}`, including `CategoryAccessTest`, `RbacPermissionPolicyTest`, `OrderWorkflowTest`, `ShoppingCartTest`, `AdminGridPaginationTest`.
-- `CatalogNotificationCest` was edited to assert `/category/view` targets for create/update.
+- `CatalogNotificationCest` was edited to assert `/category/view` targets for create/update. `tests/Unit/Models/InventoryTest.php` covers low-stock thresholds and the alert text.
 
 ## 10. Verification status and constraints
 
-- Passed here: `php -l` on all touched PHP files, `git diff --check`, migration up/down/up, DB-backed CLI assertions for all eight product/category notification types, and a CLI render of the cart page confirming the image anchor, tooltip attributes, and overlay markup.
+- Passed here: `php -l` on all touched PHP files, `git diff --check`, migration up/down/up, DB-backed CLI assertions for all eight product/category notification types, a CLI render of the cart page confirming the image anchor/tooltip/overlay, and CLI checks of inventory create/update/dedupe/restock/movement plus rendered inventory index/view and both dashboards.
 - **Could not run here**: Codeception (CURL/PHP DLL policy) and any real browser check. Visual hover/zoom, dropdown behavior, and dark-mode appearance still need manual confirmation.
 - Tooltips depend on the global `window.bootstrap` being loaded; if a page drops the Bootstrap JS asset, tooltips silently do nothing.
 - All work is **uncommitted**. Unrelated pre-existing user edits must be preserved, including `models/LoginForm.php`, `services/ActivityLogger.php`, `views/site/about.php`, `views/login.php`, and untracked migrations/widgets.
 
 ## 11. First files to read when continuing
 
-`config/web.php`, `services/RbacPermissionPolicy.php`, `services/NotificationService.php`, `models/Notification.php`, `controllers/NotificationController.php`, `views/layouts/_notifications_link.php`, `widgets/ToolTip.php`, `web/css/cafebara-theme.css`, `models/ApplicationSettings.php`, `services/ActivityLogger.php`, `tests/Functional/CatalogNotificationCest.php`.
+`config/web.php`, `services/RbacPermissionPolicy.php`, `services/NotificationService.php`, `services/InventoryService.php`, `models/Inventory.php`, `controllers/InventoryController.php`, `models/Notification.php`, `controllers/NotificationController.php`, `views/layouts/_notifications_link.php`, `widgets/ToolTip.php`, `web/css/cafebara-theme.css`, `models/ApplicationSettings.php`, `services/ActivityLogger.php`, `tests/Functional/CatalogNotificationCest.php`.

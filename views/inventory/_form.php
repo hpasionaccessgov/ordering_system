@@ -1,35 +1,33 @@
 <?php
 
+use app\models\Inventory;
+use app\widgets\AdminActiveForm;
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
-/** @var app\models\Inventory $model */
-/** @var yii\widgets\ActiveForm $form */
+/** @var Inventory $model */
+/** @var AdminActiveForm $form */
 ?>
-
-<div class="inventory-form">
-
-    <?php $form = ActiveForm::begin(); ?>
-
-    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'unit')->textInput() ?>
-
-    <?= $form->field($model, 'current_stock')->textInput() ?>
-
-    <?= $form->field($model, 'minimum_stock')->textInput() ?>
-
-    <?= $form->field($model, 'status')->textInput() ?>
-
-    <?= $form->field($model, 'created_at')->textInput() ?>
-
-    <?= $form->field($model, 'updated_at')->textInput() ?>
-
-    <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
+<section class="card admin-panel">
+    <div class="card-body">
+        <?php $form = AdminActiveForm::begin() ?>
+        <?= $form->errorSummary($model, ['class' => 'alert alert-danger']) ?>
+        <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+        <?= $form->field($model, 'description')->textarea(['rows' => 4]) ?>
+        <?= $form->field($model, 'unit')->textInput(['maxlength' => true, 'placeholder' => 'Liter, piece, cup...']) ?>
+        <div class="row g-3">
+            <div class="col-sm-6"><?= $form->field($model, 'current_stock')->input('number', ['min' => 0]) ?></div>
+            <div class="col-sm-6"><?= $form->field($model, 'minimum_stock')->input('number', ['min' => 0]) ?></div>
+        </div>
+        <?= $form->field($model, 'status')->dropDownList(Inventory::statusList()) ?>
+        <div class="d-flex flex-wrap gap-2 mt-4">
+            <?= Html::submitButton($model->isNewRecord ? 'Create item' : 'Save item', ['class' => 'btn btn-primary']) ?>
+            <?= Html::a(
+                'Cancel',
+                Yii::$app->user->can('inventory.index') ? ['index'] : ['/site/dashboard'],
+                ['class' => 'btn btn-outline-secondary'],
+            ) ?>
+        </div>
+        <?php AdminActiveForm::end() ?>
     </div>
-
-    <?php ActiveForm::end(); ?>
-
-</div>
+</section>

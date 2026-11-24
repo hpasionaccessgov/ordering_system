@@ -4,6 +4,10 @@
 /** @var int $activeProductCount */
 /** @var int $pendingOrderCount */
 /** @var int $processingOrderCount */
+/** @var int $inventoryCount */
+/** @var int $lowStockCount */
+/** @var int $outOfStockCount */
+/** @var \app\models\Inventory[] $lowStockItems */
 /** @var array<string, int> $orderStatusCounts */
 
 use app\models\User;
@@ -47,12 +51,17 @@ $displayName = $identity instanceof User
     </div>
 </section>
 
+<?= $this->render('../shared/_inventory_alert', ['lowStockItems' => $lowStockItems]) ?>
+
 <div class="row g-3 mb-4">
     <?php foreach (
         [
             ['Active products', $activeProductCount, 'bi-cup-hot'],
             ['Pending orders', $pendingOrderCount, 'bi-hourglass-split'],
             ['Processing orders', $processingOrderCount, 'bi-arrow-repeat'],
+            ['Inventory items', $inventoryCount, 'bi-box-seam'],
+            ['Low stock items', $lowStockCount, 'bi-exclamation-triangle'],
+            ['Out of stock', $outOfStockCount, 'bi-x-circle'],
         ] as [$label, $value, $icon]
     ) : ?>
         <div class="col-12 col-md-4">

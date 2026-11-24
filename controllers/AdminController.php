@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\models\Inventory;
 use app\models\Order;
 use app\models\Product;
 use app\models\User;
@@ -38,6 +39,10 @@ class AdminController extends Controller
             'activeUserCount' => (int) User::find()->where(['status' => User::STATUS_ACTIVE])->count(),
             'productCount' => (int) Product::find()->where(['status' => Product::STATUS_ACTIVE])->count(),
             'pendingOrderCount' => (int) Order::find()->where(['status' => Order::STATUS_PENDING])->count(),
+            'inventoryCount' => (int) Inventory::find()->active()->count(),
+            'lowStockCount' => (int) Inventory::find()->lowStock()->count(),
+            'outOfStockCount' => (int) Inventory::find()->outOfStock()->count(),
+            'lowStockItems' => Inventory::find()->lowStock()->orderBy(['current_stock' => SORT_ASC])->all(),
             'orderStatusCounts' => OrderStatistics::statusCounts(),
         ]);
     }

@@ -15,7 +15,7 @@ $this->title = 'My Profile';
     <div class="col-12 col-xl-8">
         <div class="card">
             <div class="card-header">
-                <h2 class="card-title mb-0">Profile details</h2>
+                <h2 class="mb-0 card-title">Profile details</h2>
             </div>
 
             <div class="card-body">
@@ -47,17 +47,17 @@ $this->title = 'My Profile';
             </div>
         </div>
 
-        <div class="card mt-4">
+        <div class="mt-4 card">
             <div class="card-header">
-                <h2 class="card-title mb-0">Account actions</h2>
+                <h2 class="mb-0 card-title">Account actions</h2>
             </div>
 
-            <div class="card-body d-flex flex-wrap gap-2">
+            <div class="d-flex flex-wrap gap-2 card-body">
                 <?= Html::a('Change password', ['/site/change-password'], ['class' => 'btn btn-outline-primary']) ?>
 
                 <?= Html::a('Deactivate account', ['/site/deactivate'], ['class' => 'btn btn-outline-danger']) ?>
 
-                <?= Html::beginForm(['/site/logout'], 'post', ['class' => 'd-inline']) ?>
+                <?= Html::beginForm(['/site/logout'], 'POST', ['class' => 'd-inline']) ?>
                 <?= Html::submitButton('Logout', ['class' => 'btn btn-outline-warning']) ?>
                 <?= Html::endForm() ?>
             </div>

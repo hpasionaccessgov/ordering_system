@@ -62,10 +62,10 @@ class AdminUserController extends Controller
                 'class' => VerbFilter::class,
                 'actions' => [
                     'create' => ['GET', 'POST'],
-                    'assign-role' => ['post'],
-                    'view' => ['get'],
+                    'assign-role' => ['POST'],
+                    'view' => ['GET'],
                     'update' => ['GET', 'POST'],
-                    'delete' => ['post'],
+                    'delete' => ['POST'],
                 ],
             ],
         ];

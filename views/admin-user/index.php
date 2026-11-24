@@ -20,10 +20,10 @@ foreach ($roles as $role) {
 }
 ?>
 
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+<div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-center">
     <div>
-        <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Administration</p>
-        <h1 class="h3 mb-0">User list</h1>
+        <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Administration</p>
+        <h1 class="mb-0 h3">User list</h1>
     </div>
     <?php if (Yii::$app->user->can('user.create')) : ?>
         <?= Html::a('Create account', ['/admin-user/create'], ['class' => 'btn btn-primary']) ?>
@@ -34,7 +34,7 @@ foreach ($roles as $role) {
 
 <section class="card admin-panel">
     <div class="card-header">
-        <p class="text-body-secondary mb-0">Review account details, roles, and access.</p>
+        <p class="mb-0 text-body-secondary">Review account details, roles, and access.</p>
     </div>
     <?= AdminGridView::widget([
         'dataProvider' => $dataProvider,
@@ -88,7 +88,7 @@ foreach ($roles as $role) {
 
                     return Html::beginForm(
                         ['/admin-user/assign-role', 'id' => $user->id],
-                        'post',
+                        'POST',
                         ['class' => 'd-flex flex-wrap gap-2 role-assignment-form'],
                     )
                         . Html::dropDownList('role', $selected, $roleOptions, [
@@ -134,7 +134,7 @@ foreach ($roles as $role) {
                     ) {
                         $actions[] = Html::beginForm(
                             ['/admin-user/delete', 'id' => $user->id],
-                            'post',
+                            'POST',
                             ['class' => 'd-inline'],
                         )
                             . Html::submitButton('Delete', ToolTip::options(

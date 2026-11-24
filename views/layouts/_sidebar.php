@@ -56,6 +56,13 @@ $navGroups = [
                 'route' => ['/cart/index'],
                 'active' => str_starts_with($currentRoute, 'cart/'),
             ],
+            [
+                'label' => 'Inventory',
+                'icon' => 'bi-box-seam-fill',
+                'visible' => $can('inventory.index') || $can('inventory.create'),
+                'route' => $can('inventory.index') ? ['/inventory/index'] : ['/inventory/create'],
+                'active' => str_starts_with($currentRoute, 'inventory/'),
+            ]
         ],
     ],
     [
@@ -95,7 +102,7 @@ $navGroups = [
     ],
 ];
 ?>
-<aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+<aside class="bg-body-secondary shadow app-sidebar" data-bs-theme="dark">
     <div class="sidebar-brand">
         <?= Html::a(
             Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
@@ -109,7 +116,7 @@ $navGroups = [
 
     <div class="sidebar-wrapper">
         <nav class="mt-2" aria-label="Main navigation">
-            <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" data-accordion="false">
+            <ul class="flex-column nav sidebar-menu" data-lte-toggle="treeview" data-accordion="false">
                 <li class="nav-item">
                     <?= Html::a(
                         '<i class="nav-icon bi bi-house"></i><p>'

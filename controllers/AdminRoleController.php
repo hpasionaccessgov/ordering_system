@@ -29,11 +29,11 @@ class AdminRoleController extends Controller
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
-                    'create' => ['post'],
-                    'update' => ['post'],
-                    'update-permissions' => ['post'],
-                    'update-matrix' => ['post'],
-                    'delete' => ['post'],
+                    'create' => ['POST'],
+                    'update' => ['POST'],
+                    'update-permissions' => ['POST'],
+                    'update-matrix' => ['POST'],
+                    'delete' => ['POST'],
                 ],
             ],
         ];

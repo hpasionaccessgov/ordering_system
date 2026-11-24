@@ -8,11 +8,11 @@ use yii\widgets\DetailView;
 
 $this->title = $model->name;
 ?>
-<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+<div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-start">
     <div>
-        <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Product catalog</p>
-        <h1 class="h3 mb-1"><?= Html::encode($this->title) ?></h1>
-        <p class="text-body-secondary mb-0">Category details</p>
+        <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Product catalog</p>
+        <h1 class="mb-1 h3"><?= Html::encode($this->title) ?></h1>
+        <p class="mb-0 text-body-secondary">Category details</p>
     </div>
     <div class="d-flex flex-wrap gap-2">
         <?php if (Yii::$app->user->can('category.update')) : ?>
@@ -43,7 +43,7 @@ $this->title = $model->name;
             ],
         ]) ?>
         <?php if (Yii::$app->user->can('category.delete')) : ?>
-            <?= Html::beginForm(['delete', 'id' => $model->id], 'post', ['class' => 'mt-3']) ?>
+            <?= Html::beginForm(['delete', 'id' => $model->id], 'POST', ['class' => 'mt-3']) ?>
             <?= Html::submitButton('Delete category', [
                 'class' => 'btn btn-outline-danger',
                 'data-confirm-modal' => 'Delete this category? Categories assigned to products cannot be deleted.',

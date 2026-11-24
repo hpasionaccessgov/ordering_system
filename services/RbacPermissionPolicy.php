@@ -14,6 +14,7 @@ final class RbacPermissionPolicy
     private const INDEX_DEPENDENTS = [
         'user.index' => ['user.view', 'user.create', 'user.delete', 'user.update'],
         'category.index' => ['category.view', 'category.create', 'category.update', 'category.delete'],
+        'inventory.index' => ['inventory.view', 'inventory.create', 'inventory.update', 'inventory.delete'],
         'product.index' => [
             'product.view',
             'product.create',
@@ -48,6 +49,7 @@ final class RbacPermissionPolicy
     private const VIEW_DEPENDENTS = [
         'user.view' => ['user.create', 'user.delete', 'user.update'],
         'category.view' => ['category.create', 'category.update', 'category.delete'],
+        'inventory.view' => ['inventory.create', 'inventory.update', 'inventory.delete'],
         'product.view' => ['product.create', 'product.update', 'product.delete', 'product.archive'],
         'order.view' => ['order.create', 'order.update', 'order.cancel', 'order.process', 'order.receipt.print'],
     ];

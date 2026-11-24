@@ -90,9 +90,9 @@ class OrderController extends Controller
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
-                    'cancel' => ['post'],
-                    'process' => ['post'],
-                    'create-product' => ['post'],
+                    'cancel' => ['POST'],
+                    'process' => ['POST'],
+                    'create-product' => ['POST'],
                 ],
             ],
         ];

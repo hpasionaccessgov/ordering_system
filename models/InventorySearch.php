@@ -1,74 +1,97 @@
 <?php
 
+declare(strict_types=1);
+
 namespace app\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Inventory;
 
 /**
  * InventorySearch represents the model behind the search form of `app\models\Inventory`.
  */
 class InventorySearch extends Inventory
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
+    /** @var string|null */
+    public $q;
+    /** @var ListingFilters */
+    public $filters;
+
+    public function rules(): array
     {
         return [
-            [['id', 'unit', 'current_stock', 'minimum_stock', 'status', 'created_at', 'updated_at'], 'integer'],
-            [['name'], 'safe'],
+            [['id', 'status', 'current_stock', 'minimum_stock', 'created_at', 'updated_at'], 'integer'],
+            [['name', 'description', 'unit'], 'safe'],
+            [['q'], 'string'],
+            [['q'], 'trim', 'skipOnArray' => true, 'skipOnEmpty' => true],
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function scenarios()
+    public function scenarios(): array
     {
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
 
-    /**
-     * Creates data provider instance with search query applied
-     *
-     * @param array $params
-     * @param string|null $formName Form name to be used into `->load()` method.
-     *
-     * @return ActiveDataProvider
-     */
-    public function search($params, $formName = null)
+    public function search(array $params, ?string $formName = null): ActiveDataProvider
     {
         $query = Inventory::find();
-
-        // add conditions that should always apply here
+        $this->filters = new ListingFilters();
+        $this->filters->loadFilters($params, false, false, false);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'pagination' => ApplicationSettings::pagination(),
+            'sort' => [
+                'attributes' => [
+                    'id',
+                    'name',
+                    'unit',
+                    'current_stock',
+                    'minimum_stock',
+                    'status',
+                    'created_at',
+                    'updated_at',
+                ],
+                'defaultOrder' => ['name' => SORT_ASC, 'id' => SORT_ASC],
+            ],
         ]);
 
         $this->load($params, $formName);
+        if (isset($params['q'])) {
+            $this->q = $params['q'];
+        }
 
-        if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
+        if (!$this->validate() || !$this->filters->validate()) {
+            $query->andWhere('0=1');
+
             return $dataProvider;
         }
 
-        // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'unit' => $this->unit,
+            'status' => $this->status,
             'current_stock' => $this->current_stock,
             'minimum_stock' => $this->minimum_stock,
-            'status' => $this->status,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ]);
 
-        $query->andFilterWhere(['like', 'name', $this->name]);
+        $query->andFilterWhere(['like', 'name', $this->name])
+            ->andFilterWhere(['like', 'description', $this->description])
+            ->andFilterWhere(['like', 'unit', $this->unit]);
+        $this->filters->apply($query);
+
+        if ($this->q !== null && $this->q !== '') {
+            $conditions = [
+                'or',
+                ['like', 'name', $this->q],
+                ['like', 'description', $this->q],
+                ['like', 'unit', $this->q],
+            ];
+            if (ctype_digit($this->q)) {
+                $conditions[] = ['id' => $this->q];
+            }
+            $query->andWhere($conditions);
+        }
 
         return $dataProvider;
     }

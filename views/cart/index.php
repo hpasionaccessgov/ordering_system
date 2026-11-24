@@ -71,7 +71,7 @@ $this->title = 'Shopping cart';
                                     <strong><?= Yii::$app->formatter->asCurrency($product->price) ?> each</strong>
                                 </div>
                                 <?php if (Yii::$app->user->can('cart.update')) : ?>
-                                    <?= Html::beginForm(['/cart/update', 'id' => $product->id], 'post', [
+                                    <?= Html::beginForm(['/cart/update', 'id' => $product->id], 'POST', [
                                         'class' => 'd-flex align-items-end gap-2',
                                     ]) ?>
                                     <?= Html::input('number', 'quantity', $line['quantity'], [
@@ -89,7 +89,7 @@ $this->title = 'Shopping cart';
                                     <strong><?= Yii::$app->formatter->asCurrency($line['subtotal']) ?></strong>
                                 </div>
                                 <?php if (Yii::$app->user->can('cart.remove')) : ?>
-                                    <?= Html::beginForm(['/cart/remove', 'id' => $product->id], 'post', [
+                                    <?= Html::beginForm(['/cart/remove', 'id' => $product->id], 'POST', [
                                         'class' => 'ms-lg-2',
                                     ]) ?>
                                     <?= Html::submitButton('Remove', [

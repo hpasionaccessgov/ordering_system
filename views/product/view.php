@@ -91,7 +91,7 @@ $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
                                 </div>
                                 <?= Html::beginForm(
                                     ['/cart/add', 'id' => $model->id],
-                                    'post',
+                                    'POST',
                                     ['class' => 'd-flex flex-wrap align-items-end gap-3'],
                                 ) ?>
                                 <div>
@@ -125,7 +125,7 @@ $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
                         ) : ?>
                             <?= Html::beginForm(
                                 ['/product/archive', 'id' => $model->id],
-                                'post',
+                                'POST',
                                 ['class' => 'd-inline'],
                             ) ?>
                             <?= Html::submitButton('Archive product', [
@@ -138,7 +138,7 @@ $canOrder = Yii::$app->user->can('cart.add') && $model->isActive();
                         <?php if ($canDeleteProducts) : ?>
                             <?= Html::beginForm(
                                 ['/product/delete', 'id' => $model->id],
-                                'post',
+                                'POST',
                                 ['class' => 'd-inline'],
                             ) ?>
                             <?= Html::submitButton('Delete permanently', [

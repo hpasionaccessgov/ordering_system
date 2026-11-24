@@ -72,10 +72,10 @@ class SiteController extends Controller
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
-                    'logout' => ['post'],
-                    'profile' => ['get', 'post'],
-                    'change-password' => ['get', 'post'],
-                    'deactivate' => ['get', 'post'],
+                    'logout' => ['POST'],
+                    'profile' => ['GET', 'POST'],
+                    'change-password' => ['GET', 'POST'],
+                    'deactivate' => ['GET', 'POST'],
                 ],
             ],
         ];

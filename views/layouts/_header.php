@@ -38,7 +38,7 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
             </li>
         </ul>
 
-        <ul class="navbar-nav ms-auto align-items-center gap-2 cafebara-admin-actions">
+        <ul class="gap-2 navbar-nav ms-auto align-items-center cafebara-admin-actions">
             <?php if (Yii::$app->user->isGuest): ?>
                 <li class="nav-item">
                     <?= Html::a('Sign in', ['/site/login'], ['class' => 'btn btn-outline-primary']) ?>
@@ -82,7 +82,7 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <?= Html::beginForm(['/site/logout'], 'post', ['class' => 'm-0']) ?>
+                            <?= Html::beginForm(['/site/logout'], 'POST', ['class' => 'm-0']) ?>
                             <?= Html::submitButton('Logout', ['class' => 'dropdown-item']) ?>
                             <?= Html::endForm() ?>
                         </li>

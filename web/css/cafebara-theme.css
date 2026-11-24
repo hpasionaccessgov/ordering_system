@@ -127,7 +127,6 @@ body.confirm-modal-open .modal-backdrop {
     border: 1px solid var(--bs-border-color);
     background: var(--bs-tertiary-bg);
     border-radius: 1rem;
-    padding: clamp(1.25rem, 3vw, 2rem);
 }
 
 /* Scroll long admin card content inside the card instead of the whole page. */

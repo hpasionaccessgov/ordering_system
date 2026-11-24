@@ -78,9 +78,9 @@ class ProductController extends Controller
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
-                    'archive' => ['post'],
-                    'restore' => ['post'],
-                    'delete' => ['post'],
+                    'archive' => ['POST'],
+                    'restore' => ['POST'],
+                    'delete' => ['POST'],
                 ],
             ],
         ];
