@@ -27,6 +27,9 @@ final class NotificationService
     public const TYPE_ORDER_STATUS = 'order_status';
     public const TYPE_ORDER_CANCELLED = 'order_cancelled';
     public const TYPE_REPORT_DAILY_SUMMARY = 'report_daily_summary';
+    public const TYPE_LOYALTY_EARNED = 'loyalty_earned';
+    public const TYPE_LOYALTY_REDEEMED = 'loyalty_redeemed';
+    public const TYPE_LOYALTY_TIER_UP = 'loyalty_tier_up';
 
     public static function notifyAll(
         string $type,

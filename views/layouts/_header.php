@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use app\services\LoyaltyService;
 use app\widgets\ToolTip;
 use yii\helpers\Html;
 
@@ -16,7 +17,7 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
     ['class' => 'cafebara-brand-copy'],
 );
 ?>
-<nav class="navbar navbar-expand bg-body app-header" aria-label="Staff navigation">
+<nav class="navbar navbar-expand bg-body app-header" aria-label="Main navigation">
     <div class="container-fluid">
         <?= Html::a($brand, ['/site/index'], [
             'class' => 'navbar-brand cafebara-admin-brand cafebara-brand-lockup d-flex align-items-center gap-2',
@@ -44,6 +45,44 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                     <?= Html::a('Sign in', ['/site/login'], ['class' => 'btn btn-outline-primary']) ?>
                 </li>
             <?php else: ?>
+                <?php if (Yii::$app->user->can('loyalty.view')): ?>
+                    <?php $loyalty = LoyaltyService::summary((int) Yii::$app->user->id); ?>
+                    <li class="nav-item dropdown">
+                        <?= Html::button(
+                            $this->render('../shared/_loyalty_badge', ['tier' => $loyalty['tier']])
+                                . ' ' . Yii::$app->formatter->asInteger($loyalty['current']) . ' pts',
+                            [
+                                'class' => 'btn btn-outline-primary dropdown-toggle text-nowrap',
+                                'data-bs-toggle' => 'dropdown',
+                                'aria-expanded' => 'false',
+                                'aria-label' => 'My rewards: ' . $loyalty['current']
+                                    . ' points, ' . LoyaltyService::tierLabel($loyalty['tier']) . ' tier',
+                            ],
+                        ) ?>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <h6 class="dropdown-header text-body-secondary">Your loyalty snapshot</h6>
+                            </li>
+                            <?php foreach (
+                                [
+                                    'Current points' => Yii::$app->formatter->asInteger($loyalty['current']) . ' pts',
+                                    'Lifetime earned' => Yii::$app->formatter->asInteger($loyalty['lifetimeEarned']) . ' pts',
+                                    'Lifetime redeemed' => Yii::$app->formatter->asInteger($loyalty['lifetimeRedeemed']) . ' pts',
+                                    'Tier' => LoyaltyService::tierLabel($loyalty['tier']),
+                                ] as $label => $value
+                            ): ?>
+                                <li class="d-flex gap-4 px-3 py-1 mb-1 justify-content-between border-bottom border-primary-subtle small">
+                                    <span class="text-body-secondary"><?= Html::encode($label) ?></span>
+                                    <span class="fw-semibold"><?= Html::encode($value) ?></span>
+                                </li>
+                            <?php endforeach; ?>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><?= Html::a('Open My Rewards', ['/loyalty/index'], ['class' => 'dropdown-item cafebara-notification-item']) ?></li>
+                        </ul>
+                    </li>
+                <?php endif; ?>
                 <?php if (Yii::$app->user->can('notification.index')): ?>
                     <li class="nav-item">
                         <?= $this->render('_notifications_link', ['class' => 'btn btn-outline-primary']) ?>

@@ -39,6 +39,9 @@ final class RbacPermissionPolicy
         'favorite.index' => ['favorite.add', 'favorite.remove'],
         'activityLog.index' => ['activityLog.view'],
         'notification.index' => ['notification.read', 'notification.delete'],
+        'loyalty.view' => ['loyalty.redeem'],
+        'reward.index' => ['reward.view', 'reward.create', 'reward.update', 'reward.delete'],
+        'loyalty.transaction.index' => ['loyalty.adjust'],
         'settings.index' => ['settings.update'],
     ];
 

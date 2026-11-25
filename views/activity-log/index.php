@@ -32,10 +32,10 @@ $value = static fn($value): string => is_scalar($value) ? (string) $value : '';
         <?= Html::input('text', 'ActivityLogSearch[route]', $value($searchModel->route), ['class' => 'form-control', 'placeholder' => 'Page', 'aria-label' => 'Page']) ?>
     </div>
     <div class="col-12 col-md-auto">
-        <?= Html::dropDownList('event', $value($searchModel->event), [
-            '' => 'All events', ActivityLog::VISIT => 'Page visits',
-            ActivityLog::LOGIN => 'Logins', ActivityLog::LOGOUT => 'Logouts',
-        ], ['class' => 'form-select', 'aria-label' => 'Event']) ?>
+        <?= Html::dropDownList('event', $value($searchModel->event), ['' => 'All events'] + ActivityLog::eventLabels(), [
+            'class' => 'form-select',
+            'aria-label' => 'Event',
+        ]) ?>
     </div>
     <?php if (is_string($sort) && $sort !== '') : ?>
         <?= Html::hiddenInput('sort', $sort) ?>

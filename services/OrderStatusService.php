@@ -113,6 +113,7 @@ final class OrderStatusService
             }
             if ($toStatus === Order::STATUS_COMPLETED) {
                 ProductIngredientService::deduct($fresh);
+                LoyaltyService::earnForCompletedOrder($fresh);
             }
             $transaction->commit();
 

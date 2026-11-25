@@ -7,6 +7,7 @@ namespace app\controllers;
 use app\models\ReportFilter;
 use app\models\User;
 use app\services\InventoryReportService;
+use app\services\LoyaltyReportService;
 use app\services\OrderReportService;
 use app\services\ProductReportService;
 use app\services\ReportExportService;
@@ -23,7 +24,7 @@ class ReportController extends Controller
 {
     public $layout = 'admin';
 
-    private const REPORTS = ['sales', 'product', 'orders', 'inventory'];
+    private const REPORTS = ['sales', 'product', 'orders', 'inventory', 'loyalty'];
     private const FORMATS = ['csv', 'excel', 'pdf'];
 
     public function behaviors(): array
@@ -69,6 +70,11 @@ class ReportController extends Controller
         return $this->render('inventory', ['filter' => $this->filter()] + $this->build('inventory'));
     }
 
+    public function actionLoyalty(): string
+    {
+        return $this->render('loyalty', ['filter' => $this->filter()] + $this->build('loyalty'));
+    }
+
     public function actionExport(string $report, string $format): Response
     {
         if (!in_array($report, self::REPORTS, true) || !in_array($format, self::FORMATS, true)) {
@@ -98,6 +104,7 @@ class ReportController extends Controller
             'product' => $this->productData(),
             'orders' => $this->ordersData(),
             'inventory' => $this->inventoryData(),
+            'loyalty' => $this->loyaltyData(),
         };
     }
 
@@ -202,6 +209,32 @@ class ReportController extends Controller
         ];
     }
 
+    private function loyaltyData(): array
+    {
+        $service = new LoyaltyReportService();
+        $filter = $this->filter();
+        $summary = $service->summary($filter);
+        $tiers = $service->tiers($filter);
+        $rows = $service->rows($filter);
+
+        return [
+            'title' => 'Loyalty report',
+            'columns' => $this->columns('loyalty'),
+            'rows' => $rows,
+            'summary' => [
+                ['label' => 'Total points issued', 'value' => Yii::$app->formatter->asInteger($summary['issued']), 'caption' => 'Earned in range', 'icon' => 'bi-coin'],
+                ['label' => 'Total points redeemed', 'value' => Yii::$app->formatter->asInteger($summary['redeemed']), 'caption' => 'Used in range', 'icon' => 'bi-gift'],
+                ['label' => 'Active loyalty members', 'value' => Yii::$app->formatter->asInteger($summary['activeMembers']), 'caption' => 'With activity in range', 'icon' => 'bi-people'],
+                ['label' => 'Tier tracked', 'value' => '3', 'caption' => 'Bronze / Silver / Gold', 'icon' => 'bi-trophy'],
+            ],
+            'tierLabels' => array_column($tiers, 'label'),
+            'tierValues' => array_column($tiers, 'members'),
+            'volumeLabels' => array_column($rows, 'date'),
+            'earnedValues' => array_column($rows, 'earned'),
+            'redeemedValues' => array_column($rows, 'redeemed'),
+        ];
+    }
+
     private function filter(): ReportFilter
     {
         $filter = new ReportFilter();
@@ -239,6 +272,12 @@ class ReportController extends Controller
                 ['label' => 'Current Stock', 'attribute' => 'current_stock', 'type' => 'number'],
                 ['label' => 'Minimum Stock', 'attribute' => 'minimum_stock', 'type' => 'number'],
                 ['label' => 'Consumption Rate / day', 'attribute' => 'rate', 'type' => 'decimal'],
+            ],
+            'loyalty' => [
+                ['label' => 'Date', 'attribute' => 'date', 'type' => 'date'],
+                ['label' => 'Points issued', 'attribute' => 'earned', 'type' => 'number'],
+                ['label' => 'Points redeemed', 'attribute' => 'redeemed', 'type' => 'number'],
+                ['label' => 'Active members', 'attribute' => 'members', 'type' => 'number'],
             ],
         };
     }

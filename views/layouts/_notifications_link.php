@@ -100,7 +100,7 @@ JS, View::POS_READY);
         <li><span class="dropdown-header text-body-secondary fw-semibold">Unread notifications</span></li>
         <?php foreach ($notifications as $notification) : ?>
             <?php /** @var Notification $notification */ ?>
-            <li class="border-bottom border-secondary-subtle">
+            <li class="border-bottom border-primary-subtle">
                 <?= Html::a(
                     Html::tag('span', 'Unread', ['class' => 'badge text-bg-primary me-1'])
                         . Html::tag('span', Html::encode($notification->categoryLabel), ['class' => 'badge ' . $notification->categoryBadgeClass . ' me-1'])
@@ -122,6 +122,9 @@ JS, View::POS_READY);
         <?php if ($notifications === []) : ?>
             <li><span class="dropdown-item-text text-body-secondary">No unread notifications.</span></li>
         <?php endif; ?>
-        <li><?= Html::a('View all notifications', ['/notifications'], ['class' => 'dropdown-item fw-bold cafebara-notification-item']) ?></li>
+        <li>
+            <hr class="dropdown-dividier">
+        </li>
+        <li><?= Html::a('View all notifications', ['/notifications'], ['class' => 'dropdown-item cafebara-notification-item']) ?></li>
     </ul>
 </div>

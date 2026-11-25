@@ -18,7 +18,7 @@ class ActivityLogSearch extends ActivityLog
             [['id', 'user_id'], 'integer'],
             [['username', 'event', 'route'], 'string'],
             [['username', 'route'], 'trim', 'skipOnArray' => true],
-            [['event'], 'in', 'range' => [self::VISIT, self::LOGIN, self::LOGOUT]],
+            [['event'], 'in', 'range' => array_keys(self::eventLabels())],
         ];
     }
 

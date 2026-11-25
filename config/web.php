@@ -117,10 +117,25 @@ $config = [
                 'sales/inventory/<id:\d+>/delete' => 'inventory/delete',
                 'sales/inventory/<id:\d+>/adjust' => 'inventory/adjust',
 
+                'rewards' => 'loyalty/index',
+                'rewards/<id:\d+>/redeem' => 'loyalty/redeem',
+
+                'admin/rewards' => 'reward/index',
+                'admin/rewards/create' => 'reward/create',
+                'admin/rewards/<id:\d+>' => 'reward/view',
+                'admin/rewards/<id:\d+>/update' => 'reward/update',
+                'admin/rewards/<id:\d+>/delete' => 'reward/delete',
+
+                'admin/loyalty' => 'admin-loyalty/index',
+                'admin/loyalty/transactions' => 'admin-loyalty/transactions',
+                'admin/loyalty/redemptions' => 'admin-loyalty/redemptions',
+                'admin/loyalty/adjust' => 'admin-loyalty/adjust',
+
                 'reports/sales' => 'report/sales',
                 'reports/product-performance' => 'report/product',
                 'reports/orders' => 'report/orders',
                 'reports/inventory' => 'report/inventory',
+                'reports/loyalty' => 'report/loyalty',
                 'reports/export/<type:[\w-]+>' => 'report/export',
                 'reports/export' => 'report/export',
 

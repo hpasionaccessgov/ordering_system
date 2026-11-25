@@ -15,12 +15,10 @@ $this->title = 'Activity logs';
 </div>
 <?= Html::beginForm(['/admin/activity'], 'get', ['class' => 'd-flex gap-2 mb-3', 'role' => 'search']) ?>
 <?= Html::label('Event', 'activity-event', ['class' => 'visually-hidden']) ?>
-<?= Html::dropDownList('event', $event, [
-    '' => 'All events',
-    ActivityLog::VISIT => 'Page visits',
-    ActivityLog::LOGIN => 'Logins',
-    ActivityLog::LOGOUT => 'Logouts',
-], ['id' => 'activity-event', 'class' => 'form-select w-auto']) ?>
+<?= Html::dropDownList('event', $event, ['' => 'All events'] + ActivityLog::eventLabels(), [
+    'id' => 'activity-event',
+    'class' => 'form-select w-auto',
+]) ?>
 <?= Html::submitButton('Filter', ['class' => 'btn btn-primary']) ?>
 <?= Html::endForm() ?>
 <section class="card admin-panel">

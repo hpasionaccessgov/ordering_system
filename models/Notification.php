@@ -14,6 +14,7 @@ class Notification extends ActiveRecord
     public const CATEGORY_INVENTORY = 'inventory';
     public const CATEGORY_SYSTEM = 'system';
     public const CATEGORY_REPORT = 'report';
+    public const CATEGORY_LOYALTY = 'loyalty';
 
     public static function tableName(): string
     {
@@ -22,7 +23,13 @@ class Notification extends ActiveRecord
 
     public static function categoryValues(): array
     {
-        return [self::CATEGORY_ORDER, self::CATEGORY_INVENTORY, self::CATEGORY_SYSTEM, self::CATEGORY_REPORT];
+        return [
+            self::CATEGORY_ORDER,
+            self::CATEGORY_INVENTORY,
+            self::CATEGORY_SYSTEM,
+            self::CATEGORY_REPORT,
+            self::CATEGORY_LOYALTY,
+        ];
     }
 
     public static function categoryLabels(): array
@@ -32,6 +39,7 @@ class Notification extends ActiveRecord
             self::CATEGORY_INVENTORY => 'Inventory',
             self::CATEGORY_SYSTEM => 'System',
             self::CATEGORY_REPORT => 'Report',
+            self::CATEGORY_LOYALTY => 'Loyalty',
         ];
     }
 
@@ -46,6 +54,7 @@ class Notification extends ActiveRecord
             self::CATEGORY_ORDER => 'text-bg-primary',
             self::CATEGORY_INVENTORY => 'text-bg-warning',
             self::CATEGORY_REPORT => 'text-bg-success',
+            self::CATEGORY_LOYALTY => 'text-bg-info',
             default => 'text-bg-secondary',
         };
     }
@@ -56,6 +65,7 @@ class Notification extends ActiveRecord
             self::CATEGORY_ORDER => 'bi-cart-check',
             self::CATEGORY_INVENTORY => 'bi-box-seam',
             self::CATEGORY_REPORT => 'bi-graph-up',
+            self::CATEGORY_LOYALTY => 'bi-gift',
             default => 'bi-gear',
         };
     }
@@ -66,6 +76,7 @@ class Notification extends ActiveRecord
         return match (true) {
             str_starts_with($type, 'inventory_') => self::CATEGORY_INVENTORY,
             str_starts_with($type, 'report_') => self::CATEGORY_REPORT,
+            str_starts_with($type, 'loyalty_') => self::CATEGORY_LOYALTY,
             str_starts_with($type, 'order_') => self::CATEGORY_ORDER,
             str_starts_with($type, 'product_'),
             str_starts_with($type, 'category_'),

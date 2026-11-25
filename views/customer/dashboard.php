@@ -10,6 +10,7 @@
 /** @var array<int, int> $favoriteIds */
 /** @var array<int, array{average: float, count: int}> $ratingSummaries */
 /** @var list<array{product_id: int, product_name: string, quantity: int}> $bestSellers */
+/** @var array{current: int, lifetimeEarned: int, lifetimeRedeemed: int, tier: string} $loyalty */
 
 use app\models\User;
 use yii\bootstrap5\LinkPager;
@@ -77,6 +78,43 @@ $displayName = $identity instanceof User
         </div>
     <?php endforeach; ?>
 </div>
+
+<?php if (Yii::$app->user->can('loyalty.view')) : ?>
+    <section class="mb-4 card cafebara-dashboard-card">
+        <div class="card-header d-flex flex-wrap gap-2 justify-content-between align-items-center">
+            <h2 class="h5 mb-0">Your loyalty journey</h2>
+            <?= Html::a('Open My Rewards', ['/loyalty/index'], ['class' => 'btn btn-outline-primary btn-sm']) ?>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 align-items-center text-center">
+                <div class="col-6 col-xl-2">
+                    <p class="mb-1 text-body-secondary small">Tier</p>
+                    <?= $this->render('../shared/_loyalty_badge', ['tier' => $loyalty['tier']]) ?>
+                </div>
+                <?php foreach ([
+                    ['Current points', $loyalty['current']],
+                    ['Lifetime earned', $loyalty['lifetimeEarned']],
+                    ['Lifetime redeemed', $loyalty['lifetimeRedeemed']],
+                ] as [$label, $value]) : ?>
+                    <div class="col-6 col-xl-2">
+                        <p class="mb-1 text-body-secondary small"><?= Html::encode($label) ?></p>
+                        <p class="h4 mb-0"><?= Yii::$app->formatter->asInteger($value) ?></p>
+                    </div>
+                <?php endforeach; ?>
+                <div class="col-12 col-xl-4">
+                    <p class="mb-1 text-body-secondary small">Next treat</p>
+                    <p class="mb-0">
+                        <?php if ($loyalty['current'] >= 50) : ?>
+                            You have enough points for a free coffee.
+                        <?php else : ?>
+                            <?= Yii::$app->formatter->asInteger(50 - $loyalty['current']) ?> more points until a free coffee.
+                        <?php endif; ?>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+<?php endif; ?>
 
 <section class="mb-4 card admin-panel">
     <div class="d-flex flex-wrap gap-3 card-body justify-content-between align-items-center">

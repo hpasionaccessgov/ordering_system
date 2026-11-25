@@ -16,6 +16,7 @@ use app\models\DeactivateForm;
 use app\models\Product;
 use app\models\ProductSearch;
 use app\services\FavoriteService;
+use app\services\LoyaltyService;
 use app\services\ProductReportService;
 use app\services\ReviewService;
 use app\services\ShoppingCart;
@@ -345,6 +346,7 @@ class SiteController extends Controller
         return $this->render('user_profile', [
             'user' => $user,
             'model' => $model,
+            'loyalty' => LoyaltyService::summary((int) $user->id),
         ]);
     }
 

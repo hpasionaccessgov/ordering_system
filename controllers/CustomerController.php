@@ -8,6 +8,7 @@ use app\models\Order;
 use app\models\Product;
 use app\models\ApplicationSettings;
 use app\services\FavoriteService;
+use app\services\LoyaltyService;
 use app\services\ProductReportService;
 use app\services\ReviewService;
 use Yii;
@@ -63,6 +64,7 @@ class CustomerController extends Controller
                 ->orderBy(['created_at' => SORT_DESC, 'id' => SORT_DESC])
                 ->one(),
             'favoriteIds' => FavoriteService::ids($userId),
+            'loyalty' => LoyaltyService::summary($userId),
             'ratingSummaries' => ReviewService::summaries(array_map(
                 static fn(Product $product): int => (int) $product->id,
                 $featuredProducts,

@@ -91,7 +91,7 @@ final class ActivityLogger implements BootstrapInterface
         }
     }
 
-    private static function record(string $event, int|string $userId, ?string $route = null): void
+    public static function record(string $event, int|string|null $userId, ?string $route = null): void
     {
         Yii::$app->db->createCommand()->insert(ActivityLog::tableName(), [
             'user_id' => $userId,
