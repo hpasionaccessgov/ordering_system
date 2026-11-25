@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\services;
 
+use app\models\Notification;
 use app\models\Order;
 use app\models\OrderStatusHistory;
 use app\models\User;
@@ -97,14 +98,16 @@ final class OrderStatusService
                 throw new BadRequestHttpException('Order status could not be updated.');
             }
             $this->record($fresh, $fromStatus, $toStatus, $changedBy);
-            Yii::$app->db->createCommand()->insert('{{%notifications}}', [
-                'user_id' => $fresh->user_id,
-                'order_id' => $fresh->id,
-                'status' => $toStatus,
-                'target_route' => '/sales/orders',
-                'target_id' => $fresh->id,
-                'created_at' => time(),
-            ])->execute();
+            NotificationService::notifyUser(
+                (int) $fresh->user_id,
+                NotificationService::TYPE_ORDER_STATUS,
+                $this->customerStatusMessage($fresh),
+                '/sales/orders',
+                (int) $fresh->id,
+                Notification::CATEGORY_ORDER,
+                (int) $fresh->id,
+                $toStatus,
+            );
             if (!$isProcessing && $changedBy === (int) $fresh->user_id) {
                 $this->notifyOrderManagers($fresh, $changedBy);
             }
@@ -129,22 +132,47 @@ final class OrderStatusService
         $userIds = User::find()->select('id')->where(['status' => User::STATUS_ACTIVE])->column();
         $rows = [];
         $createdAt = time();
+        $message = 'Order ' . $order->order_number . ' was cancelled by the customer.';
         foreach ($userIds as $userId) {
             if ((int) $userId === $actorId || (int) $userId === (int) $order->user_id) {
                 continue;
             }
             if (($auth->checkAccess($userId, 'admin.access') || $auth->checkAccess($userId, 'staff.access'))
                 && $auth->checkAccess($userId, 'order.view')) {
-                $rows[] = [$userId, $order->id, $order->status, '/sales/orders', $order->id, $createdAt];
+                $rows[] = [
+                    $userId,
+                    NotificationService::TYPE_ORDER_CANCELLED,
+                    $message,
+                    '/sales/orders',
+                    $order->id,
+                    $createdAt,
+                    Notification::CATEGORY_ORDER,
+                    $order->id,
+                    (string) $order->status,
+                ];
             }
         }
         if ($rows !== []) {
             Yii::$app->db->createCommand()->batchInsert(
-                '{{%notifications}}',
-                ['user_id', 'order_id', 'status', 'target_route', 'target_id', 'created_at'],
+                Notification::tableName(),
+                ['user_id', 'type', 'message', 'target_route', 'target_id', 'created_at', 'category', 'order_id', 'status'],
                 $rows,
             )->execute();
         }
+    }
+
+    private function customerStatusMessage(Order $order): string
+    {
+        $orderNumber = (string) $order->order_number;
+        return match ((string) $order->status) {
+            Order::STATUS_READY_FOR_PICKUP => 'Your order ' . $orderNumber . ' is ready for pickup.',
+            Order::STATUS_PENDING => 'Your order ' . $orderNumber . ' is pending.',
+            Order::STATUS_CONFIRMED => 'Your order ' . $orderNumber . ' has been confirmed.',
+            Order::STATUS_PROCESSING => 'Your order ' . $orderNumber . ' is being prepared.',
+            Order::STATUS_COMPLETED => 'Your order ' . $orderNumber . ' has been completed.',
+            Order::STATUS_CANCELLED => 'Your order ' . $orderNumber . ' has been cancelled.',
+            default => 'Your order ' . $orderNumber . ' status was updated.',
+        };
     }
 
     private function record(

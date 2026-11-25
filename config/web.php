@@ -118,7 +118,7 @@ $config = [
                 'sales/inventory/<id:\d+>/adjust' => 'inventory/adjust',
 
                 'reports/sales' => 'report/sales',
-                'reports/products' => 'report/product',
+                'reports/product-performance' => 'report/product',
                 'reports/orders' => 'report/orders',
                 'reports/inventory' => 'report/inventory',
                 'reports/export/<type:[\w-]+>' => 'report/export',
@@ -134,6 +134,8 @@ $config = [
                 'admin/users/<id:\d+>/delete' => 'admin-user/delete',
                 'admin/roles' => 'admin-role/index',
                 'admin/roles/create' => 'admin-role/create',
+                'admin/roles/update-matrix' => 'admin-role/update-matrix',
+                'admin/roles/<name:[\w-]+>/update-permissions' => 'admin-role/update-permissions',
                 'admin/roles/<name:[\w-]+>/update' => 'admin-role/update',
                 'admin/roles/<name:[\w-]+>/delete' => 'admin-role/delete',
                 'admin/activity-logs' => 'activity-log/index',

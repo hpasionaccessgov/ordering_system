@@ -58,7 +58,7 @@ if (Yii::$app->user->can('order.view')) {
             'view' => static fn($url, Order $model): string => Html::a(
                 'View',
                 ['/sales/orders/' . $model->id],
-                ['class' => 'btn btn-sm btn-primary'],
+                ['class' => 'btn btn-sm btn-secondary'],
             ),
             'order-again' => static fn($url, Order $model): string => $model->status === Order::STATUS_COMPLETED
                 ? Html::beginForm(['/sales/orders/' . $model->id . '/order-again'], 'POST', ['class' => 'd-inline'])

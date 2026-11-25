@@ -19,6 +19,7 @@ final class InventoryService
             }
             if ((int) $inventory->current_stock !== 0) {
                 self::addTransaction($inventory, (int) $inventory->current_stock, InventoryTransaction::TYPE_STOCK_IN, 'Initial stock');
+                self::notifyInventoryChange($inventory, NotificationService::TYPE_INVENTORY_STOCK_IN, 'Inventory Updated: ' . (int) $inventory->current_stock . ' ' . $inventory->unit . ' of ' . $inventory->name . ' added.');
             }
             self::syncLowStockNotification($inventory);
 
@@ -36,7 +37,16 @@ final class InventoryService
             }
             $change = (int) $inventory->current_stock - $oldStock;
             if ($change !== 0) {
-                self::addTransaction($inventory, $change, InventoryTransaction::TYPE_ADJUSTMENT, 'Stock level updated');
+                $type = $change > 0 ? InventoryTransaction::TYPE_STOCK_IN : InventoryTransaction::TYPE_ADJUSTMENT;
+                $remarks = $change > 0 ? 'Stock added' : 'Stock level updated';
+                self::addTransaction($inventory, $change, $type, $remarks);
+                $message = $change > 0
+                    ? 'Inventory Updated: ' . abs($change) . ' ' . $inventory->unit . ' of ' . $inventory->name . ' added.'
+                    : 'Inventory Adjusted: ' . $inventory->name . ' changed from ' . $oldStock . $inventory->unit . ' to ' . (int) $inventory->current_stock . $inventory->unit . '.';
+                $notificationType = $change > 0
+                    ? NotificationService::TYPE_INVENTORY_STOCK_IN
+                    : NotificationService::TYPE_INVENTORY_ADJUSTED;
+                self::notifyInventoryChange($inventory, $notificationType, $message);
             }
             self::syncLowStockNotification($inventory);
 
@@ -113,12 +123,24 @@ final class InventoryService
             NotificationService::notifyManagers(
                 NotificationService::TYPE_INVENTORY_LOW_STOCK,
                 self::lowStockMessage($inventory),
-                '/inventory/view',
+                '/sales/inventory',
                 (int) $inventory->id,
+                \app\models\Notification::CATEGORY_INVENTORY,
             );
             $inventory->updateAttributes(['low_stock_notified' => 1]);
         } elseif (!$inventory->isLowStock() && $notified) {
             $inventory->updateAttributes(['low_stock_notified' => 0]);
         }
+    }
+
+    private static function notifyInventoryChange(Inventory $inventory, string $type, string $message): void
+    {
+        NotificationService::notifyManagers(
+            $type,
+            $message,
+            '/sales/inventory',
+            (int) $inventory->id,
+            \app\models\Notification::CATEGORY_INVENTORY,
+        );
     }
 }

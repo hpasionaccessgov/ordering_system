@@ -94,7 +94,7 @@ $navGroups = [
                 'label' => 'Product performance',
                 'icon' => 'bi-graph-up',
                 'visible' => $can('reports.view'),
-                'route' => ['/reports/products'],
+                'route' => ['reports/product-performance'],
                 'active' => str_starts_with($currentRoute, 'report/product'),
             ],
             [

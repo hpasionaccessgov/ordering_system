@@ -23,7 +23,7 @@ $priorityBadge = match ($priority) {
 };
 $nextStatus = $order->nextStatus();
 $actionLabels = [
-    Order::STATUS_PENDING => 'Confirm',
+    Order::STATUS_PENDING => 'Confirm order',
     Order::STATUS_CONFIRMED => 'Start preparing',
     Order::STATUS_PROCESSING => 'Mark ready',
     Order::STATUS_READY_FOR_PICKUP => 'Mark completed',
@@ -55,24 +55,25 @@ $returnUrl = Url::to(['/sales/kitchen-board']);
         </div>
 
         <div class="d-flex flex-wrap gap-2">
+            <?php if (Yii::$app->user->can('order.view')) : ?>
+                <?= Html::a('View', ['/sales/orders/' . $order->id], ['class' => 'btn btn-sm btn-secondary']) ?>
+            <?php endif; ?>
             <?php if (Yii::$app->user->can('order.process') && $nextStatus !== null) : ?>
                 <?= Html::beginForm(['/sales/orders/' . $order->id . '/process'], 'post', ['class' => 'd-inline']) ?>
                 <?= Html::hiddenInput('returnUrl', $returnUrl) ?>
                 <?= Html::submitButton($actionLabels[(string) $order->status] ?? 'Advance', ['class' => 'btn btn-sm btn-primary']) ?>
                 <?= Html::endForm() ?>
             <?php endif; ?>
-            <?php if (Yii::$app->user->can('order.cancel') && Yii::$app->user->can('order.process') && $order->canBeCancelledByStaff()) : ?>
-                <?= Html::beginForm(['/sales/orders/' . $order->id . '/cancel'], 'post', ['class' => 'd-inline']) ?>
-                <?= Html::hiddenInput('returnUrl', $returnUrl) ?>
-                <?= Html::submitButton('Cancel', [
-                    'class' => 'btn btn-sm btn-outline-danger',
-                    'data-confirm-modal' => 'Cancel this order?',
-                ]) ?>
-                <?= Html::endForm() ?>
-            <?php endif; ?>
+            <?= $this->render('/order/_cancel', [
+                'model' => $order,
+                'returnUrl' => $returnUrl,
+                'buttonClass' => 'btn btn-sm btn-outline-danger',
+                'buttonLabel' => 'Cancel',
+            ]) ?>
             <?php if (Yii::$app->user->can('order.view')) : ?>
                 <?= Html::a('View', ['/sales/orders/' . $order->id], ['class' => 'btn btn-sm btn-outline-secondary']) ?>
             <?php endif; ?>
+
         </div>
     </div>
 </article>

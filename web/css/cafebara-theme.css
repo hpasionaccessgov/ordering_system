@@ -42,6 +42,7 @@
     --cafebara-surface-raised: #2b1a12;
     --cafebara-border: rgba(248, 230, 203, .14);
     --cafebara-muted: #c9b8aa;
+    --bs-primary-bg-subtle: rgba(248, 230, 203, .14);
     --bs-body-bg: #160d09;
     --bs-body-color: #f8eee4;
     --bs-secondary-bg: #21130d;
@@ -1835,6 +1836,16 @@ body {
     border-color: rgba(248, 230, 203, .35);
     background-color: rgba(248, 230, 203, .1);
     color: var(--cafebara-cream);
+}
+
+.cafebara-notification-unread {
+    background-color: var(--bs-primary-bg-subtle);
+    color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .cafebara-notification-unread {
+    background-color: rgba(197, 152, 73, 0.18);
+    color: var(--bs-body-color);
 }
 
 .cafebara-notification-item:focus-visible {

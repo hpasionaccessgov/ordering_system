@@ -102,16 +102,18 @@ JS, View::POS_READY);
             <?php /** @var Notification $notification */ ?>
             <li class="border-bottom border-secondary-subtle">
                 <?= Html::a(
-                    Html::tag('span', 'Unread', ['class' => 'badge text-bg-primary me-2'])
+                    Html::tag('span', 'Unread', ['class' => 'badge text-bg-primary me-1'])
+                        . Html::tag('span', Html::encode($notification->categoryLabel), ['class' => 'badge ' . $notification->categoryBadgeClass . ' me-1'])
+                        . Html::tag('i', '', ['class' => 'bi ' . $notification->categoryIconClass . ' me-1', 'aria-hidden' => 'true'])
                         . Html::tag('span', Html::encode($notification->label), ['class' => 'small'])
                         . Html::tag('span', Html::encode(\Yii::$app->formatter->asDatetime($notification->created_at)), [
-                            'class' => 'd-block text-body-secondary small',
+                            'class' => 'd-block text-body-secondary small mt-1',
                         ]),
                     $canViewNotification
                         ? ['/notification/view', 'id' => $notification->id]
                         : ['/notifications'],
                     [
-                        'class' => 'dropdown-item cafebara-notification-item',
+                        'class' => 'dropdown-item cafebara-notification-item py-2',
                         'data-notification-item' => true,
                     ],
                 ) ?>

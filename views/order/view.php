@@ -76,9 +76,9 @@ $formatSeconds = static function (?int $seconds): string {
                         <?= Html::encode(Order::statusLabel((string) $model->status)) ?>
                     </span>
                     <?php if ($priority === 'warning') : ?>
-                        <span class="badge text-bg-warning ms-1">Waiting 15+ min</span>
+                        <span class="ms-1 badge text-bg-warning">Waiting 15+ min</span>
                     <?php elseif ($priority === 'critical') : ?>
-                        <span class="badge text-bg-danger ms-1">Waiting 30+ min</span>
+                        <span class="ms-1 badge text-bg-danger">Waiting 30+ min</span>
                     <?php endif; ?>
                 </div>
                 <div class="col-6 col-lg-3">
@@ -154,8 +154,6 @@ $formatSeconds = static function (?int $seconds): string {
                 This is an order summary. Payment is not recorded by this system.
             </p>
             <div class="d-flex flex-wrap gap-2">
-                <?= $this->render('_cancel', ['model' => $model]) ?>
-
                 <?php if (Yii::$app->user->can('order.process') && $nextStatus !== null) : ?>
                     <?= Html::beginForm(
                         ['/sales/orders/' . $model->id . '/process'],
@@ -168,6 +166,7 @@ $formatSeconds = static function (?int $seconds): string {
                     ) ?>
                     <?= Html::endForm() ?>
                 <?php endif; ?>
+                <?= $this->render('_cancel', ['model' => $model]) ?>
             </div>
         </div>
     </section>

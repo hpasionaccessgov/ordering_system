@@ -23,13 +23,13 @@ class NotificationController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     ['allow' => true, 'actions' => ['index', 'unread-count'], 'roles' => ['notification.index']],
-                    ['allow' => true, 'actions' => ['view', 'read'], 'roles' => ['notification.read']],
+                    ['allow' => true, 'actions' => ['view', 'read', 'read-all'], 'roles' => ['notification.read']],
                     ['allow' => true, 'actions' => ['delete'], 'roles' => ['notification.delete']],
                 ],
             ],
             'verbs' => [
                 'class' => VerbFilter::class,
-                'actions' => ['read' => ['POST'], 'delete' => ['POST']],
+                'actions' => ['read' => ['POST'], 'read-all' => ['POST'], 'delete' => ['POST']],
             ],
         ];
     }
@@ -50,6 +50,9 @@ class NotificationController extends Controller
             'search' => $searchModel->q,
             'status' => $searchModel->status,
             'read' => $searchModel->readFilter,
+            'category' => $searchModel->categoryFilter,
+            'sort' => $searchModel->sortFilter,
+            'unreadCount' => (int) $this->visibleNotifications()->andWhere(['read_at' => null])->count(),
         ]);
     }
 
@@ -81,6 +84,16 @@ class NotificationController extends Controller
                 throw new \RuntimeException('Notification could not be marked as read.');
             }
         }
+
+        return $this->redirect(['index']);
+    }
+
+    public function actionReadAll(): Response
+    {
+        Notification::updateAll(
+            ['read_at' => time()],
+            ['and', ['user_id' => Yii::$app->user->id], ['read_at' => null]],
+        );
 
         return $this->redirect(['index']);
     }
