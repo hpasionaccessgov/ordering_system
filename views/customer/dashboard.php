@@ -52,37 +52,30 @@ $displayName = $identity instanceof User
 
 <div class="row g-3 mb-4">
     <?php foreach ([
-        ['Total orders', (string) ($orderCount ?? 0), 'bi-receipt'],
-        ['Total spent', Yii::$app->formatter->asCurrency($totalSpent ?? 0), 'bi-cash-coin'],
-        ['Favorites', (string) ($favoriteCount ?? 0), 'bi-heart'],
-    ] as [$label, $value, $icon]) : ?>
+        ['Total orders', (string) ($orderCount ?? 0), 'bi-receipt', 'All statuses'],
+        ['Total spent', Yii::$app->formatter->asCurrency($totalSpent ?? 0), 'bi-cash-coin', 'Completed orders only'],
+        ['Favorites', (string) ($favoriteCount ?? 0), 'bi-heart', 'Saved products'],
+        ['Favorite product', ($favoriteProduct ?? null) !== null ? $favoriteProduct->name : 'No favorites yet', 'bi-star', 'Most recently added'],
+    ] as [$label, $value, $icon, $caption]) : ?>
         <div class="col-12 col-sm-6 col-xl-3">
             <section class="h-100 small-box cafebara-stat-card">
                 <div class="inner">
                     <p><?= Html::encode($label) ?></p>
-                    <h3 class="cafebara-stat-value"><?= Html::encode($value) ?></h3>
+                    <?php if ($label === 'Favorite product' && ($favoriteProduct ?? null) !== null) : ?>
+                        <h3 class="cafebara-stat-value">
+                            <?= Html::a(Html::encode($favoriteProduct->name), ['/product/view', 'id' => $favoriteProduct->id], [
+                                'class' => 'link-body-emphasis text-decoration-none',
+                            ]) ?>
+                        </h3>
+                    <?php else : ?>
+                        <h3 class="cafebara-stat-value"><?= Html::encode((string) $value) ?></h3>
+                    <?php endif; ?>
+                    <span><?= Html::encode($caption) ?></span>
                 </div>
                 <i class="small-box-icon bi <?= Html::encode($icon) ?>" aria-hidden="true"></i>
             </section>
         </div>
     <?php endforeach; ?>
-    <div class="col-12 col-sm-6 col-xl-3">
-        <section class="h-100 small-box cafebara-stat-card">
-            <div class="inner">
-                <p>Favorite product</p>
-                <?php if (($favoriteProduct ?? null) !== null) : ?>
-                    <h3 class="cafebara-stat-value">
-                        <?= Html::a(Html::encode($favoriteProduct->name), ['/product/view', 'id' => $favoriteProduct->id], [
-                            'class' => 'link-body-emphasis text-decoration-none',
-                        ]) ?>
-                    </h3>
-                <?php else : ?>
-                    <h3 class="cafebara-stat-value">No favorites yet</h3>
-                <?php endif; ?>
-            </div>
-            <i class="small-box-icon bi bi-star" aria-hidden="true"></i>
-        </section>
-    </div>
 </div>
 
 <section class="mb-4 card admin-panel">

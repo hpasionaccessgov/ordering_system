@@ -8,7 +8,8 @@ use yii\web\AssetBundle;
 
 class OverlayScrollbarsAsset extends AssetBundle
 {
-    public $sourcePath = '@app/node_modules/overlayscrollbars';
+    /** Vendor-only OverlayScrollbars (no node_modules at runtime). */
+    public $sourcePath = '@app/vendor/asset-libs/overlayscrollbars';
 
     public $css = [
         'styles/overlayscrollbars.css',

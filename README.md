@@ -26,7 +26,7 @@ A Yii2 basic application for ordering system. This application is built using Yi
     ```
 2. Install local dependencies:
     ```bash
-    composer install && npm install
+    composer install
     ```
 3. Create a `.env` file in the root directory of the project and configure your database connection settings, You can use the provided `.env.example` file as a template
 4. Start Laragon Apache and MySQL, then open http://localhost/ordering_system/web/.

@@ -8,7 +8,8 @@ use yii\web\AssetBundle;
 
 class BootstrapJsAsset extends AssetBundle
 {
-    public $sourcePath = '@app/node_modules/bootstrap/dist/js';
+    /** Vendor-only Bootstrap JS (no node_modules). */
+    public $sourcePath = '@app/vendor/twbs/bootstrap/dist/js';
 
     public $js = [
         'bootstrap.bundle.min.js',

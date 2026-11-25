@@ -47,9 +47,20 @@ $plain = static fn(string $value): string => str_replace('₱', 'PHP ', $value);
     <table class="summary">
         <tr>
             <?php foreach ($summary as $label => $value) : ?>
+                <?php
+                $caption = null;
+                if (is_array($value)) {
+                    $caption = isset($value['caption']) ? (string) $value['caption'] : null;
+                    $label = (string) ($value['label'] ?? $label);
+                    $value = (string) ($value['value'] ?? '');
+                }
+                ?>
                 <td>
                     <div class="label"><?= Html::encode((string) $label) ?></div>
                     <div class="value"><?= Html::encode($plain((string) $value)) ?></div>
+                    <?php if ($caption !== null && $caption !== '') : ?>
+                        <div class="meta"><?= Html::encode($caption) ?></div>
+                    <?php endif; ?>
                 </td>
             <?php endforeach; ?>
         </tr>

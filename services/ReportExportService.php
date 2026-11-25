@@ -17,7 +17,7 @@ use yii\web\View;
 final class ReportExportService
 {
     /**
-     * @param array<string, string> $summary label => formatted value
+     * @param array<string, string>|list<array{label: string, value: string}> $summary
      * @param list<array{label: string, attribute: string, type?: string}> $columns
      * @param list<array<string, mixed>> $rows
      */
@@ -30,6 +30,7 @@ final class ReportExportService
         ReportFilter $filter,
         string $filename,
     ): Response {
+        $summary = $this->normalizeSummary($summary);
         return match ($format) {
             'csv' => $this->csv($title, $columns, $rows, $summary, $filter, $filename),
             'excel' => $this->excel($title, $columns, $rows, $summary, $filter, $filename),
@@ -228,5 +229,23 @@ final class ReportExportService
         $response->content = $content;
 
         return $response;
+    }
+
+    /**
+     * @param array<string, string>|list<array{label: string, value: string}> $summary
+     * @return array<string, string>
+     */
+    private function normalizeSummary(array $summary): array
+    {
+        $normalized = [];
+        foreach ($summary as $key => $item) {
+            if (is_array($item)) {
+                $normalized[(string) ($item['label'] ?? '')] = (string) ($item['value'] ?? '');
+                continue;
+            }
+            $normalized[(string) $key] = (string) $item;
+        }
+
+        return $normalized;
     }
 }

@@ -804,7 +804,7 @@ body {
 
 .app-sidebar .sidebar-menu>.nav-item.menu-open:not(.has-active-child)>.nav-link {
     background-color: transparent;
-    color: inherit;
+    color: rgba(248, 230, 203, .88);
     font-weight: 400;
     border-left-color: transparent;
 }
@@ -1809,6 +1809,18 @@ body {
 [data-bs-theme="dark"] .app-header .navbar-brand,
 [data-bs-theme="dark"] .app-header .nav-link {
     color: var(--bs-body-color);
+}
+
+[data-bs-theme="dark"] .app-header .btn-outline-primary,
+[data-bs-theme="dark"] .cafebara-admin-actions .btn-outline-primary {
+    --bs-btn-color: var(--cafebara-cream);
+    --bs-btn-border-color: rgba(215, 184, 151, .72);
+    --bs-btn-hover-color: var(--cafebara-dark);
+    --bs-btn-hover-bg: var(--cafebara-cream);
+    --bs-btn-hover-border-color: var(--cafebara-cream);
+    --bs-btn-active-color: var(--cafebara-dark);
+    --bs-btn-active-bg: #efd6b5;
+    --bs-btn-active-border-color: #efd6b5;
 }
 
 [data-bs-theme="dark"] .cafebara-auth-header .btn-outline-primary {

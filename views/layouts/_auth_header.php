@@ -25,7 +25,7 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                 'aria-label' => 'Cafébara home',
             ]) ?>
 
-            <div class="d-flex align-items-center gap-2 ms-auto">
+            <div class="d-flex gap-2 align-items-center ms-auto">
                 <?= $this->render('_theme_toggle') ?>
                 <?= Html::a('Home', ['/site/index'], ['class' => 'btn btn-outline-primary']) ?>
                 <?= Html::a($otherAuthLabel, $otherAuthRoute, ['class' => 'btn btn-primary']) ?>

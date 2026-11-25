@@ -9,7 +9,13 @@ use yii\web\YiiAsset;
 
 class AdminLteAsset extends AssetBundle
 {
-    public $sourcePath = "@app/node_modules/admin-lte/dist";
+    /**
+     * AdminLTE dist (v4.x). Vendor-only; no node_modules fallback.
+     * Supported drop locations:
+     * - @app/vendor/almasaeed2010/adminlte/dist
+     * - @app/almasaeed2010/adminlte/dist
+     */
+    public $sourcePath = '@app/vendor/almasaeed2010/adminlte/dist';
 
     public $css = [
         'css/adminlte.min.css',
@@ -26,4 +32,20 @@ class AdminLteAsset extends AssetBundle
         BootstrapIconsAsset::class,
         OverlayScrollbarsAsset::class,
     ];
+
+    public function init(): void
+    {
+        foreach ([
+            '@app/vendor/almasaeed2010/adminlte/dist',
+            '@app/almasaeed2010/adminlte/dist',
+        ] as $alias) {
+            $path = \Yii::getAlias($alias, false);
+            if ($path !== false && is_dir($path)) {
+                $this->sourcePath = $alias;
+                break;
+            }
+        }
+
+        parent::init();
+    }
 }

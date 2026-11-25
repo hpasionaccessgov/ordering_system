@@ -21,13 +21,13 @@ $displayName = $identity instanceof User
     : 'there';
 ?>
 
-<section class="card dashboard-welcome-card dashboard-welcome-staff border-0 mb-4">
-    <div class="card-body row align-items-center g-4">
+<section class="mb-4 card border-0 dashboard-welcome-card dashboard-welcome-staff">
+    <div class="row g-4 card-body align-items-center">
         <div class="col">
-            <span class="dashboard-welcome-role mb-3">
+            <span class="mb-3 dashboard-welcome-role">
                 <i class="bi bi-cup-hot" aria-hidden="true"></i> Staff
             </span>
-            <h1 class="h3 mt-2 mb-2">Welcome, <?= Html::encode($displayName) ?></h1>
+            <h1 class="mt-2 mb-2 h3">Welcome, <?= Html::encode($displayName) ?></h1>
             <p class="mb-3">Keep the menu current and move customer orders through service.</p>
             <div class="d-flex flex-wrap gap-2">
                 <?php if (Yii::$app->user->can('order.index')) : ?>
@@ -57,22 +57,18 @@ $displayName = $identity instanceof User
 <div class="row g-3 mb-4">
     <?php foreach (
         [
-            ["Today's revenue", Yii::$app->formatter->asCurrency($todaySales['revenue']), 'bi-cash-coin'],
-            ["Today's orders", $todaySales['orders'], 'bi-receipt'],
-            ['Average order value', Yii::$app->formatter->asCurrency($todaySales['aov']), 'bi-graph-up'],
-            ['Current low stock', $lowStockCount, 'bi-exclamation-triangle'],
-            ['Active products', $activeProductCount, 'bi-cup-hot'],
-            ['Pending orders', $pendingOrderCount, 'bi-hourglass-split'],
-            ['Processing orders', $processingOrderCount, 'bi-arrow-repeat'],
-            ['Inventory items', $inventoryCount, 'bi-box-seam'],
-            ['Out of stock', $outOfStockCount, 'bi-x-circle'],
-        ] as [$label, $value, $icon]
+            ["Today's revenue", Yii::$app->formatter->asCurrency($todaySales['revenue']), 'bi-cash-coin', 'Completed orders today'],
+            ["Today's orders", $todaySales['orders'], 'bi-receipt', 'All statuses today'],
+            ['Pending orders', $pendingOrderCount + $processingOrderCount, 'bi-hourglass-split', 'Pending + processing'],
+            ['Current low stock', $lowStockCount, 'bi-exclamation-triangle', 'Below minimum'],
+        ] as [$label, $value, $icon, $caption]
     ) : ?>
-        <div class="col-12 col-md-4">
-            <section class="small-box cafebara-stat-card h-100">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <section class="h-100 small-box cafebara-stat-card">
                 <div class="inner">
                     <p><?= Html::encode($label) ?></p>
                     <h3 class="cafebara-stat-value"><?= Html::encode((string) $value) ?></h3>
+                    <span><?= Html::encode($caption) ?></span>
                 </div>
                 <i class="small-box-icon bi <?= Html::encode($icon) ?>" aria-hidden="true"></i>
             </section>

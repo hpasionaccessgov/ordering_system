@@ -28,7 +28,7 @@ use yii\helpers\Html;
  * instead of delegating to the Bootstrap widget. The Bootstrap widget would register
  * `yii\bootstrap5\BootstrapPluginAsset` (the vendor `twbs/bootstrap` bundle) every time
  * a flash message is present. On AdminLTE pages that vendor bundle is a second copy of
- * Bootstrap on top of the node_modules bundle loaded by `AdminLteAsset`, which breaks
+ * Bootstrap on top of the AdminLTE bundle loaded by `AdminLteAsset`, which breaks
  * the admin layout: the late `bootstrap.css` overrides the theme and the duplicated
  * `bootstrap.bundle.js` double-binds the `data-bs-toggle` handlers, so the header
  * dropdown opens and immediately closes. Bootstrap is already provided by the layout,

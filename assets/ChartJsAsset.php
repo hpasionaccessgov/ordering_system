@@ -8,9 +8,10 @@ use yii\web\AssetBundle;
 
 class ChartJsAsset extends AssetBundle
 {
-    public $sourcePath = '@app/node_modules/chart.js/dist';
+    /** Vendor-only Chart.js (no node_modules at runtime). */
+    public $sourcePath = '@app/vendor/asset-libs/chart.js/dist';
 
     public $js = [
-        'chart.umd.js',
+        'chart.umd.min.js',
     ];
 }
