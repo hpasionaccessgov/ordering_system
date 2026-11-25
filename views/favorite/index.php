@@ -22,7 +22,7 @@ foreach ($dataProvider->getModels() as $favorite) {
         <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
     </div>
     <?php if (Yii::$app->user->can('product.index')) : ?>
-        <?= Html::a('Browse menu', ['/product/index'], ['class' => 'btn btn-outline-primary']) ?>
+        <?= Html::a('Browse menu', ['/product/index'], ['class' => 'btn btn-primary']) ?>
     <?php endif; ?>
 </div>
 

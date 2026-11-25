@@ -25,12 +25,12 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php if (Yii::$app->user->can('inventory.delete')) : ?>
             <?= Html::beginForm(['delete', 'id' => $model->id], 'POST', ['class' => 'd-inline']) ?>
             <?= Html::submitButton('Delete', [
-                'class' => 'btn btn-outline-danger',
+                'class' => 'btn btn-danger',
                 'data-confirm-modal' => 'Delete this item? Items with stock history cannot be deleted.',
             ]) ?>
             <?= Html::endForm() ?>
         <?php endif; ?>
-        <?= Html::a('Back', ['index'], ['class' => 'btn btn-outline-secondary']) ?>
+        <?= Html::a('Back', ['index'], ['class' => 'btn btn-secondary']) ?>
     </div>
 </div>
 
@@ -38,7 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= $this->render('../shared/_inventory_alert', ['lowStockItems' => [$model]]) ?>
 <?php endif; ?>
 
-<section class="card admin-panel mb-4">
+<section class="mb-4 card admin-panel">
     <div class="card-header">
         <p class="mb-0 text-body-secondary">Current stock details.</p>
     </div>

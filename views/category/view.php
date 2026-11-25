@@ -19,7 +19,7 @@ $this->title = $model->name;
             <?= Html::a('Edit category', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?php endif; ?>
         <?php if (Yii::$app->user->can('category.index')) : ?>
-            <?= Html::a('Back to categories', ['index'], ['class' => 'btn btn-outline-secondary']) ?>
+            <?= Html::a('Back to categories', ['index'], ['class' => 'btn btn-secondary']) ?>
         <?php endif; ?>
     </div>
 </div>
@@ -45,7 +45,7 @@ $this->title = $model->name;
         <?php if (Yii::$app->user->can('category.delete')) : ?>
             <?= Html::beginForm(['delete', 'id' => $model->id], 'POST', ['class' => 'mt-3']) ?>
             <?= Html::submitButton('Delete category', [
-                'class' => 'btn btn-outline-danger',
+                'class' => 'btn btn-danger',
                 'data-confirm-modal' => 'Delete this category? Categories assigned to products cannot be deleted.',
             ]) ?>
             <?= Html::endForm() ?>

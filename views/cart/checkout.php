@@ -58,7 +58,7 @@ $this->title = 'Checkout';
                     <?= Html::submitButton('Place order', ['class' => 'btn btn-primary w-100']) ?>
                     <?= Html::endForm() ?>
                     <?= Html::a('Back to cart', ['/cart/index'], [
-                        'class' => 'btn btn-outline-secondary w-100 mt-2',
+                        'class' => 'btn btn-secondary w-100 mt-2',
                     ]) ?>
                 </div>
             </section>

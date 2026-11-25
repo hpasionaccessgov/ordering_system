@@ -44,12 +44,12 @@ $this->registerJs(<<<'JS'
 })();
 JS);
 ?>
-<section class="card admin-panel mt-4">
+<section class="mt-4 card admin-panel">
     <div class="card-header">
-        <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Recipe</p>
-        <h2 class="h5 mb-0">Ingredients</h2>
+        <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Recipe</p>
+        <h2 class="mb-0 h5">Ingredients</h2>
     </div>
-    <div class="card-body p-4">
+    <div class="p-4 card-body">
         <p class="text-body-secondary small">
             Quantities are required per single product. They are deducted from inventory when an order is completed.
         </p>
@@ -91,7 +91,7 @@ JS);
                                 ) ?>
                             </td>
                             <td>
-                                <button type="button" class="btn btn-outline-danger btn-sm" data-remove-ingredient aria-label="Remove ingredient">
+                                <button type="button" class="btn btn-danger btn-sm" data-remove-ingredient aria-label="Remove ingredient">
                                     <i class="bi bi-trash" aria-hidden="true"></i>
                                 </button>
                             </td>
@@ -115,15 +115,15 @@ JS);
                     <?= Html::input('number', 'ingredients[__INDEX__][quantity_required]', 1, $quantityOptions) ?>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-outline-danger btn-sm" data-remove-ingredient aria-label="Remove ingredient">
+                    <button type="button" class="btn btn-danger btn-sm" data-remove-ingredient aria-label="Remove ingredient">
                         <i class="bi bi-trash" aria-hidden="true"></i>
                     </button>
                 </td>
             </tr>
         </template>
 
-        <button type="button" class="btn btn-outline-primary mt-3" data-add-ingredient <?= $inventoryItems === [] ? 'disabled' : '' ?>>
-            <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>Add ingredient
+        <button type="button" class="mt-3 btn btn-primary" data-add-ingredient <?= $inventoryItems === [] ? 'disabled' : '' ?>>
+            <i class="me-1 bi bi-plus-lg" aria-hidden="true"></i>Add ingredient
         </button>
     </div>
 </section>

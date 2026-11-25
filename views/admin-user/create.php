@@ -19,14 +19,14 @@ foreach ($roles as $role) {
 
 <div class="row justify-content-center">
     <div class="col-12 col-xl-8">
-        <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+        <div class="d-flex gap-3 mb-4 justify-content-between align-items-start">
             <div>
-                <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Administration</p>
-                <h1 class="h3 mb-1">Create account</h1>
-                <p class="text-body-secondary mb-0">Create a user and assign an existing role.</p>
+                <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Administration</p>
+                <h1 class="mb-1 h3">Create account</h1>
+                <p class="mb-0 text-body-secondary">Create a user and assign an existing role.</p>
             </div>
             <?php if (Yii::$app->user->can('user.index')) : ?>
-                <?= Html::a('Back to user list', ['/admin-user/list'], ['class' => 'btn btn-outline-secondary']) ?>
+                <?= Html::a('Back to user list', ['/admin-user/list'], ['class' => 'btn btn-secondary']) ?>
             <?php endif; ?>
         </div>
 
@@ -67,7 +67,7 @@ foreach ($roles as $role) {
                 <div class="d-flex flex-wrap gap-2 mt-4">
                     <?= Html::submitButton('Create account', ['class' => 'btn btn-primary']) ?>
                     <?php if (Yii::$app->user->can('user.index')) : ?>
-                        <?= Html::a('Cancel', ['/admin-user/list'], ['class' => 'btn btn-outline-secondary']) ?>
+                        <?= Html::a('Cancel', ['/admin-user/list'], ['class' => 'btn btn-secondary']) ?>
                     <?php endif; ?>
                 </div>
 

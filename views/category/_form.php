@@ -24,7 +24,7 @@ use yii\helpers\Html;
             <?= Html::a(
                 'Cancel',
                 Yii::$app->user->can('category.index') ? ['index'] : ['/site/dashboard'],
-                ['class' => 'btn btn-outline-secondary'],
+                ['class' => 'btn btn-secondary'],
             ) ?>
         </div>
         <?php AdminActiveForm::end(); ?>

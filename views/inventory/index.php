@@ -67,20 +67,20 @@ $this->params['breadcrumbs'][] = $this->title;
                         $actions[] = Html::a(
                             'View',
                             ['view', 'id' => $inventory->id],
-                            ['class' => 'btn btn-sm btn-outline-secondary', 'aria-label' => 'View ' . $inventory->name],
+                            ['class' => 'btn btn-sm btn-secondary', 'aria-label' => 'View ' . $inventory->name],
                         );
                     }
                     if (Yii::$app->user->can('inventory.update') && Yii::$app->user->can('inventory.view')) {
                         $actions[] = Html::a(
                             'Edit',
                             ['update', 'id' => $inventory->id],
-                            ['class' => 'btn btn-sm btn-outline-primary', 'aria-label' => 'Edit ' . $inventory->name],
+                            ['class' => 'btn btn-sm btn-primary', 'aria-label' => 'Edit ' . $inventory->name],
                         );
                     }
                     if (Yii::$app->user->can('inventory.delete')) {
                         $actions[] = Html::beginForm(['delete', 'id' => $inventory->id], 'POST', ['class' => 'd-inline'])
                             . Html::submitButton('Delete', [
-                                'class' => 'btn btn-sm btn-outline-danger',
+                                'class' => 'btn btn-sm btn-danger',
                                 'aria-label' => 'Delete ' . $inventory->name,
                                 'data-confirm-modal' => 'Delete this item? Items with stock history cannot be deleted.',
                             ])

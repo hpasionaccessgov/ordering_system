@@ -33,19 +33,19 @@ $this->title = 'Notifications';
                 </div>
                 <div class="d-flex gap-2">
                     <?php if (Yii::$app->user->can('notification.read')): ?>
-                        <?= Html::a('View', ['/notification/view', 'id' => $notification->id], ['class' => 'btn btn-sm btn-outline-primary']) ?>
+                        <?= Html::a('View', ['/notification/view', 'id' => $notification->id], ['class' => 'btn btn-sm btn-primary']) ?>
                     <?php elseif (Yii::$app->user->can('order.view') && $notification->order_id !== null): ?>
-                        <?= Html::a('View order', ['/order/view', 'id' => $notification->order_id], ['class' => 'btn btn-sm btn-outline-primary']) ?>
+                        <?= Html::a('View order', ['/order/view', 'id' => $notification->order_id], ['class' => 'btn btn-sm btn-primary']) ?>
                     <?php endif ?>
                     <?php if ($notification->read_at === null && Yii::$app->user->can('notification.read')): ?>
                         <?= Html::beginForm(['/notification/read', 'id' => $notification->id], 'POST') ?>
-                        <?= Html::submitButton('Mark as read', ['class' => 'btn btn-sm btn-outline-secondary']) ?>
+                        <?= Html::submitButton('Mark as read', ['class' => 'btn btn-sm btn-secondary']) ?>
                         <?= Html::endForm() ?>
                     <?php endif ?>
                     <?php if (Yii::$app->user->can('notification.delete')): ?>
                         <?= Html::beginForm(['/notification/delete', 'id' => $notification->id], 'POST') ?>
                         <?= Html::submitButton('Delete', [
-                            'class' => 'btn btn-sm btn-outline-danger',
+                            'class' => 'btn btn-sm btn-danger',
                             'data-confirm-modal' => 'Delete this notification? This cannot be undone.',
                         ]) ?>
                         <?= Html::endForm() ?>

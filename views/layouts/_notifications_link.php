@@ -10,7 +10,7 @@ use yii\web\View;
 
 /** @var string $class */
 
-$class = $class ?? 'btn btn-outline-primary';
+$class = $class ?? 'btn btn-primary';
 $canViewAll = \Yii::$app->user->can('order.view') && OrderAccessPolicy::canViewAllOrders(
     \Yii::$app->user->can('admin.access'),
     \Yii::$app->user->can('staff.access'),

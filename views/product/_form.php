@@ -54,12 +54,12 @@ $form = AdminActiveForm::begin([
 
 <div class="row g-4 align-items-start">
     <div class="col-12 col-xl-8">
-        <section class="card admin-panel product-editor-card h-100">
+        <section class="card h-100 admin-panel product-editor-card">
             <div class="card-header">
-                <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Menu listing</p>
-                <h2 class="h5 mb-0">Product details</h2>
+                <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Menu listing</p>
+                <h2 class="mb-0 h5">Product details</h2>
             </div>
-            <div class="card-body p-4">
+            <div class="p-4 card-body">
                 <?= $form->field($model, 'name')->textInput([
                     'maxlength' => true,
                     'placeholder' => 'e.g. Cafébara House Latte',
@@ -92,11 +92,11 @@ $form = AdminActiveForm::begin([
     <div class="col-12 col-xl-4">
         <section class="card admin-panel product-editor-card">
             <div class="card-header">
-                <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Presentation</p>
-                <h2 class="h5 mb-0">Photo and availability</h2>
+                <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Presentation</p>
+                <h2 class="mb-0 h5">Photo and availability</h2>
             </div>
-            <div class="card-body p-4">
-                <div class="product-editor-preview mb-3">
+            <div class="p-4 card-body">
+                <div class="mb-3 product-editor-preview">
                     <?= Html::tag('img', '', array_merge([
                         'class' => 'product-editor-preview-image' . ($initialImageUrl === null ? ' d-none' : ''),
                         'alt' => 'Product image preview',
@@ -104,7 +104,7 @@ $form = AdminActiveForm::begin([
                         'data-has-image' => $initialImageUrl === null ? 'false' : 'true',
                     ], $initialImageUrl === null ? [] : ['src' => $initialImageUrl])) ?>
                     <div
-                        class="product-editor-preview-placeholder<?= $initialImageUrl === null ? '' : ' d-none' ?>"
+                        class="d-none' product-editor-preview-placeholder<?= $initialImageUrl === null ? '' : ' ?>"
                         data-product-image-placeholder>
                         <i class="bi bi-image" aria-hidden="true"></i>
                         <span>Product photo preview</span>
@@ -137,8 +137,8 @@ $form = AdminActiveForm::begin([
     'ingredientRows' => $ingredientRows,
 ]) ?>
 
-<div class="d-flex flex-wrap justify-content-end gap-2 mt-4">
-    <?= Html::a('Cancel', $cancelRoute, ['class' => 'btn btn-outline-secondary']) ?>
+<div class="d-flex flex-wrap gap-2 mt-4 justify-content-end">
+    <?= Html::a('Cancel', $cancelRoute, ['class' => 'btn btn-secondary']) ?>
     <?= Html::submitButton('Save product', ['class' => 'btn btn-primary px-4']) ?>
 </div>
 

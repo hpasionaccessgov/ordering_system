@@ -395,7 +395,7 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
                             <?php if (!$isBuiltIn) : ?>
                                 <?= Html::submitButton('Delete role', [
                                     'form' => 'delete-role-' . $role->name,
-                                    'class' => 'btn btn-sm btn-outline-danger',
+                                    'class' => 'btn btn-sm btn-danger',
                                     'data-confirm-modal' => 'Delete this role?',
                                 ]) ?>
                             <?php endif; ?>

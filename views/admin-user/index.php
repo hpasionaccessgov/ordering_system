@@ -109,7 +109,7 @@ foreach ($roles as $role) {
                         $actions[] = Html::a('View', ['/admin-user/view', 'id' => $user->id], ToolTip::options(
                             'View account details for ' . $user->username,
                             [
-                                'class' => 'btn btn-sm btn-outline-secondary',
+                                'class' => 'btn btn-sm btn-secondary',
                                 'aria-label' => 'View account details for ' . $user->username,
                             ],
                         ));
@@ -122,7 +122,7 @@ foreach ($roles as $role) {
                         $actions[] = Html::a('Edit', ['/admin-user/update', 'id' => $user->id], ToolTip::options(
                             'Edit personal data for ' . $user->username,
                             [
-                                'class' => 'btn btn-sm btn-outline-primary',
+                                'class' => 'btn btn-sm btn-primary',
                                 'aria-label' => 'Edit personal data for ' . $user->username,
                             ],
                         ));
@@ -140,7 +140,7 @@ foreach ($roles as $role) {
                             . Html::submitButton('Delete', ToolTip::options(
                                 'Delete ' . $user->username,
                                 [
-                                    'class' => 'btn btn-sm btn-outline-danger',
+                                    'class' => 'btn btn-sm btn-danger',
                                     'data-confirm-modal' => 'Permanently delete this account? Accounts with order history cannot be deleted.',
                                 ],
                             ))

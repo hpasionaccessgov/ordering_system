@@ -47,7 +47,7 @@ Order statuses: `pending → confirmed → processing → completed`, plus `canc
 - Home with featured products (3-column cards, paginated), menu page (6 cards/page), about, contact form that sends mail, register, login, logout.
 - Profile, change password, account deactivate, role-based dashboard landing.
 - Login throttling, lockout, and idle timeout come from `ApplicationSettings` + `services/SessionUser.php`; `SessionController` exposes `status`/`activity` endpoints.
-- Public header (`_public_header.php`) collapses on mobile; its toggler now uses `bi bi-list` inside a `btn btn-outline-primary`, matching the admin sidebar toggle. Bootstrap's `navbar-toggler` class is retained so it hides on desktop.
+- Public header (`_public_header.php`) collapses on mobile; its toggler now uses `bi bi-list` inside a `btn btn-primary`, matching the admin sidebar toggle. Bootstrap's `navbar-toggler` class is retained so it hides on desktop.
 
 ### Products (`ProductController`, `views/product`, `shared/_product_card.php`)
 - Index with search/filter/sort, detail, create, update, archive, restore, permanent delete.

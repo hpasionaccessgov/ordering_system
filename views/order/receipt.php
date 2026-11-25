@@ -16,11 +16,11 @@ $statusLabels = [
 ?>
 
 <div class="receipt-print-page">
-    <div class="receipt-actions d-flex flex-wrap justify-content-between gap-2 mb-4">
+    <div class="d-flex flex-wrap gap-2 mb-4 justify-content-between receipt-actions">
         <?= Html::a(
             'Back to order',
             ['/order/view', 'id' => $model->id],
-            ['class' => 'btn btn-outline-secondary'],
+            ['class' => 'btn btn-secondary'],
         ) ?>
         <?= Html::button('Print receipt', [
             'class' => 'btn btn-primary',
@@ -30,7 +30,7 @@ $statusLabels = [
     </div>
 
     <article class="order-detail-card order-receipt p-3 p-md-4" id="order-receipt">
-        <header class="order-receipt-heading d-flex justify-content-between align-items-center gap-3 mb-4">
+        <header class="order-receipt-heading d-flex gap-3 mb-4 justify-content-between align-items-center">
             <?= Html::img(
                 Yii::getAlias('@web/Cafebara_logo.png'),
                 [
@@ -39,11 +39,11 @@ $statusLabels = [
                 ],
             ) ?>
             <div class="text-end">
-                <p class="text-uppercase small fw-semibold text-body-secondary mb-1">
+                <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">
                     Order receipt
                 </p>
-                <h1 class="h4 mb-1"><?= Html::encode($model->order_number) ?></h1>
-                <span class="badge order-status">
+                <h1 class="mb-1 h4"><?= Html::encode($model->order_number) ?></h1>
+                <span class="order-status badge">
                     <?= Html::encode($statusLabels[$model->status] ?? $model->status) ?>
                 </span>
             </div>
@@ -60,7 +60,7 @@ $statusLabels = [
             </div>
         </div>
 
-        <h2 class="h6 mb-3">Order details</h2>
+        <h2 class="mb-3 h6">Order details</h2>
         <div class="table-responsive">
             <table class="table table-striped table-hover table-bordered align-middle cafebara-data-table">
                 <thead>
@@ -92,7 +92,7 @@ $statusLabels = [
             <span>Total</span>
             <strong><?= Yii::$app->formatter->asCurrency($model->total_amount) ?></strong>
         </div>
-        <p class="small text-body-secondary mt-3 mb-0">
+        <p class="mt-3 mb-0 text-body-secondary small">
             This receipt confirms the order and fulfillment status; payment is not recorded by this system.
         </p>
     </article>

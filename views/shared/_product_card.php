@@ -113,7 +113,7 @@ $isFavorite = isset($favoriteIds[(int) $product->id]);
             <div class="mt-3 position-relative z-2 product-card-actions">
                 <?php if ($canUpdateProducts) : ?>
                     <?= Html::a('Edit', ['/product/update', 'id' => $product->id], [
-                        'class' => 'btn btn-sm btn-outline-primary',
+                        'class' => 'btn btn-sm btn-primary',
                     ]) ?>
                 <?php endif; ?>
                 <?php if ($canArchiveProducts && $product->isActive()) : ?>
@@ -123,7 +123,7 @@ $isFavorite = isset($favoriteIds[(int) $product->id]);
                         ['class' => 'd-inline'],
                     ) ?>
                     <?= Html::submitButton('Archive', [
-                        'class' => 'btn btn-sm btn-outline-danger',
+                        'class' => 'btn btn-sm btn-danger',
                         'data-confirm-modal' => 'Archive this product?',
                     ]) ?>
                     <?= Html::endForm() ?>
@@ -134,7 +134,7 @@ $isFavorite = isset($favoriteIds[(int) $product->id]);
                         ['class' => 'd-inline'],
                     ) ?>
                     <?= Html::submitButton('Restore', [
-                        'class' => 'btn btn-sm btn-outline-success',
+                        'class' => 'btn btn-sm btn-success',
                         'data-confirm-modal' => 'Restore this product to the active catalog?',
                     ]) ?>
                     <?= Html::endForm() ?>
@@ -146,7 +146,7 @@ $isFavorite = isset($favoriteIds[(int) $product->id]);
                         ['class' => 'd-inline'],
                     ) ?>
                     <?= Html::submitButton('Delete permanently', [
-                        'class' => 'btn btn-sm btn-outline-danger',
+                        'class' => 'btn btn-sm btn-danger',
                         'data-confirm-modal' => 'Permanently delete this product? This cannot be undone.',
                     ]) ?>
                     <?= Html::endForm() ?>

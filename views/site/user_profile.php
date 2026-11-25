@@ -53,12 +53,12 @@ $this->title = 'My Profile';
             </div>
 
             <div class="d-flex flex-wrap gap-2 card-body">
-                <?= Html::a('Change password', ['/site/change-password'], ['class' => 'btn btn-outline-primary']) ?>
+                <?= Html::a('Change password', ['/site/change-password'], ['class' => 'btn btn-primary']) ?>
 
-                <?= Html::a('Deactivate account', ['/site/deactivate'], ['class' => 'btn btn-outline-danger']) ?>
+                <?= Html::a('Deactivate account', ['/site/deactivate'], ['class' => 'btn btn-danger']) ?>
 
                 <?= Html::beginForm(['/site/logout'], 'POST', ['class' => 'd-inline']) ?>
-                <?= Html::submitButton('Logout', ['class' => 'btn btn-outline-warning']) ?>
+                <?= Html::submitButton('Logout', ['class' => 'btn btn-warning']) ?>
                 <?= Html::endForm() ?>
             </div>
         </div>

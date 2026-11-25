@@ -773,7 +773,7 @@ body {
     background-color: var(--cafebara-surface-raised) !important;
 }
 
-[data-bs-theme="dark"] .btn-outline-secondary {
+[data-bs-theme="dark"] .btn-secondary {
     --bs-btn-color: #e4d3c5;
     --bs-btn-border-color: #8d7463;
     --bs-btn-hover-color: #fff;

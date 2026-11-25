@@ -19,7 +19,7 @@ $this->title = 'Shopping cart';
             <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
         </div>
         <?php if (Yii::$app->user->can('product.index')) : ?>
-            <?= Html::a('Continue shopping', ['/product/index'], ['class' => 'btn btn-outline-primary']) ?>
+            <?= Html::a('Continue shopping', ['/product/index'], ['class' => 'btn btn-primary']) ?>
         <?php endif; ?>
     </div>
 
@@ -81,7 +81,7 @@ $this->title = 'Shopping cart';
                                         'step' => 1,
                                         'aria-label' => 'Quantity of ' . $product->name,
                                     ]) ?>
-                                    <?= Html::submitButton('Update', ['class' => 'btn btn-outline-primary']) ?>
+                                    <?= Html::submitButton('Update', ['class' => 'btn btn-primary']) ?>
                                     <?= Html::endForm() ?>
                                 <?php endif; ?>
                                 <div class="text-end">
@@ -93,7 +93,7 @@ $this->title = 'Shopping cart';
                                         'class' => 'ms-lg-2',
                                     ]) ?>
                                     <?= Html::submitButton('Remove', [
-                                        'class' => 'btn btn-sm btn-outline-danger',
+                                        'class' => 'btn btn-sm btn-danger',
                                         'aria-label' => 'Remove ' . $product->name,
                                     ]) ?>
                                     <?= Html::endForm() ?>

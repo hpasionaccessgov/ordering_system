@@ -15,20 +15,20 @@ $canViewFeaturedProducts = Yii::$app->user->isGuest || Yii::$app->user->can('pro
 $batchFormId = Yii::$app->user->can('cart.add') ? 'home-batch-cart' : null;
 ?>
 <div class="site-index">
-    <section class="cafebara-hero rounded-4 p-4 p-lg-5 mb-5">
-        <div class="row align-items-center g-4 g-lg-5">
+    <section class="p-4 p-lg-5 mb-5 rounded-4 cafebara-hero">
+        <div class="row g-4 g-lg-5 align-items-center">
             <div class="col-lg-7">
-                <p class="cafebara-hero-kicker mb-3">
+                <p class="mb-3 cafebara-hero-kicker">
                     <!-- <span class="cafebara-kicker-dot" aria-hidden="true"></span> -->
                     A relaxed in every coffee break
                 </p>
 
-                <h1 class="display-4 fw-bold mb-3">
+                <h1 class="mb-3 fw-bold display-4">
                     Good coffee.<br>
                     <span>Easy ordering.</span>
                 </h1>
 
-                <p class="lead cafebara-hero-copy mb-4">
+                <p class="mb-4 lead cafebara-hero-copy">
                     Welcome to Cafébara! follow the cafe tools as they grow.
                 </p>
 
@@ -69,16 +69,16 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'home-batch-cart' : null;
     </section>
 
     <?php if ($canViewFeaturedProducts && $featuredDataProvider->getTotalCount() > 0) : ?>
-        <section class="cafebara-featured mb-5">
-            <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+        <section class="mb-5 cafebara-featured">
+            <div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-end">
                 <div>
-                    <p class="cafebara-section-kicker mb-2">From the counter</p>
-                    <h2 class="h2 fw-bold mb-0">Featured drinks and bites</h2>
+                    <p class="mb-2 cafebara-section-kicker">From the counter</p>
+                    <h2 class="mb-0 fw-bold h2">Featured drinks and bites</h2>
                 </div>
                 <?= Html::a(
                     'Browse menu',
                     ['/site/menu'],
-                    ['class' => 'btn btn-outline-primary'],
+                    ['class' => 'btn btn-primary'],
                 ) ?>
             </div>
             <?php if ($batchFormId !== null) : ?>
@@ -109,14 +109,14 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'home-batch-cart' : null;
 
     <?= $this->render('../shared/_best_sellers', ['bestSellers' => $bestSellers ?? []]) ?>
 
-    <section class="cafebara-intro pb-4">
-        <div class="row align-items-end g-3 mb-4">
+    <section class="pb-4 cafebara-intro">
+        <div class="row g-3 mb-4 align-items-end">
             <div class="col-lg-7">
-                <p class="cafebara-section-kicker mb-2">WELCOME TO CAFÉBARA!</p>
-                <h2 class="h2 fw-bold mb-0">Your cafe, all in one place.</h2>
+                <p class="mb-2 cafebara-section-kicker">WELCOME TO CAFÉBARA!</p>
+                <h2 class="mb-0 fw-bold h2">Your cafe, all in one place.</h2>
             </div>
             <!-- <div class="col-lg-5">
-                <p class="text-body-secondary mb-0">
+                <p class="mb-0 text-body-secondary">
                     Start with your account today. Cafébara's ordering workspace is designed to grow with the cafe.
                 </p>
             </div> -->
@@ -152,13 +152,13 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'home-batch-cart' : null;
             </div>
 
             <div class="col-12 col-md-4">
-                <article class="card cafebara-feature-card h-100">
-                    <div class="card-body p-4">
+                <article class="card h-100 cafebara-feature-card">
+                    <div class="p-4 card-body">
                         <span class="cafebara-feature-icon" aria-hidden="true">
                             <i class="bi bi-phone"></i>
                         </span>
-                        <h3 class="h5 fw-bold mt-4">Made for each screen</h3>
-                        <p class="text-body-secondary mb-0">
+                        <h3 class="mt-4 fw-bold h5">Made for each screen</h3>
+                        <p class="mb-0 text-body-secondary">
                             Access Cafébara on any device.
                         </p>
                     </div>

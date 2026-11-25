@@ -32,7 +32,7 @@ $isFavorite = isset(($favoriteIds ?? [])[(int) $model->id]);
             <?= Html::a(
                 'Back to products',
                 ['/product/index'],
-                ['class' => 'btn btn-outline-secondary'],
+                ['class' => 'btn btn-secondary'],
             ) ?>
         <?php endif; ?>
     </div>
@@ -131,14 +131,14 @@ $isFavorite = isset(($favoriteIds ?? [])[(int) $model->id]);
                             <?= Html::submitButton(
                                 '<i class="bi ' . ($isFavorite ? 'bi-heart-fill' : 'bi-heart') . ' me-1" aria-hidden="true"></i>'
                                 . ($isFavorite ? 'Remove from favorites' : 'Add to favorites'),
-                                ['class' => 'btn btn-outline-primary', 'encode' => false],
+                                ['class' => 'btn btn-primary', 'encode' => false],
                             ) ?>
                             <?= Html::endForm() ?>
                         <?php endif; ?>
 
                         <?php if ($canManageProducts) : ?>
                             <?= Html::a('Edit product', ['/product/update', 'id' => $model->id], [
-                                'class' => 'btn btn-outline-primary',
+                                'class' => 'btn btn-primary',
                             ]) ?>
                         <?php endif; ?>
 
@@ -152,7 +152,7 @@ $isFavorite = isset(($favoriteIds ?? [])[(int) $model->id]);
                                 ['class' => 'd-inline'],
                             ) ?>
                             <?= Html::submitButton('Archive product', [
-                                'class' => 'btn btn-outline-danger',
+                                'class' => 'btn btn-danger',
                                 'data-confirm-modal' => 'Archive this product?',
                             ]) ?>
                             <?= Html::endForm() ?>
@@ -165,7 +165,7 @@ $isFavorite = isset(($favoriteIds ?? [])[(int) $model->id]);
                                 ['class' => 'd-inline'],
                             ) ?>
                             <?= Html::submitButton('Delete permanently', [
-                                'class' => 'btn btn-outline-danger',
+                                'class' => 'btn btn-danger',
                                 'data-confirm-modal' => 'Permanently delete this product? This cannot be undone.',
                             ]) ?>
                             <?= Html::endForm() ?>

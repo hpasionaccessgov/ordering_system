@@ -96,10 +96,10 @@ $displayName = $identity instanceof User
         </div>
         <div class="d-flex flex-wrap gap-2 ms-auto">
             <?php if (Yii::$app->user->can('favorite.index')) : ?>
-                <?= Html::a('My favorites', ['/favorite/index'], ['class' => 'btn btn-outline-primary']) ?>
+                <?= Html::a('My favorites', ['/favorite/index'], ['class' => 'btn btn-primary']) ?>
             <?php endif; ?>
             <?php if (Yii::$app->user->can('order.index')) : ?>
-                <?= Html::a('View your orders', ['/order/index'], ['class' => 'btn btn-outline-primary']) ?>
+                <?= Html::a('View your orders', ['/order/index'], ['class' => 'btn btn-primary']) ?>
             <?php endif; ?>
         </div>
     </div>

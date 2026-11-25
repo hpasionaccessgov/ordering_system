@@ -37,7 +37,7 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
                 && $model->status === Order::STATUS_COMPLETED
             ) : ?>
                 <?= Html::beginForm(['/order/order-again', 'id' => $model->id], 'POST', ['class' => 'd-inline']) ?>
-                <?= Html::submitButton('Order Again', ['class' => 'btn btn-outline-success']) ?>
+                <?= Html::submitButton('Order Again', ['class' => 'btn btn-success']) ?>
                 <?= Html::endForm() ?>
             <?php endif; ?>
             <?php if (
@@ -47,14 +47,14 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
                 <?= Html::a(
                     'View printable receipt',
                     ['/order/receipt', 'id' => $model->id],
-                    ['class' => 'btn btn-outline-primary'],
+                    ['class' => 'btn btn-primary'],
                 ) ?>
             <?php endif; ?>
             <?php if (Yii::$app->user->can('order.index')) : ?>
                 <?= Html::a(
                     'Back to orders',
                     ['/order/index'],
-                    ['class' => 'btn btn-outline-secondary'],
+                    ['class' => 'btn btn-secondary'],
                 ) ?>
             <?php endif; ?>
         </div>

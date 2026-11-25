@@ -11,10 +11,10 @@ $this->title = 'Activity logs';
 $sort = Yii::$app->request->get('sort');
 $value = static fn($value): string => is_scalar($value) ? (string) $value : '';
 ?>
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+<div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-center">
     <div>
-        <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Administration</p>
-        <h1 class="h3 mb-0"><?= Html::encode($this->title) ?></h1>
+        <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Administration</p>
+        <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
     </div>
 </div>
 <?= Html::beginForm(['/activity-log/index'], 'get', ['class' => 'catalog-filter p-3 mb-4', 'role' => 'search']) ?>
@@ -57,7 +57,7 @@ $value = static fn($value): string => is_scalar($value) ? (string) $value : '';
 <?= Html::endForm() ?>
 <section class="card admin-panel">
     <div class="card-header">
-        <p class="text-body-secondary mb-0">Review sign-in, sign-out, and page visit activity.</p>
+        <p class="mb-0 text-body-secondary">Review sign-in, sign-out, and page visit activity.</p>
     </div>
     <?= AdminGridView::widget([
         'dataProvider' => $dataProvider,
@@ -76,7 +76,7 @@ $value = static fn($value): string => is_scalar($value) ? (string) $value : '';
                 'format' => 'raw',
                 'visible' => Yii::$app->user->can('activityLog.view'),
                 'value' => static fn(ActivityLog $log): string => Html::a(
-                    'View', ['view', 'id' => $log->id], ['class' => 'btn btn-sm btn-outline-primary'],
+                    'View', ['view', 'id' => $log->id], ['class' => 'btn btn-sm btn-primary'],
                 ),
             ],
         ],

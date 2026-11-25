@@ -58,11 +58,11 @@ if (Yii::$app->user->can('order.view')) {
             'view' => static fn($url, Order $model): string => Html::a(
                 'View',
                 ['/order/view', 'id' => $model->id],
-                ['class' => 'btn btn-sm btn-outline-primary'],
+                ['class' => 'btn btn-sm btn-primary'],
             ),
             'order-again' => static fn($url, Order $model): string => $model->status === Order::STATUS_COMPLETED
                 ? Html::beginForm(['/order/order-again', 'id' => $model->id], 'POST', ['class' => 'd-inline'])
-                    . Html::submitButton('Order Again', ['class' => 'btn btn-sm btn-outline-success'])
+                    . Html::submitButton('Order Again', ['class' => 'btn btn-sm btn-success'])
                     . Html::endForm()
                 : '',
         ],

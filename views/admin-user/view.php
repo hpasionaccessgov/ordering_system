@@ -15,11 +15,11 @@ $statusLabels = [
 ];
 ?>
 
-<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+<div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-start">
     <div>
-        <p class="text-uppercase small fw-semibold text-body-secondary mb-1">Administration</p>
-        <h1 class="h3 mb-1"><?= Html::encode($this->title) ?></h1>
-        <p class="text-body-secondary mb-0">Account details</p>
+        <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Administration</p>
+        <h1 class="mb-1 h3"><?= Html::encode($this->title) ?></h1>
+        <p class="mb-0 text-body-secondary">Account details</p>
     </div>
     <div class="d-flex flex-wrap gap-2">
         <?php if (
@@ -32,7 +32,7 @@ $statusLabels = [
         <?php endif; ?>
         <?php if (Yii::$app->user->can('user.index')) : ?>
             <?= Html::a('Back to user list', ['/admin-user/list'], [
-                'class' => 'btn btn-outline-secondary',
+                'class' => 'btn btn-secondary',
             ]) ?>
         <?php endif; ?>
     </div>

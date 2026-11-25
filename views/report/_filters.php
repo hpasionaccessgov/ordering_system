@@ -58,7 +58,7 @@ $form = ActiveForm::begin([
             <?= Html::a('Reset', [$route], ['class' => 'btn btn-outline-secondary']) ?>
         </div>
     </div>
-    <p class="small text-body-secondary mb-0 mt-2">
+    <p class="mb-0 mt-2 text-body-secondary small">
         Start and end dates are only used with the Custom date range option.
     </p>
 </div>
