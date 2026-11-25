@@ -19,6 +19,10 @@ $canCancel = Yii::$app->user->can('order.cancel')
         'POST',
         ['class' => 'd-inline'],
     ) ?>
+    <?php $returnUrl = Yii::$app->request->get('returnUrl'); ?>
+    <?php if (is_string($returnUrl) && str_starts_with($returnUrl, '/')) : ?>
+        <?= Html::hiddenInput('returnUrl', $returnUrl) ?>
+    <?php endif; ?>
 
     <?= Html::submitButton(
         'Cancel order',

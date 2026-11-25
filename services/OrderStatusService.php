@@ -91,7 +91,9 @@ final class OrderStatusService
 
             $fromStatus = (string) $fresh->status;
             $fresh->status = $toStatus;
-            if (!$fresh->save(false, ['status', 'updated_at', 'updated_by'])) {
+            $timestampAttributes = $this->timestampAttributesForStatus($toStatus, $fresh);
+            $dirtyAttributes = array_merge(['status', 'updated_at', 'updated_by'], $timestampAttributes);
+            if (!$fresh->save(false, $dirtyAttributes)) {
                 throw new BadRequestHttpException('Order status could not be updated.');
             }
             $this->record($fresh, $fromStatus, $toStatus, $changedBy);
@@ -163,5 +165,26 @@ final class OrderStatusService
                 'Order status history could not be saved.',
             );
         }
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function timestampAttributesForStatus(string $status, Order $order): array
+    {
+        $now = time();
+        $map = [
+            Order::STATUS_CONFIRMED => 'confirmed_at',
+            Order::STATUS_PROCESSING => 'processing_at',
+            Order::STATUS_READY_FOR_PICKUP => 'ready_at',
+            Order::STATUS_COMPLETED => 'completed_at',
+        ];
+        $attribute = $map[$status] ?? null;
+        if ($attribute === null || !$order->hasAttribute($attribute) || $order->$attribute !== null) {
+            return [];
+        }
+        $order->$attribute = $now;
+
+        return [$attribute];
     }
 }

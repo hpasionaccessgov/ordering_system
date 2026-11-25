@@ -15,6 +15,7 @@ $statuses = [
     Order::STATUS_PENDING => 'Pending',
     Order::STATUS_CONFIRMED => 'Confirmed',
     Order::STATUS_PROCESSING => 'Processing',
+    Order::STATUS_READY_FOR_PICKUP => 'Ready for pickup',
     Order::STATUS_COMPLETED => 'Completed',
     Order::STATUS_CANCELLED => 'Cancelled',
 ];
@@ -43,7 +44,7 @@ if (statusChartCanvas && window.Chart) {
             datasets: [{
                 label: 'Orders',
                 data: chartData.values,
-                backgroundColor: ['#c98c5d', '#a96a3d', '#89431c', '#56805d', '#a44a3f'],
+                backgroundColor: ['#c98c5d', '#a96a3d', '#89431c', '#0d6efd', '#56805d', '#a44a3f'],
                 borderRadius: 6,
                 maxBarThickness: 48
             }]

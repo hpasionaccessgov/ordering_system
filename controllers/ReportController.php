@@ -162,11 +162,11 @@ class ReportController extends Controller
                 ['label' => 'Total orders', 'value' => Yii::$app->formatter->asInteger($summary['total']), 'caption' => 'All statuses in range', 'icon' => 'bi-receipt'],
                 ['label' => 'Completed orders', 'value' => Yii::$app->formatter->asInteger($summary['completed']), 'caption' => 'Completed in range', 'icon' => 'bi-check2-circle'],
                 ['label' => 'Cancelled orders', 'value' => Yii::$app->formatter->asInteger($summary['cancelled']), 'caption' => 'Cancelled in range', 'icon' => 'bi-x-circle'],
-                ['label' => 'In progress', 'value' => Yii::$app->formatter->asInteger($summary['pending'] + $summary['confirmed'] + $summary['processing']), 'caption' => 'Pending, confirmed, processing', 'icon' => 'bi-hourglass-split'],
+                ['label' => 'In progress', 'value' => Yii::$app->formatter->asInteger($summary['pending'] + $summary['confirmed'] + $summary['processing'] + $summary['ready_for_pickup']), 'caption' => 'Pending to ready for pickup', 'icon' => 'bi-hourglass-split'],
             ],
             'statusRows' => $statusRows,
             'statusLabels' => array_map(
-                static fn(array $row): string => ucfirst($row['status']),
+                static fn(array $row): string => \app\models\Order::statusLabel((string) $row['status']),
                 $statusRows,
             ),
             'statusValues' => array_column($statusRows, 'orders'),

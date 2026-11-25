@@ -123,7 +123,7 @@ $isFavorite = isset($favoriteIds[(int) $product->id]);
                         ['class' => 'd-inline'],
                     ) ?>
                     <?= Html::submitButton('Archive', [
-                        'class' => 'btn btn-sm btn-danger',
+                        'class' => 'btn btn-sm btn-warning',
                         'data-confirm-modal' => 'Archive this product?',
                     ]) ?>
                     <?= Html::endForm() ?>

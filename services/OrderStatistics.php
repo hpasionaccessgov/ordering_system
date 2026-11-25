@@ -17,6 +17,7 @@ final class OrderStatistics
             Order::STATUS_PENDING => 0,
             Order::STATUS_CONFIRMED => 0,
             Order::STATUS_PROCESSING => 0,
+            Order::STATUS_READY_FOR_PICKUP => 0,
             Order::STATUS_COMPLETED => 0,
             Order::STATUS_CANCELLED => 0,
         ];

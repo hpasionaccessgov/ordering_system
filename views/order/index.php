@@ -17,7 +17,7 @@ $columns = [
     'order_number',
     [
         'attribute' => 'status',
-        'value' => static fn(Order $order): string => ucfirst((string) $order->status),
+        'value' => static fn(Order $order): string => Order::statusLabel((string) $order->status),
     ],
     'total_amount:currency',
     'created_at:datetime',

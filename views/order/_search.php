@@ -19,14 +19,10 @@ $sort = Yii::$app->request->get('sort');
         ]) ?>
     </div>
     <div class="col-12 col-md-auto">
-        <?= Html::dropDownList('status', $status, [
-            '' => 'All statuses',
-            'pending' => 'Pending',
-            'confirmed' => 'Confirmed',
-            'processing' => 'Processing',
-            'completed' => 'Completed',
-            'cancelled' => 'Cancelled',
-        ], [
+        <?= Html::dropDownList('status', $status, ['' => 'All statuses'] + array_combine(
+            \app\models\Order::statusValues(),
+            array_map([\app\models\Order::class, 'statusLabel'], \app\models\Order::statusValues()),
+        ), [
             'class' => 'form-select',
             'aria-label' => 'Filter orders by status',
         ]) ?>

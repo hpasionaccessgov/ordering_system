@@ -6,21 +6,28 @@ use yii\helpers\Html;
 /** @var Order $model */
 
 $this->title = $model->order_number;
-$statusLabels = [
-    Order::STATUS_PENDING => 'Pending',
-    Order::STATUS_CONFIRMED => 'Confirmed',
-    Order::STATUS_PROCESSING => 'Processing',
-    Order::STATUS_COMPLETED => 'Completed',
-    Order::STATUS_CANCELLED => 'Cancelled',
-];
 $staffActionLabels = [
     Order::STATUS_PENDING => 'Confirm order',
     Order::STATUS_CONFIRMED => 'Start preparing',
-    Order::STATUS_PROCESSING => 'Mark completed',
+    Order::STATUS_PROCESSING => 'Mark ready for pickup',
+    Order::STATUS_READY_FOR_PICKUP => 'Mark completed',
 ];
 $nextStatus = $model->nextStatus();
 $canViewCustomerInformation = Yii::$app->user->can('admin.access')
     || Yii::$app->user->can('staff.access');
+$priority = $model->priorityLevel();
+$formatSeconds = static function (?int $seconds): string {
+    if ($seconds === null) {
+        return '—';
+    }
+    $minutes = intdiv($seconds, 60);
+    $hours = intdiv($minutes, 60);
+    $remMinutes = $minutes % 60;
+    if ($hours > 0) {
+        return $hours . 'h ' . $remMinutes . 'm';
+    }
+    return $minutes . 'm';
+};
 ?>
 
 <section class="order-detail-page">
@@ -66,12 +73,25 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
                 <div class="col-6 col-lg-3">
                     <span class="d-block text-body-secondary small">Status</span>
                     <span class="order-status badge">
-                        <?= Html::encode($statusLabels[$model->status] ?? $model->status) ?>
+                        <?= Html::encode(Order::statusLabel((string) $model->status)) ?>
                     </span>
+                    <?php if ($priority === 'warning') : ?>
+                        <span class="badge text-bg-warning ms-1">Waiting 15+ min</span>
+                    <?php elseif ($priority === 'critical') : ?>
+                        <span class="badge text-bg-danger ms-1">Waiting 30+ min</span>
+                    <?php endif; ?>
                 </div>
                 <div class="col-6 col-lg-3">
                     <span class="d-block text-body-secondary small">Placed</span>
                     <strong><?= Yii::$app->formatter->asDatetime($model->created_at) ?></strong>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <span class="d-block text-body-secondary small">Waiting time</span>
+                    <strong><?= Html::encode($formatSeconds($model->waitingSeconds())) ?></strong>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <span class="d-block text-body-secondary small">Preparation time</span>
+                    <strong><?= Html::encode($formatSeconds($model->preparationSeconds())) ?></strong>
                 </div>
                 <?php if ($canViewCustomerInformation) : ?>
                     <div class="col-12 col-lg-6">
@@ -164,11 +184,11 @@ $canViewCustomerInformation = Yii::$app->user->can('admin.access')
                     <div class="d-flex flex-wrap gap-2 list-group-item justify-content-between">
                         <div>
                             <strong>
-                                <?= Html::encode($statusLabels[$history->to_status] ?? $history->to_status) ?>
+                                <?= Html::encode(Order::statusLabel((string) $history->to_status)) ?>
                             </strong>
                             <?php if ($history->from_status !== null) : ?>
                                 <span class="text-body-secondary">
-                                    from <?= Html::encode($statusLabels[$history->from_status] ?? $history->from_status) ?>
+                                    from <?= Html::encode(Order::statusLabel((string) $history->from_status)) ?>
                                 </span>
                             <?php endif; ?>
                         </div>

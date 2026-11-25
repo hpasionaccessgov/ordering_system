@@ -40,14 +40,26 @@ final class OrderStatusServiceTest extends Unit
         self::assertNull($notification->read_at);
         $order = $statusService->process($order, (int) $user->id);
         $order = $statusService->process($order, (int) $user->id);
+        $readyNotification = Notification::findOne([
+            'user_id' => $user->id,
+            'order_id' => $order->id,
+            'status' => Order::STATUS_READY_FOR_PICKUP,
+        ]);
+        self::assertNotNull($readyNotification);
+        self::assertStringContainsString('ready for pickup', strtolower($readyNotification->label));
+        $order = $statusService->process($order, (int) $user->id);
 
         $order->refresh();
         self::assertSame(Order::STATUS_COMPLETED, $order->status);
+        self::assertNotNull($order->confirmed_at);
+        self::assertNotNull($order->processing_at);
+        self::assertNotNull($order->ready_at);
+        self::assertNotNull($order->completed_at);
         self::assertSame(
-            ['pending', 'confirmed', 'processing', 'completed'],
+            ['pending', 'confirmed', 'processing', 'ready_for_pickup', 'completed'],
             array_column($order->statusHistory, 'to_status'),
         );
-        self::assertSame(3, (int) Notification::find()->where(['order_id' => $order->id])->count());
+        self::assertSame(4, (int) Notification::find()->where(['order_id' => $order->id])->count());
 
         $this->expectException(BadRequestHttpException::class);
         $statusService->process($order, (int) $user->id);

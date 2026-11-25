@@ -20,13 +20,7 @@ class OrderStatusHistory extends ActiveRecord
             [['order_id', 'to_status', 'created_at'], 'required'],
             [['order_id', 'changed_by', 'created_at'], 'integer'],
             [['from_status', 'to_status'], 'string', 'max' => 30],
-            [['to_status'], 'in', 'range' => [
-                Order::STATUS_PENDING,
-                Order::STATUS_CONFIRMED,
-                Order::STATUS_PROCESSING,
-                Order::STATUS_COMPLETED,
-                Order::STATUS_CANCELLED,
-            ]],
+            [['to_status'], 'in', 'range' => Order::statusValues()],
         ];
     }
 

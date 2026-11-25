@@ -6,9 +6,8 @@ namespace app\controllers;
 
 use app\models\Inventory;
 use app\models\Order;
-use app\models\Product;
+use app\services\OrderBoardService;
 use app\services\OrderStatistics;
-use app\services\SalesReportService;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 
@@ -32,19 +31,18 @@ class StaffController extends Controller
     public function actionDashboard(): string
     {
         $this->layout = 'admin';
+        $board = new OrderBoardService();
+        $statusCounts = OrderStatistics::statusCounts();
 
         return $this->render('dashboard', [
-            'activeProductCount' => (int) Product::find()->where(['status' => Product::STATUS_ACTIVE])->count(),
-            'pendingOrderCount' => (int) Order::find()->where(['status' => Order::STATUS_PENDING])->count(),
-            'processingOrderCount' => (int) Order::find()->where([
-                'status' => Order::STATUS_PROCESSING,
-            ])->count(),
-            'inventoryCount' => (int) Inventory::find()->active()->count(),
+            'pendingOrderCount' => (int) ($statusCounts[Order::STATUS_PENDING] ?? 0),
+            'processingOrderCount' => (int) ($statusCounts[Order::STATUS_PROCESSING] ?? 0),
+            'readyForPickupCount' => (int) ($statusCounts[Order::STATUS_READY_FOR_PICKUP] ?? 0),
+            'completedTodayCount' => $board->completedToday(),
+            'averagePreparationMinutes' => $board->averagePreparationMinutesToday(),
             'lowStockCount' => (int) Inventory::find()->lowStock()->count(),
-            'outOfStockCount' => (int) Inventory::find()->outOfStock()->count(),
             'lowStockItems' => Inventory::find()->lowStock()->orderBy(['current_stock' => SORT_ASC])->all(),
-            'orderStatusCounts' => OrderStatistics::statusCounts(),
-            'todaySales' => (new SalesReportService())->todaySummary(),
+            'orderStatusCounts' => $statusCounts,
         ]);
     }
 }

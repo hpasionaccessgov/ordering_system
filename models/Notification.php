@@ -39,9 +39,12 @@ class Notification extends ActiveRecord
             return (string) $this->message;
         }
         if ($this->order !== null) {
-            return $this->status === Order::STATUS_PENDING
-                ? 'New order ' . $this->order->order_number . ' received.'
-                : 'Order ' . $this->order->order_number . ' is ' . $this->status . '.';
+            $orderNumber = $this->order->order_number;
+            return match ((string) $this->status) {
+                Order::STATUS_PENDING => 'New order ' . $orderNumber . ' received.',
+                Order::STATUS_READY_FOR_PICKUP => 'Order ' . $orderNumber . ' is ready for pickup.',
+                default => 'Order ' . $orderNumber . ' is ' . str_replace('_', ' ', (string) $this->status) . '.',
+            };
         }
 
         return ucfirst(str_replace(['-', '_', '.'], ' ', (string) $this->status)) . '.';

@@ -20,8 +20,12 @@ final class OrderWorkflowTest extends Unit
             Order::nextStatusFor(Order::STATUS_CONFIRMED),
         );
         self::assertSame(
-            Order::STATUS_COMPLETED,
+            Order::STATUS_READY_FOR_PICKUP,
             Order::nextStatusFor(Order::STATUS_PROCESSING),
+        );
+        self::assertSame(
+            Order::STATUS_COMPLETED,
+            Order::nextStatusFor(Order::STATUS_READY_FOR_PICKUP),
         );
     }
 

@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'datasets' => [[
                 'label' => 'Orders',
                 'data' => $statusValues,
-                'backgroundColor' => ['#c98c5d', '#a96a3d', '#89431c', '#56805d', '#a44a3f'],
+                'backgroundColor' => ['#c98c5d', '#a96a3d', '#89431c', '#0d6efd', '#56805d', '#a44a3f'],
             ]],
             'options' => ['plugins' => ['legend' => ['display' => true, 'position' => 'bottom']]],
         ]) ?>

@@ -6,13 +6,6 @@ use yii\helpers\Html;
 /** @var Order $model */
 
 $this->title = "Receipt for {$model->order_number}";
-$statusLabels = [
-    Order::STATUS_PENDING => 'Pending',
-    Order::STATUS_CONFIRMED => 'Confirmed',
-    Order::STATUS_PROCESSING => 'Processing',
-    Order::STATUS_COMPLETED => 'Completed',
-    Order::STATUS_CANCELLED => 'Cancelled',
-];
 ?>
 
 <div class="receipt-print-page">
@@ -44,7 +37,7 @@ $statusLabels = [
                 </p>
                 <h1 class="mb-1 h4"><?= Html::encode($model->order_number) ?></h1>
                 <span class="order-status badge">
-                    <?= Html::encode($statusLabels[$model->status] ?? $model->status) ?>
+                    <?= Html::encode(Order::statusLabel((string) $model->status)) ?>
                 </span>
             </div>
         </header>

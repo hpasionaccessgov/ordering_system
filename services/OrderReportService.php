@@ -11,7 +11,7 @@ use yii\db\ActiveQuery;
 final class OrderReportService
 {
     /**
-     * @return array{total: int, completed: int, cancelled: int, pending: int, confirmed: int, processing: int}
+     * @return array{total: int, completed: int, cancelled: int, pending: int, confirmed: int, processing: int, ready_for_pickup: int}
      */
     public function summary(ReportFilter $filter): array
     {
@@ -27,6 +27,7 @@ final class OrderReportService
             'pending' => $counts[Order::STATUS_PENDING],
             'confirmed' => $counts[Order::STATUS_CONFIRMED],
             'processing' => $counts[Order::STATUS_PROCESSING],
+            'ready_for_pickup' => $counts[Order::STATUS_READY_FOR_PICKUP],
         ];
     }
 

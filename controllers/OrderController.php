@@ -284,7 +284,7 @@ class OrderController extends Controller
 
         Yii::$app->session->setFlash('success', 'Order cancelled.');
 
-        return $this->redirect($this->getOrderReturnRoute((int) $order->id));
+        return $this->redirect($this->getReturnUrl($this->getOrderReturnRoute((int) $order->id)));
     }
 
     public function actionProcess(int $id): Response
@@ -299,12 +299,12 @@ class OrderController extends Controller
         } catch (InsufficientInventoryException $exception) {
             Yii::$app->session->setFlash('error', nl2br(Html::encode($exception->getMessage())));
 
-            return $this->redirect($this->getOrderReturnRoute((int) $order->id));
+            return $this->redirect($this->getReturnUrl($this->getOrderReturnRoute((int) $order->id)));
         }
 
         Yii::$app->session->setFlash('success', 'Order status updated.');
 
-        return $this->redirect($this->getOrderReturnRoute((int) $order->id));
+        return $this->redirect($this->getReturnUrl($this->getOrderReturnRoute((int) $order->id)));
     }
 
     private function findAccessibleOrder(int $id): Order
@@ -336,6 +336,20 @@ class OrderController extends Controller
             Yii::$app->user->can('admin.access'),
             Yii::$app->user->can('staff.access'),
         );
+    }
+
+    /**
+     * @param array|string $fallback
+     * @return array|string
+     */
+    private function getReturnUrl(array|string $fallback): array|string
+    {
+        $returnUrl = $this->request->post('returnUrl');
+        if (is_string($returnUrl) && str_starts_with($returnUrl, '/')) {
+            return $returnUrl;
+        }
+
+        return $fallback;
     }
 
     /**

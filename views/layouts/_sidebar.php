@@ -50,6 +50,13 @@ $navGroups = [
                 'active' => str_starts_with($currentRoute, 'order/'),
             ],
             [
+                'label' => 'Kitchen board',
+                'icon' => 'bi-kanban',
+                'visible' => $can('order.board'),
+                'route' => ['/kitchen/board'],
+                'active' => str_starts_with($currentRoute, 'kitchen/'),
+            ],
+            [
                 'label' => 'Cart',
                 'icon' => 'bi-cart',
                 'visible' => $can('cart.index'),
