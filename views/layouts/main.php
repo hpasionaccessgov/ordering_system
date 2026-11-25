@@ -36,6 +36,7 @@ $this->render('_head');
 </main>
 
 <?= $this->render('_footer') ?>
+<?= $this->render('_mini_cart') ?>
 
 <?= ConfirmModal::widget() ?>
 <?= $this->render('_session_monitor') ?>

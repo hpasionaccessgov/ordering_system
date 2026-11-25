@@ -7,6 +7,7 @@ namespace app\controllers;
 use app\models\Order;
 use app\models\Product;
 use app\models\ApplicationSettings;
+use app\models\Notification;
 use app\services\FavoriteService;
 use app\services\LoyaltyService;
 use app\services\ProductReportService;
@@ -39,6 +40,7 @@ class CustomerController extends Controller
         $userId = (int) Yii::$app->user->id;
         $featuredDataProvider = new ActiveDataProvider([
             'query' => Product::find()
+                ->with(['categoryRecord', 'productIngredients.inventory'])
                 ->where([
                     'status' => Product::STATUS_ACTIVE,
                     'is_featured' => true,
@@ -59,11 +61,16 @@ class CustomerController extends Controller
                 ->sum('total_amount'),
             'favoriteCount' => FavoriteService::countFor($userId),
             'favoriteProduct' => FavoriteService::latestProduct($userId),
-            'recentOrder' => Order::find()
+            'favoriteIds' => FavoriteService::ids($userId),
+            'recentOrders' => Order::find()
                 ->where(['user_id' => $userId])
                 ->orderBy(['created_at' => SORT_DESC, 'id' => SORT_DESC])
-                ->one(),
-            'favoriteIds' => FavoriteService::ids($userId),
+                ->limit(5)
+                ->all(),
+            'recentNotifications' => Notification::visibleTo($userId, false)
+                ->orderBy(['created_at' => SORT_DESC, 'id' => SORT_DESC])
+                ->limit(5)
+                ->all(),
             'loyalty' => LoyaltyService::summary($userId),
             'ratingSummaries' => ReviewService::summaries(array_map(
                 static fn(Product $product): int => (int) $product->id,

@@ -80,7 +80,7 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
 
     <div class="row g-3">
         <?php foreach ($dataProvider->getModels() as $product) : ?>
-            <div class="col-12 col-sm-6 col-lg-4">
+            <div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
                 <?= $this->render('../shared/_product_card', [
                     'product' => $product,
                     'batchFormId' => $batchFormId,
@@ -94,10 +94,12 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
     <?= $this->render('../shared/_best_sellers', ['bestSellers' => $bestSellers ?? []]) ?>
 
     <?php if ($dataProvider->getCount() === 0) : ?>
-        <div class="card admin-panel">
+        <div class="card admin-panel cafebara-empty-state">
             <div class="py-5 card-body text-center">
-                <h2 class="h5">No products match your search</h2>
-                <p class="mb-0 text-body-secondary">Try another name or category.</p>
+                <span class="cafebara-empty-icon" aria-hidden="true"><i class="bi bi-cup-hot"></i></span>
+                <h2 class="mt-3 h5">No drinks found matching your search.</h2>
+                <p class="mb-3 text-body-secondary">Try another category or search term.</p>
+                <?= Html::a('Browse menu', ['/site/menu'], ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
     <?php endif; ?>

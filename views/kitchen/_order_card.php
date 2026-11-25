@@ -67,12 +67,9 @@ $returnUrl = Url::to(['/sales/kitchen-board']);
             <?= $this->render('/order/_cancel', [
                 'model' => $order,
                 'returnUrl' => $returnUrl,
-                'buttonClass' => 'btn btn-sm btn-outline-danger',
+                'buttonClass' => 'btn btn-sm btn-danger',
                 'buttonLabel' => 'Cancel',
             ]) ?>
-            <?php if (Yii::$app->user->can('order.view')) : ?>
-                <?= Html::a('View', ['/sales/orders/' . $order->id], ['class' => 'btn btn-sm btn-outline-secondary']) ?>
-            <?php endif; ?>
 
         </div>
     </div>

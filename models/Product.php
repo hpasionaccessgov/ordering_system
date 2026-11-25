@@ -24,6 +24,7 @@ use yii\helpers\Url;
  * @property string|null $image_mime
  * @property string|null $image_name
  * @property bool $is_featured
+ * @property bool $is_special
  * @property Category $categoryRecord
  * @property User|null $createdBy
  * @property User|null $updatedBy
@@ -66,7 +67,7 @@ class Product extends ActiveRecord
             [['image_path'], 'string', 'max' => 255],
             [['image_mime'], 'string', 'max' => 100],
             [['image_name'], 'string', 'max' => 255],
-            [['is_featured'], 'boolean'],
+            [['is_featured', 'is_special'], 'boolean'],
             [['imageFile'], 'file', 'skipOnEmpty' => true, 'extensions' => ['png', 'jpg', 'jpeg', 'webp'], 'maxSize' => 3 * 1024 * 1024],
             [['price'], 'number', 'min' => 0, 'max' => 99999999.99],
             [['price'], 'filter', 'filter' => static function ($value): string {
@@ -150,6 +151,49 @@ class Product extends ActiveRecord
     public function isActive(): bool
     {
         return (int) $this->status === self::STATUS_ACTIVE;
+    }
+
+    public function stockStatus(): string
+    {
+        if (!$this->isActive()) {
+            return 'out';
+        }
+
+        $low = false;
+        $ingredients = $this->productIngredients;
+        if (!is_iterable($ingredients)) {
+            return 'in';
+        }
+
+        foreach ($ingredients as $ingredient) {
+            $inventory = $ingredient->inventory;
+            if ($inventory === null || $inventory->isOutOfStock()) {
+                return 'out';
+            }
+            if ($inventory->isLowStock() || (int) $inventory->current_stock < (int) $ingredient->quantity_required) {
+                $low = true;
+            }
+        }
+
+        return $low ? 'low' : 'in';
+    }
+
+    public function stockBadgeClass(): string
+    {
+        return match ($this->stockStatus()) {
+            'low' => 'text-bg-warning',
+            'out' => 'text-bg-danger',
+            default => 'text-bg-success',
+        };
+    }
+
+    public function stockLabel(): string
+    {
+        return match ($this->stockStatus()) {
+            'low' => 'Low Stock',
+            'out' => 'Out of Stock',
+            default => 'In Stock',
+        };
     }
 
     public function getImageUrl(): ?string

@@ -62,7 +62,7 @@ if (Yii::$app->user->can('order.view')) {
             ),
             'order-again' => static fn($url, Order $model): string => $model->status === Order::STATUS_COMPLETED
                 ? Html::beginForm(['/sales/orders/' . $model->id . '/order-again'], 'POST', ['class' => 'd-inline'])
-                    . Html::submitButton('Order Again', ['class' => 'btn btn-sm btn-outline-primary'])
+                    . Html::submitButton('Order Again', ['class' => 'btn btn-sm btn-primary'])
                     . Html::endForm()
                 : '',
         ],
@@ -87,12 +87,23 @@ if (Yii::$app->user->can('order.view')) {
     'canViewAudit' => $canViewAudit,
 ]) ?>
 
-<section class="card admin-panel">
-    <div class="card-header">
-        <p class="mb-0 text-body-secondary">Review order details.</p>
+<?php if ($dataProvider->getCount() === 0) : ?>
+    <div class="card admin-panel cafebara-empty-state">
+        <div class="py-5 card-body text-center">
+            <span class="cafebara-empty-icon" aria-hidden="true"><i class="bi bi-cup-hot"></i></span>
+            <h2 class="mt-3 h5">No orders yet.</h2>
+            <p class="mb-3 text-body-secondary">Order your first drink today.</p>
+            <?= Html::a('Browse Menu', ['/site/menu'], ['class' => 'btn btn-primary']) ?>
+        </div>
     </div>
-    <?= AdminGridView::widget([
-        'dataProvider' => $dataProvider,
-        'columns' => $columns,
-    ]) ?>
-</section>
+<?php else : ?>
+    <section class="card admin-panel">
+        <div class="card-header">
+            <p class="mb-0 text-body-secondary">Review order details.</p>
+        </div>
+        <?= AdminGridView::widget([
+            'dataProvider' => $dataProvider,
+            'columns' => $columns,
+        ]) ?>
+    </section>
+<?php endif; ?>

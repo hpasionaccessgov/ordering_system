@@ -22,12 +22,12 @@ $columnMeta = [
     Order::STATUS_READY_FOR_PICKUP => ['label' => 'Ready For Pickup', 'class' => 'text-bg-success'],
 ];
 ?>
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+<div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-center">
     <div>
         <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Staff Operations</p>
         <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
     </div>
-    <div class="small text-body-secondary">
+    <div class="text-body-secondary small">
         Completed today: <strong><?= Html::encode((string) $completedToday) ?></strong>
         <?php if ($averagePreparationMinutes !== null) : ?>
             · Avg prep: <strong><?= Html::encode((string) $averagePreparationMinutes) ?> min</strong>
@@ -38,9 +38,10 @@ $columnMeta = [
 <div class="d-flex flex-wrap gap-2 mb-4">
     <?php foreach ($statuses as $status) : ?>
         <?php $meta = $columnMeta[$status] ?? ['label' => Order::statusLabel($status), 'class' => 'text-bg-light']; ?>
-        <span class="badge <?= Html::encode($meta['class']) ?>">
-            <?= Html::encode($meta['label']) ?> (<?= Html::encode((string) ($counts[$status] ?? 0)) ?>)
-        </span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge <?= Html::encode($meta['class']) ?>"><?= Html::encode($meta['label']) ?></span>
+            <span class="badge text-bg-light border"><?= Html::encode((string) ($counts[$status] ?? 0)) ?></span>
+        </div>
     <?php endforeach; ?>
 </div>
 
@@ -49,8 +50,8 @@ $columnMeta = [
         <?php $meta = $columnMeta[$status] ?? ['label' => Order::statusLabel($status), 'class' => 'text-bg-light']; ?>
         <div class="col-12 col-md-6 col-xl-3">
             <section class="card h-100 admin-panel">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h2 class="h6 mb-0"><?= Html::encode($meta['label']) ?></h2>
+                <div class="d-flex card-header align-items-center gap-3">
+                    <h2 class="mb-0 h6"><?= Html::encode($meta['label']) ?></h2>
                     <span class="badge <?= Html::encode($meta['class']) ?>"><?= Html::encode((string) ($counts[$status] ?? 0)) ?></span>
                 </div>
                 <div class="card-body bg-body-tertiary" style="min-height: 12rem;">
@@ -58,7 +59,7 @@ $columnMeta = [
                         <?= $this->render('_order_card', ['order' => $order]) ?>
                     <?php endforeach; ?>
                     <?php if (($columns[$status] ?? []) === []) : ?>
-                        <p class="text-body-secondary small mb-0">No orders.</p>
+                        <p class="mb-0 text-body-secondary small">No orders.</p>
                     <?php endif; ?>
                 </div>
             </section>

@@ -27,13 +27,12 @@ foreach ($dataProvider->getModels() as $favorite) {
 </div>
 
 <?php if ($products === []) : ?>
-    <div class="card admin-panel">
+    <div class="card admin-panel cafebara-empty-state">
         <div class="py-5 card-body text-center">
-            <h2 class="h5">No favorites yet</h2>
-            <p class="mb-3 text-body-secondary">Tap the heart on a product to save it here.</p>
-            <?php if (Yii::$app->user->can('product.index')) : ?>
-                <?= Html::a('Browse products', ['/catalog/products'], ['class' => 'btn btn-primary']) ?>
-            <?php endif; ?>
+            <span class="cafebara-empty-icon" aria-hidden="true"><i class="bi bi-heart"></i></span>
+            <h2 class="h5 mt-3">❤ No favorites yet.</h2>
+            <p class="mb-3 text-body-secondary">Save your favorite drinks for quick ordering.</p>
+            <?= Html::a('Browse Menu', ['/site/menu'], ['class' => 'btn btn-primary']) ?>
         </div>
     </div>
 <?php else : ?>

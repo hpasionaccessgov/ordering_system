@@ -56,6 +56,7 @@ $this->render('_favicon');
     </footer>
 </div>
 
+<?= $this->render('_mini_cart') ?>
 <?= ConfirmModal::widget() ?>
 <?= $this->render('_session_monitor') ?>
 

@@ -17,5 +17,6 @@ class CafebaraThemeAsset extends AssetBundle
 
     public $js = [
         'js/password-toggle.js',
+        'js/mini-cart.js',
     ];
 }

@@ -56,7 +56,9 @@ class ProductSearch extends Product
         ], '');
 
         $query = ProductCatalogPolicy::applyStatusFilter(
-            Product::find()->with($publicMenu ? ['categoryRecord'] : ['categoryRecord', 'createdBy', 'updatedBy']),
+            Product::find()->with($publicMenu
+                ? ['categoryRecord', 'productIngredients.inventory']
+                : ['categoryRecord', 'productIngredients.inventory', 'createdBy', 'updatedBy']),
             $this->catalogStatus,
         );
         if (!$canViewProducts) {

@@ -22,6 +22,7 @@ class ProductSeeder
                 'Coffee',
                 145.00,
                 true,
+                true,
                 'house_latte.webp',
             ],
             [
@@ -30,6 +31,7 @@ class ProductSeeder
                 'Coffee',
                 160.00,
                 true,
+                false,
                 'Brown_Sugar_Cold_Brew.jpg',
             ],
             [
@@ -37,6 +39,7 @@ class ProductSeeder
                 'A balanced cappuccino with cinnamon and oat milk.',
                 'Coffee',
                 155.00,
+                false,
                 false,
                 'Cinnamon_Oat_Cappuccino.webp',
             ],
@@ -46,6 +49,7 @@ class ProductSeeder
                 'Pastries',
                 85.00,
                 true,
+                true,
                 'Dark_Chocolate_Cookie.webp',
             ],
             [
@@ -54,12 +58,13 @@ class ProductSeeder
                 'Pastries',
                 95.00,
                 false,
+                false,
                 'Butter_Croissant.webp',
             ],
         ];
         $added = 0;
 
-        foreach ($records as [$name, $description, $category, $price, $featured, $imageName]) {
+        foreach ($records as [$name, $description, $category, $price, $featured, $special, $imageName]) {
             if (Product::findOne(['name' => $name]) !== null) {
                 continue;
             }
@@ -86,6 +91,7 @@ class ProductSeeder
                     'price' => number_format($price, 2, '.', ''),
                     'status' => Product::STATUS_ACTIVE,
                     'is_featured' => $featured,
+                    'is_special' => $special,
                     'image_data' => $imageData,
                     'image_mime' => $imageMime,
                     'image_name' => $imageName,

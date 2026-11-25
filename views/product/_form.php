@@ -126,6 +126,12 @@ $form = AdminActiveForm::begin([
                     'labelOptions' => ['class' => 'form-check-label fw-semibold'],
                     'class' => 'form-check-input',
                 ]) ?>
+
+                <?= $form->field($model, 'is_special')->checkbox([
+                    'label' => 'Mark as today’s special',
+                    'labelOptions' => ['class' => 'form-check-label fw-semibold'],
+                    'class' => 'form-check-input',
+                ]) ?>
             </div>
         </section>
     </div>

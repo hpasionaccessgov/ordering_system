@@ -24,21 +24,20 @@ $this->title = 'Shopping cart';
     </div>
 
     <?php if ($summary['lines'] === []): ?>
-        <div class="card admin-panel">
+        <div class="card admin-panel cafebara-empty-state bg-transparent">
             <div class="py-5 card-body text-center">
-                <h2 class="h5">Your cart is empty</h2>
-                <p class="text-body-secondary">Choose active products from the catalog.</p>
-                <?php if (Yii::$app->user->can('product.index')) : ?>
-                    <?= Html::a('Browse menu', ['/catalog/products'], ['class' => 'btn btn-primary']) ?>
-                <?php endif; ?>
+                <span class="cafebara-empty-icon" aria-hidden="true"><i class="bi bi-cup-hot"></i></span>
+                <h2 class="mt-3 h5">Your cart is waiting for its first drink.</h2>
+                <p class="mb-3 text-body-secondary">Browse our menu to get started.</p>
+                <?= Html::a('Browse Menu', ['/site/menu'], ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
     <?php else: ?>
         <div class="row g-4">
-            <div class="col-12 col-lg-8 p-3 card admin-panel cart-items-panel">
+            <div class="col-12 col-lg-8 p-3 card admin-panel cart-items-panel bg-transparent">
                 <?php foreach ($summary['lines'] as $line): ?>
                     <?php $product = $line['product']; ?>
-                    <article class="mb-3 card admin-panel">
+                    <article class="mb-3 card admin-panel bg-transparent">
                         <div class="card-body">
                             <div class="d-flex flex-wrap gap-3 align-items-center">
                                 <?php if ($product->getImageUrl() !== null) : ?>
@@ -104,7 +103,7 @@ $this->title = 'Shopping cart';
                 <?php endforeach; ?>
             </div>
             <div class="col-12 col-lg-4">
-                <section class="card admin-panel">
+                <section class="card admin-panel bg-transparent">
                     <div class="card-body">
                         <h2 class="h5">Order summary</h2>
                         <div class="d-flex my-3 justify-content-between">

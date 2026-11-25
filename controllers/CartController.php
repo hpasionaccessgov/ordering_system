@@ -30,7 +30,7 @@ final class CartController extends Controller
             'access' => [
                 'class' => AccessControl::class,
                 'rules' => [
-                    ['actions' => ['index'], 'allow' => true, 'roles' => ['cart.index']],
+                    ['actions' => ['index', 'summary'], 'allow' => true, 'roles' => ['cart.index']],
                     ['actions' => ['add', 'add-batch'], 'allow' => true, 'roles' => ['cart.add']],
                     ['actions' => ['update'], 'allow' => true, 'roles' => ['cart.update']],
                     ['actions' => ['remove'], 'allow' => true, 'roles' => ['cart.remove']],
@@ -45,6 +45,7 @@ final class CartController extends Controller
                     'update' => ['POST'],
                     'remove' => ['POST'],
                     'checkout' => ['GET', 'POST'],
+                    'summary' => ['GET'],
                 ],
             ],
         ];
@@ -60,12 +61,21 @@ final class CartController extends Controller
         ]);
     }
 
-    public function actionAdd(int $id): Response
+    public function actionSummary(): Response|array
     {
-        (new ShoppingCart())->add($id, $this->postedQuantity());
-        Yii::$app->session->setFlash('success', 'Product added to your cart.');
+        if (!$this->request->isAjax) {
+            return $this->redirect(['index']);
+        }
 
-        return $this->redirect(['index']);
+        return $this->cartResponse(new ShoppingCart(), '');
+    }
+
+    public function actionAdd(int $id): Response|array
+    {
+        $cart = new ShoppingCart();
+        $cart->add($id, $this->postedQuantity());
+
+        return $this->cartResponse($cart, 'Product added to your cart.');
     }
 
     /**
@@ -109,19 +119,18 @@ final class CartController extends Controller
         return $this->redirect(['index']);
     }
 
-    public function actionUpdate(int $id): Response
+    public function actionUpdate(int $id): Response|array
     {
         (new ShoppingCart())->update($id, $this->postedQuantity(true));
 
-        return $this->redirect(['index']);
+        return $this->cartResponse(new ShoppingCart(), '');
     }
 
-    public function actionRemove(int $id): Response
+    public function actionRemove(int $id): Response|array
     {
         (new ShoppingCart())->remove($id);
-        Yii::$app->session->setFlash('success', 'Product removed from your cart.');
 
-        return $this->redirect(['index']);
+        return $this->cartResponse(new ShoppingCart(), 'Product removed from your cart.');
     }
 
     public function actionCheckout(): Response|string
@@ -161,6 +170,33 @@ final class CartController extends Controller
             'summary' => $summary,
             'checkoutToken' => $cart->checkoutToken(),
         ]);
+    }
+
+    /**
+     * @return Response|array<string, mixed>
+     */
+    private function cartResponse(ShoppingCart $cart, string $message): Response|array
+    {
+        $summary = $cart->summary();
+        if (!$this->request->isAjax) {
+            if ($message !== '') {
+                Yii::$app->session->setFlash('success', $message);
+            }
+
+            return $this->redirect(['index']);
+        }
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        return [
+            'success' => true,
+            'message' => $message,
+            'count' => $summary['count'],
+            'total' => Yii::$app->formatter->asCurrency($summary['total']),
+            'html' => $this->renderPartial('@app/views/layouts/_mini_cart_body', [
+                'summary' => $summary,
+            ]),
+        ];
     }
 
     private function postedQuantity(bool $allowZero = false): int

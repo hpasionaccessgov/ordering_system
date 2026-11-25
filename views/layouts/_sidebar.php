@@ -31,6 +31,13 @@ $navGroups = [
                 'active' => str_starts_with($currentRoute, 'product/'),
             ],
             [
+                'label' => $isCustomer ? 'Saved favorites' : 'Favorites',
+                'icon' => 'bi-heart',
+                'visible' => $can('favorite.index'),
+                'route' => ['/sales/favorites'],
+                'active' => str_starts_with($currentRoute, 'favorite/'),
+            ],
+            [
                 'label' => $isCustomer ? 'Browse categories' : 'Categories',
                 'icon' => 'bi-tags',
                 'visible' => $can('category.index') || $can('category.create'),
@@ -64,13 +71,7 @@ $navGroups = [
                 'route' => ['/sales/cart'],
                 'active' => str_starts_with($currentRoute, 'cart/'),
             ],
-            [
-                'label' => $isCustomer ? 'Saved favorites' : 'Favorites',
-                'icon' => 'bi-heart',
-                'visible' => $can('favorite.index'),
-                'route' => ['/sales/favorites'],
-                'active' => str_starts_with($currentRoute, 'favorite/'),
-            ],
+
             [
                 'label' => 'Inventory',
                 'icon' => 'bi-box-seam-fill',

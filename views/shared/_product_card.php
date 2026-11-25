@@ -18,6 +18,7 @@ $canDeleteProducts = Yii::$app->user->can('product.delete');
 $canViewAudit = $canUpdateProducts || $canArchiveProducts || $canDeleteProducts;
 $canFavorite = !Yii::$app->user->isGuest && Yii::$app->user->can('favorite.index');
 $isFavorite = isset($favoriteIds[(int) $product->id]);
+$stockStatus = $product->stockStatus();
 ?>
 
 <article class="card h-100 position-relative product-card product-catalog-card">
@@ -39,6 +40,11 @@ $isFavorite = isset($favoriteIds[(int) $product->id]);
                 <i class="bi bi-cup-hot"></i>
             </div>
         <?php endif; ?>
+        <?php if ($product->is_special) : ?>
+            <span class="badge rounded-pill product-special-badge">
+                <i class="bi bi-lightning-charge-fill me-1" aria-hidden="true"></i>Today’s special
+            </span>
+        <?php endif; ?>
         <?php if ($canFavorite) : ?>
             <?php
             $favoriteLabel = $isFavorite ? 'Remove from favorites' : 'Add to favorites';
@@ -46,13 +52,14 @@ $isFavorite = isset($favoriteIds[(int) $product->id]);
             <?= Html::beginForm(
                 [$isFavorite ? '/favorite/remove' : '/favorite/add', 'id' => $product->id],
                 'POST',
-                ['class' => 'product-card-favorite'],
+                ['class' => 'product-card-favorite js-favorite'],
             ) ?>
             <?= Html::submitButton('<i class="bi ' . ($isFavorite ? 'bi-heart-fill' : 'bi-heart') . '" aria-hidden="true"></i>', [
                 'class' => 'btn btn-sm btn-light rounded-circle shadow-sm',
                 'encode' => false,
                 'aria-label' => $favoriteLabel,
                 'aria-pressed' => $isFavorite ? 'true' : 'false',
+                'data-favorite-button' => '',
                 'title' => $favoriteLabel,
             ]) ?>
             <?= Html::endForm() ?>
@@ -60,9 +67,14 @@ $isFavorite = isset($favoriteIds[(int) $product->id]);
     </div>
 
     <div class="d-flex flex-column card-body">
-        <p class="mb-2 product-category">
-            <?= Html::encode($product->categoryRecord?->name ?? 'Cafébara menu') ?>
-        </p>
+        <div class="mb-2 d-flex flex-wrap gap-2 align-items-center">
+            <p class="mb-0 product-category">
+                <?= Html::encode($product->categoryRecord?->name ?? 'Cafébara menu') ?>
+            </p>
+            <span class="badge rounded-pill <?= Html::encode($product->stockBadgeClass()) ?> product-stock-badge">
+                <?= Html::encode($product->stockLabel()) ?>
+            </span>
+        </div>
         <?= $this->render('_rating_stars', [
             'summary' => $ratingSummaries[(int) $product->id] ?? null,
         ]) ?>
@@ -87,7 +99,7 @@ $isFavorite = isset($favoriteIds[(int) $product->id]);
         <?php
         $canAddToCart = Yii::$app->user->isGuest || Yii::$app->user->can('cart.add');
         ?>
-        <?php if ($canAddToCart && $product->isActive()) : ?>
+        <?php if ($canAddToCart && $stockStatus !== 'out') : ?>
             <?php if ($batchFormId !== null) : ?>
                 <div class="d-flex gap-2 mt-3 align-items-center position-relative z-2">
                     <label class="mb-0 form-label small" for="qty-<?= $product->id ?>">Quantity</label>
@@ -103,7 +115,8 @@ $isFavorite = isset($favoriteIds[(int) $product->id]);
                 </div>
             <?php endif; ?>
             <?= Html::beginForm(['/cart/add', 'id' => $product->id], 'POST', [
-                'class' => 'position-relative z-2 mt-3',
+                'class' => 'position-relative z-2 mt-3 js-cart-add',
+                'data-cart-ajax' => '1',
             ]) ?>
             <?= Html::hiddenInput('quantity', '1') ?>
             <?= Html::submitButton('Add to cart', ['class' => 'btn btn-primary w-100']) ?>

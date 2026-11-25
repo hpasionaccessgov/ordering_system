@@ -17,8 +17,8 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
     ['class' => 'cafebara-brand-copy'],
 );
 ?>
-<nav class="navbar navbar-expand bg-body app-header" aria-label="Main navigation">
-    <div class="container-fluid">
+<nav class="navbar navbar-expand-md bg-body app-header" aria-label="Main navigation">
+    <div class="container-fluid flex-wrap flex-md-nowrap">
         <?= Html::a($brand, ['/site/index'], [
             'class' => 'navbar-brand cafebara-admin-brand cafebara-brand-lockup d-flex align-items-center gap-2',
             'aria-label' => 'Cafébara home',
@@ -39,7 +39,26 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
             </li>
         </ul>
 
-        <ul class="gap-2 navbar-nav ms-auto align-items-center cafebara-admin-actions">
+        <ul class="navbar-nav d-md-none">
+            <li class="nav-item">
+                <?= Html::button(
+                    Html::tag('i', '', ['class' => 'bi bi-three-dots', 'aria-hidden' => 'true']),
+                    [
+                        'class' => 'btn btn-outline-primary',
+                        'type' => 'button',
+                        'title' => 'Toggle account menu',
+                        'data-bs-toggle' => 'collapse',
+                        'data-bs-target' => '#cafebara-admin-nav',
+                        'aria-controls' => 'cafebara-admin-nav',
+                        'aria-expanded' => 'false',
+                        'aria-label' => 'Toggle account menu',
+                    ],
+                ) ?>
+            </li>
+        </ul>
+
+        <div class="collapse navbar-collapse" id="cafebara-admin-nav">
+            <ul class="gap-2 navbar-nav ms-auto align-items-center cafebara-admin-actions">
             <?php if (Yii::$app->user->isGuest): ?>
                 <li class="nav-item">
                     <?= Html::a('Sign in', ['/site/login'], ['class' => 'btn btn-outline-primary']) ?>
@@ -89,6 +108,9 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                     </li>
                 <?php endif ?>
                 <li class="nav-item">
+                    <?= $this->render('_cart_button') ?>
+                </li>
+                <li class="nav-item">
                     <?= $this->render('_theme_toggle') ?>
                 </li>
                 <li class="nav-item dropdown">
@@ -127,7 +149,8 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                         </li>
                     </ul>
                 </li>
-            <?php endif ?>
-        </ul>
+                <?php endif ?>
+            </ul>
+        </div>
     </div>
 </nav>

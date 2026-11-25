@@ -66,6 +66,11 @@ $isFavorite = isset(($favoriteIds ?? [])[(int) $model->id]);
                                 <i class="me-1" aria-hidden="true"></i>Featured
                             </span>
                         <?php endif; ?>
+                        <?php if ($model->is_special) : ?>
+                            <span class="badge rounded-pill text-bg-warning">
+                                <i class="bi bi-lightning-charge me-1" aria-hidden="true"></i>Today’s special
+                            </span>
+                        <?php endif; ?>
                         <?php if ($canManageProducts && !$model->isActive()) : ?>
                             <span class="badge text-bg-warning">Archived</span>
                         <?php endif; ?>
@@ -127,11 +132,12 @@ $isFavorite = isset(($favoriteIds ?? [])[(int) $model->id]);
                             <?= Html::beginForm(
                                 [$isFavorite ? '/favorite/remove' : '/favorite/add', 'id' => $model->id],
                                 'POST',
+                                ['class' => 'js-favorite'],
                             ) ?>
                             <?= Html::submitButton(
                                 '<i class="bi ' . ($isFavorite ? 'bi-heart-fill' : 'bi-heart') . ' me-1" aria-hidden="true"></i>'
                                 . ($isFavorite ? 'Remove from favorites' : 'Add to favorites'),
-                                ['class' => 'btn btn-primary', 'encode' => false],
+                                ['class' => 'btn btn-primary', 'encode' => false, 'data-favorite-button' => ''],
                             ) ?>
                             <?= Html::endForm() ?>
                         <?php endif; ?>

@@ -128,19 +128,34 @@ class SiteController extends Controller
     {
         $featuredDataProvider = new ActiveDataProvider([
             'query' => Product::find()
+                ->with(['categoryRecord', 'productIngredients.inventory'])
                 ->where([
                     'status' => Product::STATUS_ACTIVE,
                     'is_featured' => true,
                 ])
-                ->orderBy(['name' => SORT_ASC]),
-            'pagination' => ApplicationSettings::pagination(true),
+                ->orderBy(['name' => SORT_ASC])
+                ->limit(8),
+            'pagination' => false,
             'sort' => false,
         ]);
+        $specialProducts = Product::find()
+            ->with(['categoryRecord', 'productIngredients.inventory'])
+            ->where([
+                'status' => Product::STATUS_ACTIVE,
+                'is_special' => true,
+            ])
+            ->orderBy(['name' => SORT_ASC])
+            ->limit(8)
+            ->all();
 
         return $this->render('index', [
             'featuredDataProvider' => $featuredDataProvider,
+            'specialProducts' => $specialProducts,
             'favoriteIds' => $this->favoriteIds(),
-            'ratingSummaries' => ReviewService::summaries($this->productIds($featuredDataProvider->getModels())),
+            'ratingSummaries' => ReviewService::summaries(array_values(array_unique(array_merge(
+                $this->productIds($featuredDataProvider->getModels()),
+                $this->productIds($specialProducts),
+            )))),
             'bestSellers' => (new ProductReportService())->bestSellers(5),
         ]);
     }

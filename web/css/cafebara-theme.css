@@ -1726,6 +1726,18 @@ body {
     }
 }
 
+@media (max-width: 767.98px) {
+    .app-header .navbar-collapse {
+        flex-basis: 100%;
+    }
+
+    .cafebara-admin-actions {
+        flex-wrap: wrap;
+        padding: .75rem 0 .25rem;
+        border-top: 1px solid var(--bs-border-color);
+    }
+}
+
 @media (max-width: 991.98px) {
     .cafebara-site-header .navbar-collapse {
         padding: 1rem 0 .5rem;
@@ -1904,4 +1916,166 @@ body {
     .order-receipt-meta {
         grid-template-columns: 1fr;
     }
+}
+
+/* Phase 7 customer experience refresh */
+.cafebara-hero-chips .badge {
+    border: 1px solid rgba(248, 230, 203, .4);
+    background-color: rgba(248, 230, 203, .14);
+    color: var(--cafebara-cream);
+    font-weight: 500;
+}
+
+.cafebara-hero .btn:hover,
+.product-card .btn:hover,
+.cafebara-cart-button:hover {
+    transform: translateY(-1px);
+}
+
+.product-card {
+    overflow: hidden;
+    border-radius: 1rem;
+    transition: transform .18s ease-in-out, box-shadow .18s ease-in-out;
+}
+
+.product-special-badge {
+    position: absolute;
+    top: .75rem;
+    left: .75rem;
+    z-index: 2;
+    background-color: var(--bs-warning);
+    color: var(--bs-dark);
+}
+
+.product-stock-badge {
+    font-size: .7rem;
+    font-weight: 600;
+}
+
+.product-card .btn-primary:active,
+.cafebara-cart-button:active {
+    transform: translateY(1px) scale(.98);
+}
+
+.best-seller-image {
+    width: 42px;
+    height: 42px;
+    border-radius: .75rem;
+    object-fit: cover;
+    flex: 0 0 auto;
+}
+
+.best-seller-placeholder {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bs-tertiary-bg);
+    color: var(--bs-secondary-color);
+}
+
+.cafebara-empty-state .card-body {
+    border-radius: 1rem;
+}
+
+.cafebara-empty-icon {
+    display: inline-flex;
+    width: 4rem;
+    height: 4rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--bs-primary-bg-subtle);
+    color: var(--bs-primary-text-emphasis);
+    font-size: 1.75rem;
+}
+
+.cafebara-kpi-card .inner {
+    padding: 1rem;
+}
+
+.dashboard-activity-panel .list-group-item-action {
+    border-color: var(--bs-border-color-translucent);
+}
+
+.cafebara-cart-button {
+    position: relative;
+}
+
+.cafebara-cart-count {
+    position: absolute;
+    top: -.35rem;
+    right: -.35rem;
+    min-width: 1.25rem;
+    padding: .1rem .3rem;
+    font-size: .7rem;
+}
+
+.cafebara-cart-bump {
+    animation: cafebara-bump .3s ease-in-out;
+}
+
+@keyframes cafebara-bump {
+    50% { transform: scale(1.25); }
+}
+
+.cafebara-cart-line {
+    border-radius: .85rem;
+    background: var(--bs-tertiary-bg);
+}
+
+.cafebara-cart-line-image {
+    width: 48px;
+    height: 48px;
+    border-radius: .65rem;
+    object-fit: cover;
+}
+
+.cafebara-cart-qty {
+    min-width: 2rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+.cafebara-cart-feedback:empty {
+    display: none;
+}
+
+@media (max-width: 575.98px) {
+    .cafebara-hero h1 {
+        font-size: 2.25rem;
+    }
+
+    .cafebara-hero .btn {
+        flex: 1 1 auto;
+    }
+
+    .cafebara-kpi-card h3 {
+        font-size: 1.3rem;
+    }
+}
+
+.cafebara-cart-drawer .offcanvas-header {
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.cafebara-cart-drawer .offcanvas-body {
+    padding: 1rem;
+}
+
+.offcanvas-backdrop {
+    --bs-backdrop-bg: transparent;
+    background-color: transparent !important;
+}
+
+.cart-item-overlay {
+    color: var(--cafebara-dark);
+    background: rgba(248, 230, 203, .35);
+}
+
+.cafebara-favorite-pulse i {
+    animation: cafebara-favorite-pulse .28s ease-in-out;
+}
+
+@keyframes cafebara-favorite-pulse {
+    50% { transform: scale(1.35); }
 }

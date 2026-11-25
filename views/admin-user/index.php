@@ -1,15 +1,16 @@
 <?php
 
+use app\models\User;
+use app\widgets\AdminGridView;
+use app\widgets\ToolTip;
+use yii\helpers\Html;
+use yii\widgets\Pjax;
+
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 /** @var yii\rbac\Role[] $roles */
 /** @var string $search */
 /** @var \app\models\UserSearch $searchModel */
-
-use app\models\User;
-use app\widgets\AdminGridView;
-use app\widgets\ToolTip;
-use yii\helpers\Html;
 
 $this->title = 'User list';
 $roleOptions = ['' => 'Select role'];
@@ -36,6 +37,7 @@ foreach ($roles as $role) {
     <div class="card-header">
         <p class="mb-0 text-body-secondary">Review account details, roles, and access.</p>
     </div>
+
     <?= AdminGridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [

@@ -60,6 +60,7 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
 
                 <div class="d-flex gap-2 align-items-center cafebara-nav-actions">
                     <?= $this->render('_theme_toggle') ?>
+                    <?= $this->render('_cart_button') ?>
 
                     <?php if (Yii::$app->user->isGuest): ?>
                         <?= Html::a('Sign in', ['/site/login'], [
