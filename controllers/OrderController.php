@@ -155,7 +155,7 @@ class OrderController extends Controller
             }
             Yii::$app->session->setFlash('success', $message);
 
-            return $this->redirect(['/cart/index']);
+            return $this->redirect(['/sales/cart']);
         } catch (BadRequestHttpException $exception) {
             Yii::$app->session->setFlash('error', $exception->getMessage());
 
@@ -189,7 +189,7 @@ class OrderController extends Controller
     public function actionCreate(): Response|string
     {
         if (!$this->canViewAllOrders()) {
-            return $this->redirect(['/cart/index']);
+            return $this->redirect(['/sales/cart']);
         }
 
         $this->layout = 'admin';
@@ -231,7 +231,7 @@ class OrderController extends Controller
         (new ShoppingCart())->add($id, $quantity);
         Yii::$app->session->setFlash('success', 'Product added to your cart.');
 
-        return $this->redirect(['/cart/index']);
+        return $this->redirect(['/sales/cart']);
     }
 
     public function actionUpdate(int $id): Response|string
@@ -358,12 +358,12 @@ class OrderController extends Controller
     private function getOrderReturnRoute(int $id): array|string
     {
         if (Yii::$app->user->can('order.view')) {
-            return ['view', 'id' => $id];
+            return ['/sales/orders/' . $id];
         }
         if (Yii::$app->user->can('order.index')) {
-            return ['index'];
+            return ['/sales/orders'];
         }
 
-        return ['/site/dashboard'];
+        return ['/dashboard'];
     }
 }

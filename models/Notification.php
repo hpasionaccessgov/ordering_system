@@ -50,16 +50,24 @@ class Notification extends ActiveRecord
         return ucfirst(str_replace(['-', '_', '.'], ' ', (string) $this->status)) . '.';
     }
 
-    public function getTargetUrl(): array
+    public function getTargetUrl(): array|string
     {
         $route = (string) $this->target_route;
+        $targetId = $this->target_id;
         if (str_starts_with($route, '/') && !str_starts_with($route, '//')) {
-            return $this->target_id === null ? [$route] : [$route, 'id' => $this->target_id];
+            if ($targetId !== null) {
+                return match ($route) {
+                    '/sales/orders', '/order/view' => ['/sales/orders/' . (int) $targetId],
+                    '/sales/cart', '/cart/index' => ['/sales/cart'],
+                    default => [$route, 'id' => $targetId],
+                };
+            }
+            return [$route];
         }
         if ($this->order !== null && \Yii::$app->user->can('order.view')) {
-            return ['/order/view', 'id' => $this->order->id];
+            return ['/sales/orders/' . (int) $this->order->id];
         }
 
-        return ['/notification/index'];
+        return ['/notifications'];
     }
 }

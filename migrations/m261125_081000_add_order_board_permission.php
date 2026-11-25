@@ -20,7 +20,7 @@ class m261125_081000_add_order_board_permission extends Migration
             }
         }
 
-        foreach (['staff', 'admin'] as $roleName) {
+        foreach (['staff', 'admin', 'customer'] as $roleName) {
             $role = $auth->getRole($roleName);
             if ($role instanceof Role && !$auth->hasChild($role, $permission)) {
                 if (!$auth->addChild($role, $permission)) {
@@ -38,7 +38,7 @@ class m261125_081000_add_order_board_permission extends Migration
             return;
         }
 
-        foreach (['staff', 'admin'] as $roleName) {
+        foreach (['staff', 'admin', 'customer'] as $roleName) {
             $role = $auth->getRole($roleName);
             if ($role instanceof Role && $auth->hasChild($role, $permission)) {
                 $auth->removeChild($role, $permission);

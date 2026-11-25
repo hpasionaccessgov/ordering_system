@@ -26,7 +26,7 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'product-batch-cart' : null;
     <?php if (Yii::$app->user->can('product.create')) : ?>
         <?= Html::a(
             'Create product',
-            ['/product/create'],
+            ['/catalog/products/create'],
             ['class' => 'btn btn-primary'],
         ) ?>
     <?php endif; ?>

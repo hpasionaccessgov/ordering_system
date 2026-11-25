@@ -32,12 +32,12 @@ $displayName = $identity instanceof User
             <p class="mb-3">Manage access, keep the catalog healthy, and monitor cafe operations.</p>
             <div class="d-flex flex-wrap gap-2">
                 <?php if (Yii::$app->user->can('user.index')) : ?>
-                    <?= Html::a('Manage people', ['/admin-user/list'], ['class' => 'btn btn-cafebara-light']) ?>
+                    <?= Html::a('Manage people', ['/admin/users'], ['class' => 'btn btn-cafebara-light']) ?>
                 <?php elseif (Yii::$app->user->can('user.create')) : ?>
-                    <?= Html::a('Create account', ['/admin-user/create'], ['class' => 'btn btn-cafebara-light']) ?>
+                    <?= Html::a('Create account', ['/admin/users/create'], ['class' => 'btn btn-cafebara-light']) ?>
                 <?php endif; ?>
                 <?php if (Yii::$app->user->can('user.assignRole')) : ?>
-                    <?= Html::a('Review roles', ['/admin-role/index'], ['class' => 'btn btn-cafebara-outline-light']) ?>
+                    <?= Html::a('Review roles', ['/admin/roles'], ['class' => 'btn btn-cafebara-outline-light']) ?>
                 <?php endif; ?>
             </div>
         </div>

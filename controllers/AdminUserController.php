@@ -334,6 +334,6 @@ class AdminUserController extends Controller
     {
         return Yii::$app->user->can('user.index')
             ? ['list']
-            : ['/site/dashboard'];
+            : ['/dashboard'];
     }
 }

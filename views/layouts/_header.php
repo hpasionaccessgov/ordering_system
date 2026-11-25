@@ -71,10 +71,10 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
 
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <?= Html::a('Profile', ['/site/profile'], ['class' => 'dropdown-item']) ?>
+                            <?= Html::a('Profile', ['/profile'], ['class' => 'dropdown-item']) ?>
                         </li>
                         <!-- <li>
-                            <?= Html::a('Change password', ['/site/change-password'], [
+                            <?= Html::a('Change password', ['/profile/change-password'], [
                                 'class' => 'dropdown-item',
                             ]) ?>
                         </li> -->

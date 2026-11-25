@@ -12,7 +12,7 @@ $this->title = "Receipt for {$model->order_number}";
     <div class="d-flex flex-wrap gap-2 mb-4 justify-content-between receipt-actions">
         <?= Html::a(
             'Back to order',
-            ['/order/view', 'id' => $model->id],
+            ['/sales/orders/' . $model->id],
             ['class' => 'btn btn-secondary'],
         ) ?>
         <?= Html::button('Print receipt', [

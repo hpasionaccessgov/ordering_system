@@ -31,10 +31,10 @@ $avgPrep = $averagePreparationMinutes !== null ? $averagePreparationMinutes . ' 
             <p class="mb-3">Keep the menu current and move customer orders through service.</p>
             <div class="d-flex flex-wrap gap-2">
                 <?php if (Yii::$app->user->can('order.board')) : ?>
-                    <?= Html::a('Kitchen board', ['/kitchen/board'], ['class' => 'btn btn-cafebara-light']) ?>
+                    <?= Html::a('Kitchen board', ['/sales/kitchen-board'], ['class' => 'btn btn-cafebara-light']) ?>
                 <?php endif; ?>
                 <?php if (Yii::$app->user->can('order.index')) : ?>
-                    <?= Html::a('Process orders', ['/order/index'], ['class' => 'btn btn-cafebara-outline-light']) ?>
+                    <?= Html::a('Process orders', ['/sales/orders'], ['class' => 'btn btn-cafebara-outline-light']) ?>
                 <?php endif; ?>
             </div>
         </div>

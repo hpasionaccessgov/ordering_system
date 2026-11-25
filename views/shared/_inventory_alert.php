@@ -19,6 +19,6 @@ if ($lowStockItems === []) {
                 <li><?= Html::encode(InventoryService::lowStockMessage($item)) ?></li>
             <?php endforeach; ?>
         </ul>
-        <?= Html::a('Review inventory', ['/inventory/index'], ['class' => 'alert-link']) ?>
+        <?= Html::a('Review inventory', ['/sales/inventory'], ['class' => 'alert-link']) ?>
     </div>
 </div>

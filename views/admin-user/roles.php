@@ -268,7 +268,7 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
     <div class="card-body">
         <h2 class="h5">Create role</h2>
         <?php $form = AdminActiveForm::begin([
-            'action' => ['/admin-role/create'],
+            'action' => ['/admin/roles/create'],
             'method' => 'POST',
             'options' => ['class' => 'row g-2'],
         ]); ?>
@@ -323,7 +323,7 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
             'class' => 'btn btn-primary ms-auto',
         ]) ?>
     </div>
-    <?= Html::beginForm(['/admin-role/update-matrix'], 'POST', [
+    <?= Html::beginForm(['/admin/roles/update-matrix'], 'POST', [
         'id' => 'role-matrix-form',
         'data-role-matrix-form' => 'true',
     ]) ?>
@@ -467,7 +467,7 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
 
 <?php foreach ($roleList as $role) : ?>
     <?php if (!in_array($role->name, $builtInRoles, true)) : ?>
-        <?= Html::beginForm(['/admin-role/delete', 'name' => $role->name], 'POST', [
+        <?= Html::beginForm(['/admin/roles/' . $role->name . '/delete'], 'POST', [
             'id' => 'delete-role-' . $role->name,
         ]) ?>
         <?= Html::endForm() ?>

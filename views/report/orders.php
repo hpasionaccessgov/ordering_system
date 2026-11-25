@@ -18,7 +18,7 @@ use yii\helpers\Html;
 /** @var list<int> $volumeValues */
 
 $this->title = 'Order report';
-$this->params['breadcrumbs'][] = ['label' => 'Reports', 'url' => ['/report/sales']];
+$this->params['breadcrumbs'][] = ['label' => 'Reports', 'url' => ['/reports/sales']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-center">

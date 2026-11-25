@@ -12,7 +12,7 @@ declare(strict_types=1);
 /** @var list<int> $orderValues */
 
 $this->title = 'Sales report';
-$this->params['breadcrumbs'][] = ['label' => 'Reports', 'url' => ['/report/sales']];
+$this->params['breadcrumbs'][] = ['label' => 'Reports', 'url' => ['/reports/sales']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-center">

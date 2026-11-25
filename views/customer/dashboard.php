@@ -33,10 +33,10 @@ $displayName = $identity instanceof User
             <p class="mb-3">Find a favorite, place an order, and follow its progress.</p>
             <div class="d-flex flex-wrap gap-2">
                 <?php if (Yii::$app->user->can('product.index')) : ?>
-                    <?= Html::a('Browse menu', ['/product/index'], ['class' => 'btn btn-cafebara-light']) ?>
+                    <?= Html::a('Browse menu', ['/catalog/products'], ['class' => 'btn btn-cafebara-light']) ?>
                 <?php endif; ?>
                 <?php if (Yii::$app->user->can('order.index')) : ?>
-                    <?= Html::a('View orders', ['/order/index'], ['class' => 'btn btn-cafebara-outline-light']) ?>
+                    <?= Html::a('View orders', ['/sales/orders'], ['class' => 'btn btn-cafebara-outline-light']) ?>
                 <?php endif; ?>
             </div>
         </div>
@@ -63,7 +63,7 @@ $displayName = $identity instanceof User
                     <p><?= Html::encode($label) ?></p>
                     <?php if ($label === 'Favorite product' && ($favoriteProduct ?? null) !== null) : ?>
                         <h3 class="cafebara-stat-value">
-                            <?= Html::a(Html::encode($favoriteProduct->name), ['/product/view', 'id' => $favoriteProduct->id], [
+                            <?= Html::a(Html::encode($favoriteProduct->name), ['/catalog/products/' . $favoriteProduct->id], [
                                 'class' => 'link-body-emphasis text-decoration-none',
                             ]) ?>
                         </h3>
@@ -96,10 +96,10 @@ $displayName = $identity instanceof User
         </div>
         <div class="d-flex flex-wrap gap-2 ms-auto">
             <?php if (Yii::$app->user->can('favorite.index')) : ?>
-                <?= Html::a('My favorites', ['/favorite/index'], ['class' => 'btn btn-primary']) ?>
+                <?= Html::a('My favorites', ['/sales/favorites'], ['class' => 'btn btn-primary']) ?>
             <?php endif; ?>
             <?php if (Yii::$app->user->can('order.index')) : ?>
-                <?= Html::a('View your orders', ['/order/index'], ['class' => 'btn btn-primary']) ?>
+                <?= Html::a('View your orders', ['/sales/orders'], ['class' => 'btn btn-primary']) ?>
             <?php endif; ?>
         </div>
     </div>
@@ -113,7 +113,7 @@ $displayName = $identity instanceof User
                 <h2 class="mb-0 h4">Featured drinks and bites</h2>
             </div>
             <?php if (Yii::$app->user->can('product.index')) : ?>
-                <?= Html::a('Browse all products', ['/product/index'], ['class' => 'link-primary fw-semibold']) ?>
+                <?= Html::a('Browse all products', ['/catalog/products'], ['class' => 'link-primary fw-semibold']) ?>
             <?php endif; ?>
         </div>
         <?php if ($batchFormId !== null && $featuredDataProvider->getCount() > 0) : ?>

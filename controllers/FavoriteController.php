@@ -96,6 +96,6 @@ final class FavoriteController extends Controller
             && str_starts_with($referrer, '/')
             && !str_starts_with($referrer, '//')
             ? $referrer
-            : ['/favorite/index'];
+            : ['/sales/favorites'];
     }
 }

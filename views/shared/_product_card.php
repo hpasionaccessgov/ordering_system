@@ -68,7 +68,7 @@ $isFavorite = isset($favoriteIds[(int) $product->id]);
         ]) ?>
         <h2 class="mb-2 h5">
             <?php if ($canViewProduct) : ?>
-                <?= Html::a(Html::encode($product->name), ['/product/view', 'id' => $product->id], [
+                <?= Html::a(Html::encode($product->name), ['/catalog/products/' . $product->id], [
                     'class' => 'stretched-link link-body-emphasis text-decoration-none',
                 ]) ?>
             <?php else : ?>
@@ -112,7 +112,7 @@ $isFavorite = isset($favoriteIds[(int) $product->id]);
         <?php if ($canUpdateProducts || $canArchiveProducts || $canDeleteProducts) : ?>
             <div class="mt-3 position-relative z-2 product-card-actions">
                 <?php if ($canUpdateProducts) : ?>
-                    <?= Html::a('Edit', ['/product/update', 'id' => $product->id], [
+                    <?= Html::a('Edit', ['/catalog/products/' . $product->id . '/update'], [
                         'class' => 'btn btn-sm btn-primary',
                     ]) ?>
                 <?php endif; ?>
@@ -129,7 +129,7 @@ $isFavorite = isset($favoriteIds[(int) $product->id]);
                     <?= Html::endForm() ?>
                 <?php elseif ($canUpdateProducts && !$product->isActive()) : ?>
                     <?= Html::beginForm(
-                        ['/product/restore', 'id' => $product->id],
+                        ['/catalog/products/' . $product->id . '/restore'],
                         'POST',
                         ['class' => 'd-inline'],
                     ) ?>
@@ -141,7 +141,7 @@ $isFavorite = isset($favoriteIds[(int) $product->id]);
                 <?php endif; ?>
                 <?php if ($canDeleteProducts) : ?>
                     <?= Html::beginForm(
-                        ['/product/delete', 'id' => $product->id],
+                        ['/catalog/products/' . $product->id . '/delete'],
                         'POST',
                         ['class' => 'd-inline'],
                     ) ?>

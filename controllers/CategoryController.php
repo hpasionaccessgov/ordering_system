@@ -167,7 +167,7 @@ class CategoryController extends Controller
         NotificationService::notifyManagers(
             NotificationService::TYPE_CATEGORY_DELETED,
             'Category ' . $categoryName . ' deleted.',
-            '/category/index',
+            '/catalog/categories',
         );
 
         return $this->redirect($this->getCategoryListReturnRoute());
@@ -184,7 +184,7 @@ class CategoryController extends Controller
 
     private function getCategoryListReturnRoute(): array
     {
-        return Yii::$app->user->can('category.index') ? ['index'] : ['/site/dashboard'];
+        return Yii::$app->user->can('category.index') ? ['index'] : ['/dashboard'];
     }
 
     /**

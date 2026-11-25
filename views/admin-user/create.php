@@ -26,7 +26,7 @@ foreach ($roles as $role) {
                 <p class="mb-0 text-body-secondary">Create a user and assign an existing role.</p>
             </div>
             <?php if (Yii::$app->user->can('user.index')) : ?>
-                <?= Html::a('Back to user list', ['/admin-user/list'], ['class' => 'btn btn-secondary']) ?>
+                <?= Html::a('Back to user list', ['/admin/users'], ['class' => 'btn btn-secondary']) ?>
             <?php endif; ?>
         </div>
 
@@ -67,7 +67,7 @@ foreach ($roles as $role) {
                 <div class="d-flex flex-wrap gap-2 mt-4">
                     <?= Html::submitButton('Create account', ['class' => 'btn btn-primary']) ?>
                     <?php if (Yii::$app->user->can('user.index')) : ?>
-                        <?= Html::a('Cancel', ['/admin-user/list'], ['class' => 'btn btn-secondary']) ?>
+                        <?= Html::a('Cancel', ['/admin/users'], ['class' => 'btn btn-secondary']) ?>
                     <?php endif; ?>
                 </div>
 

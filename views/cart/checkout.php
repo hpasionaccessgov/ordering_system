@@ -53,11 +53,11 @@ $this->title = 'Checkout';
                     <p class="text-body-secondary small">
                         Prices are validated again when you place the order. This system records orders, not payment.
                     </p>
-                    <?= Html::beginForm(['/cart/checkout'], 'POST') ?>
+                    <?= Html::beginForm(['/sales/cart/checkout'], 'POST') ?>
                     <?= Html::hiddenInput('checkout_token', $checkoutToken) ?>
                     <?= Html::submitButton('Place order', ['class' => 'btn btn-primary w-100']) ?>
                     <?= Html::endForm() ?>
-                    <?= Html::a('Back to cart', ['/cart/index'], [
+                    <?= Html::a('Back to cart', ['/sales/cart'], [
                         'class' => 'btn btn-secondary w-100 mt-2',
                     ]) ?>
                 </div>

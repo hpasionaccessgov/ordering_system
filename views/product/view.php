@@ -31,7 +31,7 @@ $isFavorite = isset(($favoriteIds ?? [])[(int) $model->id]);
         <?php if ($canViewProducts) : ?>
             <?= Html::a(
                 'Back to products',
-                ['/product/index'],
+                ['/catalog/products'],
                 ['class' => 'btn btn-secondary'],
             ) ?>
         <?php endif; ?>
@@ -137,7 +137,7 @@ $isFavorite = isset(($favoriteIds ?? [])[(int) $model->id]);
                         <?php endif; ?>
 
                         <?php if ($canManageProducts) : ?>
-                            <?= Html::a('Edit product', ['/product/update', 'id' => $model->id], [
+                            <?= Html::a('Edit product', ['/catalog/products/' . $model->id . '/update'], [
                                 'class' => 'btn btn-primary',
                             ]) ?>
                         <?php endif; ?>
@@ -160,7 +160,7 @@ $isFavorite = isset(($favoriteIds ?? [])[(int) $model->id]);
 
                         <?php if ($canDeleteProducts) : ?>
                             <?= Html::beginForm(
-                                ['/product/delete', 'id' => $model->id],
+                                ['/catalog/products/' . $model->id . '/delete'],
                                 'POST',
                                 ['class' => 'd-inline'],
                             ) ?>

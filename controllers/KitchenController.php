@@ -18,7 +18,7 @@ class KitchenController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' => ['order.board'],
+                        'roles' => ['order.board', 'customer.access'],
                     ],
                 ],
             ],

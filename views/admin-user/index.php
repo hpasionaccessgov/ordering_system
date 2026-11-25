@@ -26,7 +26,7 @@ foreach ($roles as $role) {
         <h1 class="mb-0 h3">User list</h1>
     </div>
     <?php if (Yii::$app->user->can('user.create')) : ?>
-        <?= Html::a('Create account', ['/admin-user/create'], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Create account', ['/admin/users/create'], ['class' => 'btn btn-primary']) ?>
     <?php endif; ?>
 </div>
 
@@ -50,7 +50,7 @@ foreach ($roles as $role) {
 
                     return Html::a(
                         Html::encode($user->username),
-                        ['/admin-user/view', 'id' => $user->id],
+                        ['/admin/users/' . $user->id],
                     );
                 },
             ],
@@ -87,7 +87,7 @@ foreach ($roles as $role) {
                     }
 
                     return Html::beginForm(
-                        ['/admin-user/assign-role', 'id' => $user->id],
+                        ['/admin/users/' . $user->id . '/assign-role'],
                         'POST',
                         ['class' => 'd-flex flex-wrap gap-2 role-assignment-form'],
                     )
@@ -106,7 +106,7 @@ foreach ($roles as $role) {
                 'value' => static function (User $user): string {
                     $actions = [];
                     if (Yii::$app->user->can('user.view')) {
-                        $actions[] = Html::a('View', ['/admin-user/view', 'id' => $user->id], ToolTip::options(
+                        $actions[] = Html::a('View', ['/admin/users/' . $user->id], ToolTip::options(
                             'View account details for ' . $user->username,
                             [
                                 'class' => 'btn btn-sm btn-secondary',
@@ -119,7 +119,7 @@ foreach ($roles as $role) {
                         Yii::$app->user->can('user.update')
                         && Yii::$app->user->can('user.view')
                     ) {
-                        $actions[] = Html::a('Edit', ['/admin-user/update', 'id' => $user->id], ToolTip::options(
+                        $actions[] = Html::a('Edit', ['/admin/users/' . $user->id . '/update'], ToolTip::options(
                             'Edit personal data for ' . $user->username,
                             [
                                 'class' => 'btn btn-sm btn-primary',
@@ -133,7 +133,7 @@ foreach ($roles as $role) {
                         && (string) $user->id !== (string) Yii::$app->user->id
                     ) {
                         $actions[] = Html::beginForm(
-                            ['/admin-user/delete', 'id' => $user->id],
+                            ['/admin/users/' . $user->id . '/delete'],
                             'POST',
                             ['class' => 'd-inline'],
                         )

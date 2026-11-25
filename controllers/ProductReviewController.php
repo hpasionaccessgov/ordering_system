@@ -53,6 +53,6 @@ final class ProductReviewController extends Controller
         );
         Yii::$app->session->setFlash('success', 'Thank you for your review.');
 
-        return $this->redirect(['/product/view', 'id' => $id]);
+        return $this->redirect(['/catalog/products/' . $id]);
     }
 }

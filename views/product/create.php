@@ -18,7 +18,7 @@ $this->title = 'Create product';
     </div>
     <?= Html::a(
         Yii::$app->user->can('product.index') ? 'Back to menu' : 'Back to dashboard',
-        Yii::$app->user->can('product.index') ? ['/product/index'] : ['/site/dashboard'],
+        Yii::$app->user->can('product.index') ? ['/catalog/products'] : ['/dashboard'],
         ['class' => 'btn btn-secondary'],
     ) ?>
 </div>

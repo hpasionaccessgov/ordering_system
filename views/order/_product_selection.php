@@ -111,7 +111,7 @@ JS);
                     </p>
                     <h2 class="h5">
                         <?php if ($canViewProduct) : ?>
-                            <?= Html::a(Html::encode($product->name), ['/product/view', 'id' => $product->id], [
+                            <?= Html::a(Html::encode($product->name), ['/catalog/products/' . $product->id], [
                                 'class' => 'stretched-link link-body-emphasis text-decoration-none',
                             ]) ?>
                         <?php else : ?>

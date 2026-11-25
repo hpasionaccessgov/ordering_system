@@ -54,6 +54,6 @@ class AdminController extends Controller
         $params = $this->request->queryParams;
         unset($params['r']);
 
-        return $this->redirect(['/activity-log/index'] + $params);
+        return $this->redirect(['/admin/activity-logs'] + $params);
     }
 }

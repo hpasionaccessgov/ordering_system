@@ -28,7 +28,7 @@ $actionLabels = [
     Order::STATUS_PROCESSING => 'Mark ready',
     Order::STATUS_READY_FOR_PICKUP => 'Mark completed',
 ];
-$returnUrl = Url::to(['/kitchen/board']);
+$returnUrl = Url::to(['/sales/kitchen-board']);
 ?>
 <article class="mb-3 card shadow-sm <?= Html::encode($priorityClass) ?>">
     <div class="p-3 card-body">
@@ -56,19 +56,22 @@ $returnUrl = Url::to(['/kitchen/board']);
 
         <div class="d-flex flex-wrap gap-2">
             <?php if (Yii::$app->user->can('order.process') && $nextStatus !== null) : ?>
-                <?= Html::beginForm(['/order/process', 'id' => $order->id], 'post', ['class' => 'd-inline']) ?>
+                <?= Html::beginForm(['/sales/orders/' . $order->id . '/process'], 'post', ['class' => 'd-inline']) ?>
                 <?= Html::hiddenInput('returnUrl', $returnUrl) ?>
                 <?= Html::submitButton($actionLabels[(string) $order->status] ?? 'Advance', ['class' => 'btn btn-sm btn-primary']) ?>
                 <?= Html::endForm() ?>
             <?php endif; ?>
             <?php if (Yii::$app->user->can('order.cancel') && Yii::$app->user->can('order.process') && $order->canBeCancelledByStaff()) : ?>
-                <?= Html::beginForm(['/order/cancel', 'id' => $order->id], 'post', ['class' => 'd-inline']) ?>
+                <?= Html::beginForm(['/sales/orders/' . $order->id . '/cancel'], 'post', ['class' => 'd-inline']) ?>
                 <?= Html::hiddenInput('returnUrl', $returnUrl) ?>
-                <?= Html::submitButton('Cancel', ['class' => 'btn btn-sm btn-outline-danger', 'data-confirm' => 'Cancel this order?']) ?>
+                <?= Html::submitButton('Cancel', [
+                    'class' => 'btn btn-sm btn-outline-danger',
+                    'data-confirm-modal' => 'Cancel this order?',
+                ]) ?>
                 <?= Html::endForm() ?>
             <?php endif; ?>
             <?php if (Yii::$app->user->can('order.view')) : ?>
-                <?= Html::a('View', ['/order/view', 'id' => $order->id], ['class' => 'btn btn-sm btn-outline-secondary']) ?>
+                <?= Html::a('View', ['/sales/orders/' . $order->id], ['class' => 'btn btn-sm btn-outline-secondary']) ?>
             <?php endif; ?>
         </div>
     </div>

@@ -57,12 +57,12 @@ if (Yii::$app->user->can('order.view')) {
         'buttons' => [
             'view' => static fn($url, Order $model): string => Html::a(
                 'View',
-                ['/order/view', 'id' => $model->id],
+                ['/sales/orders/' . $model->id],
                 ['class' => 'btn btn-sm btn-primary'],
             ),
             'order-again' => static fn($url, Order $model): string => $model->status === Order::STATUS_COMPLETED
-                ? Html::beginForm(['/order/order-again', 'id' => $model->id], 'POST', ['class' => 'd-inline'])
-                    . Html::submitButton('Order Again', ['class' => 'btn btn-sm btn-success'])
+                ? Html::beginForm(['/sales/orders/' . $model->id . '/order-again'], 'POST', ['class' => 'd-inline'])
+                    . Html::submitButton('Order Again', ['class' => 'btn btn-sm btn-outline-primary'])
                     . Html::endForm()
                 : '',
         ],
@@ -76,7 +76,7 @@ if (Yii::$app->user->can('order.view')) {
         <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
     </div>
     <?php if (Yii::$app->user->can('cart.index')) : ?>
-        <?= Html::a('Open cart', ['/cart/index'], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Open cart', ['/sales/cart'], ['class' => 'btn btn-primary']) ?>
     <?php endif; ?>
 </div>
 

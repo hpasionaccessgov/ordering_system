@@ -22,7 +22,7 @@ foreach ($dataProvider->getModels() as $favorite) {
         <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
     </div>
     <?php if (Yii::$app->user->can('product.index')) : ?>
-        <?= Html::a('Browse menu', ['/product/index'], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Browse menu', ['/catalog/products'], ['class' => 'btn btn-primary']) ?>
     <?php endif; ?>
 </div>
 
@@ -32,7 +32,7 @@ foreach ($dataProvider->getModels() as $favorite) {
             <h2 class="h5">No favorites yet</h2>
             <p class="mb-3 text-body-secondary">Tap the heart on a product to save it here.</p>
             <?php if (Yii::$app->user->can('product.index')) : ?>
-                <?= Html::a('Browse products', ['/product/index'], ['class' => 'btn btn-primary']) ?>
+                <?= Html::a('Browse products', ['/catalog/products'], ['class' => 'btn btn-primary']) ?>
             <?php endif; ?>
         </div>
     </div>

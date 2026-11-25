@@ -11,8 +11,8 @@ use yii\helpers\Html;
 
 $initialImageUrl = $model->getImageUrl();
 $cancelRoute = Yii::$app->user->can('product.index')
-    ? ['/product/index']
-    : ['/site/dashboard'];
+    ? ['/catalog/products']
+    : ['/dashboard'];
 $this->registerJs(<<<'JS'
 (() => {
     const input = document.getElementById('product-image-upload');

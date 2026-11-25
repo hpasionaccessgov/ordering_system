@@ -21,7 +21,7 @@ $this->title = 'Edit user details';
                 </p>
             </div>
             <?php if (Yii::$app->user->can('user.index')) : ?>
-                <?= Html::a('Back to user list', ['/admin-user/list'], [
+                <?= Html::a('Back to user list', ['/admin/users'], [
                     'class' => 'btn btn-secondary',
                 ]) ?>
             <?php endif; ?>
@@ -59,7 +59,7 @@ $this->title = 'Edit user details';
                 <div class="d-flex flex-wrap gap-2 mt-4">
                     <?= Html::submitButton('Save changes', ['class' => 'btn btn-primary']) ?>
                     <?php if (Yii::$app->user->can('user.index')) : ?>
-                        <?= Html::a('Cancel', ['/admin-user/list'], [
+                        <?= Html::a('Cancel', ['/admin/users'], [
                             'class' => 'btn btn-secondary',
                         ]) ?>
                     <?php endif; ?>

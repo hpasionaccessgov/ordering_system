@@ -41,7 +41,7 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'home-batch-cart' : null;
                             'class' => 'btn btn-cafebara-outline-light btn-lg',
                         ]) ?>
                     <?php else : ?>
-                        <?= Html::a('Open your dashboard', ['/site/dashboard'], [
+                        <?= Html::a('Open your dashboard', ['/dashboard'], [
                             'class' => 'btn btn-cafebara-light btn-lg',
                         ]) ?>
                     <?php endif ?>

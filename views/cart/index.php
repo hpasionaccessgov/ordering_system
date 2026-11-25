@@ -19,7 +19,7 @@ $this->title = 'Shopping cart';
             <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
         </div>
         <?php if (Yii::$app->user->can('product.index')) : ?>
-            <?= Html::a('Continue shopping', ['/product/index'], ['class' => 'btn btn-primary']) ?>
+            <?= Html::a('Continue shopping', ['/catalog/products'], ['class' => 'btn btn-primary']) ?>
         <?php endif; ?>
     </div>
 
@@ -29,7 +29,7 @@ $this->title = 'Shopping cart';
                 <h2 class="h5">Your cart is empty</h2>
                 <p class="text-body-secondary">Choose active products from the catalog.</p>
                 <?php if (Yii::$app->user->can('product.index')) : ?>
-                    <?= Html::a('Browse menu', ['/product/index'], ['class' => 'btn btn-primary']) ?>
+                    <?= Html::a('Browse menu', ['/catalog/products'], ['class' => 'btn btn-primary']) ?>
                 <?php endif; ?>
             </div>
         </div>
@@ -49,7 +49,7 @@ $this->title = 'Shopping cart';
                                     ]) ?>
                                     <div class="cart-item-media">
                                         <?php if ($canViewProduct) : ?>
-                                            <?= Html::a($image, ['/product/view', 'id' => $product->id]) ?>
+                                            <?= Html::a($image, ['/catalog/products/' . $product->id]) ?>
                                             <div class="cart-item-overlay" aria-hidden="true">
                                                 <i class="bi bi-zoom-in cart-item-overlay-icon"></i>
                                                 <span class="cart-item-overlay-label">View</span>
@@ -116,7 +116,7 @@ $this->title = 'Shopping cart';
                             <strong><?= Yii::$app->formatter->asCurrency($summary['total']) ?></strong>
                         </div>
                         <?php if (Yii::$app->user->can('cart.checkout')) : ?>
-                            <?= Html::a('Continue to checkout', ['/cart/checkout'], [
+                            <?= Html::a('Continue to checkout', ['/sales/cart/checkout'], [
                                 'class' => 'btn btn-primary w-100',
                             ]) ?>
                         <?php endif; ?>

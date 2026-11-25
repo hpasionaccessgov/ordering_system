@@ -18,7 +18,7 @@ $bestSellers = $bestSellers ?? [];
         <ol class="list-group list-group-numbered list-group-flush">
             <?php foreach ($bestSellers as $item) : ?>
                 <li class="list-group-item d-flex flex-wrap gap-2 justify-content-between align-items-center">
-                    <?= Html::a(Html::encode($item['product_name']), ['/product/view', 'id' => $item['product_id']], [
+                    <?= Html::a(Html::encode($item['product_name']), ['/catalog/products/' . $item['product_id']], [
                         'class' => 'link-body-emphasis text-decoration-none fw-semibold',
                     ]) ?>
                     <span class="badge rounded-pill text-bg-primary">

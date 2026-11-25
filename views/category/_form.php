@@ -23,7 +23,7 @@ use yii\helpers\Html;
             <?= Html::submitButton('Save category', ['class' => 'btn btn-primary']) ?>
             <?= Html::a(
                 'Cancel',
-                Yii::$app->user->can('category.index') ? ['index'] : ['/site/dashboard'],
+                Yii::$app->user->can('category.index') ? ['index'] : ['/dashboard'],
                 ['class' => 'btn btn-secondary'],
             ) ?>
         </div>

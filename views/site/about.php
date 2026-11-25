@@ -21,7 +21,7 @@ $this->params['meta_keywords'] = 'yii, yii2, about, php, framework';
                         placing orders, and keeping track of every order's progress.
                     </p>
                     <div class="d-flex flex-wrap gap-2">
-                        <!-- <?= Html::a('Browse the menu', ['/product/index'], [
+                        <!-- <?= Html::a('Browse the menu', ['/catalog/products'], [
                             'class' => 'btn btn-cafebara-light',
                         ]) ?> -->
                         <?= Html::a('Get in touch', ['/site/contact'], [

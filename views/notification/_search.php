@@ -9,7 +9,7 @@ use yii\helpers\Html;
 /** @var string $status */
 /** @var string $read */
 ?>
-<?= Html::beginForm(['/notification/index'], 'get', [
+<?= Html::beginForm(['/notifications'], 'get', [
     'class' => 'catalog-filter p-3 mb-4',
     'role' => 'search',
 ]) ?>
@@ -41,6 +41,6 @@ use yii\helpers\Html;
         ]) ?>
     </div>
     <div class="col-auto"><?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?></div>
-    <div class="col-auto"><?= Html::a('Clear', ['/notification/index'], ['class' => 'btn btn-outline-secondary']) ?></div>
+    <div class="col-auto"><?= Html::a('Clear', ['/notifications'], ['class' => 'btn btn-outline-secondary']) ?></div>
 </div>
 <?= Html::endForm() ?>

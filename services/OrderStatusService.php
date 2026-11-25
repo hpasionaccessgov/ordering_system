@@ -101,7 +101,7 @@ final class OrderStatusService
                 'user_id' => $fresh->user_id,
                 'order_id' => $fresh->id,
                 'status' => $toStatus,
-                'target_route' => '/order/view',
+                'target_route' => '/sales/orders',
                 'target_id' => $fresh->id,
                 'created_at' => time(),
             ])->execute();
@@ -135,7 +135,7 @@ final class OrderStatusService
             }
             if (($auth->checkAccess($userId, 'admin.access') || $auth->checkAccess($userId, 'staff.access'))
                 && $auth->checkAccess($userId, 'order.view')) {
-                $rows[] = [$userId, $order->id, $order->status, '/order/view', $order->id, $createdAt];
+                $rows[] = [$userId, $order->id, $order->status, '/sales/orders', $order->id, $createdAt];
             }
         }
         if ($rows !== []) {

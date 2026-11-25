@@ -24,7 +24,7 @@ use yii\helpers\Html;
             <?= Html::submitButton($model->isNewRecord ? 'Create item' : 'Save item', ['class' => 'btn btn-primary']) ?>
             <?= Html::a(
                 'Cancel',
-                Yii::$app->user->can('inventory.index') ? ['index'] : ['/site/dashboard'],
+                Yii::$app->user->can('inventory.index') ? ['index'] : ['/dashboard'],
                 ['class' => 'btn btn-secondary'],
             ) ?>
         </div>

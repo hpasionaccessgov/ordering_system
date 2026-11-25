@@ -18,7 +18,7 @@ $this->title = 'Create order';
     <?= $this->render('_product_selection', [
         'products' => $products,
         'quantities' => [],
-        'formAction' => ['/order/create'],
+        'formAction' => ['/sales/orders/create'],
         'submitLabel' => 'Place order',
     ]) ?>
 </section>

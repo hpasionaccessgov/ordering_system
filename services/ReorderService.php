@@ -74,7 +74,7 @@ final class ReorderService
                 $userId,
                 NotificationService::TYPE_ORDER_REORDERED,
                 "Items from order {$order->order_number} were added to your cart.",
-                '/cart/index',
+                '/sales/cart',
             );
             $transaction->commit();
         } catch (\Throwable $exception) {

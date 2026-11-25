@@ -70,7 +70,7 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                         ]) ?>
                     <?php else: ?>
                         <?php if (Yii::$app->user->can('favorite.index')): ?>
-                            <?= Html::a('<i class="bi bi-heart" aria-hidden="true"></i><span class="ms-1 d-none d-xl-inline">Favorites</span>', ['/favorite/index'], [
+                            <?= Html::a('<i class="bi bi-heart" aria-hidden="true"></i><span class="ms-1 d-none d-xl-inline">Favorites</span>', ['/sales/favorites'], [
                                 'class' => 'btn btn-outline-primary',
                                 'encode' => false,
                                 'aria-label' => 'Favorites',
@@ -81,11 +81,11 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                         <?php endif ?>
                         <?= Html::a(
                             $hasDashboardAccess ? 'Dashboard' : 'Home',
-                            $hasDashboardAccess ? ['/site/dashboard'] : ['/site/index'],
+                            $hasDashboardAccess ? ['/dashboard'] : ['/site/index'],
                             [
                             'class' => 'btn btn-primary',
                         ]) ?>
-                        <?= Html::a('Profile', ['/site/profile'], [
+                        <?= Html::a('Profile', ['/profile'], [
                             'class' => 'btn btn-outline-primary',
                         ]) ?>
                         <?= Html::beginForm(['/site/logout'], 'POST', ['class' => 'm-0']) ?>

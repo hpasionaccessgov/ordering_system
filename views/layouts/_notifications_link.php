@@ -24,7 +24,7 @@ $notifications = (clone $visibleQuery)
     ->all();
 $canViewNotification = \Yii::$app->user->can('notification.read');
 $url = Json::htmlEncode(Url::to(['/notification/unread-count']));
-$inboxUrl = Url::to(['/notification/index']);
+$inboxUrl = Url::to(['/notifications']);
 $this->registerJs(<<<JS
 const notificationLink = document.querySelector('[data-notification-link]');
 const notificationBadge = notificationLink.querySelector('[data-notification-count]');
@@ -109,7 +109,7 @@ JS, View::POS_READY);
                         ]),
                     $canViewNotification
                         ? ['/notification/view', 'id' => $notification->id]
-                        : ['/notification/index'],
+                        : ['/notifications'],
                     [
                         'class' => 'dropdown-item cafebara-notification-item',
                         'data-notification-item' => true,
@@ -120,6 +120,6 @@ JS, View::POS_READY);
         <?php if ($notifications === []) : ?>
             <li><span class="dropdown-item-text text-body-secondary">No unread notifications.</span></li>
         <?php endif; ?>
-        <li><?= Html::a('View all notifications', ['/notification/index'], ['class' => 'dropdown-item fw-bold cafebara-notification-item']) ?></li>
+        <li><?= Html::a('View all notifications', ['/notifications'], ['class' => 'dropdown-item fw-bold cafebara-notification-item']) ?></li>
     </ul>
 </div>

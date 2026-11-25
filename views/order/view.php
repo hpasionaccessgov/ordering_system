@@ -43,7 +43,7 @@ $formatSeconds = static function (?int $seconds): string {
                 && Yii::$app->user->can('cart.add')
                 && $model->status === Order::STATUS_COMPLETED
             ) : ?>
-                <?= Html::beginForm(['/order/order-again', 'id' => $model->id], 'POST', ['class' => 'd-inline']) ?>
+                <?= Html::beginForm(['/sales/orders/' . $model->id . '/order-again'], 'POST', ['class' => 'd-inline']) ?>
                 <?= Html::submitButton('Order Again', ['class' => 'btn btn-success']) ?>
                 <?= Html::endForm() ?>
             <?php endif; ?>
@@ -53,14 +53,14 @@ $formatSeconds = static function (?int $seconds): string {
             ) : ?>
                 <?= Html::a(
                     'View printable receipt',
-                    ['/order/receipt', 'id' => $model->id],
+                    ['/sales/orders/' . $model->id . '/receipt'],
                     ['class' => 'btn btn-primary'],
                 ) ?>
             <?php endif; ?>
             <?php if (Yii::$app->user->can('order.index')) : ?>
                 <?= Html::a(
                     'Back to orders',
-                    ['/order/index'],
+                    ['/sales/orders'],
                     ['class' => 'btn btn-secondary'],
                 ) ?>
             <?php endif; ?>
@@ -158,7 +158,7 @@ $formatSeconds = static function (?int $seconds): string {
 
                 <?php if (Yii::$app->user->can('order.process') && $nextStatus !== null) : ?>
                     <?= Html::beginForm(
-                        ['/order/process', 'id' => $model->id],
+                        ['/sales/orders/' . $model->id . '/process'],
                         'POST',
                         ['class' => 'd-inline'],
                     ) ?>

@@ -9,7 +9,7 @@ use yii\helpers\Html;
 <div class="d-flex flex-wrap gap-2 mb-4">
     <?php foreach (['csv' => 'Export CSV', 'excel' => 'Export Excel', 'pdf' => 'Export PDF'] as $format => $label) : ?>
         <?= Html::a($label, [
-            '/report/export',
+            '/reports/export',
             'report' => $report,
             'format' => $format,
             'ReportFilter' => $filter->attributes,

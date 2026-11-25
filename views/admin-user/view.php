@@ -26,12 +26,12 @@ $statusLabels = [
             Yii::$app->user->can('user.update')
             && Yii::$app->user->can('user.view')
         ) : ?>
-            <?= Html::a('Edit account', ['/admin-user/update', 'id' => $model->id], [
+            <?= Html::a('Edit account', ['/admin/users/' . $model->id . '/update'], [
                 'class' => 'btn btn-primary',
             ]) ?>
         <?php endif; ?>
         <?php if (Yii::$app->user->can('user.index')) : ?>
-            <?= Html::a('Back to user list', ['/admin-user/list'], [
+            <?= Html::a('Back to user list', ['/admin/users'], [
                 'class' => 'btn btn-secondary',
             ]) ?>
         <?php endif; ?>

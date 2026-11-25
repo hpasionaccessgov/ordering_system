@@ -17,7 +17,7 @@ $value = static fn($value): string => is_scalar($value) ? (string) $value : '';
         <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
     </div>
 </div>
-<?= Html::beginForm(['/activity-log/index'], 'get', ['class' => 'catalog-filter p-3 mb-4', 'role' => 'search']) ?>
+<?= Html::beginForm(['/admin/activity-logs'], 'get', ['class' => 'catalog-filter p-3 mb-4', 'role' => 'search']) ?>
 <div class="row g-2">
     <div class="col-12 col-md-2">
         <?= Html::input('text', 'ActivityLogSearch[id]', $value($searchModel->id), ['class' => 'form-control', 'placeholder' => 'Log ID', 'aria-label' => 'Log ID']) ?>

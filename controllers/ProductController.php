@@ -303,7 +303,7 @@ class ProductController extends Controller
         NotificationService::notifyManagers(
             NotificationService::TYPE_PRODUCT_DELETED,
             'Product ' . $productName . ' deleted.',
-            '/product/index',
+            '/catalog/products',
         );
         Yii::$app->session->setFlash('success', 'Product permanently deleted.');
 
@@ -418,7 +418,7 @@ class ProductController extends Controller
             return ['index'];
         }
 
-        return ['/site/dashboard'];
+        return ['/dashboard'];
     }
 
     /**
@@ -428,7 +428,7 @@ class ProductController extends Controller
     {
         return Yii::$app->user->can('product.index')
             ? ['index']
-            : ['/site/dashboard'];
+            : ['/dashboard'];
     }
 
     private function saveWithIngredients(Product $model): bool

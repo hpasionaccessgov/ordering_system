@@ -43,7 +43,7 @@ class m261120_190000_generalize_notifications extends Migration
         }
 
         $this->execute(
-            "UPDATE {{%notifications}} SET [[target_route]] = '/order/view', [[target_id]] = [[order_id]] "
+            "UPDATE {{%notifications}} SET [[target_route]] = '/sales/orders', [[target_id]] = [[order_id]] "
                 . 'WHERE [[target_route]] IS NULL AND [[order_id]] IS NOT NULL'
         );
     }
