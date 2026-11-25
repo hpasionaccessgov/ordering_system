@@ -104,7 +104,7 @@ $form = AdminActiveForm::begin([
                         'data-has-image' => $initialImageUrl === null ? 'false' : 'true',
                     ], $initialImageUrl === null ? [] : ['src' => $initialImageUrl])) ?>
                     <div
-                        class="d-none' product-editor-preview-placeholder<?= $initialImageUrl === null ? '' : ' ?>"
+                        class="product-editor-preview-placeholder<?= $initialImageUrl === null ? '' : ' d-none' ?>"
                         data-product-image-placeholder>
                         <i class="bi bi-image" aria-hidden="true"></i>
                         <span>Product photo preview</span>
@@ -138,7 +138,7 @@ $form = AdminActiveForm::begin([
 ]) ?>
 
 <div class="d-flex flex-wrap gap-2 mt-4 justify-content-end">
-    <?= Html::a('Cancel', $cancelRoute, ['class' => 'btn btn-secondary']) ?>
+    <?= Html::a('Cancel', $cancelRoute, ['class' => 'btn btn-outline-secondary']) ?>
     <?= Html::submitButton('Save product', ['class' => 'btn btn-primary px-4']) ?>
 </div>
 
