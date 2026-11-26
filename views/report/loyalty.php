@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use app\services\Navigation;
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */
@@ -16,7 +17,7 @@ use yii\helpers\Html;
 /** @var list<int> $redeemedValues */
 
 $this->title = 'Loyalty report';
-$this->params['breadcrumbs'][] = ['label' => 'Reports', 'url' => ['/reports/sales']];
+$this->params['breadcrumbs'][] = ['label' => 'Reports', 'url' => Navigation::url(Navigation::REPORT_SALES)];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-center">
@@ -25,7 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
         <p class="mb-0 text-body-secondary">Points issued, redemptions, and member tiers.</p>
     </div>
-    <?= Html::a('Loyalty admin', ['/admin/loyalty'], ['class' => 'btn btn-outline-secondary']) ?>
+    <?= Html::a('Loyalty admin', Navigation::url(Navigation::LOYALTY_OVERVIEW), ['class' => 'btn btn-outline-secondary']) ?>
 </div>
 
 <?= $this->render('_filters', ['filter' => $filter, 'orderFilters' => false]) ?>

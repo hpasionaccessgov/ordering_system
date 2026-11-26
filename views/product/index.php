@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use yii\bootstrap5\LinkPager;
 use yii\helpers\Html;
 
@@ -26,7 +27,7 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'product-batch-cart' : null;
     <?php if (Yii::$app->user->can('product.create')) : ?>
         <?= Html::a(
             'Create product',
-            ['/catalog/products/create'],
+            Navigation::url(Navigation::PRODUCT_CREATE),
             ['class' => 'btn btn-primary'],
         ) ?>
     <?php endif; ?>

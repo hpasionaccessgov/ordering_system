@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\Order;
 use app\widgets\AdminGridView;
 use yii\helpers\Html;
@@ -57,11 +58,11 @@ if (Yii::$app->user->can('order.view')) {
         'buttons' => [
             'view' => static fn($url, Order $model): string => Html::a(
                 'View',
-                ['/sales/orders/' . $model->id],
-                ['class' => 'btn btn-sm btn-secondary'],
+                Navigation::url(Navigation::ORDER_VIEW, ['id' => $model->id]),
+                ['class' => 'btn btn-sm btn-outline-secondary'],
             ),
             'order-again' => static fn($url, Order $model): string => $model->status === Order::STATUS_COMPLETED
-                ? Html::beginForm(['/sales/orders/' . $model->id . '/order-again'], 'POST', ['class' => 'd-inline'])
+                ? Html::beginForm(Navigation::url(Navigation::ORDER_AGAIN, ['id' => $model->id]), 'POST', ['class' => 'd-inline'])
                     . Html::submitButton('Order Again', ['class' => 'btn btn-sm btn-primary'])
                     . Html::endForm()
                 : '',
@@ -76,7 +77,7 @@ if (Yii::$app->user->can('order.view')) {
         <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
     </div>
     <?php if (Yii::$app->user->can('cart.index')) : ?>
-        <?= Html::a('Open cart', ['/sales/cart'], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Open cart', Navigation::url(Navigation::CART_INDEX), ['class' => 'btn btn-primary']) ?>
     <?php endif; ?>
 </div>
 
@@ -93,7 +94,7 @@ if (Yii::$app->user->can('order.view')) {
             <span class="cafebara-empty-icon" aria-hidden="true"><i class="bi bi-cup-hot"></i></span>
             <h2 class="mt-3 h5">No orders yet.</h2>
             <p class="mb-3 text-body-secondary">Order your first drink today.</p>
-            <?= Html::a('Browse Menu', ['/site/menu'], ['class' => 'btn btn-primary']) ?>
+            <?= Html::a('Browse Menu', Navigation::url(Navigation::MENU), ['class' => 'btn btn-primary']) ?>
         </div>
     </div>
 <?php else : ?>

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\services\Navigation;
+
 use app\services\OrderService;
 use app\services\ShoppingCart;
 use Yii;
@@ -157,7 +159,7 @@ final class CartController extends Controller
             );
             $cart->clear();
 
-            return $this->redirect(['/order/confirmation', 'id' => $order->id]);
+            return $this->redirect(Navigation::url(Navigation::ORDER_CONFIRMATION, ['id' => $order->id]));
         }
 
         if ($summary['lines'] === []) {

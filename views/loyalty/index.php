@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use app\services\Navigation;
 use app\models\LoyaltyPointTransaction;
 use app\models\Reward;
 use app\services\LoyaltyService;
@@ -105,7 +106,7 @@ $progress = max(0, min(100, $progress));
                             <h3 class="h5 mt-3 mb-1"><?= Html::encode($reward->name) ?></h3>
                             <p class="text-body-secondary small flex-grow-1"><?= Html::encode($reward->description ?: 'A little something for your next visit.') ?></p>
                             <?php if ($canRedeem) : ?>
-                                <?= Html::beginForm(['/loyalty/redeem', 'id' => $reward->id], 'POST', ['class' => 'mt-3']) ?>
+                                <?= Html::beginForm(Navigation::url(Navigation::REWARD_REDEEM, ['id' => $reward->id]), 'POST', ['class' => 'mt-3']) ?>
                                 <?= Html::submitButton('Redeem now', [
                                     'class' => 'btn btn-primary w-100',
                                     'data-confirm-modal' => 'Redeem ' . $reward->name . ' for ' . $reward->point_cost . ' points?',

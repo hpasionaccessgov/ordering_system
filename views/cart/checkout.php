@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\Product;
 use yii\helpers\Html;
 
@@ -53,12 +54,12 @@ $this->title = 'Checkout';
                     <p class="text-body-secondary small">
                         Prices are validated again when you place the order. This system records orders, not payment.
                     </p>
-                    <?= Html::beginForm(['/sales/cart/checkout'], 'POST') ?>
+                    <?= Html::beginForm(Navigation::url(Navigation::CART_CHECKOUT), 'POST') ?>
                     <?= Html::hiddenInput('checkout_token', $checkoutToken) ?>
                     <?= Html::submitButton('Place order', ['class' => 'btn btn-primary w-100']) ?>
                     <?= Html::endForm() ?>
-                    <?= Html::a('Back to cart', ['/sales/cart'], [
-                        'class' => 'btn btn-secondary w-100 mt-2',
+                    <?= Html::a('Back to cart', Navigation::url(Navigation::CART_INDEX), [
+                        'class' => 'btn btn-outline-secondary w-100 mt-2',
                     ]) ?>
                 </div>
             </section>

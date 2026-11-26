@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\Product;
 use yii\helpers\Html;
 
@@ -18,7 +19,7 @@ $this->title = 'Create order';
     <?= $this->render('_product_selection', [
         'products' => $products,
         'quantities' => [],
-        'formAction' => ['/sales/orders/create'],
+        'formAction' => Navigation::url(Navigation::ORDER_CREATE),
         'submitLabel' => 'Place order',
     ]) ?>
 </section>

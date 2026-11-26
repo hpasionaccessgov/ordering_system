@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use app\services\Navigation;
+
 /** @var yii\web\View $this */
 /** @var app\models\ReportFilter $filter */
 /** @var list<array{label: string, attribute: string, type?: string}> $columns */
@@ -12,7 +14,7 @@ declare(strict_types=1);
 /** @var list<int> $orderValues */
 
 $this->title = 'Sales report';
-$this->params['breadcrumbs'][] = ['label' => 'Reports', 'url' => ['/reports/sales']];
+$this->params['breadcrumbs'][] = ['label' => 'Reports', 'url' => Navigation::url(Navigation::REPORT_SALES)];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-center">

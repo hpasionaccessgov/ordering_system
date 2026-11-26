@@ -15,33 +15,36 @@ $this->render('_head');
 <?php $this->beginPage() ?>
 <!doctype html>
 <html lang="<?= Html::encode(Yii::$app->language) ?>" data-bs-theme="light">
+
 <head>
     <title><?= Html::encode($this->title ?: Yii::$app->name) ?></title>
     <?php $this->head() ?>
 </head>
+
 <body class="d-flex flex-column min-vh-100">
-<?php $this->beginBody() ?>
+    <?php $this->beginBody() ?>
 
-<?= $this->render('_public_header') ?>
+    <?= $this->render('_public_header') ?>
 
-<main id="main" class="flex-grow-1" role="main">
-    <div class="container">
-        <?php if (!empty($this->params['breadcrumbs'])): ?>
-            <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
-        <?php endif ?>
+    <main id="main" class="flex-grow-1" role="main">
+        <div class="container">
+            <?php if (!empty($this->params['breadcrumbs'])): ?>
+                <?= Breadcrumbs::widget(['links' => $this->params['breadcrumbs']]) ?>
+            <?php endif ?>
 
-        <?= Alert::widget() ?>
-        <?= $content ?>
-    </div>
-</main>
+            <?= Alert::widget() ?>
+            <?= $content ?>
+        </div>
+    </main>
 
-<?= $this->render('_footer') ?>
-<?= $this->render('_mini_cart') ?>
+    <?= $this->render('_footer') ?>
+    <?= $this->render('_mini_cart') ?>
 
-<?= ConfirmModal::widget() ?>
-<?= $this->render('_session_monitor') ?>
+    <?= ConfirmModal::widget() ?>
+    <?= $this->render('_session_monitor') ?>
 
-<?php $this->endBody() ?>
+    <?php $this->endBody() ?>
 </body>
+
 </html>
 <?php $this->endPage() ?>

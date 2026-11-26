@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\Notification;
 use yii\bootstrap5\LinkPager;
 use yii\helpers\Html;
@@ -17,7 +18,7 @@ $this->title = 'Notifications';
 <div class="d-flex flex-wrap gap-2 mb-4 justify-content-between align-items-center">
     <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
     <?php if (Yii::$app->user->can('notification.read')) : ?>
-        <?= Html::beginForm(['/notifications/read-all'], 'POST', ['class' => 'm-0']) ?>
+        <?= Html::beginForm(Navigation::url(Navigation::NOTIFICATION_READ_ALL), 'POST', ['class' => 'm-0']) ?>
         <?= Html::submitButton('Mark all as read', [
             'class' => 'btn btn-primary btn-sm',
             'disabled' => $unreadCount === 0,
@@ -55,19 +56,19 @@ $this->title = 'Notifications';
                 </div>
                 <div class="d-flex flex-wrap gap-2">
                     <?php if ($isUnread && Yii::$app->user->can('notification.read')): ?>
-                        <?= Html::beginForm(['/notifications/' . $notification->id . '/read'], 'POST', ['class' => 'm-0']) ?>
+                        <?= Html::beginForm(Navigation::url(Navigation::NOTIFICATION_READ, ['id' => $notification->id]), 'POST', ['class' => 'm-0']) ?>
                         <?= Html::submitButton('Mark as read', ['class' => 'btn btn-sm btn-primary']) ?>
                         <?= Html::endForm() ?>
                     <?php endif ?>
                     <?php if (Yii::$app->user->can('notification.read')): ?>
-                        <?= Html::a('View', ['/notification/view', 'id' => $notification->id], ['class' => 'btn btn-sm btn-secondary']) ?>
+                        <?= Html::a('View', Navigation::url(Navigation::NOTIFICATION_READ, ['id' => $notification->id]), ['class' => 'btn btn-sm btn-outline-secondary']) ?>
                     <?php elseif (Yii::$app->user->can('order.view') && $notification->order_id !== null): ?>
-                        <?= Html::a('View order', ['/sales/orders/' . $notification->order_id], ['class' => 'btn btn-sm btn-primary']) ?>
+                        <?= Html::a('View order', Navigation::url(Navigation::ORDER_VIEW, ['id' => $notification->order_id]), ['class' => 'btn btn-sm btn-primary']) ?>
                     <?php endif ?>
                     <?php if (Yii::$app->user->can('notification.delete')): ?>
-                        <?= Html::beginForm(['/notifications/' . $notification->id . '/delete'], 'POST', ['class' => 'm-0']) ?>
+                        <?= Html::beginForm(Navigation::url(Navigation::NOTIFICATION_DELETE, ['id' => $notification->id]), 'POST', ['class' => 'm-0']) ?>
                         <?= Html::submitButton('Delete', [
-                            'class' => 'btn btn-sm btn-danger',
+                            'class' => 'btn btn-sm btn-outline-danger',
                             'data-confirm-modal' => 'Delete this notification? This cannot be undone.',
                         ]) ?>
                         <?= Html::endForm() ?>

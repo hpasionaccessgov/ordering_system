@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\services\Navigation;
+
+
 use app\models\AdjustPointsForm;
 use app\models\LoyaltyPointTransaction;
 use app\models\LoyaltyTransactionSearch;
@@ -93,7 +96,7 @@ class AdminLoyaltyController extends Controller
                     LoyaltyService::adjust($model, (int) Yii::$app->user->id);
                     Yii::$app->session->setFlash('success', 'Loyalty points adjusted and logged.');
 
-                    return $this->redirect(['/admin-loyalty/transactions']);
+                    return $this->redirect(Navigation::url(Navigation::LOYALTY_TRANSACTIONS));
                 }
             } catch (BadRequestHttpException $exception) {
                 Yii::$app->session->setFlash('error', $exception->getMessage());

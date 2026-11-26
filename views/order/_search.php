@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use yii\helpers\Html;
 
 /** @var string $search */
@@ -9,7 +10,7 @@ use yii\helpers\Html;
 
 $sort = Yii::$app->request->get('sort');
 ?>
-<?= Html::beginForm(['/sales/orders'], 'get', ['class' => 'catalog-filter p-3 mb-4', 'role' => 'search']) ?>
+<?= Html::beginForm(Navigation::url(Navigation::ORDER_INDEX), 'get', ['class' => 'catalog-filter p-3 mb-4', 'role' => 'search']) ?>
 <div class="row g-2">
     <div class="col-12 col-md">
         <?= Html::input('search', 'q', $search, [
@@ -31,7 +32,7 @@ $sort = Yii::$app->request->get('sort');
         <?= Html::hiddenInput('sort', $sort) ?>
     <?php endif; ?>
     <div class="col-auto"><?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?></div>
-    <div class="col-auto"><?= Html::a('Clear', ['/sales/orders'], ['class' => 'btn btn-outline-secondary']) ?></div>
+    <div class="col-auto"><?= Html::a('Clear', Navigation::url(Navigation::ORDER_INDEX), ['class' => 'btn btn-outline-secondary']) ?></div>
 </div>
 <?= $this->render('../shared/_listing_filters', [
     'filters' => $filters,

@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\AdminUserCreateForm;
 use app\widgets\AdminActiveForm;
 use yii\helpers\Html;
@@ -26,7 +27,7 @@ foreach ($roles as $role) {
                 <p class="mb-0 text-body-secondary">Create a user and assign an existing role.</p>
             </div>
             <?php if (Yii::$app->user->can('user.index')) : ?>
-                <?= Html::a('Back to user list', ['/admin/users'], ['class' => 'btn btn-secondary']) ?>
+                <?= Html::a('Back to user list', Navigation::url(Navigation::ADMIN_USER_INDEX), ['class' => 'btn btn-outline-secondary']) ?>
             <?php endif; ?>
         </div>
 
@@ -67,7 +68,7 @@ foreach ($roles as $role) {
                 <div class="d-flex flex-wrap gap-2 mt-4">
                     <?= Html::submitButton('Create account', ['class' => 'btn btn-primary']) ?>
                     <?php if (Yii::$app->user->can('user.index')) : ?>
-                        <?= Html::a('Cancel', ['/admin/users'], ['class' => 'btn btn-secondary']) ?>
+                        <?= Html::a('Cancel', Navigation::url(Navigation::ADMIN_USER_INDEX), ['class' => 'btn btn-outline-secondary']) ?>
                     <?php endif; ?>
                 </div>
 

@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\web\View;
@@ -8,9 +9,9 @@ if (Yii::$app->user->isGuest) {
     return;
 }
 
-$statusUrl = Json::htmlEncode(Url::to(['/session/status']));
-$activityUrl = Json::htmlEncode(Url::to(['/session/activity']));
-$loginUrl = Json::htmlEncode(Url::to(['/site/login']));
+$statusUrl = Json::htmlEncode(Url::to(Navigation::url(Navigation::SESSION_STATUS)));
+$activityUrl = Json::htmlEncode(Url::to(Navigation::url(Navigation::SESSION_ACTIVITY)));
+$loginUrl = Json::htmlEncode(Url::to(Navigation::url(Navigation::LOGIN)));
 $this->registerJs(<<<JS
 let userActivity = false;
 ['keydown', 'pointerdown', 'pointermove', 'scroll', 'touchstart'].forEach(event =>

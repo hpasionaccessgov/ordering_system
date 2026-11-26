@@ -65,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'View',
                                 ['view', 'id' => $category->id],
                                 [
-                                    'class' => 'btn btn-sm btn-secondary',
+                                    'class' => 'btn btn-sm btn-outline-secondary',
                                     'aria-label' => 'View category ' . $category->name,
                                 ],
                             );
@@ -89,7 +89,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 . Html::submitButton(
                                     'Delete',
                                     [
-                                        'class' => 'btn btn-sm btn-danger',
+                                        'class' => 'btn btn-sm btn-outline-danger',
                                         'aria-label' => 'Delete category ' . $category->name,
                                         'data-confirm-modal' => 'Delete this category? Categories assigned to products cannot be deleted.',
                                     ],

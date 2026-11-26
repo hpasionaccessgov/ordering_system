@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\Order;
 use yii\helpers\Html;
 
@@ -43,8 +44,8 @@ $formatSeconds = static function (?int $seconds): string {
                 && Yii::$app->user->can('cart.add')
                 && $model->status === Order::STATUS_COMPLETED
             ) : ?>
-                <?= Html::beginForm(['/sales/orders/' . $model->id . '/order-again'], 'POST', ['class' => 'd-inline']) ?>
-                <?= Html::submitButton('Order Again', ['class' => 'btn btn-success']) ?>
+                <?= Html::beginForm(Navigation::url(Navigation::ORDER_AGAIN, ['id' => $model->id]), 'POST', ['class' => 'd-inline']) ?>
+                <?= Html::submitButton('Order Again', ['class' => 'btn btn-outline-primary']) ?>
                 <?= Html::endForm() ?>
             <?php endif; ?>
             <?php if (
@@ -53,15 +54,15 @@ $formatSeconds = static function (?int $seconds): string {
             ) : ?>
                 <?= Html::a(
                     'View printable receipt',
-                    ['/sales/orders/' . $model->id . '/receipt'],
+                    Navigation::url(Navigation::ORDER_RECEIPT, ['id' => $model->id]),
                     ['class' => 'btn btn-primary'],
                 ) ?>
             <?php endif; ?>
             <?php if (Yii::$app->user->can('order.index')) : ?>
                 <?= Html::a(
                     'Back to orders',
-                    ['/sales/orders'],
-                    ['class' => 'btn btn-secondary'],
+                    Navigation::url(Navigation::ORDER_INDEX),
+                    ['class' => 'btn btn-outline-secondary'],
                 ) ?>
             <?php endif; ?>
         </div>
@@ -156,7 +157,7 @@ $formatSeconds = static function (?int $seconds): string {
             <div class="d-flex flex-wrap gap-2">
                 <?php if (Yii::$app->user->can('order.process') && $nextStatus !== null) : ?>
                     <?= Html::beginForm(
-                        ['/sales/orders/' . $model->id . '/process'],
+                        Navigation::url(Navigation::ORDER_PROCESS, ['id' => $model->id]),
                         'POST',
                         ['class' => 'd-inline'],
                     ) ?>

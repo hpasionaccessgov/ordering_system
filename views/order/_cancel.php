@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\Order;
 use yii\helpers\Html;
 
@@ -21,7 +22,7 @@ $canCancel = Yii::$app->user->can('order.cancel')
 ?>
 
 <?php if ($canCancel) : ?>
-    <?= Html::beginForm(['/sales/orders/' . $model->id . '/cancel'], 'POST', ['class' => 'd-inline']) ?>
+    <?= Html::beginForm(Navigation::url(Navigation::ORDER_CANCEL, ['id' => $model->id]), 'POST', ['class' => 'd-inline']) ?>
     <?php if (is_string($returnUrl) && str_starts_with($returnUrl, '/')) : ?>
         <?= Html::hiddenInput('returnUrl', $returnUrl) ?>
     <?php endif; ?>

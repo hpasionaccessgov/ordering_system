@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use app\services\Navigation;
 use app\models\LoyaltyPointTransaction;
 use app\widgets\AdminGridView;
 use yii\helpers\Html;
@@ -11,7 +12,7 @@ use yii\helpers\Html;
 /** @var string $title */
 
 $this->title = $title;
-$this->params['breadcrumbs'][] = ['label' => 'Loyalty', 'url' => ['/admin/loyalty']];
+$this->params['breadcrumbs'][] = ['label' => 'Loyalty', 'url' => Navigation::url(Navigation::LOYALTY_OVERVIEW)];
 $this->params['breadcrumbs'][] = $this->title;
 
 $route = '/' . Yii::$app->controller->route;
@@ -23,10 +24,10 @@ $isRedemptions = Yii::$app->controller->action->id === 'redemptions';
         <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
     </div>
     <div class="d-flex flex-wrap gap-2">
-        <?= Html::a('All transactions', ['/admin/loyalty/transactions'], ['class' => 'btn btn-outline-secondary']) ?>
-        <?= Html::a('Redemptions', ['/admin/loyalty/redemptions'], ['class' => 'btn btn-outline-secondary']) ?>
+        <?= Html::a('All transactions', Navigation::url(Navigation::LOYALTY_TRANSACTIONS), ['class' => 'btn btn-outline-secondary']) ?>
+        <?= Html::a('Redemptions', Navigation::url(Navigation::LOYALTY_REDEMPTIONS), ['class' => 'btn btn-outline-secondary']) ?>
         <?php if (Yii::$app->user->can('loyalty.adjust')) : ?>
-            <?= Html::a('Adjust points', ['/admin/loyalty/adjust'], ['class' => 'btn btn-primary']) ?>
+            <?= Html::a('Adjust points', Navigation::url(Navigation::LOYALTY_ADJUST), ['class' => 'btn btn-primary']) ?>
         <?php endif; ?>
     </div>
 </div>

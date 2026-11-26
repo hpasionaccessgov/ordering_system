@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\widgets\AdminActiveForm;
 use yii\helpers\Html;
 
@@ -7,7 +8,7 @@ use yii\helpers\Html;
 /** @var array<int|string, string> $customerOptions */
 
 $this->title = 'Adjust loyalty points';
-$this->params['breadcrumbs'][] = ['label' => 'Loyalty', 'url' => ['/admin/loyalty']];
+$this->params['breadcrumbs'][] = ['label' => 'Loyalty', 'url' => Navigation::url(Navigation::LOYALTY_OVERVIEW)];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-start">
@@ -16,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <h1 class="mb-1 h3"><?= Html::encode($this->title) ?></h1>
         <p class="mb-0 text-body-secondary">Use a negative number to deduct points. Adjustments never reduce the customer's tier.</p>
     </div>
-    <?= Html::a('Back to transactions', ['/admin/loyalty/transactions'], ['class' => 'btn btn-outline-secondary']) ?>
+    <?= Html::a('Back to transactions', Navigation::url(Navigation::LOYALTY_TRANSACTIONS), ['class' => 'btn btn-outline-secondary']) ?>
 </div>
 
 <section class="card admin-panel">

@@ -34,7 +34,7 @@ class CustomerController extends Controller
         ];
     }
 
-    public function actionDashboard(): string
+    public function actionIndex(): string
     {
         $this->layout = 'admin';
         $userId = (int) Yii::$app->user->id;
@@ -51,7 +51,7 @@ class CustomerController extends Controller
         ]);
         $featuredProducts = $featuredDataProvider->getModels();
 
-        return $this->render('dashboard', [
+        return $this->render('index', [
             'featuredDataProvider' => $featuredDataProvider,
             'orderCount' => (int) Order::find()
                 ->where(['user_id' => $userId])

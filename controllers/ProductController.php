@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\services\Navigation;
+
 use app\models\Category;
 use app\models\Inventory;
 use app\models\OrderItem;
@@ -418,7 +420,7 @@ class ProductController extends Controller
             return ['index'];
         }
 
-        return ['/dashboard'];
+        return Navigation::url(Navigation::DASHBOARD);
     }
 
     /**
@@ -428,7 +430,7 @@ class ProductController extends Controller
     {
         return Yii::$app->user->can('product.index')
             ? ['index']
-            : ['/dashboard'];
+            : Navigation::url(Navigation::DASHBOARD);
     }
 
     private function saveWithIngredients(Product $model): bool

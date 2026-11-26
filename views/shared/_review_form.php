@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\Order;
 use app\models\Product;
 use yii\helpers\Html;
@@ -19,7 +20,7 @@ foreach ($eligibleOrders as $order) {
     <p class="mb-3 text-body-secondary small">
         Reviews can only be added from completed orders that include this product.
     </p>
-    <?= Html::beginForm(['/product-review/create', 'id' => $model->id], 'POST', ['class' => 'row g-3']) ?>
+    <?= Html::beginForm(Navigation::url(Navigation::REVIEW_CREATE, ['id' => $model->id]), 'POST', ['class' => 'row g-3']) ?>
     <div class="col-12 col-md-6">
         <?= Html::label('Completed order', 'review-order-id', ['class' => 'form-label small fw-semibold']) ?>
         <?= Html::dropDownList('order_id', null, $orderOptions, [

@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\Category;
 use app\widgets\AdminActiveForm;
 use yii\helpers\Html;
@@ -23,8 +24,8 @@ use yii\helpers\Html;
             <?= Html::submitButton('Save category', ['class' => 'btn btn-primary']) ?>
             <?= Html::a(
                 'Cancel',
-                Yii::$app->user->can('category.index') ? ['index'] : ['/dashboard'],
-                ['class' => 'btn btn-secondary'],
+                Yii::$app->user->can('category.index') ? ['index'] : Navigation::url(Navigation::DASHBOARD),
+                ['class' => 'btn btn-outline-secondary'],
             ) ?>
         </div>
         <?php AdminActiveForm::end(); ?>

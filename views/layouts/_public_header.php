@@ -2,35 +2,38 @@
 
 declare(strict_types=1);
 
+use app\services\Navigation;
+
 /** @var yii\web\View $this */
 
 use yii\helpers\Html;
 
 $currentRoute = Yii::$app->controller->route;
 $navigationItems = [
-    ['label' => 'Home', 'route' => 'site/index', 'url' => ['/site/index']],
-    ['label' => 'Menu', 'route' => 'site/menu', 'url' => ['/site/menu']],
-    // ['label' => 'About', 'route' => 'site/about', 'url' => ['/site/about']],
-    ['label' => 'Contact', 'route' => 'site/contact', 'url' => ['/site/contact']],
+    ['label' => 'Home', 'route' => 'site/index', 'url' => Navigation::url(Navigation::HOME)],
+    ['label' => 'Menu', 'route' => 'site/menu', 'url' => Navigation::url(Navigation::MENU)],
+    // ['label' => 'About', 'route' => 'site/about', 'url' => Navigation::url(Navigation::ABOUT)],
+    ['label' => 'Contact', 'route' => 'site/contact', 'url' => Navigation::url(Navigation::CONTACT)],
 ];
-$user = Yii::$app->user->identity;
 $hasDashboardAccess = Yii::$app->user->can('admin.access')
     || Yii::$app->user->can('staff.access')
     || Yii::$app->user->can('customer.access');
 $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
     'alt' => '',
     'class' => 'cafebara-brand-logo',
+    'width' => 38,
+    'height' => 38,
 ]) . Html::tag(
     'span',
     Html::tag('span', 'Cafébara', ['class' => 'cafebara-brand-name'])
-        . Html::tag('span', 'CAFE & ORDERING', ['class' => 'cafebara-brand-caption']),
+        . Html::tag('span', 'Café & ordering', ['class' => 'cafebara-brand-caption']),
     ['class' => 'cafebara-brand-copy'],
 );
 ?>
 <header id="header" class="cafebara-site-header">
     <nav class="navbar navbar-expand-lg" aria-label="Main navigation">
         <div class="container">
-            <?= Html::a($brand, ['/site/index'], [
+            <?= Html::a($brand, Navigation::url(Navigation::HOME), [
                 'class' => 'navbar-brand cafebara-brand-lockup d-flex align-items-center gap-2',
                 'aria-label' => 'Cafébara home',
             ]) ?>
@@ -58,40 +61,50 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                     <?php endforeach ?>
                 </ul>
 
-                <div class="d-flex gap-2 align-items-center cafebara-nav-actions">
+                <div class="d-flex flex-wrap gap-2 align-items-center cafebara-nav-actions">
                     <?= $this->render('_theme_toggle') ?>
                     <?= $this->render('_cart_button') ?>
 
                     <?php if (Yii::$app->user->isGuest): ?>
-                        <?= Html::a('Sign in', ['/site/login'], [
-                            'class' => 'btn btn-outline-primary',
-                        ]) ?>
-                        <?= Html::a('Get started', ['/site/register'], [
-                            'class' => 'btn btn-primary',
-                        ]) ?>
+                        <?= Html::a(
+                            '<i class="bi bi-box-arrow-in-right" aria-hidden="true"></i>'
+                                . Html::tag('span', 'Sign in', ['class' => 'cafebara-btn-label d-none d-sm-inline']),
+                            Navigation::url(Navigation::LOGIN),
+                            ['class' => 'btn btn-outline-primary cafebara-icon-btn', 'encode' => false, 'aria-label' => 'Sign in'],
+                        ) ?>
+                        <?= Html::a(
+                            '<i class="bi bi-person-plus" aria-hidden="true"></i>'
+                                . Html::tag('span', 'Get started', ['class' => 'cafebara-btn-label d-none d-sm-inline']),
+                            Navigation::url(Navigation::REGISTER),
+                            ['class' => 'btn btn-primary cafebara-icon-btn', 'encode' => false, 'aria-label' => 'Get started'],
+                        ) ?>
                     <?php else: ?>
                         <?php if (Yii::$app->user->can('favorite.index')): ?>
-                            <?= Html::a('<i class="bi bi-heart" aria-hidden="true"></i><span class="ms-1 d-none d-xl-inline">Favorites</span>', ['/sales/favorites'], [
-                                'class' => 'btn btn-outline-primary',
-                                'encode' => false,
-                                'aria-label' => 'Favorites',
-                            ]) ?>
+                            <?= Html::a(
+                                '<i class="bi bi-heart" aria-hidden="true"></i>'
+                                    . Html::tag('span', 'Favorites', ['class' => 'cafebara-btn-label d-none d-lg-inline']),
+                                Navigation::url(Navigation::FAVORITE_INDEX),
+                                ['class' => 'btn btn-outline-primary cafebara-icon-btn', 'encode' => false, 'aria-label' => 'Favorites'],
+                            ) ?>
                         <?php endif; ?>
                         <?php if (Yii::$app->user->can('notification.index')): ?>
-                            <?= $this->render('_notifications_link', ['class' => 'btn btn-outline-primary']) ?>
+                            <?= $this->render('_notifications_link', [
+                                'class' => 'btn btn-outline-primary cafebara-icon-btn',
+                            ]) ?>
                         <?php endif ?>
                         <?= Html::a(
-                            $hasDashboardAccess ? 'Dashboard' : 'Home',
-                            $hasDashboardAccess ? ['/dashboard'] : ['/site/index'],
+                            '<i class="bi bi-speedometer2" aria-hidden="true"></i>'
+                                . Html::tag('span', $hasDashboardAccess ? 'Dashboard' : 'Home', [
+                                    'class' => 'cafebara-btn-label d-none d-md-inline',
+                                ]),
+                            $hasDashboardAccess ? Navigation::url(Navigation::DASHBOARD) : Navigation::url(Navigation::HOME),
                             [
-                            'class' => 'btn btn-primary',
-                        ]) ?>
-                        <?= Html::a('Profile', ['/profile'], [
-                            'class' => 'btn btn-outline-primary',
-                        ]) ?>
-                        <?= Html::beginForm(['/site/logout'], 'POST', ['class' => 'm-0']) ?>
-                        <?= Html::submitButton('Sign out', ['class' => 'btn btn-link cafebara-sign-out']) ?>
-                        <?= Html::endForm() ?>
+                                'class' => 'btn btn-primary cafebara-icon-btn',
+                                'encode' => false,
+                                'aria-label' => $hasDashboardAccess ? 'Dashboard' : 'Home',
+                            ],
+                        ) ?>
+                        <?= $this->render('_profile_dropdown', ['class' => 'btn btn-outline-primary']) ?>
                     <?php endif ?>
                 </div>
             </div>

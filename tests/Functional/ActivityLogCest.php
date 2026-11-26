@@ -79,7 +79,7 @@ final class ActivityLogCest
         $I->amLoggedInAs($staff);
         $I->amOnRoute('admin/activity');
         $I->seeResponseCodeIs(403);
-        $I->amOnRoute('staff/dashboard');
+        $I->amOnRoute('staff/index');
         $I->dontSee('Activity logs');
         $I->amLoggedInAs($admin);
         $I->amOnRoute('admin/activity');

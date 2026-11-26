@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use app\services\Navigation;
+
 use yii\helpers\Html;
 
 $currentRoute = Yii::$app->controller->route;
@@ -10,10 +12,10 @@ $isCustomer = $can('customer.access') && !$can('staff.access') && !$can('admin.a
 
 $hasDashboardAccess = $can('admin.access') || $can('staff.access') || $can('customer.access');
 $dashboardRoute = match (true) {
-    $can('admin.access') => ['/admin/dashboard'],
-    $can('staff.access') => ['/staff/dashboard'],
-    $can('customer.access') => ['/customer/dashboard'],
-    default => ['/site/index'],
+    $can('admin.access') => Navigation::url(Navigation::ADMIN_DASHBOARD),
+    $can('staff.access') => Navigation::url(Navigation::STAFF_DASHBOARD),
+    $can('customer.access') => Navigation::url(Navigation::CUSTOMER_DASHBOARD),
+    default => Navigation::url(Navigation::HOME),
 };
 $dashboardRouteName = ltrim($dashboardRoute[0], '/');
 
@@ -27,21 +29,21 @@ $navGroups = [
                 'label' => $isCustomer ? 'Browse menu' : 'Products',
                 'icon' => 'bi-cup-hot',
                 'visible' => $can('product.index') || $can('product.create'),
-                'route' => $can('product.index') ? ['/catalog/products'] : ['/catalog/products/create'],
+                'route' => $can('product.index') ? Navigation::url(Navigation::PRODUCT_INDEX) : Navigation::url(Navigation::PRODUCT_CREATE),
                 'active' => str_starts_with($currentRoute, 'product/'),
             ],
             [
                 'label' => $isCustomer ? 'Saved favorites' : 'Favorites',
                 'icon' => 'bi-heart',
                 'visible' => $can('favorite.index'),
-                'route' => ['/sales/favorites'],
+                'route' => Navigation::url(Navigation::FAVORITE_INDEX),
                 'active' => str_starts_with($currentRoute, 'favorite/'),
             ],
             [
                 'label' => $isCustomer ? 'Browse categories' : 'Categories',
                 'icon' => 'bi-tags',
                 'visible' => $can('category.index') || $can('category.create'),
-                'route' => $can('category.index') ? ['/catalog/categories'] : ['/catalog/categories/create'],
+                'route' => $can('category.index') ? Navigation::url(Navigation::CATEGORY_INDEX) : Navigation::url(Navigation::CATEGORY_CREATE),
                 'active' => str_starts_with($currentRoute, 'category/'),
             ],
         ],
@@ -51,24 +53,24 @@ $navGroups = [
         'icon' => $isCustomer ? 'bi-receipt' : 'bi-cash-stack',
         'items' => [
             [
-                'label' => $isCustomer ? 'Order history' : 'Orders',
+                'label' => $isCustomer ? 'Orders' : 'Orders',
                 'icon' => 'bi-receipt',
                 'visible' => $can('order.index'),
-                'route' => ['/sales/orders'],
+                'route' => Navigation::url(Navigation::ORDER_INDEX),
                 'active' => str_starts_with($currentRoute, 'order/'),
             ],
             [
                 'label' => $isCustomer ? 'Track your order' : 'Kitchen board',
                 'icon' => 'bi-kanban',
                 'visible' => $can('order.board') || $can('customer.access'),
-                'route' => ['/sales/kitchen-board'],
+                'route' => Navigation::url(Navigation::KITCHEN_BOARD),
                 'active' => str_starts_with($currentRoute, 'kitchen/'),
             ],
             [
                 'label' => $isCustomer ? 'My cart' : 'Cart',
                 'icon' => 'bi-cart',
                 'visible' => $can('cart.index'),
-                'route' => ['/sales/cart'],
+                'route' => Navigation::url(Navigation::CART_INDEX),
                 'active' => str_starts_with($currentRoute, 'cart/'),
             ],
 
@@ -76,7 +78,7 @@ $navGroups = [
                 'label' => 'Inventory',
                 'icon' => 'bi-box-seam-fill',
                 'visible' => $can('inventory.index') || $can('inventory.create'),
-                'route' => $can('inventory.index') ? ['/sales/inventory'] : ['/sales/inventory/create'],
+                'route' => $can('inventory.index') ? Navigation::url(Navigation::INVENTORY_INDEX) : Navigation::url(Navigation::INVENTORY_CREATE),
                 'active' => str_starts_with($currentRoute, 'inventory/'),
             ],
         ],
@@ -89,30 +91,24 @@ $navGroups = [
                 'label' => 'My rewards',
                 'icon' => 'bi-stars',
                 'visible' => $can('loyalty.view'),
-                'route' => ['/rewards'],
+                'route' => Navigation::url(Navigation::REWARDS),
                 'active' => str_starts_with($currentRoute, 'loyalty/'),
             ],
             [
                 'label' => 'Reward catalog',
                 'icon' => 'bi-gift',
                 'visible' => $can('reward.index'),
-                'route' => ['/admin/rewards'],
+                'route' => Navigation::url(Navigation::REWARD_INDEX),
                 'active' => str_starts_with($currentRoute, 'reward/'),
             ],
             [
                 'label' => 'Loyalty overview',
                 'icon' => 'bi-clipboard-data',
                 'visible' => $can('loyalty.transaction.index'),
-                'route' => ['/admin/loyalty'],
+                'route' => Navigation::url(Navigation::LOYALTY_OVERVIEW),
                 'active' => str_starts_with($currentRoute, 'admin-loyalty/'),
             ],
-            [
-                'label' => 'Adjust points',
-                'icon' => 'bi-plus-slash-minus',
-                'visible' => $can('loyalty.adjust'),
-                'route' => ['/admin/loyalty/adjust'],
-                'active' => $currentRoute === 'admin-loyalty/adjust',
-            ],
+
         ],
     ],
     [
@@ -123,35 +119,35 @@ $navGroups = [
                 'label' => 'Sales',
                 'icon' => 'bi-cash-coin',
                 'visible' => $can('reports.view'),
-                'route' => ['/reports/sales'],
+                'route' => Navigation::url(Navigation::REPORT_SALES),
                 'active' => str_starts_with($currentRoute, 'report/sales'),
             ],
             [
                 'label' => 'Product performance',
                 'icon' => 'bi-graph-up',
                 'visible' => $can('reports.view'),
-                'route' => ['reports/product-performance'],
+                'route' => Navigation::url(Navigation::REPORT_PRODUCT),
                 'active' => str_starts_with($currentRoute, 'report/product'),
             ],
             [
                 'label' => 'Orders',
                 'icon' => 'bi-receipt',
                 'visible' => $can('reports.view'),
-                'route' => ['/reports/orders'],
+                'route' => Navigation::url(Navigation::REPORT_ORDERS),
                 'active' => str_starts_with($currentRoute, 'report/orders'),
             ],
             [
                 'label' => 'Inventory',
                 'icon' => 'bi-box-seam',
                 'visible' => $can('reports.view'),
-                'route' => ['/reports/inventory'],
+                'route' => Navigation::url(Navigation::REPORT_INVENTORY),
                 'active' => str_starts_with($currentRoute, 'report/inventory'),
             ],
             [
                 'label' => 'Loyalty',
                 'icon' => 'bi-gift',
                 'visible' => $can('reports.view') && $can('loyalty.report'),
-                'route' => ['/reports/loyalty'],
+                'route' => Navigation::url(Navigation::REPORT_LOYALTY),
                 'active' => str_starts_with($currentRoute, 'report/loyalty'),
             ],
         ],
@@ -164,28 +160,28 @@ $navGroups = [
                 'label' => 'Users',
                 'icon' => 'bi-person-lines-fill',
                 'visible' => $can('user.index') || $can('user.create'),
-                'route' => $can('user.index') ? ['/admin/users'] : ['/admin/users/create'],
+                'route' => $can('user.index') ? Navigation::url(Navigation::ADMIN_USER_INDEX) : Navigation::url(Navigation::ADMIN_USER_CREATE),
                 'active' => $currentRoute === 'admin-user/list',
             ],
             [
                 'label' => 'Roles',
                 'icon' => 'bi-shield-lock',
                 'visible' => $can('user.assignRole'),
-                'route' => ['/admin/roles'],
+                'route' => Navigation::url(Navigation::ADMIN_ROLE_INDEX),
                 'active' => $currentRoute === 'admin-role/index',
             ],
             [
                 'label' => 'Activity logs',
                 'icon' => 'bi-clock-history',
                 'visible' => $can('activityLog.index'),
-                'route' => ['/admin/activity-logs'],
+                'route' => Navigation::url(Navigation::ACTIVITY_LOG_INDEX),
                 'active' => str_starts_with($currentRoute, 'activity-log/'),
             ],
             [
                 'label' => 'Settings',
                 'icon' => 'bi-sliders',
                 'visible' => $can('settings.index'),
-                'route' => ['/admin/settings'],
+                'route' => Navigation::url(Navigation::SETTINGS),
                 'active' => str_starts_with($currentRoute, 'settings/'),
             ],
         ],

@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\Product;
 use app\widgets\AdminActiveForm;
 use yii\helpers\Html;
@@ -11,8 +12,8 @@ use yii\helpers\Html;
 
 $initialImageUrl = $model->getImageUrl();
 $cancelRoute = Yii::$app->user->can('product.index')
-    ? ['/catalog/products']
-    : ['/dashboard'];
+    ? Navigation::url(Navigation::PRODUCT_INDEX)
+    : Navigation::url(Navigation::DASHBOARD);
 $this->registerJs(<<<'JS'
 (() => {
     const input = document.getElementById('product-image-upload');

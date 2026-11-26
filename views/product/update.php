@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use yii\helpers\Html;
 
 /** @var app\models\Product $model */
@@ -20,8 +21,8 @@ $this->title = 'Update product';
     </div>
     <?= Html::a(
         Yii::$app->user->can('product.index') ? 'Back to menu' : 'Back to dashboard',
-        Yii::$app->user->can('product.index') ? ['/catalog/products'] : ['/dashboard'],
-        ['class' => 'btn btn-secondary'],
+        Yii::$app->user->can('product.index') ? Navigation::url(Navigation::PRODUCT_INDEX) : Navigation::url(Navigation::DASHBOARD),
+        ['class' => 'btn btn-outline-secondary'],
     ) ?>
 </div>
 

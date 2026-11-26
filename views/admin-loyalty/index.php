@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use app\services\Navigation;
 use app\models\LoyaltyPointTransaction;
 use app\services\LoyaltyService;
 use yii\helpers\Html;
@@ -20,9 +21,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <p class="mb-0 text-body-secondary">Activity this year and quick access to loyalty records.</p>
     </div>
     <div class="d-flex flex-wrap gap-2">
-        <?= Html::a('Manage rewards', ['/admin/rewards'], ['class' => 'btn btn-outline-secondary']) ?>
+        <?= Html::a('Manage rewards', Navigation::url(Navigation::REWARD_INDEX), ['class' => 'btn btn-outline-secondary']) ?>
         <?php if (Yii::$app->user->can('loyalty.adjust')) : ?>
-            <?= Html::a('Adjust points', ['/admin/loyalty/adjust'], ['class' => 'btn btn-primary']) ?>
+            <?= Html::a('Adjust points', Navigation::url(Navigation::LOYALTY_ADJUST), ['class' => 'btn btn-primary']) ?>
         <?php endif; ?>
     </div>
 </div>
@@ -47,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php endforeach; ?>
             </ul>
             <div class="card-body">
-                <?= Html::a('Open loyalty report', ['/reports/loyalty'], ['class' => 'btn btn-outline-primary']) ?>
+                <?= Html::a('Open loyalty report', Navigation::url(Navigation::REPORT_LOYALTY), ['class' => 'btn btn-outline-primary']) ?>
             </div>
         </section>
     </div>
@@ -55,7 +56,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <section class="card cafebara-dashboard-card h-100">
             <div class="card-header d-flex flex-wrap gap-2 justify-content-between align-items-center">
                 <h2 class="h5 mb-0">Recent loyalty activity</h2>
-                <?= Html::a('All transactions', ['/admin/loyalty/transactions'], ['class' => 'link-primary fw-semibold']) ?>
+                <?= Html::a('All transactions', Navigation::url(Navigation::LOYALTY_TRANSACTIONS), ['class' => 'link-primary fw-semibold']) ?>
             </div>
             <div class="card-body p-0 table-responsive">
                 <table class="table table-striped align-middle mb-0 cafebara-data-table">

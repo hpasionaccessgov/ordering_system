@@ -16,7 +16,7 @@ $cartCount = (new ShoppingCart())->summary()['count'];
         . '<span class="badge rounded-pill text-bg-primary cafebara-cart-count'
         . ($cartCount === 0 ? ' d-none' : '') . '" data-cart-count>' . (int) $cartCount . '</span>',
     [
-        'class' => 'btn btn-outline-primary cafebara-cart-button',
+        'class' => 'btn btn-outline-primary cafebara-icon-btn cafebara-cart-button',
         'type' => 'button',
         'data-bs-toggle' => 'offcanvas',
         'data-bs-target' => '#cafebara-cart-offcanvas',

@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\Product;
 use yii\helpers\Html;
 
@@ -19,6 +20,7 @@ $canViewAudit = $canUpdateProducts || $canArchiveProducts || $canDeleteProducts;
 $canFavorite = !Yii::$app->user->isGuest && Yii::$app->user->can('favorite.index');
 $isFavorite = isset($favoriteIds[(int) $product->id]);
 $stockStatus = $product->stockStatus();
+$specialProducts = $product->is_special ? [$product] : [];
 ?>
 
 <article class="card h-100 position-relative product-card product-catalog-card">
@@ -27,6 +29,8 @@ $stockStatus = $product->stockStatus();
             <?= Html::img($product->getImageUrl(), [
                 'class' => 'product-card-image',
                 'alt' => $product->name,
+                'width' => 640,
+                'height' => 480,
                 'loading' => 'lazy',
             ]) ?>
             <?php if ($canViewProduct) : ?>
@@ -42,7 +46,7 @@ $stockStatus = $product->stockStatus();
         <?php endif; ?>
         <?php if ($product->is_special) : ?>
             <span class="badge rounded-pill product-special-badge">
-                <i class="bi bi-lightning-charge-fill me-1" aria-hidden="true"></i>Today’s special
+                <i class="me-1 bi bi-lightning-charge-fill" aria-hidden="true"></i>Today’s special
             </span>
         <?php endif; ?>
         <?php if ($canFavorite) : ?>
@@ -55,7 +59,7 @@ $stockStatus = $product->stockStatus();
                 ['class' => 'product-card-favorite js-favorite'],
             ) ?>
             <?= Html::submitButton('<i class="bi ' . ($isFavorite ? 'bi-heart-fill' : 'bi-heart') . '" aria-hidden="true"></i>', [
-                'class' => 'btn btn-sm btn-light rounded-circle shadow-sm',
+                'class' => 'btn btn-sm btn-outline-danger rounded-circle shadow-sm',
                 'encode' => false,
                 'aria-label' => $favoriteLabel,
                 'aria-pressed' => $isFavorite ? 'true' : 'false',
@@ -67,7 +71,7 @@ $stockStatus = $product->stockStatus();
     </div>
 
     <div class="d-flex flex-column card-body">
-        <div class="mb-2 d-flex flex-wrap gap-2 align-items-center">
+        <div class="d-flex flex-wrap mb-2 gap-2 align-items-center">
             <p class="mb-0 product-category">
                 <?= Html::encode($product->categoryRecord?->name ?? 'Cafébara menu') ?>
             </p>
@@ -78,23 +82,20 @@ $stockStatus = $product->stockStatus();
         <?= $this->render('_rating_stars', [
             'summary' => $ratingSummaries[(int) $product->id] ?? null,
         ]) ?>
-        <h2 class="mb-2 h5">
+        <h3 class="mb-2 h5">
             <?php if ($canViewProduct) : ?>
-                <?= Html::a(Html::encode($product->name), ['/catalog/products/' . $product->id], [
+                <?= Html::a(Html::encode($product->name), Navigation::url(Navigation::PRODUCT_VIEW, ['id' => $product->id]), [
                     'class' => 'stretched-link link-body-emphasis text-decoration-none',
                 ]) ?>
             <?php else : ?>
                 <?= Html::encode($product->name) ?>
             <?php endif; ?>
-        </h2>
+        </h3>
         <p class="mb-3 text-body-secondary small">
             <?= Html::encode($product->description ?? '') ?>
         </p>
         <div class="d-flex mt-auto gap-2 justify-content-between align-items-center">
             <strong class="product-card-price"><?= Yii::$app->formatter->asCurrency($product->price) ?></strong>
-            <?php if ($canViewProduct) : ?>
-                <span class="text-primary fw-semibold small">Click to view details</span>
-            <?php endif; ?>
         </div>
         <?php
         $canAddToCart = Yii::$app->user->isGuest || Yii::$app->user->can('cart.add');
@@ -114,7 +115,7 @@ $stockStatus = $product->stockStatus();
                     ]) ?>
                 </div>
             <?php endif; ?>
-            <?= Html::beginForm(['/cart/add', 'id' => $product->id], 'POST', [
+            <?= Html::beginForm(Navigation::url(Navigation::CART_ADD, ['id' => $product->id]), 'POST', [
                 'class' => 'position-relative z-2 mt-3 js-cart-add',
                 'data-cart-ajax' => '1',
             ]) ?>
@@ -125,41 +126,41 @@ $stockStatus = $product->stockStatus();
         <?php if ($canUpdateProducts || $canArchiveProducts || $canDeleteProducts) : ?>
             <div class="mt-3 position-relative z-2 product-card-actions">
                 <?php if ($canUpdateProducts) : ?>
-                    <?= Html::a('Edit', ['/catalog/products/' . $product->id . '/update'], [
+                    <?= Html::a('Edit', Navigation::url(Navigation::PRODUCT_UPDATE, ['id' => $product->id]), [
                         'class' => 'btn btn-sm btn-primary',
                     ]) ?>
                 <?php endif; ?>
                 <?php if ($canArchiveProducts && $product->isActive()) : ?>
                     <?= Html::beginForm(
-                        ['/product/archive', 'id' => $product->id],
+                        Navigation::url(Navigation::PRODUCT_ARCHIVE, ['id' => $product->id]),
                         'POST',
                         ['class' => 'd-inline'],
                     ) ?>
                     <?= Html::submitButton('Archive', [
-                        'class' => 'btn btn-sm btn-warning',
+                        'class' => 'btn btn-sm btn-outline-secondary',
                         'data-confirm-modal' => 'Archive this product?',
                     ]) ?>
                     <?= Html::endForm() ?>
                 <?php elseif ($canUpdateProducts && !$product->isActive()) : ?>
                     <?= Html::beginForm(
-                        ['/catalog/products/' . $product->id . '/restore'],
+                        Navigation::url(Navigation::PRODUCT_RESTORE, ['id' => $product->id]),
                         'POST',
                         ['class' => 'd-inline'],
                     ) ?>
                     <?= Html::submitButton('Restore', [
-                        'class' => 'btn btn-sm btn-success',
+                        'class' => 'btn btn-sm btn-outline-primary',
                         'data-confirm-modal' => 'Restore this product to the active catalog?',
                     ]) ?>
                     <?= Html::endForm() ?>
                 <?php endif; ?>
                 <?php if ($canDeleteProducts) : ?>
                     <?= Html::beginForm(
-                        ['/catalog/products/' . $product->id . '/delete'],
+                        Navigation::url(Navigation::PRODUCT_DELETE, ['id' => $product->id]),
                         'POST',
                         ['class' => 'd-inline'],
                     ) ?>
                     <?= Html::submitButton('Delete permanently', [
-                        'class' => 'btn btn-sm btn-danger',
+                        'class' => 'btn btn-sm btn-outline-danger',
                         'data-confirm-modal' => 'Permanently delete this product? This cannot be undone.',
                     ]) ?>
                     <?= Html::endForm() ?>

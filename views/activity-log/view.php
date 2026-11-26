@@ -16,7 +16,7 @@ $this->title = 'Activity log #' . $model->id;
     </div>
     <div class="d-flex flex-wrap gap-2">
         <?php if (Yii::$app->user->can('activityLog.index')) : ?>
-            <?= Html::a('Back to activity logs', ['index'], ['class' => 'btn btn-secondary']) ?>
+            <?= Html::a('Back to activity logs', ['index'], ['class' => 'btn btn-outline-secondary']) ?>
         <?php endif; ?>
     </div>
 </div>

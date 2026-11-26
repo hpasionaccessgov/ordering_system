@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use yii\bootstrap5\LinkPager;
 use yii\helpers\Html;
 
@@ -26,7 +27,7 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
                 <h1 class="mb-2 fw-bold display-6">Find your next favorite.</h1>
                 <p class="mb-4">Browse active drinks and bites. Sign in to add items to your cart.</p>
                 <?php if (Yii::$app->user->isGuest) : ?>
-                    <?= Html::a('Sign in to order', ['/site/login'], [
+                    <?= Html::a('Sign in to order', Navigation::url(Navigation::LOGIN), [
                         'class' => 'btn btn-cafebara-light',
                     ]) ?>
                 <?php endif; ?>
@@ -40,7 +41,7 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
         </div>
     </div>
 
-    <?= Html::beginForm(['/site/menu'], 'get', [
+    <?= Html::beginForm(Navigation::url(Navigation::MENU), 'get', [
         'class' => 'catalog-filter p-3 mb-4',
         'role' => 'search',
     ]) ?>
@@ -62,7 +63,7 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
         </div>
         <div class="col-12 col-md-auto d-flex gap-2">
             <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-            <?= Html::a('Clear', ['/site/menu'], ['class' => 'btn btn-outline-secondary']) ?>
+            <?= Html::a('Clear', Navigation::url(Navigation::MENU), ['class' => 'btn btn-outline-secondary']) ?>
         </div>
     </div>
     <?= $this->render('../shared/_listing_filters', [
@@ -78,7 +79,7 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
         <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
     <?php endif; ?>
 
-    <div class="row g-3">
+    <div class="row g-3 mb-4">
         <?php foreach ($dataProvider->getModels() as $product) : ?>
             <div class="col-12 col-sm-6 col-lg-4 col-xxl-3">
                 <?= $this->render('../shared/_product_card', [
@@ -99,7 +100,7 @@ $batchFormId = (!Yii::$app->user->isGuest && Yii::$app->user->can('cart.add'))
                 <span class="cafebara-empty-icon" aria-hidden="true"><i class="bi bi-cup-hot"></i></span>
                 <h2 class="mt-3 h5">No drinks found matching your search.</h2>
                 <p class="mb-3 text-body-secondary">Try another category or search term.</p>
-                <?= Html::a('Browse menu', ['/site/menu'], ['class' => 'btn btn-primary']) ?>
+                <?= Html::a('Browse menu', Navigation::url(Navigation::MENU), ['class' => 'btn btn-primary']) ?>
             </div>
         </div>
     <?php endif; ?>

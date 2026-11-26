@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use app\services\Navigation;
+
 use app\models\Notification;
 use app\models\Order;
 use yii\helpers\Html;
@@ -12,7 +14,7 @@ use yii\helpers\Html;
 /** @var string $category */
 /** @var string $sort */
 ?>
-<?= Html::beginForm(['/notifications'], 'get', [
+<?= Html::beginForm(Navigation::url(Navigation::NOTIFICATIONS), 'get', [
     'class' => 'catalog-filter p-3 mb-4',
     'role' => 'search',
 ]) ?>
@@ -60,6 +62,6 @@ use yii\helpers\Html;
         ]) ?>
     </div>
     <div class="col-auto"><?= Html::submitButton('Apply', ['class' => 'btn btn-primary']) ?></div>
-    <div class="col-auto"><?= Html::a('Clear', ['/notifications'], ['class' => 'btn btn-outline-secondary']) ?></div>
+    <div class="col-auto"><?= Html::a('Clear', Navigation::url(Navigation::NOTIFICATIONS), ['class' => 'btn btn-outline-secondary']) ?></div>
 </div>
 <?= Html::endForm() ?>

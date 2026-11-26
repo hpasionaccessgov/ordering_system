@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\services\Navigation;
+
 use app\models\Category;
 use app\models\CategorySearch;
 use app\models\Product;
@@ -184,7 +186,7 @@ class CategoryController extends Controller
 
     private function getCategoryListReturnRoute(): array
     {
-        return Yii::$app->user->can('category.index') ? ['index'] : ['/dashboard'];
+        return Yii::$app->user->can('category.index') ? ['index'] : Navigation::url(Navigation::DASHBOARD);
     }
 
     /**

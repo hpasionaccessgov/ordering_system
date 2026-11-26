@@ -99,7 +99,7 @@ final class CategoryAccessTest extends Unit
                 [$category, 'create'],
                 [$product, 'create'],
                 [$order, 'create'],
-                [new StaffController('staff', Yii::$app), 'dashboard'],
+                [new StaffController('staff', Yii::$app), 'index'],
             ] as [$controller, $action]) {
                 try {
                     $controller->beforeAction(new Action($action, $controller));

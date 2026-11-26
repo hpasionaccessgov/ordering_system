@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\Notification;
 use app\services\OrderAccessPolicy;
 use app\widgets\ToolTip;
@@ -23,8 +24,8 @@ $notifications = (clone $visibleQuery)
     ->limit(5)
     ->all();
 $canViewNotification = \Yii::$app->user->can('notification.read');
-$url = Json::htmlEncode(Url::to(['/notification/unread-count']));
-$inboxUrl = Url::to(['/notifications']);
+$url = Json::htmlEncode(Url::to(Navigation::url(Navigation::NOTIFICATION_UNREAD_COUNT)));
+$inboxUrl = Url::to(Navigation::url(Navigation::NOTIFICATIONS));
 $this->registerJs(<<<JS
 const notificationLink = document.querySelector('[data-notification-link]');
 const notificationBadge = notificationLink.querySelector('[data-notification-count]');
@@ -96,22 +97,23 @@ JS, View::POS_READY);
             'data-notification-link' => true,
         ],
     ) ?>
-    <ul class="dropdown-menu dropdown-menu-end shadow cafebara-notification-menu">
+    <ul class="dropdown-menu dropdown-menu-end cafebara-notification-menu cafebara-header-menu" data-bs-popper="static">
         <li><span class="dropdown-header text-body-secondary fw-semibold">Unread notifications</span></li>
         <?php foreach ($notifications as $notification) : ?>
             <?php /** @var Notification $notification */ ?>
             <li class="border-bottom border-primary-subtle">
                 <?= Html::a(
-                    Html::tag('span', 'Unread', ['class' => 'badge text-bg-primary me-1'])
+                    Html::tag('i', '', ['class' => 'bi ' . $notification->categoryIconClass . ' me-1', 'aria-hidden' => 'true']) .
+                        Html::tag('span', 'Unread', ['class' => 'badge text-bg-warning me-1'])
                         . Html::tag('span', Html::encode($notification->categoryLabel), ['class' => 'badge ' . $notification->categoryBadgeClass . ' me-1'])
-                        . Html::tag('i', '', ['class' => 'bi ' . $notification->categoryIconClass . ' me-1', 'aria-hidden' => 'true'])
+
                         . Html::tag('span', Html::encode($notification->label), ['class' => 'small'])
                         . Html::tag('span', Html::encode(\Yii::$app->formatter->asDatetime($notification->created_at)), [
                             'class' => 'd-block text-body-secondary small mt-1',
                         ]),
                     $canViewNotification
-                        ? ['/notification/view', 'id' => $notification->id]
-                        : ['/notifications'],
+                        ? Navigation::url(Navigation::NOTIFICATION_READ, ['id' => $notification->id])
+                        : Navigation::url(Navigation::NOTIFICATIONS),
                     [
                         'class' => 'dropdown-item cafebara-notification-item py-2',
                         'data-notification-item' => true,
@@ -123,8 +125,8 @@ JS, View::POS_READY);
             <li><span class="dropdown-item-text text-body-secondary">No unread notifications.</span></li>
         <?php endif; ?>
         <li>
-            <hr class="dropdown-dividier">
+            <hr class="dropdown-divider">
         </li>
-        <li><?= Html::a('View all notifications', ['/notifications'], ['class' => 'dropdown-item cafebara-notification-item']) ?></li>
+        <li><?= Html::a('View all notifications', Navigation::url(Navigation::NOTIFICATIONS), ['class' => 'dropdown-item cafebara-notification-item']) ?></li>
     </ul>
 </div>

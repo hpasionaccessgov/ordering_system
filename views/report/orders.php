@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use app\services\Navigation;
+
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */
@@ -18,7 +20,7 @@ use yii\helpers\Html;
 /** @var list<int> $volumeValues */
 
 $this->title = 'Order report';
-$this->params['breadcrumbs'][] = ['label' => 'Reports', 'url' => ['/reports/sales']];
+$this->params['breadcrumbs'][] = ['label' => 'Reports', 'url' => Navigation::url(Navigation::REPORT_SALES)];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="d-flex flex-wrap gap-3 mb-4 justify-content-between align-items-center">

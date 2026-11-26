@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\Product;
 use yii\helpers\Html;
 
@@ -31,8 +32,8 @@ $isFavorite = isset(($favoriteIds ?? [])[(int) $model->id]);
         <?php if ($canViewProducts) : ?>
             <?= Html::a(
                 'Back to products',
-                ['/catalog/products'],
-                ['class' => 'btn btn-secondary'],
+                Navigation::url(Navigation::PRODUCT_INDEX),
+                ['class' => 'btn btn-outline-secondary'],
             ) ?>
         <?php endif; ?>
     </div>
@@ -68,7 +69,7 @@ $isFavorite = isset(($favoriteIds ?? [])[(int) $model->id]);
                         <?php endif; ?>
                         <?php if ($model->is_special) : ?>
                             <span class="badge rounded-pill text-bg-warning">
-                                <i class="bi bi-lightning-charge me-1" aria-hidden="true"></i>Today’s special
+                                <i class="me-1 bi bi-lightning-charge" aria-hidden="true"></i>Today’s special
                             </span>
                         <?php endif; ?>
                         <?php if ($canManageProducts && !$model->isActive()) : ?>
@@ -105,7 +106,7 @@ $isFavorite = isset(($favoriteIds ?? [])[(int) $model->id]);
                                     </strong>
                                 </div>
                                 <?= Html::beginForm(
-                                    ['/cart/add', 'id' => $model->id],
+                                    Navigation::url(Navigation::CART_ADD, ['id' => $model->id]),
                                     'POST',
                                     ['class' => 'd-flex flex-wrap align-items-end gap-3'],
                                 ) ?>
@@ -137,13 +138,13 @@ $isFavorite = isset(($favoriteIds ?? [])[(int) $model->id]);
                             <?= Html::submitButton(
                                 '<i class="bi ' . ($isFavorite ? 'bi-heart-fill' : 'bi-heart') . ' me-1" aria-hidden="true"></i>'
                                 . ($isFavorite ? 'Remove from favorites' : 'Add to favorites'),
-                                ['class' => 'btn btn-primary', 'encode' => false, 'data-favorite-button' => ''],
+                                ['class' => 'btn btn-outline-danger', 'encode' => false, 'data-favorite-button' => ''],
                             ) ?>
                             <?= Html::endForm() ?>
                         <?php endif; ?>
 
                         <?php if ($canManageProducts) : ?>
-                            <?= Html::a('Edit product', ['/catalog/products/' . $model->id . '/update'], [
+                            <?= Html::a('Edit product', Navigation::url(Navigation::PRODUCT_UPDATE, ['id' => $model->id]), [
                                 'class' => 'btn btn-primary',
                             ]) ?>
                         <?php endif; ?>
@@ -153,12 +154,12 @@ $isFavorite = isset(($favoriteIds ?? [])[(int) $model->id]);
                             && $model->isActive()
                         ) : ?>
                             <?= Html::beginForm(
-                                ['/product/archive', 'id' => $model->id],
+                                Navigation::url(Navigation::PRODUCT_ARCHIVE, ['id' => $model->id]),
                                 'POST',
                                 ['class' => 'd-inline'],
                             ) ?>
                             <?= Html::submitButton('Archive product', [
-                                'class' => 'btn btn-warning',
+                                'class' => 'btn btn-outline-secondary',
                                 'data-confirm-modal' => 'Archive this product?',
                             ]) ?>
                             <?= Html::endForm() ?>
@@ -166,12 +167,12 @@ $isFavorite = isset(($favoriteIds ?? [])[(int) $model->id]);
 
                         <?php if ($canDeleteProducts) : ?>
                             <?= Html::beginForm(
-                                ['/catalog/products/' . $model->id . '/delete'],
+                                Navigation::url(Navigation::PRODUCT_DELETE, ['id' => $model->id]),
                                 'POST',
                                 ['class' => 'd-inline'],
                             ) ?>
                             <?= Html::submitButton('Delete permanently', [
-                                'class' => 'btn btn-danger',
+                                'class' => 'btn btn-outline-danger',
                                 'data-confirm-modal' => 'Permanently delete this product? This cannot be undone.',
                             ]) ?>
                             <?= Html::endForm() ?>

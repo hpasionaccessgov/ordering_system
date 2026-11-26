@@ -28,7 +28,7 @@ $this->title = 'Deactivate account';
                     ->passwordInput()
                     ->label('Confirm your current password') ?>
 
-                <?= Html::submitButton('Deactivate my account', ['class' => 'btn btn-danger']) ?>
+                <?= Html::submitButton('Deactivate my account', ['class' => 'btn btn-outline-danger']) ?>
 
                 <?php AdminActiveForm::end(); ?>
             </div>

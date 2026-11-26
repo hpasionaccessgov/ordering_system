@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\services\Navigation;
+
 use app\exceptions\InsufficientInventoryException;
 use app\models\Order;
 use app\models\Notification;
@@ -155,7 +157,7 @@ class OrderController extends Controller
             }
             Yii::$app->session->setFlash('success', $message);
 
-            return $this->redirect(['/sales/cart']);
+            return $this->redirect(Navigation::url(Navigation::CART_INDEX));
         } catch (BadRequestHttpException $exception) {
             Yii::$app->session->setFlash('error', $exception->getMessage());
 
@@ -189,7 +191,7 @@ class OrderController extends Controller
     public function actionCreate(): Response|string
     {
         if (!$this->canViewAllOrders()) {
-            return $this->redirect(['/sales/cart']);
+            return $this->redirect(Navigation::url(Navigation::CART_INDEX));
         }
 
         $this->layout = 'admin';
@@ -231,7 +233,7 @@ class OrderController extends Controller
         (new ShoppingCart())->add($id, $quantity);
         Yii::$app->session->setFlash('success', 'Product added to your cart.');
 
-        return $this->redirect(['/sales/cart']);
+        return $this->redirect(Navigation::url(Navigation::CART_INDEX));
     }
 
     public function actionUpdate(int $id): Response|string
@@ -358,12 +360,12 @@ class OrderController extends Controller
     private function getOrderReturnRoute(int $id): array|string
     {
         if (Yii::$app->user->can('order.view')) {
-            return ['/sales/orders/' . $id];
+            return Navigation::url(Navigation::ORDER_VIEW, ['id' => $id]);
         }
         if (Yii::$app->user->can('order.index')) {
-            return ['/sales/orders'];
+            return Navigation::url(Navigation::ORDER_INDEX);
         }
 
-        return ['/dashboard'];
+        return Navigation::url(Navigation::DASHBOARD);
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use yii\bootstrap5\LinkPager;
 use yii\helpers\Html;
 
@@ -22,7 +23,7 @@ foreach ($dataProvider->getModels() as $favorite) {
         <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
     </div>
     <?php if (Yii::$app->user->can('product.index')) : ?>
-        <?= Html::a('Browse menu', ['/catalog/products'], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Browse menu', Navigation::url(Navigation::PRODUCT_INDEX), ['class' => 'btn btn-primary']) ?>
     <?php endif; ?>
 </div>
 
@@ -32,7 +33,7 @@ foreach ($dataProvider->getModels() as $favorite) {
             <span class="cafebara-empty-icon" aria-hidden="true"><i class="bi bi-heart"></i></span>
             <h2 class="h5 mt-3">❤ No favorites yet.</h2>
             <p class="mb-3 text-body-secondary">Save your favorite drinks for quick ordering.</p>
-            <?= Html::a('Browse Menu', ['/site/menu'], ['class' => 'btn btn-primary']) ?>
+            <?= Html::a('Browse Menu', Navigation::url(Navigation::MENU), ['class' => 'btn btn-primary']) ?>
         </div>
     </div>
 <?php else : ?>

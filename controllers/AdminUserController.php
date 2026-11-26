@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\services\Navigation;
+
 use app\models\AdminUserCreateForm;
 use app\models\Order;
 use app\models\User;
@@ -334,6 +336,6 @@ class AdminUserController extends Controller
     {
         return Yii::$app->user->can('user.index')
             ? ['list']
-            : ['/dashboard'];
+            : Navigation::url(Navigation::DASHBOARD);
     }
 }

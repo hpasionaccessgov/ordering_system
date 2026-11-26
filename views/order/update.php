@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use yii\helpers\Html;
 
 /** @var app\models\Product[] $products */
@@ -24,7 +25,7 @@ foreach ($model->items as $item) {
     <?= $this->render('_product_selection', [
         'products' => $products,
         'quantities' => $quantities,
-        'formAction' => ['/order/update', 'id' => $model->id],
+        'formAction' => Navigation::url(Navigation::ORDER_UPDATE, ['id' => $model->id]),
         'submitLabel' => 'Save order changes',
     ]) ?>
 </section>

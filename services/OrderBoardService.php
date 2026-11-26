@@ -5,10 +5,17 @@ declare(strict_types=1);
 namespace app\services;
 
 use app\models\Order;
+use yii\db\ActiveQuery;
 use Yii;
 
 final class OrderBoardService
 {
+    public function __construct(
+        private ?int $userId = null,
+        private bool $canViewAllOrders = true,
+    ) {
+    }
+
     /**
      * @return array<string, list<Order>>
      */
@@ -19,9 +26,9 @@ final class OrderBoardService
             $columns[$status] = [];
         }
 
-        $orders = Order::find()
+        $orders = $this->scope(Order::find())
             ->with(['user', 'items'])
-            ->where(['status' => $this->activeStatuses()])
+            ->andWhere(['status' => $this->activeStatuses()])
             ->orderBy(['created_at' => SORT_ASC, 'id' => SORT_ASC])
             ->all();
 
@@ -41,9 +48,9 @@ final class OrderBoardService
     public function statusCounts(): array
     {
         $counts = array_fill_keys($this->activeStatuses(), 0);
-        $rows = Order::find()
+        $rows = $this->scope(Order::find())
             ->select(['status', 'count' => 'COUNT(*)'])
-            ->where(['status' => $this->activeStatuses()])
+            ->andWhere(['status' => $this->activeStatuses()])
             ->groupBy(['status'])
             ->asArray()
             ->all();
@@ -60,12 +67,12 @@ final class OrderBoardService
     public function completedToday(): int
     {
         if (!$this->hasTimingColumns()) {
-            return (int) Order::find()->where(['status' => Order::STATUS_COMPLETED])->count();
+            return (int) $this->scope(Order::find())->andWhere(['status' => Order::STATUS_COMPLETED])->count();
         }
         [$from, $to] = $this->todayRange();
 
-        return (int) Order::find()
-            ->where(['status' => Order::STATUS_COMPLETED])
+        return (int) $this->scope(Order::find())
+            ->andWhere(['status' => Order::STATUS_COMPLETED])
             ->andWhere(['between', 'completed_at', $from, $to])
             ->count();
     }
@@ -76,9 +83,9 @@ final class OrderBoardService
             return null;
         }
         [$from, $to] = $this->todayRange();
-        $rows = Order::find()
+        $rows = $this->scope(Order::find())
             ->select(['processing_at', 'confirmed_at', 'ready_at', 'completed_at'])
-            ->where(['status' => Order::STATUS_COMPLETED])
+            ->andWhere(['status' => Order::STATUS_COMPLETED])
             ->andWhere(['between', 'completed_at', $from, $to])
             ->andWhere([
                 'or',
@@ -109,6 +116,15 @@ final class OrderBoardService
         }
 
         return round(($total / $count) / 60, 1);
+    }
+
+    private function scope(ActiveQuery $query): ActiveQuery
+    {
+        if ($this->userId === null || $this->canViewAllOrders) {
+            return $query;
+        }
+
+        return OrderAccessPolicy::scopeToOwner($query, $this->userId, false);
     }
 
     private function hasTimingColumns(): bool

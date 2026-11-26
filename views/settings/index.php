@@ -34,8 +34,6 @@ $canUpdate = Yii::$app->user->can('settings.update');
                 <div class="col-md-6"><?= $form->field($model, $field)->input('number', $options) ?></div>
             <?php endforeach ?>
         </div>
-        <p class="text-body-secondary small">Inactive users must sign in again, even when Remember me is selected.</p>
-        <p class="text-body-secondary small">Expired activity logs are permanently deleted during app use, checked daily. Changing the retention period can trigger an earlier cleanup. Order history is not deleted.</p>
         <h2 class="mt-3 h5">Notifications</h2>
         <div class="row">
             <div class="col-md-6"><?= $form->field($model, 'notifications_expiration_days')->input('number', [

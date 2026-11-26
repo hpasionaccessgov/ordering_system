@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\Inventory;
 use app\services\InventoryService;
 use yii\helpers\Html;
@@ -19,6 +20,6 @@ if ($lowStockItems === []) {
                 <li><?= Html::encode(InventoryService::lowStockMessage($item)) ?></li>
             <?php endforeach; ?>
         </ul>
-        <?= Html::a('Review inventory', ['/sales/inventory'], ['class' => 'alert-link']) ?>
+        <?= Html::a('Review inventory', Navigation::url(Navigation::INVENTORY_INDEX), ['class' => 'alert-link']) ?>
     </div>
 </div>

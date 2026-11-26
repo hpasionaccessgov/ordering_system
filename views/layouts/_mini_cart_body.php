@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use app\services\Navigation;
 use app\services\ShoppingCart;
 use yii\helpers\Html;
 
@@ -23,7 +24,7 @@ $canRemove = Yii::$app->user->can('cart.remove');
         <span class="cafebara-empty-icon" aria-hidden="true"><i class="bi bi-cup-hot"></i></span>
         <h2 class="mt-3 h5">Your cart is waiting for its first drink.</h2>
         <p class="mb-3 text-body-secondary">Browse our menu to get started.</p>
-        <?= Html::a('Browse Menu', ['/site/menu'], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Browse Menu', Navigation::url(Navigation::PRODUCT_INDEX), ['class' => 'btn btn-primary']) ?>
     </div>
 <?php else : ?>
     <?php foreach ($summary['lines'] as $line) : ?>
@@ -51,7 +52,7 @@ $canRemove = Yii::$app->user->can('cart.remove');
                 </p>
                 <div class="d-flex gap-2 mt-2 align-items-center">
                     <?php if ($canUpdate) : ?>
-                        <?= Html::beginForm(['/cart/update', 'id' => $product->id], 'POST', [
+                        <?= Html::beginForm(Navigation::url(Navigation::CART_UPDATE_QUANTITY, ['id' => $product->id]), 'POST', [
                             'class' => 'd-flex gap-2 align-items-center',
                             'data-cart-ajax' => '1',
                         ]) ?>
@@ -76,7 +77,7 @@ $canRemove = Yii::$app->user->can('cart.remove');
                         <span class="cafebara-cart-qty">Qty <?= (int) $line['quantity'] ?></span>
                     <?php endif; ?>
                     <?php if ($canRemove) : ?>
-                        <?= Html::beginForm(['/cart/remove', 'id' => $product->id], 'POST', [
+                        <?= Html::beginForm(Navigation::url(Navigation::CART_REMOVE, ['id' => $product->id]), 'POST', [
                             'data-cart-ajax' => '1',
                         ]) ?>
                         <?= Html::submitButton('<i class="bi bi-trash3" aria-hidden="true"></i>', [
@@ -96,9 +97,9 @@ $canRemove = Yii::$app->user->can('cart.remove');
         <strong><?= Yii::$app->formatter->asCurrency($summary['total']) ?></strong>
     </div>
     <div class="d-grid gap-2">
-        <?= Html::a('View Cart', ['/sales/cart'], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('View Cart', Navigation::url(Navigation::CART_INDEX), ['class' => 'btn btn-outline-secondary']) ?>
         <?php if (Yii::$app->user->can('cart.checkout')) : ?>
-            <?= Html::a('Checkout', ['/sales/cart/checkout'], ['class' => 'btn btn-secondary']) ?>
+            <?= Html::a('Checkout', Navigation::url(Navigation::CART_CHECKOUT), ['class' => 'btn btn-primary']) ?>
         <?php endif; ?>
     </div>
 <?php endif; ?>

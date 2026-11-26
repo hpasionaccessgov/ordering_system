@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */
@@ -18,8 +19,8 @@ $this->params['breadcrumbs'][] = 'Update';
     </div>
     <?= Html::a(
         Yii::$app->user->can('category.index') ? 'Back to categories' : 'Back to dashboard',
-        Yii::$app->user->can('category.index') ? ['index'] : ['/dashboard'],
-        ['class' => 'btn btn-secondary'],
+        Yii::$app->user->can('category.index') ? ['index'] : Navigation::url(Navigation::DASHBOARD),
+        ['class' => 'btn btn-outline-secondary'],
     ) ?>
 </div>
 

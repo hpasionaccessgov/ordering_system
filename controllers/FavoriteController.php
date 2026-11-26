@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\services\Navigation;
+
 use app\models\ApplicationSettings;
 use app\models\Favorite;
 use app\services\FavoriteService;
@@ -96,6 +98,6 @@ final class FavoriteController extends Controller
             && str_starts_with($referrer, '/')
             && !str_starts_with($referrer, '//')
             ? $referrer
-            : ['/sales/favorites'];
+            : Navigation::url(Navigation::FAVORITE_INDEX);
     }
 }

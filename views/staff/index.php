@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 /** @var yii\web\View $this */
 /** @var int $pendingOrderCount */
 /** @var int $processingOrderCount */
@@ -31,10 +32,10 @@ $avgPrep = $averagePreparationMinutes !== null ? $averagePreparationMinutes . ' 
             <p class="mb-3">Keep the menu current and move customer orders through service.</p>
             <div class="d-flex flex-wrap gap-2">
                 <?php if (Yii::$app->user->can('order.board')) : ?>
-                    <?= Html::a('Kitchen board', ['/sales/kitchen-board'], ['class' => 'btn btn-cafebara-light']) ?>
+                    <?= Html::a('Kitchen board', Navigation::url(Navigation::KITCHEN_BOARD), ['class' => 'btn btn-cafebara-light']) ?>
                 <?php endif; ?>
                 <?php if (Yii::$app->user->can('order.index')) : ?>
-                    <?= Html::a('Process orders', ['/sales/orders'], ['class' => 'btn btn-cafebara-outline-light']) ?>
+                    <?= Html::a('Process orders', Navigation::url(Navigation::ORDER_INDEX), ['class' => 'btn btn-cafebara-outline-light']) ?>
                 <?php endif; ?>
             </div>
         </div>
@@ -79,3 +80,10 @@ $avgPrep = $averagePreparationMinutes !== null ? $averagePreparationMinutes . ' 
         ]) ?>
     </div>
 </div>
+
+<?= $this->render('../shared/_dashboard_showcase', [
+    'featuredProducts' => $featuredProducts ?? [],
+    'favoriteIds' => $favoriteIds ?? [],
+    'ratingSummaries' => $ratingSummaries ?? [],
+    'bestSellers' => $bestSellers ?? [],
+]) ?>

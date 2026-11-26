@@ -1,6 +1,7 @@
 <?php
 
 use app\models\ActivityLog;
+use app\services\Navigation;
 use app\widgets\AdminGridView;
 use yii\helpers\Html;
 
@@ -13,7 +14,7 @@ $this->title = 'Activity logs';
     <p class="mb-1 text-uppercase fw-semibold text-body-secondary small">Administration</p>
     <h1 class="mb-0 h3"><?= Html::encode($this->title) ?></h1>
 </div>
-<?= Html::beginForm(['/admin/activity'], 'get', ['class' => 'd-flex gap-2 mb-3', 'role' => 'search']) ?>
+<?= Html::beginForm(Navigation::url(Navigation::ADMIN_ACTIVITY), 'get', ['class' => 'd-flex gap-2 mb-3', 'role' => 'search']) ?>
 <?= Html::label('Event', 'activity-event', ['class' => 'visually-hidden']) ?>
 <?= Html::dropDownList('event', $event, ['' => 'All events'] + ActivityLog::eventLabels(), [
     'id' => 'activity-event',

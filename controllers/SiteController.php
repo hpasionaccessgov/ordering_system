@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\services\Navigation;
+
 use Yii;
 use app\models\ApplicationSettings;
 use app\models\ContactForm;
@@ -309,15 +311,15 @@ class SiteController extends Controller
         $this->layout = 'admin';
 
         if (Yii::$app->user->can('admin.access')) {
-            return $this->redirect(['/admin/dashboard']);
+            return $this->redirect(Navigation::url(Navigation::ADMIN_DASHBOARD));
         }
 
         if (Yii::$app->user->can('staff.access')) {
-            return $this->redirect(['/staff/dashboard']);
+            return $this->redirect(Navigation::url(Navigation::STAFF_DASHBOARD));
         }
 
         if (Yii::$app->user->can('customer.access')) {
-            return $this->redirect(['/customer/dashboard']);
+            return $this->redirect(Navigation::url(Navigation::CUSTOMER_DASHBOARD));
         }
 
         Yii::$app->session->setFlash(
@@ -325,7 +327,7 @@ class SiteController extends Controller
             'No dashboard is enabled for your account. Ask an administrator to assign your role and dashboard permission.',
         );
 
-        return $this->redirect(['/site/index']);
+        return $this->redirect(Navigation::url(Navigation::HOME));
     }
 
     /**

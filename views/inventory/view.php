@@ -25,12 +25,12 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php if (Yii::$app->user->can('inventory.delete')) : ?>
             <?= Html::beginForm(['delete', 'id' => $model->id], 'POST', ['class' => 'd-inline']) ?>
             <?= Html::submitButton('Delete', [
-                'class' => 'btn btn-danger',
+                'class' => 'btn btn-outline-danger',
                 'data-confirm-modal' => 'Delete this item? Items with stock history cannot be deleted.',
             ]) ?>
             <?= Html::endForm() ?>
         <?php endif; ?>
-        <?= Html::a('Back', ['index'], ['class' => 'btn btn-secondary']) ?>
+        <?= Html::a('Back', ['index'], ['class' => 'btn btn-outline-secondary']) ?>
     </div>
 </div>
 

@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\Inventory;
 use yii\helpers\Html;
 
@@ -7,7 +8,7 @@ use yii\helpers\Html;
 
 $sort = Yii::$app->request->get('sort');
 ?>
-<?= Html::beginForm(['/sales/inventory'], 'get', ['class' => 'catalog-filter p-3 mb-4', 'role' => 'search']) ?>
+<?= Html::beginForm(Navigation::url(Navigation::INVENTORY_INDEX), 'get', ['class' => 'catalog-filter p-3 mb-4', 'role' => 'search']) ?>
 <div class="row g-2">
     <div class="col-12 col-md">
         <?= Html::input('search', 'q', is_string($model->q) ? $model->q : '', [
@@ -26,7 +27,7 @@ $sort = Yii::$app->request->get('sort');
         <?= Html::hiddenInput('sort', $sort) ?>
     <?php endif; ?>
     <div class="col-auto"><?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?></div>
-    <div class="col-auto"><?= Html::a('Clear', ['/sales/inventory'], ['class' => 'btn btn-outline-secondary']) ?></div>
+    <div class="col-auto"><?= Html::a('Clear', Navigation::url(Navigation::INVENTORY_INDEX), ['class' => 'btn btn-outline-secondary']) ?></div>
 </div>
 <?= Html::errorSummary($model, ['class' => 'alert alert-danger mt-2']) ?>
 <?= $this->render('../shared/_listing_filters', [

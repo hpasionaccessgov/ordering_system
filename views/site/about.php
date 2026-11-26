@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 /** @var yii\web\View $this */
 
 use yii\helpers\Html;
@@ -21,10 +22,10 @@ $this->params['meta_keywords'] = 'yii, yii2, about, php, framework';
                         placing orders, and keeping track of every order's progress.
                     </p>
                     <div class="d-flex flex-wrap gap-2">
-                        <!-- <?= Html::a('Browse the menu', ['/catalog/products'], [
+                        <!-- <?= Html::a('Browse the menu', Navigation::url(Navigation::PRODUCT_INDEX), [
                             'class' => 'btn btn-cafebara-light',
                         ]) ?> -->
-                        <?= Html::a('Get in touch', ['/site/contact'], [
+                        <?= Html::a('Get in touch', Navigation::url(Navigation::CONTACT), [
                             'class' => 'btn btn-cafebara-light',
                         ]) ?>
                     </div>

@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\Product;
 use yii\helpers\Html;
 
@@ -111,7 +112,7 @@ JS);
                     </p>
                     <h2 class="h5">
                         <?php if ($canViewProduct) : ?>
-                            <?= Html::a(Html::encode($product->name), ['/catalog/products/' . $product->id], [
+                            <?= Html::a(Html::encode($product->name), Navigation::url(Navigation::PRODUCT_VIEW, ['id' => $product->id]), [
                                 'class' => 'stretched-link link-body-emphasis text-decoration-none',
                             ]) ?>
                         <?php else : ?>

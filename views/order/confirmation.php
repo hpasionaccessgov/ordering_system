@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\Order;
 use yii\helpers\Html;
 
@@ -18,12 +19,12 @@ $this->title = 'Order confirmation';
             </p>
             <strong class="fs-4"><?= Yii::$app->formatter->asCurrency($model->total_amount) ?></strong>
             <div class="d-flex flex-wrap gap-2 mt-4 justify-content-center">
-                <?= Html::a('View order', ['/sales/orders/' . $model->id], [
+                <?= Html::a('View order', Navigation::url(Navigation::ORDER_VIEW, ['id' => $model->id]), [
                     'class' => 'btn btn-primary',
                 ]) ?>
                 <?php if (Yii::$app->user->can('order.index')) : ?>
-                    <?= Html::a('Order history', ['/sales/orders'], [
-                        'class' => 'btn btn-secondary',
+                    <?= Html::a('Order history', Navigation::url(Navigation::ORDER_INDEX), [
+                        'class' => 'btn btn-outline-secondary',
                     ]) ?>
                 <?php endif; ?>
             </div>

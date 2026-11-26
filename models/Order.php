@@ -183,16 +183,31 @@ class Order extends ActiveRecord
         return max(0, (int) floor(($now - $createdAt) / 60));
     }
 
+    public function queueElapsedSeconds(?int $now = null): ?int
+    {
+        $confirmedAt = $this->hasAttribute('confirmed_at') && $this->confirmed_at !== null
+            ? (int) $this->confirmed_at
+            : null;
+        if ($confirmedAt === null) {
+            return null;
+        }
+
+        return max(0, ($now ?? time()) - $confirmedAt);
+    }
+
     public function priorityLevel(?int $now = null): string
     {
         if (!$this->isActiveForBoard()) {
             return 'normal';
         }
-        $age = $this->ageMinutes($now);
-        if ($age >= self::PRIORITY_CRITICAL_MINUTES) {
+        $seconds = $this->queueElapsedSeconds($now);
+        if ($seconds === null) {
+            return 'normal';
+        }
+        if ($seconds >= self::PRIORITY_CRITICAL_MINUTES * 60) {
             return 'critical';
         }
-        if ($age >= self::PRIORITY_WARNING_MINUTES) {
+        if ($seconds >= self::PRIORITY_WARNING_MINUTES * 60) {
             return 'warning';
         }
 

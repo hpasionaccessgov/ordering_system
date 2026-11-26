@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use yii\helpers\Html;
 
 /** @var array<int, string> $categories */
@@ -9,7 +10,7 @@ use yii\helpers\Html;
 /** @var \app\models\ListingFilters $filters */
 
 ?>
-<?= Html::beginForm(['/catalog/products'], 'get', ['class' => 'catalog-filter p-3 mb-4', 'role' => 'search']) ?>
+<?= Html::beginForm(Navigation::url(Navigation::PRODUCT_INDEX), 'get', ['class' => 'catalog-filter p-3 mb-4', 'role' => 'search']) ?>
 <div class="row g-2">
     <div class="col-12 col-md-3">
         <?= Html::input('search', 'q', $search, [
@@ -43,7 +44,7 @@ use yii\helpers\Html;
     <div class="col-12 col-md-1">
         <?= Html::submitButton('Filter', ['class' => 'btn btn-primary w-100']) ?>
     </div>
-    <div class="col-auto"><?= Html::a('Clear', ['/catalog/products'], ['class' => 'btn btn-outline-secondary']) ?></div>
+    <div class="col-auto"><?= Html::a('Clear', Navigation::url(Navigation::PRODUCT_INDEX), ['class' => 'btn btn-outline-secondary']) ?></div>
 </div>
 <?= $this->render('../shared/_listing_filters', [
     'filters' => $filters,

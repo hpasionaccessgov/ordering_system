@@ -32,10 +32,10 @@ final class CustomerDashboardAccessTest extends Unit
         Yii::$app->request->setScriptUrl('/index.php');
 
         $site = Yii::createObject(SiteController::class, ['site', Yii::$app]);
-        self::assertStringContainsString('customer%2Fdashboard', $site->actionDashboard()->headers->get('Location'));
+        self::assertStringContainsString('customer%2Findex', $site->actionDashboard()->headers->get('Location'));
         $customer = new CustomerController('customer', Yii::$app);
         Yii::$app->controller = $customer;
-        self::assertTrue($customer->beforeAction(new Action('dashboard', $customer)));
-        self::assertStringContainsString('Dashboard Customer', $customer->actionDashboard());
+        self::assertTrue($customer->beforeAction(new Action('index', $customer)));
+        self::assertStringContainsString('Dashboard Customer', $customer->actionIndex());
     }
 }

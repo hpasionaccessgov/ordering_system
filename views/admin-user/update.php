@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\User;
 use app\widgets\AdminActiveForm;
 use yii\helpers\Html;
@@ -21,8 +22,8 @@ $this->title = 'Edit user details';
                 </p>
             </div>
             <?php if (Yii::$app->user->can('user.index')) : ?>
-                <?= Html::a('Back to user list', ['/admin/users'], [
-                    'class' => 'btn btn-secondary',
+                <?= Html::a('Back to user list', Navigation::url(Navigation::ADMIN_USER_INDEX), [
+                    'class' => 'btn btn-outline-secondary',
                 ]) ?>
             <?php endif; ?>
         </div>
@@ -59,8 +60,8 @@ $this->title = 'Edit user details';
                 <div class="d-flex flex-wrap gap-2 mt-4">
                     <?= Html::submitButton('Save changes', ['class' => 'btn btn-primary']) ?>
                     <?php if (Yii::$app->user->can('user.index')) : ?>
-                        <?= Html::a('Cancel', ['/admin/users'], [
-                            'class' => 'btn btn-secondary',
+                        <?= Html::a('Cancel', Navigation::url(Navigation::ADMIN_USER_INDEX), [
+                            'class' => 'btn btn-outline-secondary',
                         ]) ?>
                     <?php endif; ?>
                 </div>

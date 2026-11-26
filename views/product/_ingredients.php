@@ -91,7 +91,7 @@ JS);
                                 ) ?>
                             </td>
                             <td>
-                                <button type="button" class="btn btn-danger btn-sm" data-remove-ingredient aria-label="Remove ingredient">
+                                <button type="button" class="btn btn-outline-danger btn-sm" data-remove-ingredient aria-label="Remove ingredient">
                                     <i class="bi bi-trash" aria-hidden="true"></i>
                                 </button>
                             </td>
@@ -115,7 +115,7 @@ JS);
                     <?= Html::input('number', 'ingredients[__INDEX__][quantity_required]', 1, $quantityOptions) ?>
                 </td>
                 <td>
-                    <button type="button" class="btn btn-danger btn-sm" data-remove-ingredient aria-label="Remove ingredient">
+                    <button type="button" class="btn btn-outline-danger btn-sm" data-remove-ingredient aria-label="Remove ingredient">
                         <i class="bi bi-trash" aria-hidden="true"></i>
                     </button>
                 </td>

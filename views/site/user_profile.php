@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\ProfileForm;
 use app\models\User;
 use app\widgets\AdminActiveForm;
@@ -18,7 +19,7 @@ $this->title = 'My Profile';
             <section class="card admin-panel mb-4">
                 <div class="card-header d-flex flex-wrap gap-2 justify-content-between align-items-center">
                     <h2 class="h5 mb-0">Loyalty snapshot</h2>
-                    <?= Html::a('My rewards', ['/loyalty/index'], ['class' => 'btn btn-outline-primary btn-sm']) ?>
+                    <?= Html::a('My rewards', Navigation::url(Navigation::REWARDS), ['class' => 'btn btn-outline-primary btn-sm']) ?>
                 </div>
                 <div class="card-body">
                     <div class="row g-3 text-center">
@@ -83,12 +84,12 @@ $this->title = 'My Profile';
             </div>
 
             <div class="d-flex flex-wrap gap-2 card-body">
-                <?= Html::a('Change password', ['/profile/change-password'], ['class' => 'btn btn-primary']) ?>
+                <?= Html::a('Change password', Navigation::url(Navigation::CHANGE_PASSWORD), ['class' => 'btn btn-primary']) ?>
 
-                <?= Html::a('Deactivate account', ['/profile/deactivate'], ['class' => 'btn btn-danger']) ?>
+                <?= Html::a('Deactivate account', Navigation::url(Navigation::DEACTIVATE), ['class' => 'btn btn-outline-danger']) ?>
 
-                <?= Html::beginForm(['/site/logout'], 'POST', ['class' => 'd-inline']) ?>
-                <?= Html::submitButton('Logout', ['class' => 'btn btn-warning']) ?>
+                <?= Html::beginForm(Navigation::url(Navigation::LOGOUT), 'POST', ['class' => 'd-inline']) ?>
+                <?= Html::submitButton('Logout', ['class' => 'btn btn-outline-secondary']) ?>
                 <?= Html::endForm() ?>
             </div>
         </div>

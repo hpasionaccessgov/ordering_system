@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\models\Product;
+use app\services\Navigation;
 use app\services\ReviewService;
 use Yii;
 use yii\filters\AccessControl;
@@ -53,6 +54,6 @@ final class ProductReviewController extends Controller
         );
         Yii::$app->session->setFlash('success', 'Thank you for your review.');
 
-        return $this->redirect(['/catalog/products/' . $id]);
+        return $this->redirect(Navigation::url(Navigation::PRODUCT_VIEW, ['id' => $id]));
     }
 }

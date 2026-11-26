@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\RoleForm;
 use app\models\User;
 use app\services\RbacPermissionPolicy;
@@ -268,7 +269,7 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
     <div class="card-body">
         <h2 class="h5">Create role</h2>
         <?php $form = AdminActiveForm::begin([
-            'action' => ['/admin/roles/create'],
+            'action' => Navigation::url(Navigation::ADMIN_ROLE_CREATE),
             'method' => 'POST',
             'options' => ['class' => 'row g-2'],
         ]); ?>
@@ -323,7 +324,7 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
             'class' => 'btn btn-primary ms-auto',
         ]) ?>
     </div>
-    <?= Html::beginForm(['/admin/roles/update-matrix'], 'POST', [
+    <?= Html::beginForm(Navigation::url(Navigation::ADMIN_ROLE_UPDATE_MATRIX), 'POST', [
         'id' => 'role-matrix-form',
         'data-role-matrix-form' => 'true',
     ]) ?>
@@ -395,7 +396,7 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
                             <?php if (!$isBuiltIn) : ?>
                                 <?= Html::submitButton('Delete role', [
                                     'form' => 'delete-role-' . $role->name,
-                                    'class' => 'btn btn-sm btn-danger',
+                                    'class' => 'btn btn-sm btn-outline-danger',
                                     'data-confirm-modal' => 'Delete this role?',
                                 ]) ?>
                             <?php endif; ?>
@@ -467,7 +468,7 @@ $auditName = static fn(?int $id): string => $id === null ? '—' : ($auditNames[
 
 <?php foreach ($roleList as $role) : ?>
     <?php if (!in_array($role->name, $builtInRoles, true)) : ?>
-        <?= Html::beginForm(['/admin/roles/' . $role->name . '/delete'], 'POST', [
+        <?= Html::beginForm(Navigation::url(Navigation::ADMIN_ROLE_DELETE, ['name' => $role->name]), 'POST', [
             'id' => 'delete-role-' . $role->name,
         ]) ?>
         <?= Html::endForm() ?>

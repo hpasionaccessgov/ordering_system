@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace app\controllers;
 
+use app\services\Navigation;
+
+
 use app\models\LoyaltyPointTransaction;
 use app\models\Reward;
 use app\services\LoyaltyService;
@@ -77,6 +80,6 @@ class LoyaltyController extends Controller
             Yii::$app->session->setFlash('error', $exception->getMessage());
         }
 
-        return $this->redirect(['/loyalty/index']);
+        return $this->redirect(Navigation::url(Navigation::REWARDS));
     }
 }

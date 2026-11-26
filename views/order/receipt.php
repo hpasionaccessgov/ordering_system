@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\Order;
 use yii\helpers\Html;
 
@@ -12,8 +13,8 @@ $this->title = "Receipt for {$model->order_number}";
     <div class="d-flex flex-wrap gap-2 mb-4 justify-content-between receipt-actions">
         <?= Html::a(
             'Back to order',
-            ['/sales/orders/' . $model->id],
-            ['class' => 'btn btn-secondary'],
+            Navigation::url(Navigation::ORDER_VIEW, ['id' => $model->id]),
+            ['class' => 'btn btn-outline-secondary'],
         ) ?>
         <?= Html::button('Print receipt', [
             'class' => 'btn btn-primary',

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use app\services\Navigation;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
@@ -14,7 +15,7 @@ if (!Yii::$app->user->can('cart.index')) {
     tabindex="-1"
     id="cafebara-cart-offcanvas"
     aria-labelledby="cafebara-cart-title"
-    data-cart-summary-url="<?= Html::encode(Url::to(['/cart/summary'])) ?>"
+    data-cart-summary-url="<?= Html::encode(Url::to(Navigation::url(Navigation::CART_SUMMARY))) ?>"
 >
     <div class="offcanvas-header">
         <h2 class="offcanvas-title h5" id="cafebara-cart-title">Your cart</h2>

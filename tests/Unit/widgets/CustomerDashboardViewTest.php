@@ -21,7 +21,7 @@ final class CustomerDashboardViewTest extends Unit
         $user->method('can')->willReturn(false);
         Yii::$app->set('user', $user);
 
-        $html = (new View())->renderFile(Yii::getAlias('@app/views/customer/dashboard.php'), [
+        $html = (new View())->renderFile(Yii::getAlias('@app/views/customer/index.php'), [
             'featuredDataProvider' => null,
             'orderCount' => 0,
         ]);

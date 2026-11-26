@@ -1,5 +1,6 @@
 <?php
 
+use app\services\Navigation;
 use app\models\User;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
@@ -26,13 +27,13 @@ $statusLabels = [
             Yii::$app->user->can('user.update')
             && Yii::$app->user->can('user.view')
         ) : ?>
-            <?= Html::a('Edit account', ['/admin/users/' . $model->id . '/update'], [
+            <?= Html::a('Edit account', Navigation::url(Navigation::ADMIN_USER_UPDATE, ['id' => $model->id]), [
                 'class' => 'btn btn-primary',
             ]) ?>
         <?php endif; ?>
         <?php if (Yii::$app->user->can('user.index')) : ?>
-            <?= Html::a('Back to user list', ['/admin/users'], [
-                'class' => 'btn btn-secondary',
+            <?= Html::a('Back to user list', Navigation::url(Navigation::ADMIN_USER_INDEX), [
+                'class' => 'btn btn-outline-secondary',
             ]) ?>
         <?php endif; ?>
     </div>
