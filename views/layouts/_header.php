@@ -7,6 +7,17 @@ use app\services\Navigation;
 use app\services\LoyaltyService;
 use yii\helpers\Html;
 
+$canAccessDashboard = Yii::$app->user->can('admin.access')
+    || Yii::$app->user->can('staff.access')
+    || Yii::$app->user->can('customer.access');
+$brandRoute = match (true) {
+    Yii::$app->user->can('admin.access') => Navigation::url(Navigation::ADMIN_DASHBOARD),
+    Yii::$app->user->can('staff.access') => Navigation::url(Navigation::STAFF_DASHBOARD),
+    Yii::$app->user->can('customer.access') => Navigation::url(Navigation::CUSTOMER_DASHBOARD),
+    default => Navigation::url(Navigation::HOME),
+};
+$brandLabel = $canAccessDashboard ? 'Cafébara dashboard' : 'Cafébara home';
+
 $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
     'alt' => '',
     'class' => 'cafebara-brand-logo',
@@ -21,9 +32,9 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
 ?>
 <nav class="navbar navbar-expand-md bg-body app-header" aria-label="Main navigation">
     <div class="container-fluid flex-wrap flex-md-nowrap">
-        <?= Html::a($brand, Navigation::url(Navigation::HOME), [
+        <?= Html::a($brand, $brandRoute, [
             'class' => 'navbar-brand cafebara-admin-brand cafebara-brand-lockup d-flex align-items-center gap-2',
-            'aria-label' => 'Cafébara home',
+            'aria-label' => $brandLabel,
         ]) ?>
 
         <ul class="flex-row gap-1 ms-md-0 navbar-nav align-items-center ms-auto">
@@ -98,7 +109,7 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                             <ul class="dropdown-menu dropdown-menu-end cafebara-header-menu" data-bs-popper="static">
                                 <li>
                                     <span class="dropdown-header text-body-secondary">
-                                        <i class="bi bi-gift me-2" aria-hidden="true"></i>Your loyalty snapshot
+                                        <i class="me-2 bi bi-gift" aria-hidden="true"></i>Your loyalty snapshot
                                     </span>
                                 </li>
                                 <?php foreach (
@@ -110,7 +121,7 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                                     ] as $label => $value
                                 ): ?>
                                     <li class="border-bottom border-primary-subtle">
-                                        <span class="dropdown-item-text d-flex justify-content-between gap-3 small">
+                                        <span class="d-flex gap-3 dropdown-item-text justify-content-between small">
                                             <span class="text-body-secondary"><?= Html::encode($label) ?></span>
                                             <span class="fw-semibold text-end"><?= Html::encode($value) ?></span>
                                         </span>

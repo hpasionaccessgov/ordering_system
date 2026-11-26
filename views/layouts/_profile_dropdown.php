@@ -13,7 +13,7 @@ $username = Yii::$app->user->identity?->username ?? 'Account';
 <div class="dropdown">
     <?= Html::button(
         Html::tag('i', '', ['class' => 'bi bi-person-circle', 'aria-hidden' => 'true'])
-            . Html::tag('span', Html::encode($username), ['class' => 'cafebara-btn-label d-none d-md-inline']),
+            . Html::tag('span', Html::encode($username), ['class' => 'cafebara-btn-label d-none d-md-inline fw-bold']),
         [
             'class' => $class . ' dropdown-toggle cafebara-icon-btn',
             'type' => 'button',
@@ -27,9 +27,9 @@ $username = Yii::$app->user->identity?->username ?? 'Account';
     <ul class="dropdown-menu dropdown-menu-end cafebara-account-menu cafebara-header-menu" data-bs-popper="static">
         <li>
             <div class="d-flex gap-2 dropdown-header align-items-center">
-                <span class="fs-5 bi bi-person-circle" aria-hidden="true"></span>
+                <span class="fs-6 text-primary bi bi-person-circle" aria-hidden="true"></span>
                 <span class="text-truncate">
-                    <span class="fw-semibold"><?= Html::encode($username) ?></span>
+                    <span class="fw-bold text-primary"><?= Html::encode($username) ?></span>
                     <span class="d-block text-body-secondary small">Your account</span>
                 </span>
             </div>

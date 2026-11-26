@@ -195,8 +195,8 @@ $navGroups = [
                 'alt' => 'Cafébara',
                 'class' => 'cafebara-sidebar-logo',
             ]) . '<span class="brand-text">' . Html::encode(Yii::$app->name) . '</span>',
-            $dashboardRoute,
-            ['class' => 'brand-link d-flex align-items-center gap-2'],
+            Navigation::url(Navigation::HOME),
+            ['class' => 'brand-link d-flex align-items-center gap-2', 'aria-label' => 'Cafébara home'],
         ) ?>
     </div>
 

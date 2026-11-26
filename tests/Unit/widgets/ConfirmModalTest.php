@@ -17,5 +17,7 @@ final class ConfirmModalTest extends Unit
         self::assertStringContainsString('data-confirm-modal-message', $renderingResult);
         self::assertStringContainsString('data-confirm-modal-accept', $renderingResult);
         self::assertStringContainsString('aria-labelledby=', $renderingResult);
+        self::assertStringContainsString('btn btn-outline-secondary', $renderingResult);
+        self::assertStringNotContainsString('btn btn-secondary', $renderingResult);
     }
 }

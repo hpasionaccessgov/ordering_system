@@ -78,7 +78,7 @@ $confirmedAt = $order->hasAttribute('confirmed_at') && $order->confirmed_at !== 
 
     <div class="kitchen-ticket-actions">
         <?php if ($canView) : ?>
-            <?= Html::a('View', Navigation::url(Navigation::ORDER_VIEW, ['id' => $order->id]), ['class' => 'btn btn-sm btn-outline-secondary']) ?>
+            <?= Html::a('View order', Navigation::url(Navigation::ORDER_VIEW, ['id' => $order->id]), ['class' => 'btn btn-sm btn-outline-primary']) ?>
         <?php endif; ?>
         <?php if (Yii::$app->user->can('order.process') && $nextStatus !== null) : ?>
             <?= Html::beginForm(Navigation::url(Navigation::ORDER_PROCESS, ['id' => $order->id]), 'post', ['class' => 'd-inline']) ?>

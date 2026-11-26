@@ -38,7 +38,7 @@ final class ConfirmModal extends Widget
                 'div',
                 Html::button('Cancel', [
                     'type' => 'button',
-                    'class' => 'btn btn-secondary',
+                    'class' => 'btn btn-outline-secondary',
                     'data-bs-dismiss' => 'modal',
                 ]) . Html::button('Confirm', [
                     'type' => 'button',

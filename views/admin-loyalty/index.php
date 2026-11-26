@@ -37,11 +37,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="row g-4 mb-4">
     <div class="col-12 col-lg-5">
-        <section class="card cafebara-dashboard-card h-100">
-            <div class="card-header"><h2 class="h5 mb-0">Tier distribution</h2></div>
+        <section class="card h-100 cafebara-dashboard-card">
+            <div class="card-header"><h2 class="mb-0 h5">Tier distribution</h2></div>
             <ul class="list-group list-group-flush">
                 <?php foreach ($tiers as $tier) : ?>
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <li class="d-flex list-group-item justify-content-between align-items-center">
                         <?= $this->render('../shared/_loyalty_badge', ['tier' => $tier['tier']]) ?>
                         <span class="fw-semibold"><?= Yii::$app->formatter->asInteger($tier['members']) ?> members</span>
                     </li>
@@ -53,17 +53,17 @@ $this->params['breadcrumbs'][] = $this->title;
         </section>
     </div>
     <div class="col-12 col-lg-7">
-        <section class="card cafebara-dashboard-card h-100">
-            <div class="card-header d-flex flex-wrap gap-2 justify-content-between align-items-center">
-                <h2 class="h5 mb-0">Recent loyalty activity</h2>
-                <?= Html::a('All transactions', Navigation::url(Navigation::LOYALTY_TRANSACTIONS), ['class' => 'link-primary fw-semibold']) ?>
+        <section class="card h-100 cafebara-dashboard-card">
+            <div class="d-flex flex-wrap gap-2 card-header justify-content-between align-items-center">
+                <h2 class="mb-0 h5">Recent loyalty activity</h2>
+                <?= Html::a('All transactions', Navigation::url(Navigation::LOYALTY_TRANSACTIONS), ['class' => 'link-primary fw-semibold ms-auto']) ?>
             </div>
-            <div class="card-body p-0 table-responsive">
-                <table class="table table-striped align-middle mb-0 cafebara-data-table">
+            <div class="p-0 card-body table-responsive">
+                <table class="mb-0 table table-striped align-middle cafebara-data-table">
                     <thead><tr><th>Customer</th><th>Activity</th><th>Points</th><th>Date</th></tr></thead>
                     <tbody>
                         <?php if ($recentTransactions === []) : ?>
-                            <tr><td colspan="4" class="text-center text-body-secondary py-4">No loyalty activity yet.</td></tr>
+                            <tr><td colspan="4" class="py-4 text-center text-body-secondary">No loyalty activity yet.</td></tr>
                         <?php else : ?>
                             <?php foreach ($recentTransactions as $transaction) : ?>
                                 <tr>
@@ -81,6 +81,6 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 
-<p class="text-body-secondary small mb-0">
+<p class="mb-0 text-body-secondary small">
     Tier thresholds: Bronze 0–99, Silver 100–499, Gold 500+ lifetime earned points. Manual adjustments do not change tier.
 </p>
