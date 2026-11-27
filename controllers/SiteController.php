@@ -140,6 +140,7 @@ class SiteController extends Controller
             'pagination' => false,
             'sort' => false,
         ]);
+        $featuredProducts = $featuredDataProvider->getModels();
         $specialProducts = Product::find()
             ->with(['categoryRecord', 'productIngredients.inventory'])
             ->where([
@@ -152,10 +153,11 @@ class SiteController extends Controller
 
         return $this->render('index', [
             'featuredDataProvider' => $featuredDataProvider,
+            'featuredProducts' => $featuredProducts,
             'specialProducts' => $specialProducts,
             'favoriteIds' => $this->favoriteIds(),
             'ratingSummaries' => ReviewService::summaries(array_values(array_unique(array_merge(
-                $this->productIds($featuredDataProvider->getModels()),
+                $this->productIds($featuredProducts),
                 $this->productIds($specialProducts),
             )))),
             'bestSellers' => (new ProductReportService())->bestSellers(5),

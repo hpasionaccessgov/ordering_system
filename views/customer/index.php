@@ -2,7 +2,8 @@
 
 use app\services\Navigation;
 /** @var yii\web\View $this */
-/** @var yii\data\ActiveDataProvider $featuredDataProvider */
+/** @var list<app\models\Product> $featuredProducts */
+/** @var list<app\models\Product> $specialProducts */
 /** @var int $orderCount */
 /** @var float $totalSpent */
 /** @var int $favoriteCount */
@@ -16,14 +17,10 @@ use app\services\Navigation;
 
 use app\models\Order;
 use app\models\User;
-use yii\bootstrap5\LinkPager;
 use yii\helpers\Html;
 
 $this->title = 'Customer dashboard';
 $batchFormId = Yii::$app->user->can('cart.add') ? 'customer-batch-cart' : null;
-$showFeaturedShowcase = Yii::$app->user->can('product.view')
-    && $featuredDataProvider !== null
-    && $featuredDataProvider->getTotalCount() > 0;
 $identity = Yii::$app->user->identity;
 $displayName = $identity instanceof User
     ? ($identity->full_name ?: $identity->username)
@@ -165,7 +162,7 @@ $loyalty = $loyalty ?? ['current' => 0, 'lifetimeEarned' => 0, 'lifetimeRedeemed
                                 . '<small class="text-body-secondary">'
                                 . Html::encode(Yii::$app->formatter->asDatetime($notification->created_at))
                                 . '</small></span></div>',
-                            Navigation::url(Navigation::NOTIFICATION_READ, ['id' => $notification->id]),
+                            Navigation::url(Navigation::NOTIFICATION_VIEW, ['id' => $notification->id]),
                             ['class' => 'list-group-item list-group-item-action'],
                         ) ?>
                     <?php endforeach; ?>
@@ -179,7 +176,7 @@ $loyalty = $loyalty ?? ['current' => 0, 'lifetimeEarned' => 0, 'lifetimeRedeemed
     <section class="mb-4 card cafebara-dashboard-card">
         <div class="d-flex flex-nowrap gap-2 card-header justify-content-between align-items-center">
             <h2 class="mb-0 h5">Your loyalty journey</h2>
-            <?= Html::a('Open My Rewards', Navigation::url(Navigation::REWARDS), ['class' => 'btn btn-outline-primary btn-sm']) ?>
+            <?= Html::a('Open My Rewards', Navigation::url(Navigation::REWARDS), ['class' => 'btn btn-outline-primary btn-sm ms-auto']) ?>
         </div>
         <div class="card-body">
             <div class="row g-3 align-items-center text-center">
@@ -215,45 +212,16 @@ $loyalty = $loyalty ?? ['current' => 0, 'lifetimeEarned' => 0, 'lifetimeRedeemed
 <?php endif; ?>
 
 <div class="row g-4">
-    <?php if ($showFeaturedShowcase) : ?>
-        <div class="col-12 col-xl-8">
-            <section class="card h-100 cafebara-dashboard-card">
-                <div class="d-flex flex-nowrap gap-3 ms-1 card-header justify-content-between align-items-center">
-                    <h2 class="mb-0 h5">Featured drinks and bites</h2>
-                    <?php if (Yii::$app->user->can('product.index')) : ?>
-                        <?= Html::a('Browse Menu', Navigation::url(Navigation::PRODUCT_INDEX), ['class' => 'btn btn-primary btn-sm ms-auto']) ?>
-                    <?php endif; ?>
-                </div>
-                <div class="card-body">
-                    <?php if ($batchFormId !== null && $featuredDataProvider->getCount() > 0) : ?>
-                        <?= $this->render('../shared/_batch_cart', ['batchFormId' => $batchFormId]) ?>
-                    <?php endif; ?>
-                    <div class="row g-3">
-                        <?php foreach ($featuredDataProvider->getModels() as $product) : ?>
-                            <div class="col-12 col-sm-6 col-xl-4">
-                                <?= $this->render('../shared/_product_card', [
-                                    'product' => $product,
-                                    'batchFormId' => $batchFormId,
-                                    'favoriteIds' => $favoriteIds ?? [],
-                                    'ratingSummaries' => $ratingSummaries ?? [],
-                                ]) ?>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <?php if ($featuredDataProvider->pagination->getPageCount() > 1) : ?>
-                        <div class="d-flex mt-4 justify-content-center">
-                            <?= LinkPager::widget([
-                                'pagination' => $featuredDataProvider->pagination,
-                                'prevPageLabel' => 'Previous',
-                                'nextPageLabel' => 'Next',
-                            ]) ?>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </section>
-        </div>
-    <?php endif; ?>
-    <div class="col-12 d-flex flex-column <?= $showFeaturedShowcase ? 'col-xl-4' : '' ?>">
+    <div class="col-12 col-xl-8">
+        <?= $this->render('../shared/_product_highlights', [
+            'featuredProducts' => $featuredProducts ?? [],
+            'specialProducts' => $specialProducts ?? [],
+            'batchFormId' => $batchFormId,
+            'favoriteIds' => $favoriteIds ?? [],
+            'ratingSummaries' => $ratingSummaries ?? [],
+        ]) ?>
+    </div>
+    <div class="col-12 col-xl-4 d-flex flex-column">
         <?= $this->render('../shared/_best_sellers', ['bestSellers' => $bestSellers ?? []]) ?>
     </div>
 </div>

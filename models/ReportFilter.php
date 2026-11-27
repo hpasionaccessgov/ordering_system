@@ -16,11 +16,33 @@ final class ReportFilter extends Model
 {
     public const PRESETS = ['today', 'week', 'month', 'year', 'custom'];
 
-    public string $preset = 'today';
+    public string $preset = 'week';
     public string $from = '';
     public string $to = '';
     public string $status = '';
-    public ?int $customerId = null;
+    private ?int $customerId = null;
+
+    public function attributes(): array
+    {
+        return array_merge(parent::attributes(), ['customerId']);
+    }
+
+    public function getCustomerId(): ?int
+    {
+        return $this->customerId;
+    }
+
+    public function setCustomerId(mixed $value): void
+    {
+        if ($value === null || $value === '') {
+            $this->customerId = null;
+
+            return;
+        }
+
+        $id = is_int($value) ? $value : (is_string($value) && ctype_digit($value) ? (int) $value : 0);
+        $this->customerId = $id > 0 ? $id : null;
+    }
 
     public function rules(): array
     {
@@ -67,7 +89,7 @@ final class ReportFilter extends Model
     {
         [$from, $to] = $this->range();
 
-        return max(1, (int) round(($to - $from) / 86400) + 1);
+        return max(1, intdiv($to - $from, 86400) + 1);
     }
 
     public function label(): string

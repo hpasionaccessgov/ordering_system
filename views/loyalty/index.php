@@ -55,16 +55,16 @@ $progress = max(0, min(100, $progress));
             </div>
         </div>
         <div class="col-md-5">
-            <div class="p-3 rounded-4 bg-light text-dark">
-                <div class="d-flex justify-content-between small fw-semibold">
+            <div class="p-3 rounded-4 bg-body-tertiary">
+                <div class="d-flex justify-content-between fw-semibold text-body-emphasis small">
                     <span><?= Html::encode(LoyaltyService::tierLabel($summary['tier'])) ?> tier</span>
-                    <span><?= Html::encode($nextTier) ?></span>
+                    <span>Next tier: <?= Html::encode($nextTier) ?></span>
                 </div>
-                <div class="progress mt-2" role="progressbar" aria-label="Progress to next tier"
-                     aria-valuenow="<?= $progress ?>" aria-valuemin="0" aria-valuemax="100">
+                <div class="mt-2 progress" role="progressbar" aria-label="Progress to next tier"
+                    aria-valuenow="<?= $progress ?>" aria-valuemin="0" aria-valuemax="100">
                     <div class="progress-bar bg-primary" style="width: <?= $progress ?>%"></div>
                 </div>
-                <p class="mt-2 mb-0 small text-body-secondary">
+                <p class="mt-2 mb-0 text-body-secondary small">
                     <?= $remaining > 0
                         ? Html::encode($remaining . ' more earned point' . ($remaining === 1 ? '' : 's') . ' to reach ' . $nextTier . '.')
                         : 'You reached the highest tier. Enjoy your perks!' ?>
@@ -95,16 +95,16 @@ $progress = max(0, min(100, $progress));
             <?php foreach ($rewards as $reward) : ?>
                 <?php $canRedeem = $summary['current'] >= (int) $reward->point_cost; ?>
                 <div class="col-12 col-sm-6 col-xl-4">
-                    <section class="card cafebara-dashboard-card h-100">
-                        <div class="card-body d-flex flex-column">
-                            <div class="d-flex justify-content-between align-items-start gap-2">
+                    <section class="card h-100 cafebara-dashboard-card">
+                        <div class="d-flex flex-column card-body">
+                            <div class="d-flex gap-2 justify-content-between align-items-start">
                                 <span class="d-inline-flex align-items-center justify-content-center rounded-3 cafebara-dashboard-icon cafebara-reward-icon">
                                     <i class="bi bi-gift" aria-hidden="true"></i>
                                 </span>
                                 <span class="badge text-bg-primary"><?= Yii::$app->formatter->asInteger($reward->point_cost) ?> pts</span>
                             </div>
-                            <h3 class="h5 mt-3 mb-1"><?= Html::encode($reward->name) ?></h3>
-                            <p class="text-body-secondary small flex-grow-1"><?= Html::encode($reward->description ?: 'A little something for your next visit.') ?></p>
+                            <h3 class="mt-3 mb-1 h5"><?= Html::encode($reward->name) ?></h3>
+                            <p class="flex-grow-1 text-body-secondary small"><?= Html::encode($reward->description ?: 'A little something for your next visit.') ?></p>
                             <?php if ($canRedeem) : ?>
                                 <?= Html::beginForm(Navigation::url(Navigation::REWARD_REDEEM, ['id' => $reward->id]), 'POST', ['class' => 'mt-3']) ?>
                                 <?= Html::submitButton('Redeem now', [
@@ -113,7 +113,7 @@ $progress = max(0, min(100, $progress));
                                 ]) ?>
                                 <?= Html::endForm() ?>
                             <?php else : ?>
-                                <button class="btn btn-outline-secondary w-100 mt-3" type="button" disabled>
+                                <button class="mt-3 btn btn-outline-secondary w-100" type="button" disabled>
                                     Need <?= Yii::$app->formatter->asInteger((int) $reward->point_cost - $summary['current']) ?> more points
                                 </button>
                             <?php endif; ?>
@@ -127,16 +127,24 @@ $progress = max(0, min(100, $progress));
 
 <div class="row g-4">
     <div class="col-12 col-xl-6">
-        <section class="card cafebara-dashboard-card h-100">
+        <section class="card h-100 cafebara-dashboard-card">
             <div class="card-header">
-                <h2 class="h5 mb-0">Reward history</h2>
+                <h2 class="mb-0 h5">Reward history</h2>
             </div>
-            <div class="card-body p-0 table-responsive">
-                <table class="table table-striped align-middle mb-0 cafebara-data-table">
-                    <thead><tr><th>Reward</th><th>Points</th><th>Date</th></tr></thead>
+            <div class="p-0 card-body table-responsive">
+                <table class="mb-0 table table-striped align-middle cafebara-data-table">
+                    <thead>
+                        <tr>
+                            <th>Reward</th>
+                            <th>Points</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         <?php if ($redemptionHistory === []) : ?>
-                            <tr><td colspan="3" class="text-center text-body-secondary py-4">No rewards redeemed yet.</td></tr>
+                            <tr>
+                                <td colspan="3" class="py-4 text-center text-body-secondary">No rewards redeemed yet.</td>
+                            </tr>
                         <?php else : ?>
                             <?php foreach ($redemptionHistory as $transaction) : ?>
                                 <tr>
@@ -152,16 +160,24 @@ $progress = max(0, min(100, $progress));
         </section>
     </div>
     <div class="col-12 col-xl-6">
-        <section class="card cafebara-dashboard-card h-100">
+        <section class="card h-100 cafebara-dashboard-card">
             <div class="card-header">
-                <h2 class="h5 mb-0">Recent point activity</h2>
+                <h2 class="mb-0 h5">Recent point activity</h2>
             </div>
-            <div class="card-body p-0 table-responsive">
-                <table class="table table-striped align-middle mb-0 cafebara-data-table">
-                    <thead><tr><th>Activity</th><th>Points</th><th>Date</th></tr></thead>
+            <div class="p-0 card-body table-responsive">
+                <table class="mb-0 table table-striped align-middle cafebara-data-table">
+                    <thead>
+                        <tr>
+                            <th>Activity</th>
+                            <th>Points</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         <?php if ($recentTransactions === []) : ?>
-                            <tr><td colspan="3" class="text-center text-body-secondary py-4">Complete an order to start earning points.</td></tr>
+                            <tr>
+                                <td colspan="3" class="py-4 text-center text-body-secondary">Complete an order to start earning points.</td>
+                            </tr>
                         <?php else : ?>
                             <?php foreach ($recentTransactions as $transaction) : ?>
                                 <tr>

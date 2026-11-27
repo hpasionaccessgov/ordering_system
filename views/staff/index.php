@@ -81,9 +81,16 @@ $avgPrep = $averagePreparationMinutes !== null ? $averagePreparationMinutes . ' 
     </div>
 </div>
 
-<?= $this->render('../shared/_dashboard_showcase', [
-    'featuredProducts' => $featuredProducts ?? [],
-    'favoriteIds' => $favoriteIds ?? [],
-    'ratingSummaries' => $ratingSummaries ?? [],
-    'bestSellers' => $bestSellers ?? [],
-]) ?>
+<div class="row g-4">
+    <div class="col-12 col-xl-8">
+        <?= $this->render('../shared/_product_highlights', [
+            'featuredProducts' => $featuredProducts ?? [],
+            'specialProducts' => $specialProducts ?? [],
+            'favoriteIds' => $favoriteIds ?? [],
+            'ratingSummaries' => $ratingSummaries ?? [],
+        ]) ?>
+    </div>
+    <div class="col-12 col-xl-4 d-flex flex-column">
+        <?= $this->render('../shared/_best_sellers', ['bestSellers' => $bestSellers ?? []]) ?>
+    </div>
+</div>

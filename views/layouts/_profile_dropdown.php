@@ -26,8 +26,8 @@ $username = Yii::$app->user->identity?->username ?? 'Account';
     ) ?>
     <ul class="dropdown-menu dropdown-menu-end cafebara-account-menu cafebara-header-menu" data-bs-popper="static">
         <li>
-            <div class="d-flex gap-2 dropdown-header align-items-center">
-                <span class="fs-6 text-primary bi bi-person-circle" aria-hidden="true"></span>
+            <div class="d-flex gap-2 dropdown-header">
+                <span class="fs-6 text-primary align-items-center bi bi-person-circle" aria-hidden="true"></span>
                 <span class="text-truncate">
                     <span class="fw-bold text-primary"><?= Html::encode($username) ?></span>
                     <span class="d-block text-body-secondary small">Your account</span>

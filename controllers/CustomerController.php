@@ -50,9 +50,17 @@ class CustomerController extends Controller
             'sort' => false,
         ]);
         $featuredProducts = $featuredDataProvider->getModels();
+        $specialProducts = Product::find()
+            ->with(['categoryRecord', 'productIngredients.inventory'])
+            ->where(['status' => Product::STATUS_ACTIVE, 'is_special' => true])
+            ->orderBy(['name' => SORT_ASC])
+            ->limit(8)
+            ->all();
 
         return $this->render('index', [
             'featuredDataProvider' => $featuredDataProvider,
+            'featuredProducts' => $featuredProducts,
+            'specialProducts' => $specialProducts,
             'orderCount' => (int) Order::find()
                 ->where(['user_id' => $userId])
                 ->count(),
@@ -72,10 +80,10 @@ class CustomerController extends Controller
                 ->limit(5)
                 ->all(),
             'loyalty' => LoyaltyService::summary($userId),
-            'ratingSummaries' => ReviewService::summaries(array_map(
-                static fn(Product $product): int => (int) $product->id,
-                $featuredProducts,
-            )),
+            'ratingSummaries' => ReviewService::summaries(array_values(array_unique(array_merge(
+                array_map(static fn(Product $product): int => (int) $product->id, $featuredProducts),
+                array_map(static fn(Product $product): int => (int) $product->id, $specialProducts),
+            )))),
             'bestSellers' => (new ProductReportService())->bestSellers(5),
         ]);
     }

@@ -54,7 +54,6 @@ final class Navigation
     public const CART_REMOVE = 'cart.remove';
     public const CART_CHECKOUT = 'cart.checkout';
     public const FAVORITE_INDEX = 'favorite.index';
-    public const FAVORITE_TOGGLE = 'favorite.toggle';
     public const FAVORITE_ADD = 'favorite.add';
     public const FAVORITE_REMOVE = 'favorite.remove';
     public const INVENTORY_INDEX = 'inventory.index';
@@ -62,7 +61,6 @@ final class Navigation
     public const INVENTORY_VIEW = 'inventory.view';
     public const INVENTORY_UPDATE = 'inventory.update';
     public const INVENTORY_DELETE = 'inventory.delete';
-    public const INVENTORY_ADJUST = 'inventory.adjust';
 
     public const REWARDS = 'loyalty.index';
     public const REWARD_REDEEM = 'loyalty.redeem';
@@ -81,7 +79,6 @@ final class Navigation
     public const REPORT_ORDERS = 'report.orders';
     public const REPORT_INVENTORY = 'report.inventory';
     public const REPORT_LOYALTY = 'report.loyalty';
-    public const REPORT_EXPORT = 'report.export';
     public const REPORT_EXPORT_INDEX = 'report.export.index';
 
     public const ADMIN_DASHBOARD = 'admin.dashboard';
@@ -108,6 +105,7 @@ final class Navigation
     public const NOTIFICATION_UNREAD_COUNT = 'notification.unread-count';
     public const NOTIFICATION_READ_ALL = 'notification.read-all';
     public const NOTIFICATION_READ = 'notification.read';
+    public const NOTIFICATION_VIEW = 'notification.view';
     public const NOTIFICATION_DELETE = 'notification.delete';
     public const REVIEW_CREATE = 'product-review.create';
     public const SESSION_STATUS = 'session.status';
@@ -156,11 +154,10 @@ final class Navigation
         self::CART_SUMMARY => ['route' => 'cart/summary', 'pattern' => null],
         self::CART_ADD => ['route' => 'cart/add', 'pattern' => 'sales/cart/add'],
         self::CART_ADD_BATCH => ['route' => 'cart/add-batch', 'pattern' => 'cart/add-batch'],
-        self::CART_UPDATE_QUANTITY => ['route' => 'cart/update-quantity', 'pattern' => 'sales/cart/update-quantity'],
+        self::CART_UPDATE_QUANTITY => ['route' => 'cart/update', 'pattern' => 'sales/cart/update/<id:\d+>'],
         self::CART_REMOVE => ['route' => 'cart/remove', 'pattern' => 'sales/cart/remove'],
         self::CART_CHECKOUT => ['route' => 'cart/checkout', 'pattern' => 'sales/cart/checkout'],
         self::FAVORITE_INDEX => ['route' => 'favorite/index', 'pattern' => 'sales/favorites'],
-        self::FAVORITE_TOGGLE => ['route' => 'favorite/toggle', 'pattern' => 'sales/favorites/toggle'],
         self::FAVORITE_ADD => ['route' => 'favorite/add', 'pattern' => null],
         self::FAVORITE_REMOVE => ['route' => 'favorite/remove', 'pattern' => null],
         self::INVENTORY_INDEX => ['route' => 'inventory/index', 'pattern' => 'sales/inventory'],
@@ -168,7 +165,6 @@ final class Navigation
         self::INVENTORY_VIEW => ['route' => 'inventory/view', 'pattern' => 'sales/inventory/<id:\d+>'],
         self::INVENTORY_UPDATE => ['route' => 'inventory/update', 'pattern' => 'sales/inventory/<id:\d+>/update'],
         self::INVENTORY_DELETE => ['route' => 'inventory/delete', 'pattern' => 'sales/inventory/<id:\d+>/delete'],
-        self::INVENTORY_ADJUST => ['route' => 'inventory/adjust', 'pattern' => 'sales/inventory/<id:\d+>/adjust'],
 
         self::REWARDS => ['route' => 'loyalty/index', 'pattern' => 'rewards'],
         self::REWARD_REDEEM => ['route' => 'loyalty/redeem', 'pattern' => 'rewards/<id:\d+>/redeem'],
@@ -187,7 +183,6 @@ final class Navigation
         self::REPORT_ORDERS => ['route' => 'report/orders', 'pattern' => 'reports/orders'],
         self::REPORT_INVENTORY => ['route' => 'report/inventory', 'pattern' => 'reports/inventory'],
         self::REPORT_LOYALTY => ['route' => 'report/loyalty', 'pattern' => 'reports/loyalty'],
-        self::REPORT_EXPORT => ['route' => 'report/export', 'pattern' => 'reports/export/<type:[\w-]+>'],
         self::REPORT_EXPORT_INDEX => ['route' => 'report/export', 'pattern' => 'reports/export'],
 
         self::ADMIN_DASHBOARD => ['route' => 'admin/index', 'pattern' => 'admin/dashboard'],
@@ -214,6 +209,7 @@ final class Navigation
         self::NOTIFICATION_UNREAD_COUNT => ['route' => 'notification/unread-count', 'pattern' => null],
         self::NOTIFICATION_READ_ALL => ['route' => 'notification/read-all', 'pattern' => 'notifications/read-all'],
         self::NOTIFICATION_READ => ['route' => 'notification/read', 'pattern' => 'notifications/<id:\d+>/read'],
+        self::NOTIFICATION_VIEW => ['route' => 'notification/view', 'pattern' => null],
         self::NOTIFICATION_DELETE => ['route' => 'notification/delete', 'pattern' => 'notifications/<id:\d+>/delete'],
         self::REVIEW_CREATE => ['route' => 'product-review/create', 'pattern' => 'reviews/create'],
         self::SESSION_STATUS => ['route' => 'session/status', 'pattern' => null],

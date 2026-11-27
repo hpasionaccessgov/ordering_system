@@ -17,6 +17,11 @@ $brandRoute = match (true) {
     default => Navigation::url(Navigation::HOME),
 };
 $brandLabel = $canAccessDashboard ? 'Cafébara dashboard' : 'Cafébara home';
+$isCustomer = Yii::$app->user->can('customer.access')
+    && !Yii::$app->user->can('staff.access')
+    && !Yii::$app->user->can('admin.access');
+$showHeaderRewards = ($isCustomer || Yii::$app->user->can('admin.access'))
+    && Yii::$app->user->can('loyalty.view');
 
 $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
     'alt' => '',
@@ -78,14 +83,14 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                         ) ?>
                     </li>
                 <?php else: ?>
-                    <?php if (Yii::$app->user->can('loyalty.view')): ?>
+                    <li class="nav-item">
+                        <?= $this->render('_theme_toggle') ?>
+                    </li>
+                    <li class="nav-item">
+                        <?= $this->render('_cart_button') ?>
+                    </li>
+                    <?php if ($showHeaderRewards): ?>
                         <?php $loyalty = LoyaltyService::summary((int) Yii::$app->user->id); ?>
-                        <li class="nav-item">
-                            <?= $this->render('_theme_toggle') ?>
-                        </li>
-                        <li class="nav-item">
-                            <?= $this->render('_cart_button') ?>
-                        </li>
                         <li class="nav-item dropdown">
                             <?= Html::button(
                                 Html::tag('i', '', ['class' => 'bi bi-gift', 'aria-hidden' => 'true'])

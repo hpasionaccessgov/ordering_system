@@ -43,7 +43,13 @@ class StaffController extends Controller
             ->with(['categoryRecord', 'productIngredients.inventory'])
             ->where(['status' => Product::STATUS_ACTIVE, 'is_featured' => true])
             ->orderBy(['name' => SORT_ASC])
-            ->limit(6)
+            ->limit(8)
+            ->all();
+        $specialProducts = Product::find()
+            ->with(['categoryRecord', 'productIngredients.inventory'])
+            ->where(['status' => Product::STATUS_ACTIVE, 'is_special' => true])
+            ->orderBy(['name' => SORT_ASC])
+            ->limit(8)
             ->all();
 
         return $this->render('index', [
@@ -56,11 +62,12 @@ class StaffController extends Controller
             'lowStockItems' => Inventory::find()->lowStock()->orderBy(['current_stock' => SORT_ASC])->all(),
             'orderStatusCounts' => $statusCounts,
             'featuredProducts' => $featuredProducts,
+            'specialProducts' => $specialProducts,
             'favoriteIds' => FavoriteService::ids($userId),
-            'ratingSummaries' => ReviewService::summaries(array_map(
-                static fn(Product $product): int => (int) $product->id,
-                $featuredProducts,
-            )),
+            'ratingSummaries' => ReviewService::summaries(array_values(array_unique(array_merge(
+                array_map(static fn(Product $product): int => (int) $product->id, $featuredProducts),
+                array_map(static fn(Product $product): int => (int) $product->id, $specialProducts),
+            )))),
             'bestSellers' => (new ProductReportService())->bestSellers(5),
         ]);
     }

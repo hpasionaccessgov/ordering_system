@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -39,6 +40,10 @@ class InventoryTransaction extends ActiveRecord
     public function behaviors(): array
     {
         return [
+            [
+                'class' => BlameableBehavior::class,
+                'createdByAttribute' => false,
+            ],
             [
                 'class' => TimestampBehavior::class,
                 'updatedAtAttribute' => false,

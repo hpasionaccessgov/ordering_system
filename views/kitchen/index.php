@@ -94,7 +94,7 @@ JS, View::POS_READY);
                         </h2>
                         <span class="kitchen-rail-count"><?= $count ?> <span class="visually-hidden">tickets</span></span>
                     </header>
-                    <div class="kitchen-rail-body">
+                    <div class="kitchen-rail-body" tabindex="0" aria-label="<?= Html::encode($meta['label']) ?> tickets, scrollable">
                         <?php foreach ($columns[$status] ?? [] as $order) : ?>
                             <?= $this->render('_order_card', ['order' => $order]) ?>
                         <?php endforeach; ?>

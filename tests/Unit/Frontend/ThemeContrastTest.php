@@ -34,4 +34,34 @@ final class ThemeContrastTest extends Unit
             $this->css,
         );
     }
+
+    public function testDarkThemeOverridesBrownTextOnThemedSurfaces(): void
+    {
+        self::assertMatchesRegularExpression(
+            '/\[data-bs-theme="dark"\] \.product-card-price,[\s\S]*?\[data-bs-theme="dark"\] \.password-toggle-button:hover\s*\{\s*color:\s*var\(--cafebara-cream\)/',
+            $this->css,
+        );
+        self::assertMatchesRegularExpression(
+            '/\[data-bs-theme="dark"\] \.app-content-header h1\s*\{\s*color:\s*var\(--bs-body-color\)/',
+            $this->css,
+        );
+    }
+
+    public function testLoyaltyProgressPanelUsesThemeAwareSurface(): void
+    {
+        $view = (string) file_get_contents(dirname(__DIR__, 3) . '/views/loyalty/index.php');
+
+        self::assertStringContainsString('bg-body-tertiary', $view);
+        self::assertStringNotContainsString('bg-light text-dark', $view);
+    }
+
+    public function testReportChartsReadBodyColorToken(): void
+    {
+        $view = (string) file_get_contents(dirname(__DIR__, 3) . '/views/report/_chart.php');
+
+        self::assertStringContainsString(
+            'Chart.defaults.color=getComputedStyle(document.documentElement).getPropertyValue("--bs-body-color")',
+            $view,
+        );
+    }
 }

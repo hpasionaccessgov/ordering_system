@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 
@@ -30,7 +31,7 @@ class Reward extends ActiveRecord
 
     public function behaviors(): array
     {
-        return [TimestampBehavior::class];
+        return [BlameableBehavior::class, TimestampBehavior::class];
     }
 
     public function rules(): array

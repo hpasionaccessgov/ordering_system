@@ -90,7 +90,7 @@ $navGroups = [
             [
                 'label' => 'My rewards',
                 'icon' => 'bi-stars',
-                'visible' => $can('loyalty.view'),
+                'visible' => ($isCustomer || $can('admin.access')) && $can('loyalty.view'),
                 'route' => Navigation::url(Navigation::REWARDS),
                 'active' => str_starts_with($currentRoute, 'loyalty/'),
             ],
@@ -194,7 +194,7 @@ $navGroups = [
             Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                 'alt' => 'Cafébara',
                 'class' => 'cafebara-sidebar-logo',
-            ]) . '<span class="brand-text">' . Html::encode(Yii::$app->name) . '</span>',
+            ]) . '<span class="brand-text font-monospace">' . Html::encode(Yii::$app->name) . ' Home</span>',
             Navigation::url(Navigation::HOME),
             ['class' => 'brand-link d-flex align-items-center gap-2', 'aria-label' => 'Cafébara home'],
         ) ?>

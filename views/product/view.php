@@ -31,7 +31,7 @@ $isFavorite = isset(($favoriteIds ?? [])[(int) $model->id]);
         </div>
         <?php if ($canViewProducts) : ?>
             <?= Html::a(
-                'Back to products',
+                'Back to menu',
                 Navigation::url(Navigation::PRODUCT_INDEX),
                 ['class' => 'btn btn-outline-secondary'],
             ) ?>

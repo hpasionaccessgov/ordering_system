@@ -26,6 +26,7 @@ final class CustomerDashboardViewTest extends Unit
             'orderCount' => 0,
         ]);
 
-        self::assertStringNotContainsString('Featured drinks and bites', $html);
+        self::assertStringNotContainsString('Featured drinks & bites', $html);
+        self::assertStringNotContainsString('Today’s specials', $html);
     }
 }

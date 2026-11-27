@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use yii\behaviors\BlameableBehavior;
 use yii\db\ActiveRecord;
 
 /**
@@ -21,6 +22,11 @@ class ApplicationSettings extends ActiveRecord
     public static function tableName(): string
     {
         return '{{%application_settings}}';
+    }
+
+    public function behaviors(): array
+    {
+        return [BlameableBehavior::class];
     }
 
     public static function current(): self

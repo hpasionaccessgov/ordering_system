@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use Yii;
+use yii\behaviors\BlameableBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -19,6 +20,11 @@ class Notification extends ActiveRecord
     public static function tableName(): string
     {
         return '{{%notifications}}';
+    }
+
+    public function behaviors(): array
+    {
+        return [BlameableBehavior::class];
     }
 
     public static function categoryValues(): array

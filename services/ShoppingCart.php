@@ -262,6 +262,8 @@ final class ShoppingCart
                     'user_id' => Yii::$app->user->id,
                     'product_id' => $productId,
                     'quantity' => $quantity,
+                    'created_by' => Yii::$app->user->id,
+                    'updated_by' => Yii::$app->user->id,
                     'created_at' => $now,
                     'updated_at' => $now,
                 ])->execute();

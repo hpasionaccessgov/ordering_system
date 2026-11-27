@@ -61,7 +61,7 @@ $this->title = 'Notifications';
                         <?= Html::endForm() ?>
                     <?php endif ?>
                     <?php if (Yii::$app->user->can('notification.read')): ?>
-                        <?= Html::a('View', Navigation::url(Navigation::NOTIFICATION_READ, ['id' => $notification->id]), ['class' => 'btn btn-sm btn-outline-secondary']) ?>
+                        <?= Html::a('View', Navigation::url(Navigation::NOTIFICATION_VIEW, ['id' => $notification->id]), ['class' => 'btn btn-sm btn-outline-secondary']) ?>
                     <?php elseif (Yii::$app->user->can('order.view') && $notification->order_id !== null): ?>
                         <?= Html::a('View order', Navigation::url(Navigation::ORDER_VIEW, ['id' => $notification->order_id]), ['class' => 'btn btn-sm btn-primary']) ?>
                     <?php endif ?>

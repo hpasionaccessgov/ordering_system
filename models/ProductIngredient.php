@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\models;
 
+use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -31,6 +32,7 @@ class ProductIngredient extends ActiveRecord
     public function behaviors(): array
     {
         return [
+            BlameableBehavior::class,
             TimestampBehavior::class,
         ];
     }

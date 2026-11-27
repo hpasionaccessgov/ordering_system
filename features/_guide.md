@@ -8,20 +8,20 @@ Read this file when you **write or change** a node, not when you only navigate. 
 The only stack-specific block in the system. Every procedure in `features/` refers to these fields by
 name. Fill it once at adoption; keep it current when the repository's layout changes.
 
-- name:            <project name>
+- name:            Cafébara ordering system
 - kit_version:     1.0.0
-- base_url:        <local URL or launch command used in Example use>
-- test_cmd:        <one command that runs the test suite from the repository root>
-- entry_kinds:     <subset of: http-route, cli-command, scheduled-job, queue-consumer, screen, event-handler, webhook>
-- entry_globs:     <where entry points are declared, per kind>
-- layer_map:       <ordered layers and their folders: entry -> logic (<dir>) -> data (<dir>) -> presentation (<dir>) -> config (<dir>)>
-- test_globs:      <where tests live and the naming rule that maps a source file to its test>
-- data_kind:       <tables | collections | files | stores | endpoints>
-- config_sources:  <where runtime config, flags and environment keys are read from>
-- behaviour_dirs:  <folders where any change is behaviour; "Feature map: n/a" is never valid there>
-- domains:         <ordered README sections, for example auth, billing, admin, shared>
-- areas:           <optional: modules / apps / packages>
-- unmapped:        <paths owned by no node, each with a reason>
+- base_url:        http://localhost:8080/ (Codeception `php-builtin`; `php yii serve --port=8080`)
+- test_cmd:        vendor/bin/codecept run --env php-builtin
+- entry_kinds:     [http-route, cli-command]
+- entry_globs:     http-route: config/web.php -> services/Navigation.php -> controllers/*Controller.php::action*; cli-command: config/console.php -> commands/*Controller.php::action*
+- layer_map:       entry (controllers/, commands/) -> logic (services/, widgets/) -> data (models/, migrations/) -> presentation (views/, web/css/, web/js/, assets/) -> config (config/)
+- test_globs:      tests/Unit/**/*Test.php, tests/Functional/**/*Cest.php, tests/Acceptance/**/*Cest.php; source-to-test: controllers/models/services -> tests/Unit/{Controllers,Models,Services}/<Class>Test.php, flows -> tests/Functional/<Feature>Cest.php
+- data_kind:       tables (MariaDB/MySQL; schema in migrations/)
+- config_sources:  .env, config/params.php, config/db.php, config/web.php, config/console.php, services/Navigation.php
+- behaviour_dirs:  controllers/, services/, models/, migrations/, config/, commands/, widgets/, views/, web/js/, assets/
+- domains:         public, auth, catalog, cart, orders, kitchen, inventory, loyalty, notifications, reports, admin, staff, customer
+- areas:           single Yii2 Basic app
+- unmapped:        vendor/ (dependencies); runtime/, web/assets/, tests/_output/, tests/_support/_generated/ (generated); web/index.php, yii (framework bootstrap); docs/, features/, .github/ (docs/tooling); .env* (local secrets)
 - vcs_log:         git log --since=30.days --name-only --pretty=format:
 
 ---

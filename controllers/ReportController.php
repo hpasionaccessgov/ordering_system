@@ -91,6 +91,7 @@ class ReportController extends Controller
             $data['summary'],
             $this->filter(),
             $report . '-report-' . Yii::$app->formatter->asDate(time(), 'php:Y-m-d'),
+            $data['charts'] ?? [],
         );
     }
 
@@ -108,11 +109,29 @@ class ReportController extends Controller
         };
     }
 
+    /**
+     * @param list<string|int> $labels
+     * @param list<int|float|string> $values
+     * @return array{title: string, labels: list<string>, values: list<float>, format: string}
+     */
+    private function chart(string $title, array $labels, array $values, string $format = 'number'): array
+    {
+        return [
+            'title' => $title,
+            'labels' => array_slice(array_map('strval', array_values($labels)), -12),
+            'values' => array_slice(array_map('floatval', array_values($values)), -12),
+            'format' => $format,
+        ];
+    }
+
     private function salesData(): array
     {
         $service = new SalesReportService();
         $summary = $service->summary($this->filter());
         $rows = $service->daily($this->filter());
+        $labels = array_column($rows, 'date');
+        $revenue = array_column($rows, 'revenue');
+        $orders = array_column($rows, 'orders');
 
         return [
             'title' => 'Sales report',
@@ -124,9 +143,13 @@ class ReportController extends Controller
                 ['label' => 'Average order value', 'value' => Yii::$app->formatter->asCurrency($summary['aov']), 'caption' => 'Completed orders in range', 'icon' => 'bi-graph-up'],
                 ['label' => 'Completed orders', 'value' => Yii::$app->formatter->asInteger($summary['completed']), 'caption' => 'Completed in range', 'icon' => 'bi-check2-circle'],
             ],
-            'revenueLabels' => array_column($rows, 'date'),
-            'revenueValues' => array_column($rows, 'revenue'),
-            'orderValues' => array_column($rows, 'orders'),
+            'revenueLabels' => $labels,
+            'revenueValues' => $revenue,
+            'orderValues' => $orders,
+            'charts' => [
+                $this->chart('Revenue by day', $labels, $revenue, 'money'),
+                $this->chart('Orders by day', $labels, $orders),
+            ],
         ];
     }
 
@@ -135,6 +158,9 @@ class ReportController extends Controller
         $service = new ProductReportService();
         $ranking = $service->ranking($this->filter());
         $top = array_slice($ranking, 0, 10);
+        $labels = array_column($top, 'product_name');
+        $quantities = array_column($top, 'quantity');
+        $revenues = array_column($top, 'revenue');
 
         return [
             'title' => 'Product performance report',
@@ -148,9 +174,13 @@ class ReportController extends Controller
             ],
             'topRows' => $top,
             'leastRows' => $service->least($this->filter()),
-            'topLabels' => array_column($top, 'product_name'),
-            'topValues' => array_column($top, 'quantity'),
-            'revenueValues' => array_column($top, 'revenue'),
+            'topLabels' => $labels,
+            'topValues' => $quantities,
+            'revenueValues' => $revenues,
+            'charts' => [
+                $this->chart('Units sold by product', $labels, $quantities),
+                $this->chart('Revenue by product', $labels, $revenues, 'money'),
+            ],
         ];
     }
 
@@ -160,6 +190,13 @@ class ReportController extends Controller
         $summary = $service->summary($this->filter());
         $statusRows = $service->statusBreakdown($this->filter());
         $volumeRows = $service->dailyVolume($this->filter());
+        $statusLabels = array_map(
+            static fn(array $row): string => \app\models\Order::statusLabel((string) $row['status']),
+            $statusRows,
+        );
+        $statusValues = array_column($statusRows, 'orders');
+        $volumeLabels = array_column($volumeRows, 'date');
+        $volumeValues = array_column($volumeRows, 'orders');
 
         return [
             'title' => 'Order report',
@@ -172,14 +209,15 @@ class ReportController extends Controller
                 ['label' => 'In progress', 'value' => Yii::$app->formatter->asInteger($summary['pending'] + $summary['confirmed'] + $summary['processing'] + $summary['ready_for_pickup']), 'caption' => 'Pending to ready for pickup', 'icon' => 'bi-hourglass-split'],
             ],
             'statusRows' => $statusRows,
-            'statusLabels' => array_map(
-                static fn(array $row): string => \app\models\Order::statusLabel((string) $row['status']),
-                $statusRows,
-            ),
-            'statusValues' => array_column($statusRows, 'orders'),
+            'statusLabels' => $statusLabels,
+            'statusValues' => $statusValues,
             'volumeRows' => $volumeRows,
-            'volumeLabels' => array_column($volumeRows, 'date'),
-            'volumeValues' => array_column($volumeRows, 'orders'),
+            'volumeLabels' => $volumeLabels,
+            'volumeValues' => $volumeValues,
+            'charts' => [
+                $this->chart('Orders by status', $statusLabels, $statusValues),
+                $this->chart('Order volume by day', $volumeLabels, $volumeValues),
+            ],
         ];
     }
 
@@ -189,6 +227,10 @@ class ReportController extends Controller
         $summary = $service->summary($this->filter());
         $rows = $service->consumption($this->filter());
         $levels = $service->levels();
+        $consumptionLabels = array_column($rows, 'item');
+        $consumptionValues = array_column($rows, 'consumption');
+        $levelLabels = array_column($levels, 'name');
+        $levelValues = array_column($levels, 'current_stock');
 
         return [
             'title' => 'Inventory report',
@@ -201,11 +243,15 @@ class ReportController extends Controller
                 ['label' => 'Fast moving items', 'value' => Yii::$app->formatter->asInteger($summary['fast_moving']), 'caption' => 'Deducted in range', 'icon' => 'bi-lightning-charge'],
             ],
             'consumptionRows' => $rows,
-            'consumptionLabels' => array_column($rows, 'item'),
-            'consumptionValues' => array_column($rows, 'consumption'),
-            'levelLabels' => array_column($levels, 'name'),
-            'levelValues' => array_column($levels, 'current_stock'),
+            'consumptionLabels' => $consumptionLabels,
+            'consumptionValues' => $consumptionValues,
+            'levelLabels' => $levelLabels,
+            'levelValues' => $levelValues,
             'minimumValues' => array_column($levels, 'minimum_stock'),
+            'charts' => [
+                $this->chart('Consumption by item', $consumptionLabels, $consumptionValues, 'decimal'),
+                $this->chart('Current stock by item', $levelLabels, $levelValues),
+            ],
         ];
     }
 
@@ -216,6 +262,9 @@ class ReportController extends Controller
         $summary = $service->summary($filter);
         $tiers = $service->tiers($filter);
         $rows = $service->rows($filter);
+        $tierLabels = array_column($tiers, 'label');
+        $tierValues = array_column($tiers, 'members');
+        $dates = array_column($rows, 'date');
 
         return [
             'title' => 'Loyalty report',
@@ -227,11 +276,16 @@ class ReportController extends Controller
                 ['label' => 'Active loyalty members', 'value' => Yii::$app->formatter->asInteger($summary['activeMembers']), 'caption' => 'With activity in range', 'icon' => 'bi-people'],
                 ['label' => 'Tier tracked', 'value' => '3', 'caption' => 'Bronze / Silver / Gold', 'icon' => 'bi-trophy'],
             ],
-            'tierLabels' => array_column($tiers, 'label'),
-            'tierValues' => array_column($tiers, 'members'),
-            'volumeLabels' => array_column($rows, 'date'),
+            'tierLabels' => $tierLabels,
+            'tierValues' => $tierValues,
+            'volumeLabels' => $dates,
             'earnedValues' => array_column($rows, 'earned'),
             'redeemedValues' => array_column($rows, 'redeemed'),
+            'charts' => [
+                $this->chart('Members by tier', $tierLabels, $tierValues),
+                $this->chart('Points issued by day', $dates, array_column($rows, 'earned')),
+                $this->chart('Points redeemed by day', $dates, array_column($rows, 'redeemed')),
+            ],
         ];
     }
 

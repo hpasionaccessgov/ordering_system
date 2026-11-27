@@ -112,7 +112,7 @@ JS, View::POS_READY);
                             'class' => 'd-block text-body-secondary small mt-1',
                         ]),
                     $canViewNotification
-                        ? Navigation::url(Navigation::NOTIFICATION_READ, ['id' => $notification->id])
+                        ? Navigation::url(Navigation::NOTIFICATION_VIEW, ['id' => $notification->id])
                         : Navigation::url(Navigation::NOTIFICATIONS),
                     [
                         'class' => 'dropdown-item cafebara-notification-item py-2',

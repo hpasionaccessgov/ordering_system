@@ -32,6 +32,7 @@ $jsName = 'reportChart' . preg_replace('/[^A-Za-z0-9]/', '', $id);
 $this->registerJs(
     "(function(){const canvas=document.getElementById('" . $id . "');"
     . 'if(!canvas||!window.Chart){return;}'
+    . 'window.Chart.defaults.color=getComputedStyle(document.documentElement).getPropertyValue("--bs-body-color").trim()||"#666";'
     . 'new window.Chart(canvas,' . Json::htmlEncode($config) . ');})();',
     View::POS_END,
 );

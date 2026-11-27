@@ -16,24 +16,24 @@ $this->title = 'My Profile';
 <div class="row justify-content-center">
     <div class="col-12 col-xl-8">
         <?php if (Yii::$app->user->can('loyalty.view')) : ?>
-            <section class="card admin-panel mb-4">
-                <div class="card-header d-flex flex-wrap gap-2 justify-content-between align-items-center">
-                    <h2 class="h5 mb-0">Loyalty snapshot</h2>
-                    <?= Html::a('My rewards', Navigation::url(Navigation::REWARDS), ['class' => 'btn btn-outline-primary btn-sm']) ?>
+            <section class="mb-4 card admin-panel">
+                <div class="d-flex flex-wrap gap-2 card-header justify-content-between align-items-center">
+                    <h2 class="mb-0 h5">Loyalty snapshot</h2>
+                    <?= Html::a('My rewards', Navigation::url(Navigation::REWARDS), ['class' => 'btn btn-outline-primary btn-sm ms-auto']) ?>
                 </div>
                 <div class="card-body">
                     <div class="row g-3 text-center">
                         <div class="col-6 col-md-3">
                             <p class="mb-1 text-body-secondary small">Current points</p>
-                            <p class="h4 mb-0"><?= Yii::$app->formatter->asInteger($loyalty['current']) ?></p>
+                            <p class="mb-0 h4"><?= Yii::$app->formatter->asInteger($loyalty['current']) ?></p>
                         </div>
                         <div class="col-6 col-md-3">
                             <p class="mb-1 text-body-secondary small">Lifetime earned</p>
-                            <p class="h4 mb-0"><?= Yii::$app->formatter->asInteger($loyalty['lifetimeEarned']) ?></p>
+                            <p class="mb-0 h4"><?= Yii::$app->formatter->asInteger($loyalty['lifetimeEarned']) ?></p>
                         </div>
                         <div class="col-6 col-md-3">
                             <p class="mb-1 text-body-secondary small">Lifetime redeemed</p>
-                            <p class="h4 mb-0"><?= Yii::$app->formatter->asInteger($loyalty['lifetimeRedeemed']) ?></p>
+                            <p class="mb-0 h4"><?= Yii::$app->formatter->asInteger($loyalty['lifetimeRedeemed']) ?></p>
                         </div>
                         <div class="col-6 col-md-3">
                             <p class="mb-1 text-body-secondary small">Tier</p>

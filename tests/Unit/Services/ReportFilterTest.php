@@ -28,10 +28,29 @@ final class ReportFilterTest extends Unit
         parent::setUp();
     }
 
+    public function testDefaultPresetIsWeek(): void
+    {
+        $filter = new ReportFilter();
+        self::assertSame('week', $filter->preset);
+        [$from] = $filter->range();
+        self::assertSame('Monday', Yii::$app->formatter->asDate($from, 'php:l'));
+    }
+
     public function testTodayCoversOneDay(): void
     {
         $filter = new ReportFilter();
+        $filter->preset = 'today';
         self::assertSame(1, $filter->days());
+    }
+
+    public function testLoadNormalizesCustomerDropdownValue(): void
+    {
+        $filter = new ReportFilter();
+        $filter->load(['ReportFilter' => ['customerId' => '', 'preset' => 'week']]);
+        self::assertNull($filter->customerId);
+
+        $filter->load(['ReportFilter' => ['customerId' => '7']]);
+        self::assertSame(7, $filter->customerId);
     }
 
     public function testCustomRangeIsInclusive(): void

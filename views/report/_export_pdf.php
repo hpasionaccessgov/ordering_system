@@ -12,9 +12,16 @@ use yii\helpers\Html;
  * @var array<string, string> $summary
  * @var list<array{label: string, attribute: string, type?: string}> $columns
  * @var list<array<string, mixed>> $rows
+ * @var list<array{title: string, labels: list<string>, values: list<float>, format?: string}> $charts
  */
 
+$charts ??= [];
 $plain = static fn(string $value): string => str_replace('₱', 'PHP ', $value);
+$formatChartValue = static fn(float $value, string $format): string => match ($format) {
+    'money' => '₱' . number_format($value, 2),
+    'decimal' => number_format($value, 2),
+    default => number_format($value),
+};
 ?>
 <!doctype html>
 <html lang="en">
@@ -35,6 +42,16 @@ $plain = static fn(string $value): string => str_replace('₱', 'PHP ', $value);
         .data td { border: 1px solid #ddd; padding: 5px 6px; }
         .data tr:nth-child(even) td { background: #faf7f4; }
         .data td.number { text-align: right; }
+        .charts { width: 100%; margin-top: 14px; }
+        .charts h2 { font-size: 11px; margin: 0 0 5px; color: #4a2a17; }
+        .chart-card { width: 48%; vertical-align: top; padding: 0 8px 0 0; }
+        .chart { width: 100%; border-collapse: collapse; break-inside: avoid; }
+        .chart td { padding: 2px 0; font-size: 8px; }
+        .chart .chart-label { width: 30%; color: #555; }
+        .chart .chart-track { width: 60%; background: #f2e7dc; }
+        .chart .chart-fill { display: block; height: 7px; background: #89431c; }
+        .chart .chart-value { width: 10%; text-align: right; white-space: nowrap; }
+        .chart-empty { color: #777; font-size: 8px; }
         footer { margin-top: 14px; border-top: 1px solid #ddd; padding-top: 6px; color: #777; font-size: 8px; }
     </style>
 </head>
@@ -65,6 +82,44 @@ $plain = static fn(string $value): string => str_replace('₱', 'PHP ', $value);
             <?php endforeach; ?>
         </tr>
     </table>
+
+    <?php if ($charts !== []) : ?>
+        <table class="charts">
+            <tr>
+                <?php foreach ($charts as $chart) : ?>
+                    <?php
+                    $values = array_values($chart['values'] ?? []);
+                    $max = $values === [] ? 0.0 : max($values);
+                    $format = (string) ($chart['format'] ?? 'number');
+                    ?>
+                    <td class="chart-card">
+                        <h2><?= Html::encode((string) $chart['title']) ?></h2>
+                        <?php if ($max <= 0.0) : ?>
+                            <p class="chart-empty">No chart data for this series.</p>
+                        <?php else : ?>
+                            <table class="chart">
+                                <?php foreach ($chart['labels'] ?? [] as $index => $label) : ?>
+                                    <?php
+                                    $value = (float) ($values[$index] ?? 0);
+                                    $width = max(0.0, min(100.0, $value / $max * 100));
+                                    ?>
+                                    <tr>
+                                        <td class="chart-label"><?= Html::encode((string) $label) ?></td>
+                                        <td class="chart-track">
+                                            <span class="chart-fill" style="width: <?= number_format($width, 2, '.', '') ?>%"></span>
+                                        </td>
+                                        <td class="chart-value">
+                                            <?= Html::encode($plain($formatChartValue($value, $format))) ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </table>
+                        <?php endif; ?>
+                    </td>
+                <?php endforeach; ?>
+            </tr>
+        </table>
+    <?php endif; ?>
 
     <table class="data">
         <thead>
