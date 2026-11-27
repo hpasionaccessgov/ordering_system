@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace app\tests\Functional;
 
 use app\models\ActivityLog;
+use app\models\Category;
 use app\models\LoyaltyPointTransaction;
 use app\models\Notification;
 use app\models\Order;
+use app\models\OrderItem;
+use app\models\Product;
+use app\models\Reward;
 use app\models\User;
 use app\services\LoyaltyService;
+use app\services\Navigation;
 use app\services\NotificationService;
 use app\services\OrderStatusService;
 use app\tests\Support\FunctionalTester;
@@ -85,12 +90,14 @@ final class LoyaltyCest
 
     public function redemptionDeductsPointsAndCreatesNotification(FunctionalTester $I): void
     {
+        $this->rewardProduct($I);
         $user = $this->user($I, 'redeem');
         LoyaltyService::earnForCompletedOrder($this->order($I, $user, '5000'));
         $I->amLoggedInAs($user);
         $I->amOnRoute('loyalty/index');
         $I->see('Redeem your points', 'h2');
         $I->see('Your loyalty snapshot');
+        $I->see('Menu treat:');
         $I->seeElement('.navbar [aria-label*="My rewards: 50 points"]');
         $I->see('Lifetime earned', '.dropdown-menu');
         $I->see('Lifetime redeemed', '.dropdown-menu');
@@ -98,6 +105,22 @@ final class LoyaltyCest
 
         $I->assertSame(0, LoyaltyService::balance((int) $user->id));
         $I->assertSame(50, LoyaltyService::lifetimeRedeemed((int) $user->id));
+        $redemption = LoyaltyPointTransaction::find()
+            ->where(['user_id' => $user->id, 'transaction_type' => LoyaltyPointTransaction::TYPE_REDEEM])
+            ->one();
+        $I->assertNotNull($redemption);
+        $I->assertNotNull($redemption->order_id);
+
+        $order = Order::findOne($redemption->order_id);
+        $I->assertNotNull($order);
+        $I->assertSame(Order::STATUS_PENDING, $order->status);
+        $I->assertSame('0.00', (string) $order->total_amount);
+
+        $reward = Reward::findOne(['name' => 'Free Coffee']);
+        $item = OrderItem::findOne(['order_id' => $order->id]);
+        $I->assertNotNull($item);
+        $I->assertSame((string) $reward?->product?->name, (string) $item->product_name);
+
         $notification = Notification::find()
             ->where(['user_id' => $user->id, 'type' => NotificationService::TYPE_LOYALTY_REDEEMED])
             ->one();
@@ -105,6 +128,33 @@ final class LoyaltyCest
         $I->assertStringContainsString('Free Coffee', (string) $notification->message);
         $I->assertStringContainsString('50 points were deducted', (string) $notification->message);
         $I->assertStringContainsString('Remaining balance: 0 points', (string) $notification->message);
+        $I->assertStringContainsString($order->order_number, (string) $notification->message);
+        $I->assertSame(Navigation::url(Navigation::ORDER_VIEW)[0], $notification->target_route);
+        $I->assertSame((int) $order->id, (int) $notification->target_id);
+    }
+
+    public function staffCanCreateMappedRewards(FunctionalTester $I): void
+    {
+        $product = $this->rewardProduct($I);
+        $staff = $this->user($I, 'reward_staff', 'staff');
+        $name = 'Staff treat ' . substr(bin2hex(random_bytes(4)), 0, 8);
+
+        $I->amLoggedInAs($staff);
+        $I->amOnRoute('reward/index');
+        $I->see('Create reward');
+        $I->amOnRoute('reward/create');
+        $I->submitForm('form[action*="reward%2Fcreate"]', ['Reward' => [
+            'name' => $name,
+            'description' => 'Created by staff.',
+            'point_cost' => 75,
+            'product_id' => $product->id,
+            'status' => Reward::STATUS_ACTIVE,
+        ]]);
+
+        $reward = Reward::findOne(['name' => $name]);
+        $I->assertNotNull($reward);
+        $I->assertSame((int) $product->id, (int) $reward->product_id);
+        $I->assertSame(75, (int) $reward->point_cost);
     }
 
     public function tierUpgradeNotificationIsSentOnce(FunctionalTester $I): void
@@ -184,6 +234,7 @@ final class LoyaltyCest
         foreach ([
             'reward.index', 'reward.view', 'reward.create', 'reward.update', 'reward.delete',
             'loyalty.view', 'loyalty.transaction.index', 'loyalty.adjust', 'reports.view',
+            'loyalty.report',
         ] as $name) {
             $permission = $auth->getPermission($name);
             if ($permission === null) {
@@ -197,7 +248,32 @@ final class LoyaltyCest
         return $user;
     }
 
-    private function user(FunctionalTester $I, string $prefix): User
+    private function rewardProduct(FunctionalTester $I): Product
+    {
+        $suffix = substr(bin2hex(random_bytes(4)), 0, 8);
+        $category = new Category([
+            'name' => 'Reward category ' . $suffix,
+            'status' => Category::STATUS_ACTIVE,
+        ]);
+        $I->assertTrue($category->save(), json_encode($category->errors));
+
+        $product = new Product([
+            'name' => 'Reward treat ' . $suffix,
+            'category_id' => $category->id,
+            'price' => '150.00',
+            'status' => Product::STATUS_ACTIVE,
+        ]);
+        $I->assertTrue($product->save(), json_encode($product->errors));
+
+        $reward = Reward::findOne(['name' => 'Free Coffee']);
+        $I->assertNotNull($reward);
+        $reward->product_id = $product->id;
+        $I->assertTrue($reward->save(), json_encode($reward->errors));
+
+        return $product;
+    }
+
+    private function user(FunctionalTester $I, string $prefix, string $role = 'customer'): User
     {
         $suffix = substr(bin2hex(random_bytes(4)), 0, 8);
         $user = new User([
@@ -211,7 +287,9 @@ final class LoyaltyCest
         $I->assertTrue($user->save(), json_encode($user->errors));
 
         $auth = Yii::$app->authManager;
-        $auth->assign($auth->getRole('customer'), $user->id);
+        $authRole = $auth->getRole($role);
+        $I->assertNotNull($authRole);
+        $auth->assign($authRole, $user->id);
 
         return $user;
     }

@@ -37,12 +37,13 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
 ?>
 <nav class="navbar navbar-expand-md bg-body app-header" aria-label="Main navigation">
     <div class="container-fluid flex-wrap flex-md-nowrap">
+
+
         <?= Html::a($brand, $brandRoute, [
             'class' => 'navbar-brand cafebara-admin-brand cafebara-brand-lockup d-flex align-items-center gap-2',
             'aria-label' => $brandLabel,
         ]) ?>
-
-        <ul class="flex-row gap-1 ms-md-0 navbar-nav align-items-center ms-auto">
+        <ul class="flex-row gap-1 navbar-nav align-items-center cafebara-sidebar-nav">
             <li class="nav-item">
                 <?= Html::button(
                     Html::tag('i', '', ['class' => 'bi bi-list', 'aria-hidden' => 'true']),
@@ -54,6 +55,8 @@ $brand = Html::img(Yii::getAlias('@web/Cafebara_logo.png'), [
                     ],
                 ) ?>
             </li>
+        </ul>
+        <ul class="flex-row gap-1 ms-md-0 navbar-nav align-items-center ms-auto">
             <li class="d-md-none nav-item">
                 <?= Html::button(
                     Html::tag('i', '', ['class' => 'bi bi-three-dots', 'aria-hidden' => 'true']),

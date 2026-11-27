@@ -112,12 +112,14 @@ $specialProducts = $product->is_special ? [$product] : [];
                         'step' => 1,
                         'form' => $batchFormId,
                         'aria-label' => 'Quantity of ' . $product->name . ' for the batch add',
+                        'data-card-quantity' => (string) $product->id,
                     ]) ?>
                 </div>
             <?php endif; ?>
             <?= Html::beginForm(Navigation::url(Navigation::CART_ADD, ['id' => $product->id]), 'POST', [
                 'class' => 'position-relative z-2 mt-3 js-cart-add',
                 'data-cart-ajax' => '1',
+                'data-quantity-source' => '#qty-' . $product->id,
             ]) ?>
             <?= Html::hiddenInput('quantity', '1') ?>
             <?= Html::submitButton('Add to cart', ['class' => 'btn btn-primary w-100']) ?>

@@ -81,6 +81,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'columns' => $columns,
             'rows' => $rows,
             'emptyMessage' => 'No inventory deductions in the selected range.',
+            'pageParam' => 'inventoryPage',
         ]) ?>
     </div>
 </section>

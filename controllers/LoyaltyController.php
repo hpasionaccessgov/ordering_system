@@ -8,6 +8,7 @@ use app\services\Navigation;
 
 
 use app\models\LoyaltyPointTransaction;
+use app\models\Product;
 use app\models\Reward;
 use app\services\LoyaltyService;
 use Yii;
@@ -46,8 +47,10 @@ class LoyaltyController extends Controller
         return $this->render('index', [
             'summary' => LoyaltyService::summary($userId),
             'rewards' => Reward::find()
-                ->where(['status' => Reward::STATUS_ACTIVE])
-                ->orderBy(['point_cost' => SORT_ASC, 'name' => SORT_ASC])
+                ->innerJoin(['p' => '{{%products}}'], 'p.id = reward.product_id')
+                ->where(['reward.status' => Reward::STATUS_ACTIVE])
+                ->andWhere(['p.status' => Product::STATUS_ACTIVE])
+                ->orderBy(['reward.point_cost' => SORT_ASC, 'reward.name' => SORT_ASC])
                 ->all(),
             'recentTransactions' => LoyaltyService::recentTransactions($userId, 8),
             'redemptionHistory' => LoyaltyPointTransaction::find()
@@ -70,11 +73,14 @@ class LoyaltyController extends Controller
 
         try {
             $transaction = LoyaltyService::redeem($reward, (int) Yii::$app->user->id);
+            $order = $transaction->order;
+            $queueMessage = $order === null ? '' : ' Order #' . $order->order_number . ' is now in the queue.';
             Yii::$app->session->setFlash(
                 'success',
                 'You redeemed ' . $reward->name . '. ' . abs($transaction->points)
                     . ' points were deducted. Remaining balance: '
-                    . Yii::$app->formatter->asInteger(LoyaltyService::balance((int) Yii::$app->user->id)) . ' points.',
+                    . Yii::$app->formatter->asInteger(LoyaltyService::balance((int) Yii::$app->user->id))
+                    . ' points.' . $queueMessage,
             );
         } catch (BadRequestHttpException $exception) {
             Yii::$app->session->setFlash('error', $exception->getMessage());

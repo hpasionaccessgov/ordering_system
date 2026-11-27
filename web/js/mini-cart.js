@@ -15,6 +15,19 @@
         feedback.classList.toggle('text-success', !isError);
     }
 
+    function showToast(message, count) {
+        const toast = document.getElementById('cafebara-cart-toast');
+        if (!toast || !window.bootstrap?.Toast) {
+            return;
+        }
+        const label = toast.querySelector('[data-cart-toast-message]');
+        const items = Number(count ?? 0);
+        if (label) {
+            label.textContent = message + ' Cart: ' + items + ' item' + (items === 1 ? '' : 's') + '.';
+        }
+        window.bootstrap.Toast.getOrCreateInstance(toast, {delay: 4000}).show();
+    }
+
     function applyCart(data) {
         body.innerHTML = data.html || '';
         document.querySelectorAll('[data-cart-count]').forEach((badge) => {
@@ -26,6 +39,7 @@
         });
         if (data.message) {
             showFeedback(data.message);
+            showToast(data.message, data.count);
         }
     }
 
@@ -53,6 +67,15 @@
         const form = event.target instanceof HTMLFormElement ? event.target : null;
         if (!form) {
             return;
+        }
+
+        const quantityInput = form.dataset.quantitySource
+            ? document.querySelector(form.dataset.quantitySource)
+            : null;
+        const hiddenQuantity = form.querySelector('input[name="quantity"]');
+        if (quantityInput && hiddenQuantity) {
+            const value = Number(quantityInput.value) || 1;
+            hiddenQuantity.value = String(Math.min(99, Math.max(1, value)));
         }
 
         if (form.dataset.cartAjax === '1') {

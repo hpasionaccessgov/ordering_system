@@ -31,6 +31,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'attributes' => [
                 'id',
                 'name',
+                [
+                    'attribute' => 'product_id',
+                    'value' => static fn(Reward $model): string => $model->product?->name ?? '—',
+                ],
                 'description:ntext',
                 [
                     'attribute' => 'point_cost',

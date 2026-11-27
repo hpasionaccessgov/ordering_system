@@ -28,14 +28,21 @@ $config = [
         'scales' => ['y' => ['beginAtZero' => true]],
     ], $options ?? []),
 ];
-$jsName = 'reportChart' . preg_replace('/[^A-Za-z0-9]/', '', $id);
-$this->registerJs(
-    "(function(){const canvas=document.getElementById('" . $id . "');"
-    . 'if(!canvas||!window.Chart){return;}'
-    . 'window.Chart.defaults.color=getComputedStyle(document.documentElement).getPropertyValue("--bs-body-color").trim()||"#666";'
-    . 'new window.Chart(canvas,' . Json::htmlEncode($config) . ');})();',
-    View::POS_END,
-);
+$idJson = Json::htmlEncode($id);
+$configJson = Json::htmlEncode($config);
+$js = <<<JS
+(function () {
+    const canvas = document.getElementById({$idJson});
+    if (!canvas || !window.Chart) {
+        return;
+    }
+    window.Chart.defaults.color = getComputedStyle(document.documentElement)
+        .getPropertyValue('--bs-body-color')
+        .trim() || '#666';
+    new window.Chart(canvas, {$configJson});
+})();
+JS;
+$this->registerJs($js, View::POS_END);
 ?>
 <section class="card cafebara-dashboard-card h-100">
     <div class="card-header bg-transparent">

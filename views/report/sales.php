@@ -70,6 +70,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'columns' => $columns,
             'rows' => $rows,
             'emptyMessage' => 'No orders in the selected range.',
+            'pageParam' => 'salesPage',
         ]) ?>
     </div>
 </section>

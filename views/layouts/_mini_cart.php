@@ -31,3 +31,17 @@ if (!Yii::$app->user->can('cart.index')) {
         <?= $this->render('_mini_cart_body') ?>
     </div>
 </div>
+<div class="toast-container position-fixed top-0 end-0 p-3 cafebara-cart-toast-container">
+    <div id="cafebara-cart-toast" class="toast" role="status" aria-live="polite" aria-atomic="true">
+        <div class="toast-body d-flex flex-wrap gap-2 align-items-center justify-content-between">
+            <span class="small" data-cart-toast-message></span>
+            <?= Html::button('View cart', [
+                'class' => 'btn btn-sm btn-outline-primary',
+                'type' => 'button',
+                'data-bs-dismiss' => 'toast',
+                'data-bs-toggle' => 'offcanvas',
+                'data-bs-target' => '#cafebara-cart-offcanvas',
+            ]) ?>
+        </div>
+    </div>
+</div>

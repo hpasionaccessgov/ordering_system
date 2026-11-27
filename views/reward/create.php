@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 
 /** @var app\models\Reward $model */
+/** @var array<int, string> $products */
 
 $this->title = 'Create reward';
 $this->params['breadcrumbs'][] = ['label' => 'Rewards', 'url' => ['index']];
@@ -16,4 +17,4 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 
-<?= $this->render('_form', ['model' => $model]) ?>
+<?= $this->render('_form', ['model' => $model, 'products' => $products]) ?>

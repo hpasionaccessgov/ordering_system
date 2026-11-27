@@ -152,7 +152,7 @@ final class LoyaltyService
     {
         return Yii::$app->db->transaction(static function () use ($reward, $userId): LoyaltyPointTransaction {
             $freshReward = Reward::findOne((int) $reward->id);
-            if ($freshReward === null || !$freshReward->isActive()) {
+            if ($freshReward === null || !$freshReward->isRedeemable()) {
                 throw new BadRequestHttpException('This reward is no longer available.');
             }
             self::lockUser($userId);
@@ -162,9 +162,16 @@ final class LoyaltyService
                 throw new BadRequestHttpException('You do not have enough points to redeem this reward.');
             }
 
+            $order = (new OrderService())->create(
+                $userId,
+                [['product_id' => (int) $freshReward->product_id, 'quantity' => 1]],
+                null,
+                0.0,
+            );
+
             $transaction = new LoyaltyPointTransaction([
                 'user_id' => $userId,
-                'order_id' => null,
+                'order_id' => $order->id,
                 'points' => -$cost,
                 'transaction_type' => LoyaltyPointTransaction::TYPE_REDEEM,
                 'remarks' => 'Redeemed: ' . $freshReward->name,
@@ -178,13 +185,15 @@ final class LoyaltyService
                 $userId,
                 NotificationService::TYPE_LOYALTY_REDEEMED,
                 sprintf(
-                    'You redeemed %s. %d points were deducted. Remaining balance: %d points.',
+                    'You redeemed %s for %s. %d points were deducted. Remaining balance: %d points. Order #%s is now in the queue.',
                     $freshReward->name,
+                    $freshReward->product->name,
                     $cost,
                     $remaining,
+                    $order->order_number,
                 ),
-                '/loyalty/index',
-                null,
+                Navigation::url(Navigation::ORDER_VIEW)[0],
+                (int) $order->id,
                 Notification::CATEGORY_LOYALTY,
             );
             ActivityLogger::record(ActivityLog::REWARD_REDEEMED, $userId, 'loyalty/redeem');

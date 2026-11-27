@@ -34,4 +34,21 @@ final class RoleNavigationTest extends Unit
         self::assertStringContainsString("\$can('activityLog.index')", $sidebar);
         self::assertStringContainsString("\$can('settings.index')", $sidebar);
     }
+
+    public function testMobileSidebarToggleSitsBesideTheBrandNotTheThreeDotMenu(): void
+    {
+        $header = (string) file_get_contents(dirname(__DIR__, 3) . '/views/layouts/_header.php');
+        $dots = strpos($header, 'bi-three-dots');
+
+        self::assertLessThan($dots, strpos($header, 'cafebara-sidebar-toggle'));
+        self::assertLessThan($dots, strpos($header, 'navbar-brand cafebara-admin-brand'));
+    }
+
+    public function testMobileHeaderActionsAlignRightAndMenusFit(): void
+    {
+        $css = (string) file_get_contents(dirname(__DIR__, 3) . '/web/css/cafebara-theme.css');
+
+        self::assertStringContainsString("    .cafebara-admin-actions {\n        justify-content: flex-end;", $css);
+        self::assertStringContainsString('.cafebara-admin-actions .nav-item>.dropdown,', $css);
+    }
 }

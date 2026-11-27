@@ -72,4 +72,13 @@ final class CartSummaryCest
         $I->assertSame('Product removed from your cart.', $data['message']);
         $I->assertStringContainsString('Browse Menu', $data['html']);
     }
+
+    public function ajaxAddAppliesPostedQuantity(FunctionalTester $I): void
+    {
+        $I->sendAjaxPostRequest('/index.php?r=cart%2Fadd&id=' . $this->productId, ['quantity' => 3]);
+        $I->seeResponseCodeIs(200);
+        $data = json_decode($I->grabPageSource(), true, 512, JSON_THROW_ON_ERROR);
+        $I->assertSame(5, $data['count']);
+        $I->assertSame('Product added to your cart.', $data['message']);
+    }
 }

@@ -26,7 +26,11 @@ final class ProductReportService
                 'quantity' => 'SUM(oi.quantity)',
                 'revenue' => 'SUM(oi.subtotal)',
             ])
-            ->where(['between', 'o.created_at', $from, $to])
+            ->where([
+                'and',
+                ['between', 'o.created_at', $from, $to],
+                ['o.status' => Order::STATUS_COMPLETED],
+            ])
             ->groupBy(['oi.product_id', 'oi.product_name'])
             ->orderBy(['quantity' => SORT_DESC, 'oi.product_name' => SORT_ASC])
             ->asArray()
@@ -91,7 +95,11 @@ final class ProductReportService
             ->alias('oi')
             ->select(['oi.product_id', 'oi.quantity', 'oi.subtotal'])
             ->innerJoin(['o' => '{{%orders}}'], 'o.id = oi.order_id')
-            ->where(['between', 'o.created_at', $from, $to]);
+            ->where([
+                'and',
+                ['between', 'o.created_at', $from, $to],
+                ['o.status' => Order::STATUS_COMPLETED],
+            ]);
 
         $rows = Product::find()
             ->alias('p')

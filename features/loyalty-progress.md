@@ -66,4 +66,6 @@ The focused test checks the view no longer uses `bg-light text-dark` and uses th
 
 ## Changelog
 
+- 2026-11-27 (feat, local): reward cards used a generic gift icon -> view never read the mapped product image -> cards show the product photo with a cup fallback. Test: RewardRedemptionTest
+- 2026-11-27 (feat, local): reward cards hid the linked product and showed redeem to unauthorized users -> no product or permission guard -> cards show the menu treat and gate the button. Test: RewardRedemptionTest
 - 2026-11-27 (fix, local): loyalty caption was pale on a white panel in dark mode -> hardcoded bg-light and text-dark -> panel now uses bg-body-tertiary. Test: ThemeContrastTest

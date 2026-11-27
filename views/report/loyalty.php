@@ -87,6 +87,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'columns' => $columns,
             'rows' => $rows,
             'emptyMessage' => 'No loyalty activity for the selected filters.',
+            'pageParam' => 'loyaltyPage',
         ]) ?>
     </div>
 </section>

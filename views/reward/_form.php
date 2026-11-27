@@ -5,6 +5,7 @@ use app\widgets\AdminActiveForm;
 use yii\helpers\Html;
 
 /** @var Reward $model */
+/** @var array<int, string> $products */
 ?>
 <section class="card admin-panel">
     <div class="card-body">
@@ -13,6 +14,7 @@ use yii\helpers\Html;
         <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
         <?= $form->field($model, 'description')->textarea(['rows' => 4]) ?>
         <?= $form->field($model, 'point_cost')->input('number', ['min' => 1]) ?>
+        <?= $form->field($model, 'product_id')->dropDownList($products, ['prompt' => 'Select a menu product']) ?>
         <?= $form->field($model, 'status')->dropDownList([
             Reward::STATUS_ACTIVE => 'Active',
             Reward::STATUS_INACTIVE => 'Disabled',

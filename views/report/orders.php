@@ -93,6 +93,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'columns' => $columns,
             'rows' => $rows,
             'emptyMessage' => 'No orders match the selected filters.',
+            'pageParam' => 'ordersPage',
         ]) ?>
     </div>
 </section>

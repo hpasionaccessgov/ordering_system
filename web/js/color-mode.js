@@ -16,9 +16,42 @@
       : "light";
   };
 
+  const setOptionColor = (options, path, color) => {
+    let node = options;
+    for (const key of path.slice(0, -1)) {
+      if (!node[key] || typeof node[key] !== "object") return;
+      node = node[key];
+    }
+    node[path[path.length - 1]] = color;
+  };
+
+  const updateChartColors = () => {
+    if (!window.Chart) return;
+    const color = getComputedStyle(document.documentElement)
+      .getPropertyValue("--bs-body-color")
+      .trim() || "#666";
+    window.Chart.defaults.color = color;
+    if (typeof window.Chart.getChart !== "function") return;
+
+    document.querySelectorAll("canvas").forEach((canvas) => {
+      const chart = window.Chart.getChart(canvas);
+      if (!chart) return;
+      setOptionColor(chart.options, ["plugins", "legend", "labels", "color"], color);
+      setOptionColor(chart.options, ["plugins", "title", "color"], color);
+      Object.values(chart.options.scales || {}).forEach((scale) => {
+        if (scale.ticks) scale.ticks.color = color;
+        if (scale.title) scale.title.color = color;
+      });
+      chart.update("none");
+    });
+  };
+
   const setTheme = (theme) => {
     document.documentElement.setAttribute("data-bs-theme", theme);
+    document.dispatchEvent(new CustomEvent("cafebara:themechange", { detail: { theme } }));
   };
+
+  document.addEventListener("cafebara:themechange", updateChartColors);
 
   const updateToggle = (theme) => {
     const toggle = document.getElementById("theme-toggle");

@@ -15,6 +15,7 @@ use yii\db\ActiveRecord;
  * @property string $name
  * @property string|null $description
  * @property int $point_cost
+ * @property int|null $product_id
  * @property int $status
  * @property int $created_at
  * @property int $updated_at
@@ -37,9 +38,10 @@ class Reward extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['name', 'point_cost'], 'required'],
-            [['point_cost', 'status'], 'integer'],
+            [['name', 'point_cost', 'product_id'], 'required'],
+            [['point_cost', 'status', 'product_id'], 'integer'],
             [['point_cost'], 'integer', 'min' => 1],
+            [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::class, 'targetAttribute' => ['product_id' => 'id']],
             [['status'], 'default', 'value' => self::STATUS_ACTIVE],
             [['status'], 'in', 'range' => [self::STATUS_INACTIVE, self::STATUS_ACTIVE]],
             [['name'], 'string', 'max' => 100],
@@ -56,15 +58,28 @@ class Reward extends ActiveRecord
             'name' => 'Reward',
             'description' => 'Description',
             'point_cost' => 'Points required',
+            'product_id' => 'Menu product',
             'status' => 'Status',
             'created_at' => 'Created at',
             'updated_at' => 'Updated at',
         ];
     }
 
+    public function getProduct(): \yii\db\ActiveQuery
+    {
+        return $this->hasOne(Product::class, ['id' => 'product_id']);
+    }
+
     public function isActive(): bool
     {
         return (int) $this->status === self::STATUS_ACTIVE;
+    }
+
+    public function isRedeemable(): bool
+    {
+        return $this->isActive()
+            && $this->product !== null
+            && (int) $this->product->status === Product::STATUS_ACTIVE;
     }
 
     public function getStatusLabel(): string

@@ -59,9 +59,27 @@ final class ThemeContrastTest extends Unit
     {
         $view = (string) file_get_contents(dirname(__DIR__, 3) . '/views/report/_chart.php');
 
-        self::assertStringContainsString(
-            'Chart.defaults.color=getComputedStyle(document.documentElement).getPropertyValue("--bs-body-color")',
+        self::assertMatchesRegularExpression(
+            '/getComputedStyle\(document\.documentElement\)\s*\.getPropertyValue\(\'--bs-body-color\'\)/',
             $view,
         );
+    }
+
+    public function testThemeToggleBroadcastsTheNewMode(): void
+    {
+        $script = (string) file_get_contents(dirname(__DIR__, 3) . '/web/js/color-mode.js');
+
+        self::assertStringContainsString('cafebara:themechange', $script);
+        self::assertStringContainsString('new CustomEvent', $script);
+    }
+
+    public function testEveryChartRefreshesWhenThemeChangesWithoutReload(): void
+    {
+        $script = (string) file_get_contents(dirname(__DIR__, 3) . '/web/js/color-mode.js');
+
+        self::assertStringContainsString('cafebara:themechange', $script);
+        self::assertStringContainsString('document.querySelectorAll("canvas")', $script);
+        self::assertStringContainsString('window.Chart.getChart(canvas)', $script);
+        self::assertStringContainsString('chart.update("none")', $script);
     }
 }

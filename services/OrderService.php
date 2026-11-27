@@ -18,10 +18,16 @@ class OrderService
      *
      * @param int $userId The ID of the user creating the order.
      * @param array $requestedItems The items requested for the order.
+     * @param float|null $unitPriceOverride Optional price for every item, used by reward redemptions.
      * @return Order The created order.
      * @throws BadRequestHttpException If the order cannot be created.
      */
-    public function create(int $userId, array $requestedItems, ?string $checkoutToken = null): Order
+    public function create(
+        int $userId,
+        array $requestedItems,
+        ?string $checkoutToken = null,
+        ?float $unitPriceOverride = null,
+    ): Order
     {
         if ($checkoutToken !== null) {
             $existing = Order::findOne(['checkout_token' => $checkoutToken]);
@@ -68,7 +74,7 @@ class OrderService
                 }
 
                 $product = $products[$productId];
-                $unitPrice = (float) $product->price;
+                $unitPrice = $unitPriceOverride ?? (float) $product->price;
                 $total += $unitPrice * $quantity;
 
                 $item = new OrderItem([

@@ -36,8 +36,8 @@ http://localhost:8080/reports/sales
 
 | Entry | Handler (Symbol) | Kind / access | Note |
 |---|---|---|---|
-| screen /reports/sales | `ReportController::actionSales` | screen, report.view | Includes the shared chart partial. |
-| screen /reports/loyalty | `ReportController::actionLoyalty` | screen, report.view | Uses the same chart builder. |
+| screen /reports/sales | `ReportController::actionSales` | screen, reports.view | Includes the shared chart partial. |
+| screen /reports/loyalty | `ReportController::actionLoyalty` | screen, loyalty.report | Uses the same chart builder. |
 
 ## Chain
 
@@ -55,10 +55,12 @@ http://localhost:8080/reports/sales
 4. The partial merges responsive defaults with caller options.
 5. Inline JavaScript sets `Chart.defaults.color` from `--bs-body-color`.
 6. `new Chart` draws the canvas with theme-aware text.
+7. The shared theme script repaints every canvas through `Chart.getChart` when `cafebara:themechange` fires.
 
 ## Gotchas
 
 - Chart.js defaults to `#666` for ticks and legends when no color is supplied.
+- Chart.js does not react to `data-bs-theme` changes; the shared color-mode script repaints every canvas on toggle.
 - Series colors in report views are decorative and do not need dark overrides.
 - CSS asset changes can stay cached; hard-refresh before visual checks.
 
@@ -68,4 +70,5 @@ The focused test checks that the chart partial reads `--bs-body-color` from the 
 
 ## Changelog
 
+- 2026-11-27 (fix, local): labels kept pre-toggle color until reload -> charts were not repainted -> theme script repaints canvases. Test: ThemeContrastTest
 - 2026-11-27 (fix, local): chart labels stayed gray in dark mode -> Chart.js default color was unchanged -> chart defaults now read --bs-body-color. Test: ThemeContrastTest

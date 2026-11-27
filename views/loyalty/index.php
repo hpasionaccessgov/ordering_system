@@ -94,18 +94,35 @@ $progress = max(0, min(100, $progress));
         <div class="row g-3">
             <?php foreach ($rewards as $reward) : ?>
                 <?php $canRedeem = $summary['current'] >= (int) $reward->point_cost; ?>
+                <?php $rewardProduct = $reward->product; ?>
+                <?php $rewardImage = $rewardProduct?->getImageUrl(); ?>
                 <div class="col-12 col-sm-6 col-xl-4">
                     <section class="card h-100 cafebara-dashboard-card">
                         <div class="d-flex flex-column card-body">
                             <div class="d-flex gap-2 justify-content-between align-items-start">
                                 <span class="d-inline-flex align-items-center justify-content-center rounded-3 cafebara-dashboard-icon cafebara-reward-icon">
-                                    <i class="bi bi-gift" aria-hidden="true"></i>
+                                    <?php if ($rewardImage !== null) : ?>
+                                        <?= Html::img($rewardImage, [
+                                            'class' => 'cafebara-reward-image',
+                                            'alt' => (string) $rewardProduct->name,
+                                            'width' => 48,
+                                            'height' => 48,
+                                            'loading' => 'lazy',
+                                        ]) ?>
+                                    <?php else : ?>
+                                        <i class="bi bi-cup-hot" aria-hidden="true"></i>
+                                    <?php endif; ?>
                                 </span>
                                 <span class="badge text-bg-primary"><?= Yii::$app->formatter->asInteger($reward->point_cost) ?> pts</span>
                             </div>
                             <h3 class="mt-3 mb-1 h5"><?= Html::encode($reward->name) ?></h3>
                             <p class="flex-grow-1 text-body-secondary small"><?= Html::encode($reward->description ?: 'A little something for your next visit.') ?></p>
-                            <?php if ($canRedeem) : ?>
+                            <p class="small mb-0"><span class="fw-semibold">Menu treat:</span> <?= Html::encode($reward->product?->name ?? 'Not assigned') ?></p>
+                            <?php if (!Yii::$app->user->can('loyalty.redeem')) : ?>
+                                <button class="mt-3 btn btn-outline-secondary w-100" type="button" disabled>
+                                    Redeeming not available
+                                </button>
+                            <?php elseif ($canRedeem) : ?>
                                 <?= Html::beginForm(Navigation::url(Navigation::REWARD_REDEEM, ['id' => $reward->id]), 'POST', ['class' => 'mt-3']) ?>
                                 <?= Html::submitButton('Redeem now', [
                                     'class' => 'btn btn-primary w-100',

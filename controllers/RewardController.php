@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\models\ActivityLog;
+use app\models\Product;
 use app\models\Reward;
 use app\models\RewardSearch;
 use app\services\ActivityLogger;
@@ -64,7 +65,7 @@ class RewardController extends Controller
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
-        return $this->render('create', ['model' => $model]);
+        return $this->render('create', ['model' => $model, 'products' => $this->activeProducts()]);
     }
 
     public function actionUpdate(int $id): Response|string
@@ -78,7 +79,7 @@ class RewardController extends Controller
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
-        return $this->render('update', ['model' => $model]);
+        return $this->render('update', ['model' => $model, 'products' => $this->activeProducts()]);
     }
 
     public function actionDelete(int $id): Response
@@ -92,6 +93,19 @@ class RewardController extends Controller
         }
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function activeProducts(): array
+    {
+        return Product::find()
+            ->where(['status' => Product::STATUS_ACTIVE])
+            ->orderBy(['name' => SORT_ASC])
+            ->select('name')
+            ->indexBy('id')
+            ->column();
     }
 
     protected function findModel(int $id): Reward

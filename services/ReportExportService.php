@@ -20,7 +20,7 @@ final class ReportExportService
      * @param array<string, string>|list<array{label: string, value: string}> $summary
      * @param list<array{label: string, attribute: string, type?: string}> $columns
      * @param list<array<string, mixed>> $rows
-     * @param list<array{title: string, labels: list<string>, values: list<float>, format?: string}> $charts
+     * @param list<string> $chartImages
      */
     public function export(
         string $format,
@@ -30,13 +30,13 @@ final class ReportExportService
         array $summary,
         ReportFilter $filter,
         string $filename,
-        array $charts = [],
+        array $chartImages = [],
     ): Response {
         $summary = $this->normalizeSummary($summary);
         return match ($format) {
             'csv' => $this->csv($title, $columns, $rows, $summary, $filter, $filename),
             'excel' => $this->excel($title, $columns, $rows, $summary, $filter, $filename),
-            'pdf' => $this->pdf($title, $columns, $rows, $summary, $filter, $filename, $charts),
+            'pdf' => $this->pdf($title, $columns, $rows, $summary, $filter, $filename, $chartImages),
             default => throw new \InvalidArgumentException("Unsupported export format: {$format}"),
         };
     }
@@ -159,6 +159,7 @@ final class ReportExportService
      * @param array<string, string> $summary
      * @param list<array{label: string, attribute: string, type?: string}> $columns
      * @param list<array<string, mixed>> $rows
+     * @param list<string> $chartImages
      */
     private function pdf(
         string $title,
@@ -167,7 +168,7 @@ final class ReportExportService
         array $summary,
         ReportFilter $filter,
         string $filename,
-        array $charts,
+        array $chartImages,
     ): Response {
         $html = (new View())->renderFile(Yii::getAlias('@app/views/report/_export_pdf.php'), [
             'title' => $title,
@@ -176,7 +177,7 @@ final class ReportExportService
             'summary' => $summary,
             'columns' => $columns,
             'rows' => $rows,
-            'charts' => $charts,
+            'chartImages' => $chartImages,
         ]);
 
         $dompdf = new Dompdf(new Options(['isRemoteEnabled' => false]));

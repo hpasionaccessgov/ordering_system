@@ -14,6 +14,7 @@ depends on or feeds; the reason for each link, entry points, flow, tests and got
 ## auth
 | slug | summary | links |
 |---|---|---|
+| rbac-role-matrix | Role editor labels recent RBAC permissions; loyalty report access is enforced. | report-filters |
 
 ## catalog
 | slug | summary | links |
@@ -23,6 +24,7 @@ depends on or feeds; the reason for each link, entry points, flow, tests and got
 ## cart
 | slug | summary | links |
 |---|---|---|
+| cart-add-feedback | Adding a product shows a toast with the new count and a direct View cart action. | cart-quantity |
 | cart-quantity | Update or clear cart line quantities from the cart page and mini cart. | |
 
 ## orders
@@ -42,6 +44,7 @@ depends on or feeds; the reason for each link, entry points, flow, tests and got
 | slug | summary | links |
 |---|---|---|
 | loyalty-progress | Loyalty page shows tier progress from lifetime earned points in both color modes. | |
+| reward-redemption | Redeeming points creates a free pending order for the reward's mapped menu product. | loyalty-progress, rbac-role-matrix |
 
 ## notifications
 | slug | summary | links |
@@ -51,9 +54,11 @@ depends on or feeds; the reason for each link, entry points, flow, tests and got
 ## reports
 | slug | summary | links |
 |---|---|---|
+| product-report-ranking | Product report ranks completed orders in range, matching catalog best sellers. | report-tables, report-pdf-analytics |
 | report-charts | Shared Chart.js builder renders report charts with theme-aware labels. | |
 | report-filters | Shared report filter normalizes typed customer IDs and defaults report ranges to this week. | report-pdf-analytics |
-| report-pdf-analytics | PDF exports embed server-rendered analytics bars and summary statistics for every report. | report-filters, report-charts |
+| report-pdf-analytics | PDF exports embed browser-captured Chart.js images and summary statistics for every report. | report-filters, report-charts |
+| report-tables | Report tables paginate with the shared settings page size and keep each table's page separate. | report-filters |
 
 ## admin
 | slug | summary | links |

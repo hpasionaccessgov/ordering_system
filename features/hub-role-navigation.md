@@ -29,6 +29,7 @@ The shared header and sidebar give customers and admins personal loyalty shortcu
 - Sidebar `My rewards` requires `isCustomer` or `admin.access`, plus `loyalty.view`.
 - `Loyalty overview` remains visible on `loyalty.transaction.index` for staff and admin.
 - Admin sections stay permission-gated; do not replace `$can(...)` checks with role-name hardcoding.
+- Staff see the permission-gated Reward catalog link but still no personal rewards shortcut.
 
 ## Example use
 
@@ -47,5 +48,7 @@ http://localhost:8080/staff/dashboard
 
 ## Changelog
 
-- 2026-11-27 (fix, local): admin also lost the personal rewards dropdown -> admin role holds staff.access so the customer-only guard excluded it -> restored header and sidebar rewards for admin while keeping staff hidden. Test: RoleNavigationTest
-- 2026-11-27 (fix, local): staff header and sidebar showed customer self-service rewards -> `loyalty.view` is shared by staff and admin -> gated the badge and `My rewards` on customer-only role while keeping overview and admin RBAC links. Test: RoleNavigationTest
+- 2026-11-27 (fix, local): mobile toggle sat right and profile overflowed -> shared right group and relative nested dropdown -> toggle sits beside brand. Test: RoleNavigationTest
+- 2026-11-27 (feat, local): staff had no reward management entry -> reward.index was admin-only -> staff now see the Reward catalog link via RBAC. Test: RoleNavigationTest
+- 2026-11-27 (fix, local): admin lost personal rewards dropdown -> staff.access guard excluded admin -> restored header and sidebar rewards for admin. Test: RoleNavigationTest
+- 2026-11-27 (fix, local): staff saw personal rewards -> loyalty.view is shared -> gated badge and My rewards on customer-only role, kept overview. Test: RoleNavigationTest

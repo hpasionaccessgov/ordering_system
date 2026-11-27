@@ -69,7 +69,11 @@ $this->params['breadcrumbs'][] = $this->title;
 <section class="mb-4 card cafebara-dashboard-card">
     <div class="card-header"><h2 class="mb-0 h5">Top selling products</h2></div>
     <div class="p-0 card-body">
-        <?= $this->render('_table', ['columns' => $columns, 'rows' => $topRows]) ?>
+        <?= $this->render('_table', [
+            'columns' => $columns,
+            'rows' => $topRows,
+            'pageParam' => 'topProductsPage',
+        ]) ?>
     </div>
 </section>
 
@@ -80,6 +84,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'columns' => $columns,
             'rows' => $leastRows,
             'emptyMessage' => 'No active products.',
+            'pageParam' => 'leastProductsPage',
         ]) ?>
     </div>
 </section>

@@ -17,12 +17,14 @@ files:
   - controllers/StaffController.php
   - controllers/AdminController.php
   - views/shared/_product_highlights.php
+  - views/product/_form.php
   - views/site/index.php
   - views/customer/index.php
   - views/staff/index.php
   - views/admin/index.php
 tests:
   - tests/Unit/Frontend/ProductHighlightsTest.php
+  - tests/Unit/Frontend/ProductEditorFlagsTest.php
   - tests/Unit/widgets/CustomerDashboardViewTest.php
   - tests/Functional/BatchCartCest.php
 data: [products.is_special, products.is_featured]
@@ -59,7 +61,7 @@ http://localhost:8080/customer/dashboard
 
 ## Chain
 
-- entry: controllers load active special and featured products with relations.
+- entry: controllers load active special and featured products with relations; the product editor keeps the two flags exclusive.
 - logic: the shared partial computes special IDs and assigns one batch form input per product.
 - data: `products.is_special` and `products.is_featured` flag the two lists.
 - presentation: `views/shared/_product_highlights.php` renders cards with `views/shared/_product_card.php`.
@@ -77,7 +79,7 @@ http://localhost:8080/customer/dashboard
 
 ## Gotchas
 
-- A product can be both special and featured; its featured card must use `batchFormId => null` to avoid a duplicate input.
+- The editor disables the other highlight checkbox when one is checked; legacy rows with both flags still need `batchFormId => null` on the featured card to avoid a duplicate input.
 - Guests can view products but cannot use batch add; keep the batch form permission-gated.
 - Dashboard permission checks still decide whether the highlights render at all.
 - `/menu` and `/catalog/products` deliberately list all products; do not add the highlights partial there.
@@ -85,10 +87,11 @@ http://localhost:8080/customer/dashboard
 
 ## Tests
 
-The focused command checks the shared partial, the four showcasing views and the absence of the partial on menu/catalog. The customer dashboard test covers the permission guard; the functional batch-cart test covers a product that is both special and featured.
+The focused command checks the shared partial, the four showcasing views and the absence of the partial on menu/catalog. The editor test covers flag exclusivity and checkbox color; the customer dashboard test covers the permission guard; the batch-cart test covers a product that is both special and featured.
 
 ## Changelog
 
+- 2026-11-27 (fix, local): both flags could be checked and checkboxes turned green -> no exclusion and is-valid won -> editor disables the other and keeps brown. Test: ProductEditorFlagsTest
 - 2026-11-27 (fix, local): home showed the featured heading with no cards -> actionIndex passed only the data provider -> passed its models as featuredProducts. Test: ProductHighlightsTest
-- 2026-11-27 (refactor, local): highlights on menu and catalog complicated plain listings -> those pages need all products only -> reverted both controllers and views, kept home and dashboards. Test: ProductHighlightsTest
-- 2026-11-27 (feat, local): highlights existed only on home -> dashboards, menu and catalog lacked specials and featured sections -> added shared partial and wired all audiences. Test: ProductHighlightsTest
+- 2026-11-27 (refactor, local): menu and catalog had highlights -> plain listings wanted all products -> reverted those pages, kept home and dashboards. Test: ProductHighlightsTest
+- 2026-11-27 (feat, local): highlights existed only on home -> other screens lacked specials -> added shared partial to home and dashboards. Test: ProductHighlightsTest

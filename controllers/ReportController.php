@@ -17,6 +17,7 @@ use yii\db\Expression;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -72,6 +73,8 @@ class ReportController extends Controller
 
     public function actionLoyalty(): string
     {
+        $this->requireLoyaltyReportAccess();
+
         return $this->render('loyalty', ['filter' => $this->filter()] + $this->build('loyalty'));
     }
 
@@ -79,6 +82,9 @@ class ReportController extends Controller
     {
         if (!in_array($report, self::REPORTS, true) || !in_array($format, self::FORMATS, true)) {
             throw new NotFoundHttpException('Report or export format not found.');
+        }
+        if ($report === 'loyalty') {
+            $this->requireLoyaltyReportAccess();
         }
 
         $data = $this->build($report);
@@ -91,8 +97,46 @@ class ReportController extends Controller
             $data['summary'],
             $this->filter(),
             $report . '-report-' . Yii::$app->formatter->asDate(time(), 'php:Y-m-d'),
-            $data['charts'] ?? [],
+            $this->chartImages((array) Yii::$app->request->post('charts', [])),
         );
+    }
+
+    private function requireLoyaltyReportAccess(): void
+    {
+        if (!Yii::$app->user->can('loyalty.report')) {
+            throw new ForbiddenHttpException('You are not allowed to view the loyalty report.');
+        }
+    }
+
+    /**
+     * @param list<mixed> $charts
+     * @return list<string>
+     */
+    private function chartImages(array $charts): array
+    {
+        $images = [];
+        $total = 0;
+        foreach (array_slice($charts, 0, 4) as $value) {
+            if (!is_string($value)
+                || preg_match('/^data:image\/png;base64,([A-Za-z0-9+\/]+={0,2})$/', $value, $match) !== 1
+            ) {
+                continue;
+            }
+            $binary = base64_decode($match[1], true);
+            if ($binary === false
+                || !str_starts_with($binary, "\x89PNG\r\n\x1a\n")
+                || strlen($binary) > 1200000
+            ) {
+                continue;
+            }
+            $total += strlen($binary);
+            if ($total > 4000000) {
+                break;
+            }
+            $images[] = $value;
+        }
+
+        return $images;
     }
 
     /**
@@ -107,21 +151,6 @@ class ReportController extends Controller
             'inventory' => $this->inventoryData(),
             'loyalty' => $this->loyaltyData(),
         };
-    }
-
-    /**
-     * @param list<string|int> $labels
-     * @param list<int|float|string> $values
-     * @return array{title: string, labels: list<string>, values: list<float>, format: string}
-     */
-    private function chart(string $title, array $labels, array $values, string $format = 'number'): array
-    {
-        return [
-            'title' => $title,
-            'labels' => array_slice(array_map('strval', array_values($labels)), -12),
-            'values' => array_slice(array_map('floatval', array_values($values)), -12),
-            'format' => $format,
-        ];
     }
 
     private function salesData(): array
@@ -146,10 +175,6 @@ class ReportController extends Controller
             'revenueLabels' => $labels,
             'revenueValues' => $revenue,
             'orderValues' => $orders,
-            'charts' => [
-                $this->chart('Revenue by day', $labels, $revenue, 'money'),
-                $this->chart('Orders by day', $labels, $orders),
-            ],
         ];
     }
 
@@ -177,10 +202,6 @@ class ReportController extends Controller
             'topLabels' => $labels,
             'topValues' => $quantities,
             'revenueValues' => $revenues,
-            'charts' => [
-                $this->chart('Units sold by product', $labels, $quantities),
-                $this->chart('Revenue by product', $labels, $revenues, 'money'),
-            ],
         ];
     }
 
@@ -214,10 +235,6 @@ class ReportController extends Controller
             'volumeRows' => $volumeRows,
             'volumeLabels' => $volumeLabels,
             'volumeValues' => $volumeValues,
-            'charts' => [
-                $this->chart('Orders by status', $statusLabels, $statusValues),
-                $this->chart('Order volume by day', $volumeLabels, $volumeValues),
-            ],
         ];
     }
 
@@ -248,10 +265,6 @@ class ReportController extends Controller
             'levelLabels' => $levelLabels,
             'levelValues' => $levelValues,
             'minimumValues' => array_column($levels, 'minimum_stock'),
-            'charts' => [
-                $this->chart('Consumption by item', $consumptionLabels, $consumptionValues, 'decimal'),
-                $this->chart('Current stock by item', $levelLabels, $levelValues),
-            ],
         ];
     }
 
@@ -281,11 +294,6 @@ class ReportController extends Controller
             'volumeLabels' => $dates,
             'earnedValues' => array_column($rows, 'earned'),
             'redeemedValues' => array_column($rows, 'redeemed'),
-            'charts' => [
-                $this->chart('Members by tier', $tierLabels, $tierValues),
-                $this->chart('Points issued by day', $dates, array_column($rows, 'earned')),
-                $this->chart('Points redeemed by day', $dates, array_column($rows, 'redeemed')),
-            ],
         ];
     }
 

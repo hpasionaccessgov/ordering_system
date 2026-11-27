@@ -108,12 +108,45 @@ final class RbacPermissionPolicyTest extends Unit
 
     public function testActivityAndNotificationIndexControlTheirActions(): void
     {
-        foreach (['activityLog' => 'view', 'notification' => 'read', 'settings' => 'update'] as $module => $action) {
+        foreach ([
+            'activityLog' => ['view'],
+            'notification' => ['read', 'delete'],
+            'settings' => ['update'],
+        ] as $module => $actions) {
             $index = $module . '.index';
-            $dependent = $module . '.' . $action;
-            self::assertSame([$index, $dependent], RbacPermissionPolicy::expandIndexPermission($index, []));
+            $dependents = array_map(static fn(string $action): string => $module . '.' . $action, $actions);
+            self::assertSame(
+                array_merge([$index], $dependents),
+                RbacPermissionPolicy::expandIndexPermission($index, []),
+            );
             self::assertSame([$index], RbacPermissionPolicy::normalizeRolePermissions([$index]));
-            self::assertSame([], RbacPermissionPolicy::normalizeRolePermissions([$dependent]));
+            self::assertSame([], RbacPermissionPolicy::normalizeRolePermissions($dependents));
         }
+    }
+
+    public function testRoleEditorLabelsAndDescribesRecentFeaturePermissions(): void
+    {
+        $view = (string) file_get_contents(dirname(__DIR__, 3) . '/views/admin-user/roles.php');
+
+        foreach ([
+            "'loyalty' => 'Loyalty'",
+            "'reward' => 'Rewards'",
+            "'reports' => 'Reports'",
+            "'order.board' => 'View the live order board.'",
+            "'loyalty.report' => 'View the loyalty report.'",
+            "'reports.export' => 'Download report exports.'",
+            "'reward.index' => 'View the reward catalog.'",
+        ] as $expected) {
+            self::assertStringContainsString($expected, $view);
+        }
+    }
+
+    public function testLoyaltyReportCannotBeReachedThroughTheSharedReportsPermission(): void
+    {
+        $controller = (string) file_get_contents(dirname(__DIR__, 3) . '/controllers/ReportController.php');
+
+        self::assertStringContainsString('requireLoyaltyReportAccess()', $controller);
+        self::assertStringContainsString("can('loyalty.report')", $controller);
+        self::assertStringContainsString('ForbiddenHttpException', $controller);
     }
 }

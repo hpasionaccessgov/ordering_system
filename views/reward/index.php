@@ -31,6 +31,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             'id',
             'name',
+            [
+                'attribute' => 'product_id',
+                'label' => 'Menu product',
+                'value' => static fn(Reward $reward): string => $reward->product?->name ?? '—',
+            ],
             'description:ntext',
             [
                 'attribute' => 'point_cost',

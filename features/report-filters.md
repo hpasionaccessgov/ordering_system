@@ -72,6 +72,7 @@ http://localhost:8080/reports/sales
 - `load()` invokes `setCustomerId`, so fix belongs on the model, not only in the orders action.
 - `SalesReportService::todaySummary()` sets `preset = today` explicitly and is unaffected by the new default.
 - Today stays in the preset dropdown; only the initial selection changed.
+- `reports.view` alone does not open the loyalty report; `loyalty.report` is checked by the controller too.
 
 ## Tests
 
@@ -79,6 +80,8 @@ The focused unit test covers the week default, Monday start and customer dropdow
 
 ## Changelog
 
+- 2026-11-27 (fix, local): loyalty report was reachable by URL -> `reports.view` was the only guard -> view and export require `loyalty.report`. Test: RbacPermissionPolicyTest
+- 2026-11-27 (refactor, local): PDF export had a separate CSS-bar payload -> real charts need browser capture -> `actionExport` validates posted PNGs and report builders no longer carry chart series. Test: ReportChartExportTest
 - 2026-11-27 (feat, local): PDF exports had no analytics payload -> report builders returned only table data -> added chart series to `ReportController::build`. Test: ReportExportServiceTest
 - 2026-11-27 (fix, local): report day counts were one too high -> inclusive end-of-day was rounded instead of truncated -> `days()` now uses `intdiv`. Test: ReportFilterTest
 - 2026-11-27 (fix, local): filtering orders threw on an empty customer dropdown -> Yii assigned `''` to a typed `?int` property -> normalized the value in `ReportFilter::setCustomerId` and defaulted presets to week. Test: ReportFilterTest

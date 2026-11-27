@@ -45,6 +45,28 @@ $this->registerJs(<<<'JS'
 })();
 JS);
 
+$this->registerJs(<<<'JS'
+(() => {
+    const featured = document.getElementById('product-is_featured');
+    const special = document.getElementById('product-is_special');
+    if (!featured || !special) {
+        return;
+    }
+
+    const sync = (active, other) => {
+        other.disabled = active.checked;
+        if (active.checked) {
+            other.checked = false;
+        }
+    };
+
+    sync(featured, special);
+    sync(special, featured);
+    featured.addEventListener('change', () => sync(featured, special));
+    special.addEventListener('change', () => sync(special, featured));
+})();
+JS);
+
 $form = AdminActiveForm::begin([
     'options' => [
         'class' => 'product-editor-form',

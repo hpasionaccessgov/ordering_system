@@ -4,21 +4,26 @@ title: Report PDF analytics
 kind: feature
 domain: reports
 status: active
-summary: PDF exports embed server-rendered analytics bars and summary statistics for every report.
+summary: PDF exports embed browser-captured Chart.js images and summary statistics for every report.
 aliases: []
 entry:
+  - POST /reports/export
   - GET /reports/export?report=sales&format=pdf
 files:
+  - assets/ReportChartExportAsset.php
   - controllers/ReportController.php
   - services/ReportExportService.php
+  - views/report/_export_links.php
   - views/report/_export_pdf.php
+  - web/js/report-export.js
 tests:
+  - tests/Unit/Frontend/ReportChartExportTest.php
   - tests/Unit/Services/ReportExportServiceTest.php
 data: []
-config: []
+config: [Navigation::REPORT_EXPORT_INDEX]
 connections:
   - report-filters: parent: shares ReportController::build and ReportFilter for export params.
-  - report-charts: PDF series use the same labels and values as the on-screen charts.
+  - report-charts: captures the canvases rendered by the shared chart partial.
 hubs: []
 updated: 2026-11-27
 ---
@@ -27,50 +32,53 @@ updated: 2026-11-27
 
 ## Summary
 
-Every PDF export includes the filtered summary statistics plus compact bar charts drawn server-side. Dompdf renders the bars as HTML tables, so exports need no JavaScript or chart image service.
+PDF exports embed PNGs captured from the report page’s real Chart.js canvases. The export form posts the images with the current filter; Dompdf places them beside the summary statistics and data table.
 
 ## Example use
 
-http://localhost:8080/reports/export?report=sales&format=pdf
+Open http://localhost:8080/reports/sales and click **Export PDF**.
 
-`vendor/bin/codecept run Unit --filter ReportExportServiceTest`
+`vendor/bin/codecept run Unit --filter 'ReportChartExportTest|ReportExportServiceTest'`
 
 ## Entry points
 
 | Entry | Handler (Symbol) | Kind / access | Note |
 |---|---|---|---|
-| GET /reports/export?report=sales&format=pdf | `ReportController::actionExport` | http-route, reports.export | Passes chart payloads into `ReportExportService::export`. |
-| GET /reports/export?report=product&format=pdf | `ReportController::actionExport` | http-route, reports.export | Same pipeline for every report type. |
+| POST /reports/export | `ReportController::actionExport` | http-route, reports.export | Receives chart PNGs and the filter in the action URL. |
+| GET /reports/export?report=sales&format=pdf | `ReportController::actionExport` | http-route, reports.export | Non-JS fallback; PDF shows a capture hint instead of charts. |
 
 ## Chain
 
-- entry: `ReportController::actionExport` builds report data and filter state.
-- logic: private `chart` methods cap each series to the last twelve values.
-- data: report services supply labels, counts, revenue and stock series.
-- presentation: `views/report/_export_pdf.php` renders summary cells and CSS bar tables.
-- config: `ReportController::FORMATS` keeps PDF in the export allow-list.
+- entry: `views/report/_export_links.php` renders a CSRF-protected POST form.
+- logic: `report-export.js` captures each visible Chart.js canvas with `toDataURL`.
+- data: `ReportController::chartImages` validates PNG data URLs and size caps.
+- presentation: `views/report/_export_pdf.php` embeds images with the summary and table.
+- config: `Navigation::REPORT_EXPORT_INDEX` supplies the pretty export URL.
 
 ## Flow
 
-1. The export link sends the active `ReportFilter` to `ReportController::actionExport`.
-2. `ReportController::build` returns columns, rows, summary and chart series.
-3. `ReportController::chart` normalizes labels to strings and values to floats.
-4. `ReportExportService::export` routes PDF requests to `pdf`.
-5. `ReportExportService::pdf` renders the standalone export template.
-6. The template draws one bar per value using the series maximum as 100 percent.
-7. `Dompdf::render` produces the attachment and `response` streams it.
+1. A report page registers `ReportChartExportAsset`.
+2. The shared export partial renders CSV/Excel links and a POST PDF form.
+3. The form action carries the report key and current `ReportFilter` attributes.
+4. On submit, the script finds `.cafebara-report-chart canvas` elements.
+5. Print-safe axis colors are applied, each canvas becomes a PNG data URL, and colors are restored.
+6. `ReportController::chartImages` accepts only valid, bounded PNG data URLs.
+7. `ReportExportService::pdf` renders the images into the PDF with the summary statistics.
 
 ## Gotchas
 
-- Chart.js cannot run inside Dompdf; charts must be rendered as HTML/CSS before conversion.
-- A series with no positive values shows `No chart data for this series.` instead of a broken chart.
-- Money is converted from `₱` to `PHP ` because the PDF font does not include the peso glyph.
-- Only the last twelve points of a long series are drawn so bars stay readable.
+- Dompdf cannot execute Chart.js; the browser must hand off a rendered PNG.
+- Dark-mode text is switched to `#212529` for capture, then restored on the page.
+- GET/export clients without JavaScript get the table and a short capture hint, not chart images.
+- PNG data URLs are capped at 1.2 MB each and 4 MB total per export.
+- Captured charts are bitmap images, not selectable or editable inside the PDF.
 
 ## Tests
 
-The focused unit test renders the PDF template, checks bar widths, formatted values and the empty-series placeholder. Live export checks all five report PDFs return HTTP 200 with chart headings.
+The focused command checks the export form, capture script, image validation hook and PDF template. Live checks confirm PDFs still return HTTP 200 with summary text.
 
 ## Changelog
 
+- 2026-11-27 (fix, local): loyalty export bypassed its permission -> shared export checked only report permissions -> actionExport requires `loyalty.report`. Test: RbacPermissionPolicyTest
+- 2026-11-27 (feat, local): exported PDFs showed hand-drawn CSS bars instead of the web charts -> Dompdf cannot run Chart.js -> capture real canvases in the browser and embed validated PNGs. Test: ReportChartExportTest
 - 2026-11-27 (feat, local): PDF downloads listed raw rows only -> reports had no printable analytics -> added server-rendered chart bars and summary statistics to every PDF export. Test: ReportExportServiceTest
