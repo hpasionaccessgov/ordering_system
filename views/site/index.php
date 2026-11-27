@@ -3,7 +3,7 @@
 use app\services\Navigation;
 use yii\helpers\Html;
 
-/** @var list<app\models\Product> $featuredProducts */
+/** @var yii\data\ActiveDataProvider $featuredDataProvider */
 /** @var list<app\models\Product> $specialProducts */
 /** @var array<int, int> $favoriteIds */
 /** @var array<int, array{average: float, count: int}> $ratingSummaries */
@@ -86,7 +86,8 @@ $batchFormId = Yii::$app->user->can('cart.add') ? 'home-batch-cart' : null;
                     <p class="mb-3 text-body-secondary">
                         Download the application for additional points!
                     </p>
-                    <?= Html::a('Download App', Navigation::url(Navigation::MENU), ['class' => 'btn btn-outline-primary']) ?> <!-- Temporary as public menu nav but will change to actual app download link -->
+                    <!-- Temporary as public menu nav but will change to actual app download link in the future -->
+                    <?= Html::a('Download App', Navigation::url(Navigation::MENU), ['class' => 'btn btn-outline-primary']) ?>
                 </div>
             </section>
         </div>
