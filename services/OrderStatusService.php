@@ -133,7 +133,9 @@ final class OrderStatusService
         $userIds = User::find()->select('id')->where(['status' => User::STATUS_ACTIVE])->column();
         $rows = [];
         $createdAt = time();
-        $message = 'Order ' . $order->order_number . ' was cancelled by the customer.';
+        $message = (string) $order->status === Order::STATUS_PENDING
+            ? 'New order ' . $order->order_number . ' received.'
+            : 'Order ' . $order->order_number . ' was cancelled by the customer.';
         foreach ($userIds as $userId) {
             if ((int) $userId === $actorId || (int) $userId === (int) $order->user_id) {
                 continue;

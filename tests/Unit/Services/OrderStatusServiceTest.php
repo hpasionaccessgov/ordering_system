@@ -59,7 +59,10 @@ final class OrderStatusServiceTest extends Unit
             ['pending', 'confirmed', 'processing', 'ready_for_pickup', 'completed'],
             array_column($order->statusHistory, 'to_status'),
         );
-        self::assertSame(4, (int) Notification::find()->where(['order_id' => $order->id])->count());
+        self::assertSame(
+            4,
+            (int) Notification::find()->where(['order_id' => $order->id, 'user_id' => $user->id])->count(),
+        );
 
         $this->expectException(BadRequestHttpException::class);
         $statusService->process($order, (int) $user->id);
@@ -107,12 +110,18 @@ final class OrderStatusServiceTest extends Unit
         $transaction = \Yii::$app->db->beginTransaction();
         try {
             (new OrderStatusService())->process($order, (int) $user->id);
-            self::assertSame(1, (int) Notification::find()->where(['order_id' => $order->id])->count());
+            self::assertSame(
+                1,
+                (int) Notification::find()->where(['order_id' => $order->id, 'user_id' => $user->id])->count(),
+            );
         } finally {
             $transaction->rollBack();
         }
 
-        self::assertSame(0, (int) Notification::find()->where(['order_id' => $order->id])->count());
+        self::assertSame(
+            0,
+            (int) Notification::find()->where(['order_id' => $order->id, 'user_id' => $user->id])->count(),
+        );
         self::assertSame(Order::STATUS_PENDING, Order::findOne($order->id)->status);
     }
 

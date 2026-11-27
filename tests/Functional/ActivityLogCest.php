@@ -8,7 +8,6 @@ use app\models\ActivityLog;
 use app\models\ActivityLogSearch;
 use app\models\ApplicationSettings;
 use app\models\User;
-use app\services\ActivityLogger;
 use app\tests\Support\FunctionalTester;
 use Yii;
 use yii\caching\ArrayCache;
@@ -20,7 +19,6 @@ final class ActivityLogCest
     {
         Yii::$app->set('authManager', DbManager::class);
         Yii::$app->set('cache', ArrayCache::class);
-        (new ActivityLogger())->bootstrap(Yii::$app);
     }
 
     public function recordsSuccessfulAuthenticationAndSignedInVisits(FunctionalTester $I): void
@@ -92,7 +90,7 @@ final class ActivityLogCest
         $I->amOnRoute('admin/activity', ['event' => 'logout']);
         $I->seeElement('select[name="event"] option[value="logout"][selected]');
         $I->submitForm('form[role="search"]', ['event' => 'logout']);
-        $I->dontSee('Login', 'td');
+        $I->dontSee('Login', 'td:nth-child(4)');
     }
 
     public function deletingAUserKeepsTheirActivityWithoutIdentity(FunctionalTester $I): void
@@ -191,8 +189,9 @@ final class ActivityLogCest
             'per-page' => 100,
         ]);
         $I->seeResponseCodeIs(200);
-        $I->seeNumberOfElements('tbody tr[data-key]', 9);
-        $I->see('1-9 of 12');
+        $pageSize = (int) ApplicationSettings::pagination()['pageSize'];
+        $I->seeNumberOfElements('tbody tr[data-key]', $pageSize);
+        $I->see("1-{$pageSize} of 12");
         $I->amOnRoute('activity-log/index', ['ActivityLogSearch' => ['id' => $logs[0]->id]]);
         $I->seeNumberOfElements('tbody tr[data-key]', 1);
         $I->amOnRoute('activity-log/view', ['id' => $logs[0]->id]);

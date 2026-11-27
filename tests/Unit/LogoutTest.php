@@ -8,14 +8,19 @@ use app\controllers\SiteController;
 use app\models\User;
 use Yii;
 use yii\base\Security;
-use yii\web\IdentityInterface;
 use yii\web\View;
 
 final class LogoutTest extends \Codeception\Test\Unit
 {
+    protected function _after(): void
+    {
+        Yii::$app->user->logout();
+    }
+
     public function testRenderLogoutLinkWhenUserIsLoggedIn(): void
     {
-        $user = User::findIdentity('100');
+        Yii::$app->request->setScriptUrl('/index.php');
+        $user = $this->user();
 
         $controller = new SiteController(
             'site',
@@ -23,42 +28,38 @@ final class LogoutTest extends \Codeception\Test\Unit
             Yii::$app->mailer,
             new Security(),
         );
-
         $view = new View(['context' => $controller]);
-
-        self::assertNotNull(
-            $user,
-            "Failed asserting that the user identity with ID '100' exists.",
-        );
-        self::assertInstanceOf(
-            IdentityInterface::class,
-            $user,
-            "Failed asserting that the identity is an instance of 'Identity' class.",
-        );
+        Yii::$app->controller = $controller;
 
         Yii::$app->user->login($user);
 
         $html = $view->render('//layouts/main.php', ['content' => 'Hello World°']);
 
-        self::assertStringContainsString(
-            'Logout (admin)',
-            $html,
-            'Failed asserting that the logout link is rendered for a logged-in user.',
-        );
-        self::assertStringContainsString(
-            'data-method="POST"',
-            $html,
-            'Failed asserting that the logout link uses POST method.',
-        );
+        self::assertStringContainsString($user->username, $html);
+        self::assertStringContainsString('Sign out', $html);
+        self::assertStringContainsString('method="POST"', $html);
 
         $controller->actionLogout();
 
         $html = $view->render('//layouts/main.php', ['content' => 'Hello World°']);
 
-        self::assertStringNotContainsString(
-            'Logout (admin)',
-            $html,
-            'Failed asserting that the logout link is not rendered after logout.',
-        );
+        self::assertStringNotContainsString('Sign out', $html);
+        self::assertStringContainsString('Sign in', $html);
+    }
+
+    private function user(): User
+    {
+        $suffix = substr(bin2hex(random_bytes(4)), 0, 8);
+        $user = new User([
+            'username' => 'account_' . $suffix,
+            'email' => $suffix . '@account.test',
+            'full_name' => 'Logout test',
+            'status' => User::STATUS_ACTIVE,
+        ]);
+        $user->setPassword('Logout123!');
+        $user->generateAuthKey();
+        self::assertTrue($user->save(), json_encode($user->getErrors()));
+
+        return $user;
     }
 }

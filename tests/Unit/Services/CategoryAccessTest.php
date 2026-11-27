@@ -87,13 +87,18 @@ final class CategoryAccessTest extends Unit
             $site = Yii::createObject(SiteController::class, ['site', Yii::$app]);
             self::assertTrue($site->beforeAction(new Action('profile', $site)));
 
-            $sidebar = (new View())->renderFile(Yii::getAlias('@app/views/layouts/_sidebar.php'));
+            $view = new View(['context' => Yii::$app->controller]);
+            $sidebar = $view->renderFile(Yii::getAlias('@app/views/layouts/_sidebar.php'));
             self::assertStringContainsString('Categories', $sidebar);
-            self::assertStringContainsString('Profile', $sidebar);
-            self::assertStringContainsString('<p>Product</p>', $sidebar);
+            self::assertStringNotContainsString('Profile', $sidebar);
+            self::assertStringContainsString('<p>Products</p>', $sidebar);
             self::assertStringContainsString('<p>Orders</p>', $sidebar);
             self::assertStringNotContainsString('<p>Roles</p>', $sidebar);
             self::assertStringNotContainsString('<p>Dashboard</p>', $sidebar);
+
+            $header = $view->renderFile(Yii::getAlias('@app/views/layouts/_header.php'));
+            self::assertStringContainsString('Profile', $header);
+            self::assertStringContainsString('Sign out', $header);
 
             foreach ([
                 [$category, 'create'],

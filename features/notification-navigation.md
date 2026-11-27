@@ -74,5 +74,6 @@ The functional test proves unread scoping, header dropdown hrefs and the 405 on 
 
 ## Changelog
 
+- 2026-11-27 (fix, local): stale notification fixtures failed -> old copy and fixed page size -> assertions now match current labels and settings. Test: NotificationCest
 - 2026-11-27 (refactor, local): customer dashboard moved its showcase into the shared highlights partial -> the old section block was removed -> notification links stay on GET NOTIFICATION_VIEW. Test: CustomerDashboardViewTest
 - 2026-11-27 (fix, local): notification `View` links pointed at a POST-only action -> callers used NOTIFICATION_READ -> links now use GET NOTIFICATION_VIEW. Test: NotificationCest

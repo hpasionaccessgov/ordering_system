@@ -23,13 +23,13 @@ $displayName = $identity instanceof User
     : 'there';
 ?>
 
-<section class="card dashboard-welcome-card dashboard-welcome-admin border-0 mb-4">
-    <div class="card-body row align-items-center g-4">
+<section class="mb-4 card border-0 dashboard-welcome-card dashboard-welcome-admin">
+    <div class="row g-4 card-body align-items-center">
         <div class="col">
-            <span class="dashboard-welcome-role mb-3">
+            <span class="mb-3 dashboard-welcome-role">
                 <i class="bi bi-shield-check" aria-hidden="true"></i> Administration
             </span>
-            <h1 class="h3 mt-2 mb-2">Welcome, <?= Html::encode($displayName) ?></h1>
+            <h1 class="mt-2 mb-2 h3">Welcome, <?= Html::encode($displayName) ?></h1>
             <p class="mb-3">Manage access, keep the catalog healthy, and monitor cafe operations.</p>
             <div class="d-flex flex-wrap gap-2">
                 <?php if (Yii::$app->user->can('user.index')) : ?>
@@ -64,7 +64,7 @@ $displayName = $identity instanceof User
         ] as [$label, $value, $icon, $caption]
     ) : ?>
         <div class="col-12 col-sm-6 col-xl-3">
-            <section class="small-box cafebara-stat-card h-100">
+            <section class="h-100 small-box cafebara-stat-card">
                 <div class="inner">
                     <p><?= Html::encode($label) ?></p>
                     <h3 class="cafebara-stat-value"><?= Html::encode((string) $value) ?></h3>
@@ -82,7 +82,7 @@ $displayName = $identity instanceof User
             'orderStatusCounts' => $orderStatusCounts,
         ]) ?>
     </div>
-</div>
+</div>  
 
 <div class="row g-4">
     <div class="col-12 col-xl-8">

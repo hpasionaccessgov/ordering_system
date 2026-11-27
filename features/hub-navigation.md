@@ -45,4 +45,6 @@ Navigation holds every browser-facing route key, its controller route ID and its
 
 ## Changelog
 
+- 2026-11-27 (fix, local): stale notification fixture failed -> old selectors and retention cache -> assertions and cache reset updated. Test: NotificationCest
+- 2026-11-27 (feat, local): API routes needed JSON paths -> browser map cannot own them -> merged Module::urlRules into urlManager while Navigation still owns browser links. Test: NavigationTest
 - 2026-11-27 (fix, local): cart form and notification links reached dead or POST-only routes -> stale map entries and wrong constants -> corrected cart route, added GET view key and removed dead rules. Test: NavigationTest

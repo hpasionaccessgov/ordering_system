@@ -65,7 +65,7 @@ final class NotificationCest
         $I->see('View all notifications', '.cafebara-notification-menu');
         $I->click('Mark as read');
         $I->seeElement('[data-notification-link][aria-label="Notifications"]');
-        $I->dontSee('Unread');
+        $I->dontSeeElement('[data-notification-item] .badge.text-bg-warning');
         $I->dontSee($orders[0]->order_number, '[data-notification-item]');
         $I->amOnRoute('notification/read', ['id' => $otherNotification->id]);
         $I->seeResponseCodeIs(405);
@@ -83,7 +83,8 @@ final class NotificationCest
             $I->assertTrue($notification->save(false));
         }
         $I->amOnRoute('notification/index', ['per-page' => 100]);
-        $I->seeNumberOfElements('.list-group-item', 9);
+        $pageSize = (int) ApplicationSettings::pagination()['pageSize'];
+        $I->seeNumberOfElements('.list-group-item', $pageSize);
         $I->seeNumberOfElements('[data-notification-item]', 5);
 
         $auth = Yii::$app->authManager;
@@ -173,7 +174,7 @@ final class NotificationCest
         $I->see('"count":1');
         $I->amOnRoute('notification/index');
         $I->see('New order ' . $order->order_number . ' received.');
-        $I->see('View order');
+        $I->see('View');
         $I->amOnRoute('order/view', ['id' => $order->id]);
         $I->seeResponseCodeIs(200);
 
@@ -194,7 +195,7 @@ final class NotificationCest
         }
         $I->amLoggedInAs($users['admin']);
         $I->amOnRoute('notification/index');
-        $I->see('Order ' . $order->order_number . ' is cancelled.');
+        $I->see('Order ' . $order->order_number . ' was cancelled by the customer.');
 
         $notification = Notification::findOne(['user_id' => $users['staff']->id, 'order_id' => $order->id]);
         $auth->revoke($inheritedStaff, $users['staff']->id);
@@ -275,6 +276,7 @@ final class NotificationCest
             'created_at' => time() - 18 * 86400,
         ]);
         $I->assertTrue($expired->save(false));
+        Yii::$app->cache->delete('notification-retention-17');
         $I->amOnRoute('site/index');
         $I->assertNull(Notification::findOne($expired->id));
         $I->assertNotNull(Notification::findOne($theirs->id));

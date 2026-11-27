@@ -3,6 +3,7 @@
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 require_once dirname(__DIR__) . '/services/Navigation.php';
+require_once dirname(__DIR__) . '/modules/api/Module.php';
 $mailDsn = trim((string) ($_ENV['MAIL_DSN'] ?? $_SERVER['MAIL_DSN'] ?? ''));
 $mailer = [
     'class' => \yii\symfonymailer\Mailer::class,
@@ -36,6 +37,9 @@ $config = [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => '86b95d8059e7f70c9acdc17c14c54162a414d241c9d2d0e737091f590d7dc61f',
+            'parsers' => [
+                'application/json' => \yii\web\JsonParser::class,
+            ],
         ],
         'cache' => [
             'class' => \yii\caching\FileCache::class,
@@ -70,9 +74,15 @@ $config = [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'rules' => \app\services\Navigation::urlRules(),
+            'rules' => array_merge(
+                \app\services\Navigation::urlRules(),
+                \app\modules\api\Module::urlRules(),
+            ),
         ],
 
+    ],
+    'modules' => [
+        'api' => ['class' => \app\modules\api\Module::class],
     ],
     'params' => $params,
 ];

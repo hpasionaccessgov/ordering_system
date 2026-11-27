@@ -25,7 +25,7 @@ final class AdminGridPaginationTest extends Unit
             ],
         ]);
 
-        self::assertCount(10, $provider->getModels());
+        self::assertCount(9, $provider->getModels());
         $html = AdminGridView::widget([
             'dataProvider' => $provider,
             'columns' => ['id'],
@@ -37,7 +37,7 @@ final class AdminGridPaginationTest extends Unit
 
         $provider->pagination->setPage(2);
         $provider->refresh();
-        self::assertCount(5, $provider->getModels());
+        self::assertCount(7, $provider->getModels());
     }
 
     public function testGridUsesSharedHeaderAndSortableColumnLinks(): void

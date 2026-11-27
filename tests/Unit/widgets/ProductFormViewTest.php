@@ -19,6 +19,8 @@ final class ProductFormViewTest extends Unit
             ->getMock();
         $product->method('__get')->willReturn('Test product');
         $categories = [7 => 'Coffee'];
+        $inventoryItems = [4 => 'Coffee beans'];
+        $ingredientRows = [['inventory_id' => 4, 'quantity_required' => 1]];
 
         foreach (['create', 'update'] as $page) {
             $view = $this->getMockBuilder(View::class)
@@ -26,12 +28,22 @@ final class ProductFormViewTest extends Unit
                 ->getMock();
             $view->expects(self::once())
                 ->method('render')
-                ->with('_form', ['model' => $product, 'categories' => $categories])
+                ->with('_form', [
+                    'model' => $product,
+                    'categories' => $categories,
+                    'inventoryItems' => $inventoryItems,
+                    'ingredientRows' => $ingredientRows,
+                ])
                 ->willReturn('form rendered');
 
             $html = $view->renderFile(
                 Yii::getAlias("@app/views/product/{$page}.php"),
-                ['model' => $product, 'categories' => $categories],
+                [
+                    'model' => $product,
+                    'categories' => $categories,
+                    'inventoryItems' => $inventoryItems,
+                    'ingredientRows' => $ingredientRows,
+                ],
             );
             self::assertStringContainsString('form rendered', $html);
         }

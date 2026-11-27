@@ -10,6 +10,7 @@ return [
     'id' => 'basic-tests',
     'basePath' => dirname(__DIR__),
     'bootstrap' => [
+        \app\services\ActivityLogger::class,
         \app\tests\Support\MailerBootstrap::class,
     ],
     'aliases' => [
@@ -19,6 +20,12 @@ return [
     'language' => 'en-US',
     'components' => [
         'db' => $db,
+        'authManager' => [
+            'class' => \yii\rbac\DbManager::class,
+        ],
+        'cache' => [
+            'class' => \yii\caching\FileCache::class,
+        ],
         'mailer' => [
             'class' => \yii\symfonymailer\Mailer::class,
             'messageClass' => \yii\symfonymailer\Message::class,
@@ -43,6 +50,9 @@ return [
         'request' => [
             'cookieValidationKey' => 'test',
             'enableCsrfValidation' => false,
+            'parsers' => [
+                'application/json' => \yii\web\JsonParser::class,
+            ],
             // but if you absolutely need it set cookie domain to localhost
             /*
             'csrfCookie' => [
@@ -50,6 +60,9 @@ return [
             ],
             */
         ],
+    ],
+    'modules' => [
+        'api' => ['class' => \app\modules\api\Module::class],
     ],
     'params' => $params,
 ];

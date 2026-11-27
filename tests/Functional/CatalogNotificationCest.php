@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\tests\Functional;
 
 use app\models\Category;
+use app\models\Inventory;
 use app\models\Notification;
 use app\models\Product;
 use app\models\User;
@@ -28,6 +29,14 @@ final class CatalogNotificationCest
         $customer = $this->user($I, 'customer', $suffix);
         $category = new Category(['name' => 'Notice category ' . $suffix, 'status' => Category::STATUS_ACTIVE]);
         $I->assertTrue($category->save(), json_encode($category->getErrors()));
+        $inventory = new Inventory([
+            'name' => 'Notice inventory ' . $suffix,
+            'unit' => 'g',
+            'current_stock' => 100,
+            'minimum_stock' => 10,
+            'status' => Inventory::STATUS_ACTIVE,
+        ]);
+        $I->assertTrue($inventory->save(), json_encode($inventory->getErrors()));
 
         $productName = 'Notice product ' . $suffix;
         $I->amLoggedInAs($admin);
@@ -38,6 +47,8 @@ final class CatalogNotificationCest
             'Product[price]' => '12.00',
             'Product[description]' => 'Catalog notice description.',
             'Product[status]' => (string) Product::STATUS_ACTIVE,
+            'ingredients[0][inventory_id]' => (string) $inventory->id,
+            'ingredients[0][quantity_required]' => '1',
         ]);
         $I->see('Product created.');
         $product = Product::findOne(['name' => $productName]);
@@ -46,7 +57,7 @@ final class CatalogNotificationCest
         $created = Notification::findOne(['user_id' => $customer->id, 'type' => NotificationService::TYPE_PRODUCT_CREATED]);
         $I->assertNotNull($created);
         $I->assertSame('New product ' . $productName . ' added.', $created->label);
-        $I->assertSame(['/catalog/products/' . $product->id], $created->targetUrl);
+        $I->assertSame(['/product/view', 'id' => $product->id], $created->targetUrl);
         $I->assertNotNull(Notification::findOne([
             'user_id' => $staff->id, 'type' => NotificationService::TYPE_PRODUCT_CREATED,
         ]));
@@ -61,6 +72,8 @@ final class CatalogNotificationCest
             'Product[category_id]' => (string) $category->id,
             'Product[price]' => '12.00',
             'Product[status]' => (string) Product::STATUS_ACTIVE,
+            'ingredients[0][inventory_id]' => (string) $inventory->id,
+            'ingredients[0][quantity_required]' => '1',
         ]);
         $I->see('Product updated.');
         $I->assertNotNull(Notification::findOne([
@@ -82,7 +95,7 @@ final class CatalogNotificationCest
             'user_id' => $staff->id, 'type' => NotificationService::TYPE_CATEGORY_CREATED,
         ]);
         $I->assertNotNull($categoryCreated);
-        $I->assertSame(['/catalog/categories/' . $newCategory->id], $categoryCreated->targetUrl);
+        $I->assertSame(['/category/view', 'id' => $newCategory->id], $categoryCreated->targetUrl);
         $I->assertNull(Notification::findOne([
             'user_id' => $customer->id, 'type' => NotificationService::TYPE_CATEGORY_CREATED,
         ]));
@@ -97,7 +110,7 @@ final class CatalogNotificationCest
             'user_id' => $staff->id, 'type' => NotificationService::TYPE_CATEGORY_UPDATED,
         ]);
         $I->assertNotNull($categoryUpdated);
-        $I->assertSame(['/catalog/categories/' . $newCategory->id], $categoryUpdated->targetUrl);
+        $I->assertSame(['/category/view', 'id' => $newCategory->id], $categoryUpdated->targetUrl);
         $I->assertNull(Notification::findOne([
             'user_id' => $customer->id, 'type' => NotificationService::TYPE_CATEGORY_UPDATED,
         ]));
