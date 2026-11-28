@@ -19,7 +19,11 @@
         "yiisoft/yii2-bootstrap5": "~2.0.2",
         "yiisoft/yii2-symfonymailer": "~2.0.3",
         "vlucas/phpdotenv": "^5.8",
-        "dompdf/dompdf": "^3.1"
+        "dompdf/dompdf": "^3.1",
+        "almasaeed2010/adminlte": "^4.10.0",
+        "npm-asset/bootstrap-icons": "^1.13.1",
+        "npm-asset/chart.js": "^4.5.1",
+        "npm-asset/overlayscrollbars": "^2.11.0"
     },
     "require-dev": {
         "codeception/c3": "^2.8",

@@ -82,5 +82,6 @@ depends on or feeds; the reason for each link, entry points, flow, tests and got
 | hub-navigation | features/hub-navigation.md | route keys, controller routes and pretty URL patterns from one map |
 | hub-role-navigation | features/hub-role-navigation.md | staff lose personal rewards shortcuts; customers/admins keep them; overview and RBAC stay |
 | hub-theme | features/hub-theme.md | Bootstrap color-mode tokens for surfaces, text, borders and charts |
+| hub-vendor-assets | features/hub-vendor-assets.md | Composer-installed front-end assets under vendor paths; no node_modules runtime |
 
 ## Aliases
