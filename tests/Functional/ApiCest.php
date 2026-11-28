@@ -155,6 +155,60 @@ final class ApiCest
         $I->seeResponseCodeIs(401);
     }
 
+    public function registerCreatesCustomerAndReturnsToken(FunctionalTester $I): void
+    {
+        $suffix = substr(bin2hex(random_bytes(4)), 0, 8);
+        $username = 'api_reg_' . $suffix;
+        $I->sendAjaxPostRequest('/index.php?r=api/auth/register', [
+            'username' => $username,
+            'email' => $suffix . '@register.test',
+            'fullName' => 'Register ' . $suffix,
+            'password' => $this->password,
+            'passwordConfirm' => $this->password,
+        ]);
+        $I->seeResponseCodeIs(200);
+        $token = (string) $this->json($I)['data']['token'];
+        $I->assertNotEmpty($token);
+
+        $user = User::findOne(['username' => $username]);
+        $I->assertNotEmpty($user);
+        $I->assertNotNull(Yii::$app->authManager->getAssignment('customer', (int) $user->id));
+        $I->assertSame((int) $user->id, (int) $user->created_by);
+        $I->assertSame((int) $user->id, (int) $user->updated_by);
+
+        $I->haveHttpHeader('Authorization', 'Bearer ' . $token);
+        $I->sendAjaxGetRequest('/index.php?r=api/auth/profile');
+        $I->seeResponseCodeIs(200);
+        $I->assertSame($username, $this->json($I)['data']['username']);
+    }
+
+    public function registerRejectsDuplicateAndInvalidInput(FunctionalTester $I): void
+    {
+        $suffix = substr(bin2hex(random_bytes(4)), 0, 8);
+        $payload = [
+            'username' => 'api_dup_' . $suffix,
+            'email' => $suffix . '@dup.test',
+            'fullName' => 'Duplicate ' . $suffix,
+            'password' => $this->password,
+            'passwordConfirm' => $this->password,
+        ];
+        $I->sendAjaxPostRequest('/index.php?r=api/auth/register', $payload);
+        $I->seeResponseCodeIs(200);
+
+        $payload['email'] = 'other' . $suffix . '@dup.test';
+        $I->sendAjaxPostRequest('/index.php?r=api/auth/register', $payload);
+        $I->seeResponseCodeIs(422);
+        $I->assertSame('validation_failed', $this->json($I)['error']['code']);
+        $I->assertNotEmpty($this->json($I)['error']['errors']['username']);
+
+        $payload['username'] = 'api_bad_' . $suffix;
+        $payload['password'] = 'short';
+        $payload['passwordConfirm'] = 'short';
+        $I->sendAjaxPostRequest('/index.php?r=api/auth/register', $payload);
+        $I->seeResponseCodeIs(422);
+        $I->assertNotEmpty($this->json($I)['error']['errors']['password']);
+    }
+
     private function createUser(FunctionalTester $I, string $username, string $emailPart, ?string $role): User
     {
         $user = new User([

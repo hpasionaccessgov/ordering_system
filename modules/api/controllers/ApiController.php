@@ -8,6 +8,7 @@ use app\modules\api\exceptions\ApiException;
 use Yii;
 use yii\data\Pagination;
 use yii\filters\auth\HttpBearerAuth;
+use yii\filters\Cors;
 use yii\rest\Controller;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
@@ -42,12 +43,22 @@ abstract class ApiController extends Controller
     public function behaviors(): array
     {
         $behaviors = parent::behaviors();
+        unset($behaviors['rateLimiter'], $behaviors['authenticator']);
         $behaviors['contentNegotiator']['formats'] = ['application/json' => Response::FORMAT_JSON];
-        unset($behaviors['rateLimiter']);
+        // CORS must run before verbFilter so browser preflights are not rejected as unsupported methods.
+        $behaviors = array_merge([
+            'cors' => [
+                'class' => Cors::class,
+                'cors' => [
+                    'Origin' => Yii::$app->params['apiCorsOrigins'] ?? ['*'],
+                    'Access-Control-Request-Method' => ['GET', 'POST', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
+                    'Access-Control-Request-Headers' => ['Authorization', 'Content-Type'],
+                    'Access-Control-Max-Age' => 86400,
+                ],
+            ],
+        ], $behaviors);
         if ($this->authRequired) {
             $behaviors['authenticator'] = ['class' => HttpBearerAuth::class];
-        } else {
-            unset($behaviors['authenticator']);
         }
 
         return $behaviors;

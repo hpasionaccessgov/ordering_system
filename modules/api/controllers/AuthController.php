@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace app\modules\api\controllers;
 
 use app\models\LoginForm;
+use app\models\RegisterForm;
 use app\models\User;
 use app\modules\api\models\ApiToken;
+use app\services\RegistrationService;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Response;
@@ -16,11 +18,11 @@ final class AuthController extends ApiController
     public function behaviors(): array
     {
         $behaviors = parent::behaviors();
-        $behaviors['authenticator']['except'] = ['login'];
+        $behaviors['authenticator']['except'] = ['login', 'register'];
         $behaviors['access'] = [
             'class' => AccessControl::class,
             'rules' => [
-                ['actions' => ['login'], 'allow' => true, 'roles' => ['?', '@']],
+                ['actions' => ['login', 'register'], 'allow' => true, 'roles' => ['?', '@']],
                 ['actions' => ['logout', 'profile'], 'allow' => true, 'roles' => ['@']],
             ],
         ];
@@ -32,6 +34,7 @@ final class AuthController extends ApiController
     {
         return [
             'login' => ['POST'],
+            'register' => ['POST'],
             'logout' => ['POST'],
             'profile' => ['GET'],
         ];
@@ -46,15 +49,38 @@ final class AuthController extends ApiController
             $this->fail(401, 'invalid_credentials', $message, ['credentials' => array_values($form->getFirstErrors())]);
         }
 
-        $user = $form->getUser();
+        return $this->ok($this->tokenPayload($form->getUser()));
+    }
+
+    public function actionRegister(): array
+    {
+        $form = new RegisterForm();
+        $form->load(Yii::$app->request->getBodyParams(), '');
+        if (!$form->validate()) {
+            $this->fail(422, 'validation_failed', 'Please correct the errors below.', $form->getErrors());
+        }
+
+        $user = (new RegistrationService())->register($form);
+        if ($user->hasErrors()) {
+            $this->fail(422, 'registration_failed', 'We could not create your account.', $user->getErrors());
+        }
+
+        return $this->ok($this->tokenPayload($user));
+    }
+
+    /**
+     * @return array{token: string, token_type: string, expires_in: int, expires_at: int}
+     */
+    private function tokenPayload(User $user): array
+    {
         $issued = ApiToken::issue((int) $user->id);
 
-        return $this->ok([
+        return [
             'token' => $issued['token'],
             'token_type' => 'Bearer',
             'expires_in' => ApiToken::TTL_SECONDS,
             'expires_at' => $issued['expires_at'],
-        ]);
+        ];
     }
 
     public function actionLogout(): array

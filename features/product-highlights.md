@@ -33,7 +33,7 @@ connections: []
 hubs:
   - hub-theme: Highlight headings, cards and batch form use color-mode tokens.
   - hub-navigation: Browse links use Navigation::url.
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 # Product highlights
@@ -91,6 +91,7 @@ The focused command checks the shared partial, the four showcasing views and the
 
 ## Changelog
 
+- 2026-11-28 (refactor, local): signup writes sat in SiteController -> API needed the same rules -> moved creation/RBAC to RegistrationService. Test: ApiCest::registerCreatesCustomerAndReturnsToken
 - 2026-11-27 (fix, local): both flags could be checked and checkboxes turned green -> no exclusion and is-valid won -> editor disables the other and keeps brown. Test: ProductEditorFlagsTest
 - 2026-11-27 (fix, local): home showed the featured heading with no cards -> actionIndex passed only the data provider -> passed its models as featuredProducts. Test: ProductHighlightsTest
 - 2026-11-27 (refactor, local): menu and catalog had highlights -> plain listings wanted all products -> reverted those pages, kept home and dashboards. Test: ProductHighlightsTest

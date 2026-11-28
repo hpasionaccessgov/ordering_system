@@ -30,7 +30,7 @@ connections:
   - notification-navigation: notification list and single-row actions reuse Notification::visibleTo.
   - cart-quantity: cart writes reuse ShoppingCart add, update, remove and clear.
 hubs: []
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 # Customer Self-Service REST API
@@ -104,4 +104,5 @@ Authenticated clients manage their cart, loyalty balance, rewards, inbox, favori
 
 ## Changelog
 
+- 2026-11-28 (fix, local): shared ApiController had no CORS filter -> browser clients were blocked -> added Origin allowlist inherited by these endpoints. Test: curl OPTIONS /api/cart
 - 2026-11-27 (feat, local): self-service JSON endpoints were missing -> no cart, loyalty, inbox, favorites or reviews API -> added scoped controllers, routes and tests. Test: ApiCustomerCest

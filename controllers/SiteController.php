@@ -20,6 +20,7 @@ use app\models\ProductSearch;
 use app\services\FavoriteService;
 use app\services\LoyaltyService;
 use app\services\ProductReportService;
+use app\services\RegistrationService;
 use app\services\ReviewService;
 use app\services\ShoppingCart;
 use app\models\Category;
@@ -203,46 +204,9 @@ class SiteController extends Controller
         $model = new RegisterForm();
 
         if ($model->load($this->request->post()) && $model->validate()) {
-            $user = new User();
-            $user->username = $model->username;
-            $user->email = mb_strtolower($model->email);
-            $user->full_name = $model->fullName;
-            $user->setPassword($model->password);
-            $user->generateAuthKey();
-            $user->status = User::STATUS_ACTIVE;
+            $user = (new RegistrationService())->register($model);
 
-            $customerRole = Yii::$app->authManager->getRole('customer');
-            if ($customerRole === null) {
-                throw new \yii\base\InvalidConfigException(
-                    'The customer RBAC role is missing. Run the RBAC migrations.'
-                );
-            }
-
-            $transaction = Yii::$app->db->beginTransaction();
-            try {
-                $registrationSaved = $user->save();
-
-                if ($registrationSaved) {
-                    // Guest registration: no logged-in user for BlameableBehavior,
-                    // so credit the account to itself.
-                    $user->updateAttributes([
-                        'created_by' => $user->id,
-                        'updated_by' => $user->id,
-                    ]);
-                    Yii::$app->authManager->assign($customerRole, $user->getId());
-                    $transaction->commit();
-                } else {
-                    $transaction->rollBack();
-                }
-            } catch (\Throwable $exception) {
-                if ($transaction->isActive) {
-                    $transaction->rollBack();
-                }
-
-                throw $exception;
-            }
-
-            if ($registrationSaved) {
+            if (!$user->hasErrors()) {
                 if (Yii::$app->user->login($user)) {
                     Yii::$app->session->setFlash(
                         'success',

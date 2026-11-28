@@ -17,12 +17,14 @@ final class Module extends BaseModule
     {
         return [
             'POST api/login' => 'api/auth/login',
+            'POST api/register' => 'api/auth/register',
             'POST api/logout' => 'api/auth/logout',
             'GET api/profile' => 'api/auth/profile',
             'POST api/orders' => 'api/order/create',
             'POST api/orders/<id:\d+>/cancel' => 'api/order/cancel',
             'GET api/orders/<id:\d+>' => 'api/order/view',
             'api/login' => 'api/auth/login',
+            'api/register' => 'api/auth/register',
             'api/logout' => 'api/auth/logout',
             'api/profile' => 'api/auth/profile',
             'api/products' => 'api/product/index',

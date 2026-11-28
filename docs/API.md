@@ -3,8 +3,15 @@
 Base URL for local development: `http://localhost:8080/api`
 
 The API speaks JSON only. Send `Accept: application/json`; for writes send
-`Content-Type: application/json`. Catalog endpoints are public. Every other endpoint requires a
-bearer token from `POST /api/login`.
+`Content-Type: application/json`. Catalog and registration endpoints are public. Every other
+endpoint requires a bearer token from `POST /api/login` or `POST /api/register`.
+
+## Browser clients (CORS)
+
+`ApiController` attaches Yii's `Cors` filter before verb/auth filters. Allowed origins come from
+`API_CORS_ORIGINS` in `.env` (comma-separated). Defaults cover `http://localhost:8100` (`ionic serve`),
+`http://localhost:5173` (`npm run dev`), `http://localhost` and their `127.0.0.1` forms. Add a LAN
+origin there before testing from a physical device. Credentials are not used; auth is bearer only.
 
 ## Authentication
 
@@ -72,6 +79,7 @@ default page size comes from the admin settings page size.
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | POST | `/api/login` | public | Validate credentials and issue a bearer token. |
+| POST | `/api/register` | public | Register a customer with the website's rules and issue a bearer token. |
 | POST | `/api/logout` | bearer | Revoke the presented token. |
 | GET | `/api/profile` | bearer | Return id, username, email, full name and status. |
 | GET | `/api/products` | public | Paginated active products, name ascending. |
@@ -106,6 +114,17 @@ so prices are snapshot from the current product rows and the total is computed s
 `checkout_token` and other web form fields are never accepted as API credentials.
 
 ## Examples
+
+Registration (public; same `RegisterForm` rules as the website):
+
+```bash
+curl -sS -X POST http://localhost:8080/api/register \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"new_customer","email":"new@example.test","fullName":"New Customer","password":"CafebaraTest123!","passwordConfirm":"CafebaraTest123!"}'
+```
+
+It returns the same token payload as login. The new account is active with the `customer` role;
+duplicate or malformed fields return `422` with `validation_failed` and field errors.
 
 Catalog:
 
