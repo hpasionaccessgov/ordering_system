@@ -72,7 +72,7 @@ depends on or feeds; the reason for each link, entry points, flow, tests and got
 ## customer
 | slug | summary | links |
 |---|---|---|
-| rest-api-customer | Bearer-token APIs for cart, loyalty, rewards, notifications, favorites and reviews. | rest-api, reward-redemption, notification-navigation, cart-quantity |
+| rest-api-customer | Bearer-token APIs for cart, customer stats, loyalty, rewards, notifications, favorites and reviews. | rest-api, reward-redemption, notification-navigation, cart-quantity |
 
 ## shared (hubs)
 | slug | file | contract |

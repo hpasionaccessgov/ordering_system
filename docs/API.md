@@ -82,7 +82,9 @@ default page size comes from the admin settings page size.
 | POST | `/api/register` | public | Register a customer with the website's rules and issue a bearer token. |
 | POST | `/api/logout` | bearer | Revoke the presented token. |
 | GET | `/api/profile` | bearer | Return id, username, email, full name and status. |
+| GET | `/api/customer/summary` | bearer, `customer.access` | Order count, completed spend and favorite figures. |
 | GET | `/api/products` | public | Paginated active products, name ascending. |
+| GET | `/api/products/highlights` | public | Specials, featured products and top five best sellers. |
 | GET | `/api/products/{id}` | public | One active product. |
 | GET | `/api/categories` | public | Paginated active categories. |
 | POST | `/api/orders` | bearer, `cart.checkout` | Place an order from explicit items. |
@@ -105,7 +107,7 @@ default page size comes from the admin settings page size.
 | GET | `/api/favorites` | bearer, `favorite.index` | Paginated favorites with product details. |
 | POST | `/api/favorites` | bearer, `favorite.add` | Add `{product_id}`; idempotent. |
 | DELETE | `/api/favorites/{id}` | bearer, `favorite.remove` | Remove a favorite by product id. |
-| GET | `/api/reviews?product_id={id}` | bearer | Product reviews and rating summary. |
+| GET | `/api/reviews?product_id={id}` | bearer | Reviews, rating summary and completed orders eligible for review. |
 | POST | `/api/reviews` | bearer, `review.create` | Review a product from one completed order. |
 
 Customers see only their own orders. Staff and admin tokens can read all orders; cancellation
@@ -130,6 +132,7 @@ Catalog:
 
 ```bash
 curl -sS http://localhost:8080/api/products?page=0
+curl -sS http://localhost:8080/api/products/highlights
 curl -sS http://localhost:8080/api/products/33
 curl -sS http://localhost:8080/api/categories
 ```
@@ -154,6 +157,7 @@ curl -sS -X POST http://localhost:8080/api/orders/1/cancel -H 'Authorization: Be
 Customer self-service:
 
 ```bash
+curl -sS http://localhost:8080/api/customer/summary -H 'Authorization: Bearer REPLACE_WITH_TOKEN'
 curl -sS http://localhost:8080/api/cart -H 'Authorization: Bearer REPLACE_WITH_TOKEN'
 curl -sS -X POST http://localhost:8080/api/cart/items \
   -H 'Authorization: Bearer REPLACE_WITH_TOKEN' -H 'Content-Type: application/json' \

@@ -4,10 +4,11 @@ title: Customer Self-Service REST API
 kind: feature
 domain: customer
 status: active
-summary: Bearer-token APIs for cart, loyalty, rewards, notifications, favorites and reviews.
+summary: Bearer-token APIs for cart, customer stats, loyalty, rewards, notifications, favorites and reviews.
 aliases: []
 entry:
   - GET /api/cart
+  - GET /api/customer/summary
   - GET /api/loyalty
   - GET /api/rewards
   - GET /api/notifications
@@ -16,6 +17,7 @@ entry:
 files:
   - modules/api/Module.php
   - modules/api/controllers/CartController.php
+  - modules/api/controllers/CustomerController.php
   - modules/api/controllers/LoyaltyController.php
   - modules/api/controllers/NotificationController.php
   - modules/api/controllers/FavoriteController.php
@@ -52,6 +54,7 @@ Authenticated clients manage their cart, loyalty balance, rewards, inbox, favori
 | Entry | Handler (Symbol) | Kind / access | Note |
 |---|---|---|---|
 | GET /api/cart | `CartController::actionIndex` | bearer, cart.index | Returns `ShoppingCart::summary`. |
+| GET /api/customer/summary | `CustomerController::actionSummary` | bearer, customer.access | Order count, completed spend and favorite figures. |
 | POST /api/cart/items | `CartController::actionAdd` | bearer, cart.add | Adds `{product_id, quantity}`. |
 | PATCH /api/cart/items/{id} | `CartController::actionUpdate` | bearer, cart.update | Quantity 0 removes the line. |
 | DELETE /api/cart/items/{id} | `CartController::actionRemove` | bearer, cart.remove | Removes one line. |
@@ -67,7 +70,7 @@ Authenticated clients manage their cart, loyalty balance, rewards, inbox, favori
 | GET /api/favorites | `FavoriteController::actionIndex` | bearer, favorite.index | Paginated favorites with products. |
 | POST /api/favorites | `FavoriteController::actionAdd` | bearer, favorite.add | Adds `{product_id}`. |
 | DELETE /api/favorites/{id} | `FavoriteController::actionRemove` | bearer, favorite.remove | Removes one favorite by product id. |
-| GET /api/reviews?product_id={id} | `ReviewController::actionIndex` | bearer | Product reviews and summary. |
+| GET /api/reviews?product_id={id} | `ReviewController::actionIndex` | bearer | Reviews, summary and eligible orders for the caller. |
 | POST /api/reviews | `ReviewController::actionCreate` | bearer, review.create | Calls `ReviewService::create`. |
 
 ## Chain
@@ -83,11 +86,12 @@ Authenticated clients manage their cart, loyalty balance, rewards, inbox, favori
 1. `ApiController::init` installs the stateless bearer user and `HttpBearerAuth` resolves the token.
 2. `AccessControl` checks the endpoint's RBAC permission against the token identity.
 3. Cart actions call `ShoppingCart::add`, `update`, `remove` or `clear`, then return `summary()`.
-4. Loyalty reads call `LoyaltyService::summary` and scoped ledger queries; redeem calls `LoyaltyService::redeem`.
-5. Notification actions scope rows with `Notification::visibleTo` before count, read or delete.
-6. Favorite actions call `FavoriteService::add`/`remove` with the token user's id.
-7. Review creation loads `{product_id, order_id, rating, review}` and calls `ReviewService::create`.
-8. `ApiController::runAction` converts exceptions into the shared JSON error envelope.
+4. The customer summary scopes `Order` and `FavoriteService` reads to the token owner.
+5. Loyalty reads call `LoyaltyService::summary` and scoped ledger queries; redeem calls `LoyaltyService::redeem`.
+6. Notification actions scope rows with `Notification::visibleTo` before count, read or delete.
+7. Favorite actions call `FavoriteService::add`/`remove` with the token user's id.
+8. Review reads add `ReviewService::eligibleOrders`; creation calls `ReviewService::create`.
+9. `ApiController::runAction` converts exceptions into the shared JSON error envelope.
 
 ## Gotchas
 
@@ -104,5 +108,6 @@ Authenticated clients manage their cart, loyalty balance, rewards, inbox, favori
 
 ## Changelog
 
+- 2026-11-28 (feat, local): mobile had no spend statistic or eligible-order list -> added customer summary and review eligibility to these JSON endpoints. Test: ApiCustomerCest
 - 2026-11-28 (fix, local): shared ApiController had no CORS filter -> browser clients were blocked -> added Origin allowlist inherited by these endpoints. Test: curl OPTIONS /api/cart
 - 2026-11-27 (feat, local): self-service JSON endpoints were missing -> no cart, loyalty, inbox, favorites or reviews API -> added scoped controllers, routes and tests. Test: ApiCustomerCest

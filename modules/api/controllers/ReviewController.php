@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace app\modules\api\controllers;
 
+use app\models\Order;
 use app\models\Product;
 use app\models\ProductReview;
 use app\services\ReviewService;
@@ -49,10 +50,16 @@ final class ReviewController extends ApiController
             ReviewService::forProduct($productId),
         );
 
+        $eligible = ReviewService::eligibleOrders((int) Yii::$app->user->id, $productId);
+
         return $this->ok([
             'product_id' => $productId,
             'reviews' => $reviews,
             'summary' => ReviewService::summaries([$productId])[$productId] ?? ['average' => 0.0, 'count' => 0],
+            'eligible_orders' => array_map(
+                static fn(Order $order): array => $order->toArray(['id', 'order_number']),
+                $eligible,
+            ),
         ]);
     }
 

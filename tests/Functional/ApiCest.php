@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace app\tests\Functional;
 
 use app\models\Category;
+use app\models\Order;
+use app\models\OrderItem;
 use app\models\Product;
 use app\models\User;
 use app\services\OrderService;
@@ -81,6 +83,38 @@ final class ApiCest
         $I->sendAjaxGetRequest('/index.php?r=api/category/index');
         $I->seeResponseCodeIs(200);
         $I->assertArrayHasKey('pagination', $this->json($I)['meta']);
+    }
+
+    public function productHighlightsExposeFlagsAndCompletedOrderSales(FunctionalTester $I): void
+    {
+        $product = Product::findOne($this->productId);
+        $product->is_special = 1;
+        $I->assertTrue($product->save(), json_encode($product->getErrors()));
+
+        $order = new Order([
+            'user_id' => (int) $this->customer->id,
+            'order_number' => 'HL-' . $this->productId,
+            'status' => Order::STATUS_COMPLETED,
+            'total_amount' => '50.00',
+        ]);
+        $I->assertTrue($order->save(), json_encode($order->getErrors()));
+        $item = new OrderItem([
+            'order_id' => $order->id,
+            'product_id' => $this->productId,
+            'product_name' => $product->name,
+            'quantity' => 2,
+            'unit_price' => '25.00',
+            'subtotal' => '50.00',
+        ]);
+        $I->assertTrue($item->save(), json_encode($item->getErrors()));
+
+        $I->sendAjaxGetRequest('/index.php?r=api/product/highlights');
+        $I->seeResponseCodeIs(200);
+        $highlights = $this->json($I)['data'];
+        $I->assertSame($this->productId, $highlights['special_products'][0]['id']);
+        $I->assertSame([], $highlights['featured_products']);
+        $I->assertSame($this->productId, $highlights['best_sellers'][0]['product_id']);
+        $I->assertSame(2, $highlights['best_sellers'][0]['quantity']);
     }
 
     public function orderCreateListCancelUsesSameServiceAsCheckout(FunctionalTester $I): void

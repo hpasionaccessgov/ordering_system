@@ -27,7 +27,7 @@ class ProductSeeder
             ],
             [
                 'Brown Sugar Cold Brew',
-                'Slow-steeped coffee with brown sugar and cream.',
+                'Slow-steeped coffee with brown sugas ar and cream.',
                 'Coffee',
                 160.00,
                 true,

@@ -10,6 +10,7 @@ entry:
   - POST /api/login
   - POST /api/register
   - GET /api/products
+  - GET /api/products/highlights
   - POST /api/orders
 files:
   - modules/api/Module.php
@@ -67,6 +68,7 @@ External clients authenticate with a revocable bearer token and use JSON endpoin
 | POST /api/logout | `AuthController::actionLogout` | bearer | Revokes the presented token. |
 | GET /api/profile | `AuthController::actionProfile` | bearer | Returns non-sensitive profile fields. |
 | GET /api/products | `ProductController::actionIndex` | public JSON | Paginated active products. |
+| GET /api/products/highlights | `ProductController::actionHighlights` | public JSON | Specials, featured products and top five best sellers. |
 | GET /api/products/{id} | `ProductController::actionView` | public JSON | One active product. |
 | GET /api/categories | `CategoryController::actionIndex` | public JSON | Active categories. |
 | POST /api/orders | `OrderController::actionCreate` | bearer, cart.checkout | Calls `OrderService::create` with validated items. |
@@ -89,7 +91,7 @@ External clients authenticate with a revocable bearer token and use JSON endpoin
 3. `RegistrationService::register` creates an active user, credits its audit columns to itself and assigns `customer` in one transaction; `actionRegister` issues the same token payload as login.
 4. `HttpBearerAuth` calls `User::findIdentityByAccessToken`, which resolves the token hash through `ApiToken::findActive`.
 5. `AccessControl` checks the endpoint's RBAC permission against the token identity.
-6. `ProductController` and `CategoryController` read active catalog rows from `Product` and `Category`.
+6. `ProductController` and `CategoryController` read active catalog rows from `Product` and `Category`; highlights reuse `ProductReportService::bestSellers`.
 7. `OrderCreateForm::validateItems` rejects malformed items before any write.
 8. `OrderController::actionCreate` delegates to `OrderService::create`, which snapshots prices and computes the total.
 9. `OrderController::actionIndex` and `actionView` scope queries with `OrderAccessPolicy::scopeToOwner`.
@@ -114,6 +116,8 @@ External clients authenticate with a revocable bearer token and use JSON endpoin
 
 ## Changelog
 
+- 2026-11-28 (feat, local): mobile menu had no web-style highlights -> no public endpoint exposed the flags or best sellers -> added GET /api/products/highlights. Test: ApiCest::productHighlightsExposeFlagsAndCompletedOrderSales
+- 2026-11-28 (docs, local): API contract had no customer summary or review eligibility -> documented both endpoints in docs/API.md. Test: ApiCustomerCest
 - 2026-11-28 (fix, local): ionic serve login failed with a CORS error -> no Origin filter on API behaviors -> added restricted Cors filter and API_CORS_ORIGINS. Test: curl OPTIONS /api/login
 - 2026-11-28 (feat, local): mobile had no signup API -> signup rules lived in SiteController -> added /api/register via RegistrationService. Test: ApiCest::registerCreatesCustomerAndReturnsToken
 - 2026-11-27 (feat, local): customer JSON endpoints were missing -> no self-service API -> added child routes, docs and Postman folders. Test: ApiCustomerCest

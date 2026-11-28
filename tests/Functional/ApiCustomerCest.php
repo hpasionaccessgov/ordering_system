@@ -12,6 +12,7 @@ use app\models\OrderItem;
 use app\models\Product;
 use app\models\Reward;
 use app\models\User;
+use app\services\FavoriteService;
 use app\services\NotificationService;
 use app\tests\Support\FunctionalTester;
 use Yii;
@@ -79,6 +80,29 @@ final class ApiCustomerCest
         ]);
         $I->seeResponseCodeIs(422);
         $I->assertSame('validation_failed', $this->json($I)['error']['code']);
+    }
+
+    public function customerSummaryScopesSpendAndFavoritesToOwner(FunctionalTester $I): void
+    {
+        $this->completedOrder($I, $this->customer);
+        $I->assertTrue(FavoriteService::add((int) $this->customer->id, (int) $this->product->id));
+
+        $I->haveHttpHeader('Authorization', 'Bearer ' . $this->login($I, $this->customer->username));
+        $I->sendAjaxGetRequest('/index.php?r=api/customer/summary');
+        $I->seeResponseCodeIs(200);
+        $summary = $this->json($I)['data'];
+        $I->assertSame(1, $summary['order_count']);
+        $I->assertSame('40.00', $summary['total_spent']);
+        $I->assertSame(1, $summary['favorite_count']);
+        $I->assertSame((int) $this->product->id, $summary['favorite_product']['id']);
+
+        $I->haveHttpHeader('Authorization', 'Bearer ' . $this->login($I, $this->other->username));
+        $I->sendAjaxGetRequest('/index.php?r=api/customer/summary');
+        $I->seeResponseCodeIs(200);
+        $other = $this->json($I)['data'];
+        $I->assertSame(0, $other['order_count']);
+        $I->assertSame('0', $other['total_spent']);
+        $I->assertSame(0, $other['favorite_count']);
     }
 
     public function loyaltyAndRewardsUseExistingService(FunctionalTester $I): void
@@ -186,6 +210,9 @@ final class ApiCustomerCest
         ];
 
         $I->haveHttpHeader('Authorization', 'Bearer ' . $this->login($I, $this->customer->username));
+        $I->sendAjaxGetRequest('/index.php?r=api/review/index&product_id=' . $this->product->id);
+        $I->assertSame($order->id, $this->json($I)['data']['eligible_orders'][0]['id']);
+
         $I->sendAjaxPostRequest('/index.php?r=api/review/create', $payload);
         $I->seeResponseCodeIs(201);
         $I->assertSame(5, $this->json($I)['data']['rating']);
@@ -195,6 +222,7 @@ final class ApiCustomerCest
         $reviews = $this->json($I)['data'];
         $I->assertSame($payload['review'], $reviews['reviews'][0]['review']);
         $I->assertSame(1, $reviews['summary']['count']);
+        $I->assertCount(0, $reviews['eligible_orders']);
 
         $I->sendAjaxPostRequest('/index.php?r=api/review/create', $payload);
         $I->seeResponseCodeIs(400);

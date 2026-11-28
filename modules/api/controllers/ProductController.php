@@ -6,6 +6,7 @@ namespace app\modules\api\controllers;
 
 use app\models\ApplicationSettings;
 use app\models\Product;
+use app\services\ProductReportService;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 
@@ -19,7 +20,7 @@ final class ProductController extends ApiController
         $behaviors['access'] = [
             'class' => AccessControl::class,
             'rules' => [
-                ['actions' => ['index', 'view'], 'allow' => true, 'roles' => ['?', '@']],
+                ['actions' => ['index', 'view', 'highlights'], 'allow' => true, 'roles' => ['?', '@']],
             ],
         ];
 
@@ -31,6 +32,7 @@ final class ProductController extends ApiController
         return [
             'index' => ['GET'],
             'view' => ['GET'],
+            'highlights' => ['GET'],
         ];
     }
 
@@ -51,6 +53,15 @@ final class ProductController extends ApiController
         return $this->ok($products, ['pagination' => $this->paginationMeta($provider->getPagination())]);
     }
 
+    public function actionHighlights(): array
+    {
+        return $this->ok([
+            'special_products' => $this->highlightProducts('is_special'),
+            'featured_products' => $this->highlightProducts('is_featured'),
+            'best_sellers' => (new ProductReportService())->bestSellers(5),
+        ]);
+    }
+
     public function actionView(int $id): array
     {
         $product = Product::findOne(['id' => $id, 'status' => Product::STATUS_ACTIVE]);
@@ -59,6 +70,17 @@ final class ProductController extends ApiController
         }
 
         return $this->ok($this->serializeProduct($product));
+    }
+
+    private function highlightProducts(string $flag): array
+    {
+        $products = Product::find()
+            ->where(['status' => Product::STATUS_ACTIVE, $flag => 1])
+            ->orderBy(['name' => SORT_ASC])
+            ->limit(8)
+            ->all();
+
+        return array_map(fn(Product $product): array => $this->serializeProduct($product), $products);
     }
 
     /**
